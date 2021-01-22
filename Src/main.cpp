@@ -1,10 +1,12 @@
 #include <iostream>
 
+#include "engine.hpp"
+
 int main()
 {
     try
     {
-        std::cout << "hello solid" << std::endl;
+        Solid::Engine engine;
     }
     catch (const std::runtime_error& e)
     {
