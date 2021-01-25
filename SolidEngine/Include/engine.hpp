@@ -1,7 +1,12 @@
 #pragma once
 
+#ifndef SOLID_API
+    #define SOLID_API __declspec(dllexport)
+#endif
+
 namespace Solid
 {
+
     class Engine
     {
     public:
@@ -9,6 +14,6 @@ namespace Solid
         virtual ~Engine() = default;
     };
 
-    void test();
+    void SOLID_API test();
 
 } //!namespace

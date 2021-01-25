@@ -1,11 +1,20 @@
 #include <iostream>
 
-#include "engine.hpp"
+#include "editor.hpp"
 
 int main()
 {
+
     Solid::test();
 
-    std::system("pause");
+    try
+    {
+        Solid::Editor editor;
+    }
+    catch(const std::runtime_error& e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
+
     return EXIT_SUCCESS;
 }

@@ -33,7 +33,7 @@ link_directories(SolidEngine/ThirdParty/Lib)
 
 set(ENGINE_LIBS PUBLIC glfw3 OpenGL::GL)
 
-add_library(SolidEngine STATIC ${ENGINE_SOURCE_FILES} ${THIRD_PARTY_FILES})
+add_library(SolidEngine SHARED ${ENGINE_SOURCE_FILES} ${THIRD_PARTY_FILES})
 
 target_link_libraries(SolidEngine ${ENGINE_LIBS})
 
