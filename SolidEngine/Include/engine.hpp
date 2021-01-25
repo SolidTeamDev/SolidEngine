@@ -2,12 +2,13 @@
 
 namespace Solid
 {
-
     class Engine
     {
     public:
         Engine() = default;
-        ~Engine() = default;
+        virtual ~Engine() = default;
     };
+
+    void test();
 
 } //!namespace
