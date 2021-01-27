@@ -4,9 +4,6 @@
 
 int main()
 {
-
-    Solid::test();
-
     try
     {
         Solid::Editor editor;

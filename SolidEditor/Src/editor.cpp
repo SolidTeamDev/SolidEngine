@@ -1,2 +1,33 @@
 #include "editor.hpp"
 
+#include "Rendering/OpenGL45/openGl45Renderer.hpp"
+
+namespace Solid
+{
+    Editor::Editor()
+    {
+        RendererParams rendererParams
+        {
+            {
+                "Solid Engine",
+                {1280,720}
+            }
+        };
+        renderer = new OpenGL45Renderer();
+        renderer->Initialize(rendererParams);
+
+        Loop();
+    }
+
+    void Editor::Loop()
+    {
+        GLFWwindow* window = renderer->GetWindow()->GetHandle();
+
+        while (glfwWindowShouldClose(window) == false)
+        {
+            glfwPollEvents();
+            glfwSwapBuffers(window);
+        }
+
+    }
+} //!namespace

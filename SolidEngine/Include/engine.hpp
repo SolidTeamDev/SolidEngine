@@ -1,19 +1,14 @@
 #pragma once
 
-#ifndef SOLID_API
-    #define SOLID_API __declspec(dllexport)
-#endif
+#include "Build/SolidAPI.hpp"
 
 namespace Solid
 {
 
-    class Engine
+    class SOLID_API Engine
     {
     public:
         Engine() = default;
         virtual ~Engine() = default;
     };
-
-    void SOLID_API test();
-
 } //!namespace

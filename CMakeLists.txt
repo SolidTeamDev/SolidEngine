@@ -31,7 +31,7 @@ find_package(OpenGL REQUIRED)
 #Extern Lib
 link_directories(SolidEngine/ThirdParty/Lib)
 
-set(ENGINE_LIBS PUBLIC glfw3 OpenGL::GL)
+set(ENGINE_LIBS PUBLIC glfw3dll OpenGL::GL)
 
 add_library(SolidEngine SHARED ${ENGINE_SOURCE_FILES} ${THIRD_PARTY_FILES})
 
@@ -61,10 +61,14 @@ find_package(OpenGL REQUIRED)
 #Extern Lib
 link_directories(SolidEngine/ThirdParty/Lib Build/${CMAKE_BUILD_TYPE})
 
-set(EDITOR_LIBS PUBLIC glfw3 OpenGL::GL SolidEngine)
+set(EDITOR_LIBS PUBLIC glfw3dll OpenGL::GL SolidEngine)
 
 add_executable(SolidEditor ${EDITOR_SOURCE_FILES})
 target_link_libraries(SolidEditor ${EDITOR_LIBS})
 
+ADD_CUSTOM_COMMAND (TARGET SolidEditor POST_BUILD
+# DEBUG
+COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Lib/glfw3.dll ${CMAKE_BINARY_DIR}/
 
-
+# Output Message
+COMMENT "Copying binaries" VERBATIM)
