@@ -16,7 +16,6 @@ namespace Solid
         renderer = new OpenGL45Renderer();
         renderer->Initialize(rendererParams);
 
-        Loop();
     }
 
     void Editor::Loop()
