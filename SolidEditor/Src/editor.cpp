@@ -22,6 +22,8 @@ namespace Solid
     {
         GLFWwindow* window = renderer->GetWindow()->GetHandle();
 
+        sAssert(false);
+
         while (glfwWindowShouldClose(window) == false)
         {
             glfwPollEvents();

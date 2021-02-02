@@ -2,6 +2,8 @@
 
 #include "Build/SolidAPI.hpp"
 
+#include "Core/debug.hpp"
+
 namespace Solid
 {
     /**

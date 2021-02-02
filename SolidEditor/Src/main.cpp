@@ -9,9 +9,11 @@ int main()
         Solid::Editor editor;
         editor.Loop();
     }
-    catch(const std::runtime_error& e)
+    catch(const Solid::ThrowError& e)
     {
-        std::cerr << e.what() << std::endl;
+        std::cerr << "Solid Engine exit with error code (" << e.ErrorCode() << ") : \n" << e.What() << std::endl;
+
+        return EXIT_FAILURE;
     }
 
     return EXIT_SUCCESS;
