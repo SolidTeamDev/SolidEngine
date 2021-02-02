@@ -32,6 +32,13 @@ namespace Solid
         }
     }
 
+    void OpenGL45Renderer::Clear(const Float4& _clearColor) const
+    {
+        glViewport(0,0,window->GetWindowSize().x,window->GetWindowSize().y);
+        glClearColor(_clearColor.x,_clearColor.y,_clearColor.z,_clearColor.w);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+
     void OpenGL45Renderer::Release()
     {
         delete window;

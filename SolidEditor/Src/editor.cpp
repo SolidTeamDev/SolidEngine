@@ -15,7 +15,6 @@ namespace Solid
         };
         renderer = new OpenGL45Renderer();
         renderer->Initialize(rendererParams);
-
     }
 
     void Editor::Loop()
@@ -25,6 +24,7 @@ namespace Solid
         while (glfwWindowShouldClose(window) == false)
         {
             glfwPollEvents();
+            renderer->Clear({0.13,0.13,0.13,1});
             glfwSwapBuffers(window);
         }
 
