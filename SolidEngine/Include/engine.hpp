@@ -4,6 +4,10 @@
     #define SOLID_API __declspec(dllexport)
 #endif
 
+
+#include "Ressources.hpp"
+
+
 namespace Solid
 {
 
