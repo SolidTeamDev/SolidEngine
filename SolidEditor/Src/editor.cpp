@@ -1,4 +1,5 @@
 #include "editor.hpp"
+#include "UI/solidUI.hpp"
 
 namespace Solid
 {
@@ -17,7 +18,14 @@ namespace Solid
 
             renderer->Clear();
 
+            UI::BeginFrame();
+
+            UI::ShowDemo();
+
+            UI::RenderFrame();
+
             glfwSwapBuffers(window);
+
         }
 
     }

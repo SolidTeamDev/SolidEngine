@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include "Rendering/OpenGL45/openGl45Renderer.hpp"
-
+#include "UI/solidUI.hpp"
 namespace Solid
 {
     Engine::Engine()
@@ -16,10 +16,13 @@ namespace Solid
         };
         renderer = new OpenGL45Renderer();
         renderer->Initialize(rendererParams);
+        UI::InitializeSolidUI(renderer->GetWindow()->GetHandle());
+
     }
 
     Engine::~Engine()
     {
+        UI::ReleaseSolidUI();
         delete renderer;
     }
 } //!namespace

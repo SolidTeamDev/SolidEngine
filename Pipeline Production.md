@@ -49,6 +49,7 @@ Third Party Libraries :
 |Name               |Convention |
 |:------------------|:----------|
 |file extension     |.cpp/.hpp  |
+|file name          |myFile     |
 |local variable     |myVar      |
 |global variable    |myVar      |
 |parameter variable |_myVar     |

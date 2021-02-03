@@ -4,7 +4,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "Build/SolidAPI.hpp"
+#include "Build/solidAPI.hpp"
 
 #include "Types/extendedTypes.hpp"
 
