@@ -20,6 +20,6 @@ namespace Solid
 
     Engine::~Engine()
     {
-
+        delete renderer;
     }
 } //!namespace
