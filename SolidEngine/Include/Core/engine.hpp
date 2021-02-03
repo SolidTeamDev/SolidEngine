@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Build/solidAPI.hpp"
+#include "Rendering/renderer.hpp"
 
 namespace Solid
 {
@@ -9,9 +10,17 @@ namespace Solid
      */
     class SOLID_API Engine
     {
+    protected:
+
+        Renderer* renderer;
+
     public:
-        Engine() = default;
-        virtual ~Engine() = default;
+
+        Engine();
+        Engine(const Engine& _copy) = delete;
+        Engine(Engine&& _move) = delete;
+
+        virtual ~Engine();
 
         virtual void Loop() = 0;
     };
