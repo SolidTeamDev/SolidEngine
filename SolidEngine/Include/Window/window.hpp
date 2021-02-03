@@ -4,7 +4,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "Build/SolidAPI.hpp"
+#include "Build/solidAPI.hpp"
 
 #include "Types/extendedTypes.hpp"
 
@@ -42,6 +42,9 @@ namespace Solid
 
         [[nodiscard]]
         GLFWwindow* GetHandle() const;
+
+        [[nodiscard]]
+        Int2 GetWindowSize() const;
     };
 
 } //!namespace
