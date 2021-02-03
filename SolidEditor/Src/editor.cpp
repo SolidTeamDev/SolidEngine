@@ -1,4 +1,5 @@
 #include "editor.hpp"
+#include "UI/solidUI.hpp"
 
 namespace Solid
 {
@@ -14,7 +15,13 @@ namespace Solid
         while (glfwWindowShouldClose(window) == false)
         {
             glfwPollEvents();
+            UI::BeginFrame();
+
+            UI::ShowDemo();
+
+            UI::RenderFrame();
             glfwSwapBuffers(window);
+
         }
 
     }
