@@ -14,6 +14,9 @@ namespace Solid
         while (glfwWindowShouldClose(window) == false)
         {
             glfwPollEvents();
+
+            renderer->Clear();
+
             glfwSwapBuffers(window);
         }
 
