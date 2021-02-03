@@ -10,6 +10,10 @@ namespace Solid
      */
     class SOLID_API Engine
     {
+    private:
+
+        void InitializeRenderer();
+
     protected:
 
         Renderer* renderer;
