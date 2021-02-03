@@ -4,11 +4,9 @@
 #include <GLFW/glfw3.h>
 #include <imgui.h>
 
-namespace Solid
+namespace Solid::UIContext
 {
 
-    namespace UI
-    {
         /**
          * @brief Initializes SolidUI
          * @param window required to bind the context to the window
@@ -28,11 +26,4 @@ namespace Solid
          * @brief Ends and render a UI frame
          */
         void SOLID_API RenderFrame();
-
-        /**
-         * @brief Shows an UI demo window
-         */
-        void SOLID_API ShowDemo();
-
-    };
 } //!namespace

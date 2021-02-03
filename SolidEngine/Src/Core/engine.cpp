@@ -16,13 +16,13 @@ namespace Solid
         };
         renderer = new OpenGL45Renderer();
         renderer->Initialize(rendererParams);
-        UI::InitializeSolidUI(renderer->GetWindow()->GetHandle());
+        UIContext::InitializeSolidUI(renderer->GetWindow()->GetHandle());
 
     }
 
     Engine::~Engine()
     {
-        UI::ReleaseSolidUI();
+        UIContext::ReleaseSolidUI();
         delete renderer;
     }
 } //!namespace

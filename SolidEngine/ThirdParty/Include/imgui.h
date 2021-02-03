@@ -3002,5 +3002,8 @@ struct ImGuiViewport
 #ifdef IMGUI_INCLUDE_IMGUI_USER_H
 #include "imgui_user.h"
 #endif
-
+namespace Solid
+{
+    namespace UI = ImGui;
+}
 #endif // #ifndef IMGUI_DISABLE

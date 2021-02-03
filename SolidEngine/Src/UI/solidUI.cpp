@@ -2,7 +2,7 @@
 
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
-namespace Solid::UI
+namespace Solid::UIContext
 {
     void InitializeSolidUI(GLFWwindow* window)
     {
@@ -36,10 +36,5 @@ namespace Solid::UI
     {
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    }
-
-    void SOLID_API ShowDemo()
-    {
-        ImGui::ShowDemoWindow();
     }
 }
