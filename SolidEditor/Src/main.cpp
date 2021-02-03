@@ -11,7 +11,7 @@ int main()
     }
     catch(const Solid::ThrowError& e)
     {
-        std::cerr << "Solid Engine exit with error code (" << e.ErrorCode() << ") : \n" << e.What() << std::endl;
+        std::cerr << "Solid Engine exit with error code (" << (int)e.ErrorCode() << ") : \n" << e.What() << std::endl;
 
         return EXIT_FAILURE;
     }

@@ -3,7 +3,7 @@
 #include "Build/solidAPI.hpp"
 #include "Rendering/renderer.hpp"
 
-#include "Core/debug.hpp"
+#include "Core/Debug/debug.hpp"
 
 namespace Solid
 {
