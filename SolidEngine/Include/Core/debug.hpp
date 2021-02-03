@@ -45,7 +45,7 @@ namespace Solid
      */
     class Log
     {
-    
+
     public:
 
     };
