@@ -107,9 +107,16 @@ namespace Solid
 
     class SOLID_API MeshResource : public Resource
     {
+
+
+
     public:
-        std::vector<Vertex> vertices;
-        std::vector<unsigned int> indices;
+        class SubMesh{
+        public:
+            std::vector<Vertex> vertices;
+            std::vector<unsigned int> indices;
+        };
+        std::vector<SubMesh> Meshes;
         MeshResource()
         {
             _type = ResourceType::Mesh;
@@ -214,6 +221,7 @@ namespace Solid
     {
         ResourceManager* Manager;
         void LoadImage(const fs::path& Rpath);
+        ///void LoadMeshOBJ(const fs::path& Rpath);
         void LoadMesh(const fs::path& Rpath);
         void LoadAnim(const fs::path& Rpath);
         void LoadShader(const fs::path& Rpath);

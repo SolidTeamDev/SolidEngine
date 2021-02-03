@@ -5,6 +5,10 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include "OBJ_Loader.h"
+#include "assimp/scene.h"
+#include "assimp/mesh.h"
+#include "assimp/Importer.hpp"
+#include "assimp\postprocess.h"
 #include <sstream>
 using namespace Solid;
 
@@ -77,7 +81,7 @@ void ResourcesLoader::LoadRessource(const fs::path &Rpath)
     if(extension == ".obj")
         LoadMesh(Rpath);
     if(extension == ".fbx")
-        ;
+        LoadMesh(Rpath);
 
 }
 
@@ -117,18 +121,74 @@ void ResourcesLoader::LoadImage(const fs::path &Rpath)
 }
 
 
-void ResourcesLoader::LoadMesh(const fs::path &Rpath)
+/*void ResourcesLoader::LoadMeshOBJ(const fs::path &Rpath)
 {
     MeshResource* Mesh = new MeshResource();
     Mesh->_name = Rpath.filename().string();
     objl::Loader MeshLoader;
     MeshLoader.LoadFile(Rpath.string());
 
-    Mesh->indices.resize(MeshLoader.LoadedIndices.size());
-    std::memcpy(Mesh->indices.data(), MeshLoader.LoadedIndices.data(), sizeof(unsigned int) * MeshLoader.LoadedIndices.size());
-    Mesh->vertices.resize(MeshLoader.LoadedVertices.size());
-    std::memcpy(Mesh->vertices.data(), MeshLoader.LoadedVertices.data(),sizeof(float) * 8 *  MeshLoader.LoadedVertices.size());
+   // Mesh->indices.resize(MeshLoader.LoadedIndices.size());
+    //std::memcpy(Mesh->indices.data(), MeshLoader.LoadedIndices.data(), sizeof(unsigned int) * MeshLoader.LoadedIndices.size());
+    //Mesh->vertices.resize(MeshLoader.LoadedVertices.size());
+    //std::memcpy(Mesh->vertices.data(), MeshLoader.LoadedVertices.data(),sizeof(float) * 8 *  MeshLoader.LoadedVertices.size());
 
+#if 0
+    std::vector<char> Data;
+    Mesh->ToDataBuffer(Data);
+
+
+
+
+    fs::path cachePath = Rpath.parent_path();
+    cachePath.append(Rpath.filename().string() + ".SMesh");
+    std::ofstream cacheFile(cachePath, std::fstream::binary | std::fstream::trunc);
+
+
+    if(cacheFile.is_open())
+    {
+        std::cout << "" << "\n";
+        cacheFile.write(Data.data(), Data.size());
+    }
+#endif
+    Manager->AddResource(Mesh);
+}*/
+
+
+
+void ResourcesLoader::LoadMesh(const fs::path &Rpath)
+{
+    MeshResource* Mesh = new MeshResource;
+    Assimp::Importer importer;
+    std::string str = Rpath.string();
+
+    const aiScene* scene = importer.ReadFile(str,  aiProcess_JoinIdenticalVertices | aiProcess_OptimizeMeshes| aiProcess_SplitLargeMeshes| aiProcess_Triangulate  | aiProcess_SortByPType | aiProcess_PreTransformVertices );
+    if(!scene) {
+        printf("Unable to load mesh: %s\n", importer.GetErrorString());
+    }
+
+    for(int i = 0; i < scene->mNumMeshes; ++i) {
+        int numIndices = 3 * scene->mMeshes[i]->mNumFaces;
+        MeshResource::SubMesh& Sub = Mesh->Meshes.emplace_back();
+        Sub.indices.resize(numIndices);
+        Sub.vertices.resize(scene->mMeshes[i]->mNumVertices);
+
+        std::uint32_t WritePos = 0;
+        for (int j = 0; j < scene->mMeshes[i]->mNumFaces; ++j) {
+            std::uint32_t size = scene->mMeshes[i]->mFaces[j].mNumIndices * sizeof(unsigned int);
+            std::memcpy(&(Sub.indices[WritePos]), scene->mMeshes[i]->mFaces[j].mIndices, size);
+            WritePos+= scene->mMeshes[i]->mFaces[j].mNumIndices;
+        }
+
+        for (int j = 0; j < scene->mMeshes[i]->mNumVertices; ++j) {
+            if(scene->mMeshes[i]->HasPositions())
+                std::memcpy(&(Sub.vertices[j].Pos), &(scene->mMeshes[i]->mVertices[j]), 3 * sizeof(float));
+            if(scene->mMeshes[i]->HasNormals())
+                std::memcpy(&(Sub.vertices[j].Normal), &(scene->mMeshes[i]->mNormals[j]), 3 * sizeof(float));
+            if(scene->mMeshes[i]->HasTextureCoords(j))
+                std::memcpy(&(Sub.vertices[j].TexCoords), &(scene->mMeshes[i]->mTextureCoords[j]), 2 * sizeof(float));
+        }
+    }
 #if 1
     std::vector<char> Data;
     Mesh->ToDataBuffer(Data);
@@ -148,8 +208,8 @@ void ResourcesLoader::LoadMesh(const fs::path &Rpath)
     }
 #endif
     Manager->AddResource(Mesh);
-}
 
+}
 
 ///
 /// RessourceLoader Memory Func
@@ -309,14 +369,20 @@ void MeshResource::ToDataBuffer(std::vector<char> &buffer)
     ResourcesLoader::Append(buffer, &(size), sizeof(size));
     ResourcesLoader::Append(buffer, (void *) (this->_name.c_str()), size * sizeof(std::string::value_type));
 
-
-    size = this->indices.size();
+    size = this->Meshes.size();
     ResourcesLoader::Append(buffer, &(size), sizeof(size));
-    ResourcesLoader::Append(buffer, (this->indices.data()), size * sizeof(unsigned int));
 
-    size = this->vertices.size();
-    ResourcesLoader::Append(buffer, &(size), sizeof(size));
-    ResourcesLoader::Append(buffer, (this->vertices.data()), size * sizeof(Vertex));
+    for(MeshResource::SubMesh& Sub : this->Meshes)
+    {
+        size = Sub.indices.size();
+        ResourcesLoader::Append(buffer, &(size), sizeof(size));
+        ResourcesLoader::Append(buffer, (Sub.indices.data()), size * sizeof(unsigned int));
+
+        size = Sub.vertices.size();
+        ResourcesLoader::Append(buffer, &(size), sizeof(size));
+        ResourcesLoader::Append(buffer, (Sub.vertices.data()), size * sizeof(Vertex));
+    }
+
 }
 
 void MeshResource::FromDataBuffer(char *buffer, int bSize)
@@ -339,16 +405,24 @@ void MeshResource::FromDataBuffer(char *buffer, int bSize)
     this->_name.resize(size);
     ResourcesLoader::ReadFromBuffer(buffer, (void *) (this->_name.data()), size * sizeof(std::string::value_type), ReadPos);
 
-
+    //get SubMeshes Number
     size = 0;
     ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
-    this->indices.resize(size);
-    ResourcesLoader::ReadFromBuffer(buffer, (this->indices.data()), size * sizeof(unsigned int), ReadPos);
+    this->Meshes.resize(size);
+    for(MeshResource::SubMesh& Sub : this->Meshes)
+    {
+        size = 0;
+        ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
+        Sub.indices.resize(size);
+        ResourcesLoader::ReadFromBuffer(buffer, (Sub.indices.data()), size * sizeof(unsigned int), ReadPos);
 
-    size = 0;
-    ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
-    this->vertices.resize(size);
-    ResourcesLoader::ReadFromBuffer(buffer, (this->vertices.data()), size * sizeof(Vertex), ReadPos);
+        size = 0;
+        ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
+        Sub.vertices.resize(size);
+        ResourcesLoader::ReadFromBuffer(buffer, (Sub.vertices.data()), size * sizeof(Vertex), ReadPos);
+    }
+
+
 
 }
 
