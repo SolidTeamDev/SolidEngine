@@ -42,6 +42,9 @@ namespace Solid
 
         [[nodiscard]]
         GLFWwindow* GetHandle() const;
+
+        [[nodiscard]]
+        Int2 GetWindowSize() const;
     };
 
 } //!namespace

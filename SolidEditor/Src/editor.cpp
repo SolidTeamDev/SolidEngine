@@ -15,11 +15,15 @@ namespace Solid
         while (glfwWindowShouldClose(window) == false)
         {
             glfwPollEvents();
+
+            renderer->Clear();
+
             UI::BeginFrame();
 
             UI::ShowDemo();
 
             UI::RenderFrame();
+
             glfwSwapBuffers(window);
 
         }

@@ -42,6 +42,11 @@ namespace Solid
         return window;
     }
 
+    Int2 Window::GetWindowSize() const
+    {
+        return windowSize;
+    }
+
     void Window::Release()
     {
         if(window != nullptr)

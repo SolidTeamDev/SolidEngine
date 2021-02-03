@@ -23,5 +23,6 @@ namespace Solid
     Engine::~Engine()
     {
         UI::ReleaseSolidUI();
+        delete renderer;
     }
 } //!namespace

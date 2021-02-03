@@ -20,6 +20,8 @@ namespace Solid
 
         static void GLDebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
                                     const GLchar* message, const void* userParam);
+
+        void Clear(const Float4& _clearColor = {0,0,0, 1}) const final;
     };
 
 } //!namespace
