@@ -24,8 +24,9 @@ namespace Solid
 
             UI::RenderFrame();
 
-            glfwSwapBuffers(window);
+            renderer->GetWindow()->update();
 
+            glfwSwapBuffers(window);
         }
 
     }

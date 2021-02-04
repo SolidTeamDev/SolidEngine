@@ -40,6 +40,8 @@ namespace Solid
 
         void CreateWindow(const WindowParams& _wParam);
 
+        void update();
+
         [[nodiscard]]
         GLFWwindow* GetHandle() const;
 
