@@ -7,6 +7,18 @@ namespace Solid
 {
     Engine::Engine()
     {
+        InitializeRenderer();
+        UIContext::InitializeSolidUI(renderer->GetWindow()->GetHandle());
+    }
+
+    Engine::~Engine()
+    {
+        UIContext::ReleaseSolidUI();
+        delete renderer;
+    }
+
+    void Engine::InitializeRenderer()
+    {
         RendererParams rendererParams
         {
             {
@@ -16,13 +28,6 @@ namespace Solid
         };
         renderer = new OpenGL45Renderer();
         renderer->Initialize(rendererParams);
-        UIContext::InitializeSolidUI(renderer->GetWindow()->GetHandle());
-
     }
 
-    Engine::~Engine()
-    {
-        UIContext::ReleaseSolidUI();
-        delete renderer;
-    }
 } //!namespace

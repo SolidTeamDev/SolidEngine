@@ -22,8 +22,9 @@ namespace Solid
 
             editorInterface.Update();
 
-            glfwSwapBuffers(window);
+            renderer->GetWindow()->update();
 
+            glfwSwapBuffers(window);
         }
 
     }

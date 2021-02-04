@@ -37,6 +37,11 @@ namespace Solid
         glfwSwapInterval(1); // v-sync
     }
 
+    void Window::update()
+    {
+        glfwGetWindowSize(window,&windowSize.x, &windowSize.y);
+    }
+
     GLFWwindow* Window::GetHandle() const
     {
         return window;
