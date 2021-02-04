@@ -1,5 +1,6 @@
 #include "editor.hpp"
 #include "UI/solidUI.hpp"
+#include "UI/editorInterface.hpp"
 
 namespace Solid
 {
@@ -11,6 +12,7 @@ namespace Solid
     void Editor::Loop()
     {
         GLFWwindow* window = renderer->GetWindow()->GetHandle();
+        EditorInterface editorInterface(renderer->GetWindow());
 
         while (glfwWindowShouldClose(window) == false)
         {
@@ -18,11 +20,7 @@ namespace Solid
 
             renderer->Clear();
 
-            UI::BeginFrame();
-
-            UI::ShowDemo();
-
-            UI::RenderFrame();
+            editorInterface.Update();
 
             renderer->GetWindow()->update();
 

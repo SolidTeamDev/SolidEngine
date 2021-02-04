@@ -36,6 +36,7 @@ set(ENGINE_LIBS PUBLIC glfw3dll OpenGL::GL)
 add_library(SolidEngine SHARED ${ENGINE_SOURCE_FILES} ${THIRD_PARTY_FILES})
 
 target_link_libraries(SolidEngine ${ENGINE_LIBS})
+target_compile_definitions(SolidEngine PRIVATE "IMGUI_API=__declspec(dllexport)")
 
 # ========= EDITOR ==========
 
@@ -65,6 +66,8 @@ set(EDITOR_LIBS PUBLIC glfw3dll OpenGL::GL SolidEngine)
 
 add_executable(SolidEditor ${EDITOR_SOURCE_FILES})
 target_link_libraries(SolidEditor ${EDITOR_LIBS})
+target_compile_definitions(SolidEditor PRIVATE "IMGUI_API=__declspec(dllimport)")
+
 
 ADD_CUSTOM_COMMAND (TARGET SolidEditor POST_BUILD
 # DEBUG
