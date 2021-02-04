@@ -16,6 +16,8 @@ void EditorInterface::Update()
 
     DrawMainFrame();
     DrawMenuBar();
+    sceneInterface.Draw();
+    UI::End();
 
     UIContext::RenderFrame();
 }
@@ -27,12 +29,13 @@ void EditorInterface::DrawMenuBar()
 
     if(UI::BeginMainMenuBar())
     {
-        if (UI::BeginMenu("File"))
+        if (UI::BeginMenu("Project"))
         {
-            UI::MenuItem("TestA1");
-            if (UI::BeginMenu("TestA2.."))
+            UI::MenuItem("Save");
+            if (UI::BeginMenu("Build"))
             {
-                UI::MenuItem("TestA2-1");
+                UI::MenuItem("Windows");
+                UI::MenuItem("Linux");
                 UI::EndMenu();
             }
             UI::EndMenu();
@@ -51,7 +54,7 @@ void EditorInterface::DrawMainFrame()
     UI::SetNextWindowPos(ImVec2(0.f, 20.f));
     UI::SetNextWindowBgAlpha(0.9f);
     UI::Begin("mainFrame", &p_open, ImGuiWindowFlags_NoMove |
-        ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
+        ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar |
+        ImGuiWindowFlags_NoBringToFrontOnFocus);
 
-    UI::End();
 }
