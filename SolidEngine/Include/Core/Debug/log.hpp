@@ -4,6 +4,7 @@
 
 #include <string>
 #include <array>
+#include <fstream>
 
 constexpr int maxLogMessage = 100;
 
@@ -27,19 +28,19 @@ namespace Solid
 
     private:
 
-
-
-        static int logIndex;
-    public:
         struct LogMessage
         {
             ELogSeverity logSeverity;
-            std::string  errorMessage;
+            std::string  logMessage;
         };
         static std::array<LogMessage,maxLogMessage> logMessageList;
+        static int logIndex;
+        static std::ofstream logFile;
+    public:
 
         Log();
+        ~Log();
 
-        static void Send(const std::string& _errorMessage, const ELogSeverity& _severity = ELogSeverity::INFO);
+        static void Send(const std::string& _logMessage, const ELogSeverity& _severity = ELogSeverity::INFO);
     };
 } //!namespace

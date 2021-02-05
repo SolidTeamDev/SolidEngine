@@ -14,6 +14,8 @@ namespace Solid
     {
     private:
 
+        Log log;
+
         void InitializeRenderer();
 
     protected:
