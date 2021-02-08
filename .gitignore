@@ -1,4 +1,8 @@
 .vs/*
 Build/*
+.idea/*
+
+*/cmake-build-debug/*
+*/cmake-build-release/*
 
 !*/.gitkeep
