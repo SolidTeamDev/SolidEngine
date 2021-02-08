@@ -86,6 +86,7 @@ Third Party Libraries :
 
 ## Links
 
+- [SolidEngine](https://github.com/guillaumelbf/SolidEngine/)
 - [Trello](https://trello.com/b/bayuJUGa/solid-engine)
 - [Solid Maths](https://github.com/guillaumelbf/SolidMaths/tree/master)
 
