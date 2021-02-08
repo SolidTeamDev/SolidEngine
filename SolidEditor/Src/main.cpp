@@ -9,7 +9,6 @@ int main()
     try
     {
         Solid::Editor editor;
-        Solid::Log::Send("Test",Solid::Log::ELogSeverity::DEBUG);
         editor.Loop();
     }
     catch(const Solid::ThrowError& e)
