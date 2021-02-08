@@ -1,7 +1,6 @@
 .vs/*
-Build/*
 .idea/*
-
+Build/*
 */cmake-build-debug/*
 */cmake-build-release/*
 
