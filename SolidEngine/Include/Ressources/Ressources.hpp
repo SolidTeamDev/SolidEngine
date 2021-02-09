@@ -16,7 +16,8 @@
 #include <filesystem>
 #include <fstream>
 #include <algorithm>
-#include "SolidMath.hpp"
+
+
 
 namespace fs = std::filesystem;
 

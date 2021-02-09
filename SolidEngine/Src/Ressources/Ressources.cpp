@@ -1,7 +1,7 @@
 //
 // Created by ryan1 on 27/01/2021.
 //
-#include "Ressources.hpp"
+#include "Ressources/Ressources.hpp"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include "OBJ_Loader.h"
@@ -43,9 +43,9 @@ void ResourcesLoader::LoadRessource(const fs::path &Rpath)
     if(!fs::exists(Rpath))
         return;
 
-    if(!Rpath.has_extension())
+    if(fs::is_directory(Rpath))
     {
-        ///Shader Folder Loading
+        LoadShader(Rpath);
     }
 
     std::string extension = Rpath.extension().string();
@@ -121,38 +121,6 @@ void ResourcesLoader::LoadImage(const fs::path &Rpath)
 }
 
 
-/*void ResourcesLoader::LoadMeshOBJ(const fs::path &Rpath)
-{
-    MeshResource* Mesh = new MeshResource();
-    Mesh->_name = Rpath.filename().string();
-    objl::Loader MeshLoader;
-    MeshLoader.LoadFile(Rpath.string());
-
-   // Mesh->indices.resize(MeshLoader.LoadedIndices.size());
-    //std::memcpy(Mesh->indices.data(), MeshLoader.LoadedIndices.data(), sizeof(unsigned int) * MeshLoader.LoadedIndices.size());
-    //Mesh->vertices.resize(MeshLoader.LoadedVertices.size());
-    //std::memcpy(Mesh->vertices.data(), MeshLoader.LoadedVertices.data(),sizeof(float) * 8 *  MeshLoader.LoadedVertices.size());
-
-#if 0
-    std::vector<char> Data;
-    Mesh->ToDataBuffer(Data);
-
-
-
-
-    fs::path cachePath = Rpath.parent_path();
-    cachePath.append(Rpath.filename().string() + ".SMesh");
-    std::ofstream cacheFile(cachePath, std::fstream::binary | std::fstream::trunc);
-
-
-    if(cacheFile.is_open())
-    {
-        std::cout << "" << "\n";
-        cacheFile.write(Data.data(), Data.size());
-    }
-#endif
-    Manager->AddResource(Mesh);
-}*/
 
 
 
@@ -209,6 +177,23 @@ void ResourcesLoader::LoadMesh(const fs::path &Rpath)
 #endif
     Manager->AddResource(Mesh);
 
+}
+
+void ResourcesLoader::LoadShader(const fs::path &Rpath)
+{
+    std::string FolderName = Rpath.filename().string();
+    std::string FolderNameLower = FolderName;
+    std::transform(FolderNameLower.begin(), FolderNameLower.end(), FolderNameLower.begin(),
+                   [](unsigned char c){ return std::tolower(c); });
+    //std::cout << FolderName << "\n";
+    if(FolderNameLower.find("compute") != std::string::npos)
+    {
+
+    }
+    else
+    {
+        
+    }
 }
 
 ///
