@@ -28,10 +28,13 @@ file(GLOB_RECURSE THIRD_PARTY_FILES
 #OPENGL
 find_package(OpenGL REQUIRED)
 
+
+
+
 #Extern Lib
 link_directories(SolidEngine/ThirdParty/Lib)
 
-set(ENGINE_LIBS PUBLIC glfw3dll OpenGL::GL)
+set(ENGINE_LIBS PUBLIC glfw3dll OpenGL::GL assimp-vc142-mtd IrrXML zlibstaticd)
 
 add_library(SolidEngine SHARED ${ENGINE_SOURCE_FILES} ${THIRD_PARTY_FILES})
 
