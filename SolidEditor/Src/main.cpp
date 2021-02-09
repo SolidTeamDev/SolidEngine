@@ -4,26 +4,29 @@
 #include "editor.hpp"
 int main()
 {
-    /*try
-    {
-        Solid::Editor editor;
-        editor.Loop();
-    }
-    catch(const std::runtime_error& e)
-    {
-        std::cerr << e.what() << std::endl;
-    }*/
+    Solid::Editor editor;
+
     Solid::ResourceManager Manager;
     Solid::ResourcesLoader Loader;
     Loader.SetManager(&Manager);
     fs::path zShaderP = fs::current_path();
     fs::path computeShaderP = fs::current_path();
+    fs::path SzShaderP = fs::current_path();
+    fs::path ScomputeShaderP = fs::current_path();
+    zShaderP.append("Resources");
+    computeShaderP.append("Resources");
     zShaderP.append("ZShader");
     computeShaderP.append("ComputeShader");
     fs::create_directory(zShaderP);
     fs::create_directory(computeShaderP);
 
-    Loader.LoadRessource(computeShaderP);
+    SzShaderP.append("Solid");
+    ScomputeShaderP.append("Solid");
+    SzShaderP.append("ZShader.SVertFrag");
+    ScomputeShaderP.append("ComputeShader.SCompute");
+
+    Loader.LoadRessource(SzShaderP);
+    Loader.LoadRessource(ScomputeShaderP);
 
     std::system("Pause");
     return EXIT_SUCCESS;

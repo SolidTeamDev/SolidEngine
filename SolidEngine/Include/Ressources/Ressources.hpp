@@ -29,6 +29,7 @@ namespace Solid
         Mesh,
         Anim,
         Shader,
+        Compute,
         Material,
         Texture,
         NONE,
@@ -143,12 +144,23 @@ namespace Solid
     };
     class SOLID_API ShaderResource : public Resource
     {
-        unsigned int ShaderID;
+        unsigned int VertShaderID;
+        unsigned int FragShaderID;
+        unsigned int ProgramID;
         std::string VertexSource;
         std::string FragSource;
         //programs ID ?
     public:
 
+        ShaderResource(unsigned int vid, unsigned int fid, unsigned int pid, const char* vs, const char* fs)
+        {
+            _type = ResourceType::Shader;
+            VertShaderID = vid;
+            FragShaderID = fid;
+            ProgramID = pid;
+            VertexSource = vs;
+            FragSource = fs;
+        }
         ShaderResource()
         {
             _type = ResourceType::Shader;
@@ -157,22 +169,34 @@ namespace Solid
         {
 
         }
+        void ToDataBuffer(std::vector<char>& buffer);
+        void FromDataBuffer(char* buffer, int bSize);
     };
     class SOLID_API ComputeShaderResource : public Resource
     {
         unsigned int ShaderID;
+        unsigned int ProgramID;
         std::string ComputeSource;
         //programs ID ?
     public:
 
+        ComputeShaderResource(unsigned int sid,unsigned int pid, const char* cSource)
+        {
+            _type = ResourceType::Compute;
+            ShaderID = sid;
+            ProgramID = pid;
+            ComputeSource = cSource;
+        }
         ComputeShaderResource()
         {
-            _type = ResourceType::Shader;
+            _type = ResourceType::Compute;
         }
         ~ComputeShaderResource()
         {
 
         }
+        void ToDataBuffer(std::vector<char>& buffer);
+        void FromDataBuffer(char* buffer, int bSize);
     };
 
     class SOLID_API MaterialResource : public Resource
@@ -233,6 +257,7 @@ namespace Solid
         void LoadSolidTex(const fs::path& Rpath);
         void LoadSolidMesh(const fs::path& Rpath);
         void LoadSolidShader(const fs::path& Rpath);
+        void LoadSolidComputeShader(const fs::path& Rpath);
         void LoadSolidMaterial(const fs::path& Rpath);
         void LoadSolidAnim(const fs::path& Rpath);
 
