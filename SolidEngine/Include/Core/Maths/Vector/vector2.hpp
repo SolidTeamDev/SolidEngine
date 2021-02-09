@@ -39,6 +39,12 @@ namespace Solid
 
         static constexpr float cross(const Vec2 &_v1,const Vec2 &_v2) noexcept;
 
+        static constexpr Vec2 lerp(const Vec2& _v1,const Vec2& _v2, float _r) noexcept;
+
+        static constexpr Vec2 Nlerp(const Vec2& _v1,const Vec2& _v2, float _r) noexcept;
+
+        static constexpr Vec2 slerp(const Vec2& _v1,const Vec2& _v2, float _r) noexcept;
+
 #pragma endregion
 #pragma region Methods
 
@@ -76,7 +82,7 @@ namespace Solid
 
         constexpr Vec2 operator / (const Vec2 &_vec) const noexcept;
 
-        constexpr Vec2 &operator += const Vec2 &_vec) noexcept;
+        constexpr Vec2 &operator += (const Vec2 &_vec) noexcept;
 
         constexpr Vec2 &operator -= (const Vec2 &_vec) noexcept;
 

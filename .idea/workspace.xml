@@ -17,7 +17,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0d8d3a8b-6c63-4592-a596-12e002a2211f" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/SolidEngine/Include/Core/debug.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/SolidEngine/Include/Core/debug.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SolidEngine/Include/Core/Maths/Utils/constants.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SolidEngine/Include/Core/Maths/Vector/vector2.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/SolidEngine/Include/Core/Maths/Vector/vector2.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SolidEngine/Src/Core/Vector/vector2.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/SolidEngine/Src/Core/Maths/Vector/vector2.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SolidEngine/Src/Core/Vector/vector3.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/SolidEngine/Src/Core/Maths/Vector/vector3.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SolidEngine/Src/Core/Vector/vector4.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/SolidEngine/Src/Core/Maths/Vector/vector4.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,28 +45,31 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="cf.first.check.clang-format" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="CMakeSettings" />
+    <property name="settings.editor.selected.configurable" value="preferences.sourceCode.C/C++" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\t.francillonne\Documents\Solid\SolidEngine\SolidEngine\Include\Core\Maths\Utils" />
+      <recent name="C:\Users\t.francillonne\Documents\Solid\SolidEngine\SolidEngine\Src\Core\Maths" />
       <recent name="C:\Users\gu.lefebvre\Documents\cpp\SolidEngine\SolidEngine\Src\Core" />
     </key>
   </component>
   <component name="RunManager" selected="CMake Application.SolidEditor">
+    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="SolidEditor" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="SolidEditor" TARGET_NAME="SolidEditor" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="SolidEditor" RUN_TARGET_NAME="SolidEditor">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
     <configuration name="SolidEngine" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="SolidEditor" TARGET_NAME="SolidEngine" CONFIG_NAME="Debug">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -85,7 +94,26 @@
       <updated>1612256413599</updated>
       <workItem from="1612256415212" duration="9676000" />
       <workItem from="1612340199301" duration="783000" />
+      <workItem from="1612858059508" duration="11359000" />
     </task>
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

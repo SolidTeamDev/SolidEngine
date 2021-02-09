@@ -1,6 +1,6 @@
-#include "Core/Maths//Vector/vector2.hpp"
-#include "Core/Maths//Vector/vector3.hpp"
-#include "Core/Maths//Vector/vector4.hpp"
+#include "Core/Maths/Vector/vector2.hpp"
+#include "Core/Maths/Vector/vector3.hpp"
+#include "Core/Maths/Vector/vector4.hpp"
 
 namespace Solid
 {

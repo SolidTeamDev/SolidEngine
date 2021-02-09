@@ -1,17 +1,15 @@
-#include "Core/Maths//Vector/vector2.hpp"
-#include "Core/Maths//Vector/vector3.hpp"
-#include "Core/Maths//Vector/vector4.hpp"
+#include "Core/Maths/Vector/vector2.hpp"
+#include "Core/Maths/Vector/vector3.hpp"
+#include "Core/Maths/Vector/vector4.hpp"
 
+#include <cmath>
 
 namespace Solid
 {
-    Vec2 Vec2::zero{0,0};
-    Vec2 Vec2::up{0,1};
-    Vec2 Vec2::down{0,-1};
-    Vec2 Vec2::left{-1,0};
-    Vec2 Vec2::right{1,0};
 
 
+
+#pragma region Constructor
 
     constexpr Vec2::Vec2(const float& _value) noexcept :
     x{_value},
@@ -38,17 +36,52 @@ namespace Solid
     y{_copy.y}
     {}
 
+#pragma endregion
+#pragma region Static Methods
+
+    Vec2 Vec2::zero{0,0};
+    Vec2 Vec2::up{0,1};
+    Vec2 Vec2::down{0,-1};
+    Vec2 Vec2::left{-1,0};
+    Vec2 Vec2::right{1,0};
+
     constexpr float Vec2::dot(const Vec2& _v1,const Vec2 &_v2) noexcept
     {
-        /*TODO*/
-        return 0;
+
+        return _v1.x * _v2.x +
+                _v1.y * _v2.y;
     }
 
     constexpr float Vec2::cross(const Vec2& _v1,const Vec2 &_v2) noexcept
     {
-        /*TODO*/
-        return 0;
+        return _v1.x * _v2.y +
+                _v1.y * _v2.x;
     }
+
+    constexpr Vec2 Vec2::lerp(const Vec2 &_v1, const Vec2 &_v2, float _r) noexcept
+    {
+        return _v1 + (_v2 - _v1) * _r;
+    }
+
+    constexpr Vec2 Vec2::Nlerp(const Vec2 &_v1, const Vec2 &_v2, float _r) noexcept
+    {
+        return (_v1 + (_v2 - _v1) * _r).getNormalize();
+    }
+
+    constexpr Vec2 Vec2::slerp(const Vec2 &_v1, const Vec2 &_v2, float _r) noexcept
+    {
+        /*float dotp = dot(_v1,_v2);
+        float theta = acosf(dotp);
+
+        if(theta < 0)
+            theta = -theta;
+*/
+        return zero;
+
+    }
+
+#pragma endregion
+#pragma region Methods
 
     constexpr float Vec2::sqrtLength() const noexcept
     {
@@ -142,6 +175,11 @@ namespace Solid
         return Vec2::zero;
 
     }
+    constexpr Vec2 &Vec2::operator+=(const Vec2 &_vec) noexcept
+    {
+        /*TODO*/
+        return Vec2::zero;
+    }
 
     constexpr Vec2 &Vec2::operator-=(const Vec2 &_vec) noexcept
     {
@@ -231,5 +269,6 @@ namespace Solid
     {
         TODO
     }*/
+#pragma endregion
 
 }
