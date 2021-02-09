@@ -4,7 +4,7 @@
 #include "editor.hpp"
 int main()
 {
-    /*try
+    try
     {
         Solid::Editor editor;
         editor.Loop();
@@ -12,7 +12,7 @@ int main()
     catch(const std::runtime_error& e)
     {
         std::cerr << e.what() << std::endl;
-    }*/
+    }
     Solid::ResourceManager Manager;
     Solid::ResourcesLoader Loader;
     Loader.SetManager(&Manager);
