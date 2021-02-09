@@ -28,10 +28,13 @@ file(GLOB_RECURSE THIRD_PARTY_FILES
 #OPENGL
 find_package(OpenGL REQUIRED)
 
+
+
+
 #Extern Lib
 link_directories(SolidEngine/ThirdParty/Lib)
 
-set(ENGINE_LIBS PUBLIC glfw3dll OpenGL::GL)
+set(ENGINE_LIBS PUBLIC glfw3dll OpenGL::GL assimp-vc142-mtd IrrXML zlibstaticd)
 
 add_library(SolidEngine SHARED ${ENGINE_SOURCE_FILES} ${THIRD_PARTY_FILES})
 
@@ -72,6 +75,7 @@ target_compile_definitions(SolidEditor PRIVATE "IMGUI_API=__declspec(dllimport)"
 ADD_CUSTOM_COMMAND (TARGET SolidEditor POST_BUILD
 # DEBUG
 COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Lib/glfw3.dll ${CMAKE_BINARY_DIR}/
-
+COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Lib/assimp-vc142-mtd.dll ${CMAKE_BINARY_DIR}/
+COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Lib/IrrXML.dll ${CMAKE_BINARY_DIR}/
 # Output Message
 COMMENT "Copying binaries" VERBATIM)
