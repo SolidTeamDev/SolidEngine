@@ -48,12 +48,13 @@ void EditorInterface::DrawMenuBar()
 void EditorInterface::DrawMainFrame()
 {
     static ImGuiID dockID = 0;
-
+    static bool init = false;
     Int2 windowSize = window->GetWindowSize();
     ImGuiViewport* mainViewport = UI::GetMainViewport();
 
     UI::SetNextWindowSize(ImVec2(windowSize.x, windowSize.y));
     UI::SetNextWindowPos(ImVec2(mainViewport->GetWorkPos()));
+    UI::SetNextWindowViewport(mainViewport->ID);
 
     ImGuiWindowFlags windowFlags = 0;
     windowFlags |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar;
@@ -65,6 +66,18 @@ void EditorInterface::DrawMainFrame()
     if (UI::Begin("mainFrame", &p_open, windowFlags))
     {
         dockID = UI::GetID("mainDockSpace");
+
+            /*ImGui::DockBuilderRemoveNode(dockID); // Clear out existing layout
+            ImGuiID fullNode = ImGui::DockBuilderAddNode(dockID); // Add empty node
+            UI::DockBuilderSetNodeSize(fullNode, UI::GetMainViewport()->Size);
+            UI::DockBuilderSetNodePos(fullNode, ImVec2(0,0));
+
+            ImGuiID leftNode = ImGui::DockBuilderSplitNode(fullNode, ImGuiDir_Down, 0.20f, NULL, nullptr);
+
+            ImGui::DockBuilderDockWindow("SceneInterface", leftNode);
+            ImGui::DockBuilderFinish(dockID);*/
+
+
         UI::DockSpace(dockID, ImVec2(0.f, 0.f));
     }
 
