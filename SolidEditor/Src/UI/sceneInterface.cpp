@@ -11,7 +11,7 @@ namespace Solid
         UI::Begin("SceneInterface", &p_open,
         ImGuiWindowFlags_NoCollapse);
         UI::PopStyleColor();
-        UI::Text("YOOOOOOOOOO");
+        UI::Text("Welcome on Solid Engine");
         UI::End();
     }
 }

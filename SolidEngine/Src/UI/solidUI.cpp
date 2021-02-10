@@ -43,8 +43,10 @@ namespace Solid::UIContext
 
         if (UI::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
         {
+            GLFWwindow* backupWindow = glfwGetCurrentContext();
             ImGui::UpdatePlatformWindows();
             ImGui::RenderPlatformWindowsDefault();
+            glfwMakeContextCurrent(backupWindow);
         }
     }
 }
