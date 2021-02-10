@@ -54,17 +54,20 @@ void EditorInterface::DrawMainFrame()
 
     UI::SetNextWindowSize(ImVec2(windowSize.x, windowSize.y));
     UI::SetNextWindowPos(ImVec2(mainViewport->GetWorkPos()));
-    UI::SetNextWindowBgAlpha(0.9f);
-    if (UI::Begin("mainFrame", &p_open,
-            ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar |
-            ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoFocusOnAppearing |
-            ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_DockNodeHost))
+
+    ImGuiWindowFlags windowFlags = 0;
+    windowFlags |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar;
+    windowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoFocusOnAppearing;
+    windowFlags |= ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_DockNodeHost;
+    windowFlags |= ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoResize;
+    windowFlags |= ImGuiWindowFlags_NoDocking;
+
+    if (UI::Begin("mainFrame", &p_open, windowFlags))
     {
-        ImGuiID sceneDock = ImGui::GetID("sceneDock");
         dockID = UI::GetID("mainDockSpace");
-        UI::DockBuilderRemoveNodeChildNodes(dockID);
         UI::DockSpace(dockID, ImVec2(0.f, 0.f));
     }
+
     DrawMenuBar();
     UI::End();
 }
