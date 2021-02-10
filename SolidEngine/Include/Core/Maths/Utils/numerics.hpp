@@ -1,5 +1,6 @@
 #pragma once
 #include "Build/SolidAPI.hpp"
+#include "constants.hpp"
 
 namespace Solid
 {
@@ -25,18 +26,7 @@ namespace Solid
         * @return interpolation between _start and _end
         */
         template<typename T>
-        constexpr T lerp(T _start, T _end, T _ratio) noexcept;
-
-        /**
-        * @brief  normilized lerp from _start to _end at time.
-        * @tparam T Type of value
-        * @param _start Current value
-        * @param _end Destination value
-        * @param _ratio Ration value (Between 0 and 1)
-        * @return interpolation between _start and _end normalize
-        */
-        template<typename T>
-        constexpr T Nlerp(T _start, T _end, T _ratio) noexcept;
+        T lerp(T _start, T _end, float _ratio) noexcept;
 
         /**
          * @brief  slerp from _start to _end at time.
@@ -47,7 +37,7 @@ namespace Solid
          * @return interpolation between _start and _end
          */
         template<typename T>
-        constexpr T slerp(T _start, T _end, T _ratio) noexcept;
+        T slerp(T _start, T _end, float _ratio) noexcept;
 
         /**
          * @brief Convert degrees value into radiant
@@ -180,6 +170,18 @@ namespace Solid
         */
         template<typename T>
         constexpr T atan(T _value) noexcept;
+
+
+        /**
+         * @brief test the equality of 2 values
+         * @tparam T Type of value
+         * @param _a First value
+         * @param _b Second value
+         * @param _epsilon Allowed threshold to accept equality
+         * @return if a and b are equal
+         */
+        template <typename T>
+        constexpr bool equals(T _a, T _b, float _epsilon = S_EPSILON);
     }
 }
 

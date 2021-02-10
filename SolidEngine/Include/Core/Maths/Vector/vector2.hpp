@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Build/SolidAPI.hpp"
+#include <iostream>
+#include <string>
 
 namespace Solid
 {
@@ -17,7 +19,7 @@ namespace Solid
 
         constexpr Vec2(const float &_value) noexcept;
 
-        constexpr Vec2(const float &_x, const float &_y = 0) noexcept;
+        constexpr Vec2(float _x, float _y = 0) noexcept;
 
         constexpr Vec2(const Vec2 &_copy) noexcept;
 
@@ -39,11 +41,11 @@ namespace Solid
 
         static constexpr float cross(const Vec2 &_v1,const Vec2 &_v2) noexcept;
 
-        static constexpr Vec2 lerp(const Vec2& _v1,const Vec2& _v2, float _r) noexcept;
+        static Vec2 lerp(const Vec2& _v1,const Vec2& _v2, float _r) noexcept;
 
-        static constexpr Vec2 Nlerp(const Vec2& _v1,const Vec2& _v2, float _r) noexcept;
+        static Vec2 Nlerp(const Vec2& _v1,const Vec2& _v2, float _r) noexcept;
 
-        static constexpr Vec2 slerp(const Vec2& _v1,const Vec2& _v2, float _r) noexcept;
+        static Vec2 slerp(const Vec2& _v1,const Vec2& _v2, float _r) noexcept;
 
 #pragma endregion
 #pragma region Methods
@@ -64,6 +66,7 @@ namespace Solid
 
         constexpr Vec2 getNormalize() const noexcept;
 
+        constexpr bool isEquals(const Vec2& vec) const noexcept;
 
 #pragma endregion
 #pragma region Operator
@@ -90,28 +93,29 @@ namespace Solid
 
         constexpr Vec2 &operator /= (const Vec2 &_vec) noexcept;
 
-        constexpr Vec2 operator + (const float &_value) const noexcept;
+        constexpr Vec2 operator + (float _value) const noexcept;
 
-        constexpr Vec2 operator - (const float &_value) const noexcept;
+        constexpr Vec2 operator - (float _value) const noexcept;
 
-        constexpr Vec2 operator * (const float &_value) const noexcept;
+        constexpr Vec2 operator * (float _value) const noexcept;
 
-        constexpr Vec2 operator / (const float &_value) const noexcept;
+        constexpr Vec2 operator / (float _value) const noexcept;
 
-        constexpr Vec2 &operator += (const float &_value) noexcept;
+        constexpr Vec2 &operator += (float _value) noexcept;
 
-        constexpr Vec2 &operator -= (const float &_value) noexcept;
+        constexpr Vec2 &operator -= (float _value) noexcept;
 
-        constexpr Vec2 &operator *= (const float &_value) noexcept;
+        constexpr Vec2 &operator *= (float _value) noexcept;
 
-        constexpr Vec2 &operator /= (const float &_value) noexcept;
+        constexpr Vec2 &operator /= (float _value) noexcept;
 
-        constexpr float operator [] (const size_t _index) const noexcept;
-
-        constexpr float &operator [] (const size_t _index) noexcept;
+        constexpr Vec2 operator -() noexcept;
 
 #pragma endregion
 
     };
+    constexpr Vec2 operator * (float _value, const Vec2& vec) noexcept;
+    constexpr Vec2 operator / (float _value, const Vec2& vec) ;
 
 };
+

@@ -2,7 +2,10 @@
 #include "Core/Maths/Vector/vector3.hpp"
 #include "Core/Maths/Vector/vector4.hpp"
 
-#include <cmath>
+#include "Core/Maths/Utils/numerics.hpp"
+#include "Core/Debug/log.hpp"
+
+
 
 namespace Solid
 {
@@ -16,7 +19,7 @@ namespace Solid
     y{_value}
     {}
 
-    constexpr Vec2::Vec2(const float& _x,const float& _y) noexcept :
+    constexpr Vec2::Vec2(float _x,float _y) noexcept :
     x{_x},
     y{_y}
     {}
@@ -58,26 +61,20 @@ namespace Solid
                 _v1.y * _v2.x;
     }
 
-    constexpr Vec2 Vec2::lerp(const Vec2 &_v1, const Vec2 &_v2, float _r) noexcept
+    Vec2 Vec2::lerp(const Vec2 &_v1, const Vec2 &_v2, float _r) noexcept
     {
-        return _v1 + (_v2 - _v1) * _r;
+        //return Maths::lerp(_v1,_v2, _r);
+        return Vec2::zero;
     }
 
-    constexpr Vec2 Vec2::Nlerp(const Vec2 &_v1, const Vec2 &_v2, float _r) noexcept
+    Vec2 Vec2::Nlerp(const Vec2 &_v1, const Vec2 &_v2, float _r) noexcept
     {
-        return (_v1 + (_v2 - _v1) * _r).getNormalize();
+        return Maths::lerp(_v1,_v2,_r).getNormalize();
     }
 
-    constexpr Vec2 Vec2::slerp(const Vec2 &_v1, const Vec2 &_v2, float _r) noexcept
+    Vec2 Vec2::slerp(const Vec2 &_v1, const Vec2 &_v2, float _r) noexcept
     {
-        /*float dotp = dot(_v1,_v2);
-        float theta = acosf(dotp);
-
-        if(theta < 0)
-            theta = -theta;
-*/
-        return zero;
-
+        return Maths::slerp(_v1,_v2, _r);
     }
 
 #pragma endregion
@@ -85,190 +82,207 @@ namespace Solid
 
     constexpr float Vec2::sqrtLength() const noexcept
     {
-        /*TODO*/
-        return 0;
+        return x * x + y * y;
     }
 
     constexpr float Vec2::length() const noexcept
     {
-        /*TODO*/
-        return 0;
+        return Maths::sqrt(x * x + y * y);
     }
 
     Vec2& Vec2::scale(float _scale) noexcept
     {
-        /*TODO*/
-        return Vec2::zero;
+        x *= _scale;
+        y *= _scale;
+        return *this;
 
     }
 
     constexpr Vec2 Vec2::getScaled(float _scale) const noexcept
     {
-        /*TODO*/
-        return Vec2::zero;
+
+        return Vec2(x*_scale, y*_scale);
 
     }
 
     Vec2& Vec2::unscale(float _scale) noexcept
     {
-        /*TODO*/
-        return Vec2::zero;
-
+        if(_scale == 0)
+        {
+            Log::Send("unscale function: scale is null is impossible to divide by 0", Log::ELogSeverity::ERROR);
+            return *this;
+        }
+        x /= _scale;
+        y /= _scale;
+        return *this;
     }
 
     constexpr Vec2 Vec2::getUnscaled(float _scale) const noexcept
     {
-        /*TODO*/
-        return Vec2::zero;
+        if(_scale == 0)
+        {
+            Log::Send("getUnscale function: scale is null is impossible to divide by 0", Log::ELogSeverity::ERROR);
+            return *this;
+        }
+        return Vec2(x/_scale, y/_scale);
 
     }
 
     Vec2& Vec2::normalize() noexcept
     {
-        /*TODO*/
-        return Vec2::zero;
+        float len = length();
+        if(len == 0)
+        {
+            Log::Send("normalize function: length = 0 impossible to compute");
+            return *this;
+        }
+
+        x /= len;
+        y /= len;
+        return *this;
 
     }
 
     constexpr Vec2 Vec2::getNormalize() const noexcept
     {
-        /*TODO*/
-        return Vec2::zero;
+        float len = length();
+        if(len == 0)
+        {
+            Log::Send("normalize function: length = 0 impossible to compute");
+            return *this;
+        }
+        return Vec2(x/len, y/len);
     }
+
+    constexpr  bool Vec2::isEquals(const Vec2 &vec) const noexcept
+    {
+        return Solid::Maths::equals(x,vec.x) && Solid::Maths::equals(y,vec.y);
+    }
+
+#pragma endregion
+#pragma region Operator
 
     constexpr bool Vec2::operator==(const Vec2 &_vec) const noexcept
     {
-        /*TODO*/
-        return false;
+        return isEquals(_vec);
     }
 
     constexpr bool Vec2::operator!=(const Vec2 &_vec) const noexcept
     {
-        /*TODO*/
-        return false;
+        return !isEquals(_vec);
     }
 
     constexpr Vec2 Vec2::operator+(const Vec2 &_vec) const noexcept
     {
-        /*TODO*/
-        return Vec2::zero;
-
+        return Vec2(x + _vec.x,y + _vec.y);
     }
 
     constexpr Vec2 Vec2::operator-(const Vec2 &_vec) const noexcept
     {
-        /*TODO*/
-        return Vec2::zero;
-
+        return Vec2(x - _vec.x,y - _vec.y);
     }
 
     constexpr Vec2 Vec2::operator*(const Vec2 &_vec) const noexcept
     {
-        /*TODO*/
-        return Vec2::zero;
-
+        return Vec2(x * _vec.x,y * _vec.y);
     }
 
     constexpr Vec2 Vec2::operator/(const Vec2 &_vec) const noexcept
     {
-        /*TODO*/
-        return Vec2::zero;
-
+        return Vec2(x / _vec.x,y / _vec.y);
     }
     constexpr Vec2 &Vec2::operator+=(const Vec2 &_vec) noexcept
     {
-        /*TODO*/
-        return Vec2::zero;
+        x += _vec.x;
+        y += _vec.y;
+        return *this;
     }
 
     constexpr Vec2 &Vec2::operator-=(const Vec2 &_vec) noexcept
     {
-        /*TODO*/
-        return Vec2::zero;
-
+        x -= _vec.x;
+        y -= _vec.y;
+        return *this;
     }
 
     constexpr Vec2 &Vec2::operator*=(const Vec2 &_vec) noexcept
     {
-        /*TODO*/
-        return Vec2::zero;
-
+        x *= _vec.x;
+        y *= _vec.y;
+        return *this;
     }
 
     constexpr Vec2 &Vec2::operator/=(const Vec2 &_vec) noexcept
     {
-        /*TODO*/
-        return Vec2::zero;
-
+        x /= _vec.x;
+        y /= _vec.y;
+        return *this;
     }
 
-    constexpr Vec2 Vec2::operator+(const float &_value) const noexcept
+    constexpr Vec2 Vec2::operator+(float _value) const noexcept
     {
-        /*TODO*/
-        return Vec2::zero;
 
+        return Vec2(x + _value,y + _value);
     }
 
-    constexpr Vec2 Vec2::operator-(const float &_value) const noexcept
+    constexpr Vec2 Vec2::operator-(float _value) const noexcept
     {
-        /*TODO*/
-        return Vec2::zero;
-
+        return Vec2(x - _value,y - _value);
     }
 
-    constexpr Vec2 Vec2::operator*(const float &_value) const noexcept
+    constexpr Vec2 Vec2::operator*(float _value) const noexcept
     {
-        /*TODO*/
-        return Vec2::zero;
-
+        return Vec2(x * _value,y * _value);
     }
 
-    constexpr Vec2 Vec2::operator/(const float &_value) const noexcept
+    constexpr Vec2 Vec2::operator/(float _value) const noexcept
     {
-        /*TODO*/
-        return Vec2::zero;
-
+        return Vec2(x / _value,y / _value);
     }
 
-    constexpr Vec2 &Vec2::operator+=(const float &_value) noexcept
+    constexpr Vec2 &Vec2::operator+=( float _value) noexcept
     {
-        /*TODO*/
-        return Vec2::zero;
-
+        x += _value;
+        y += _value;
+        return *this;
     }
 
-    constexpr Vec2 &Vec2::operator-=(const float &_value) noexcept
+    constexpr Vec2 &Vec2::operator-=(float _value) noexcept
     {
-        /*TODO*/
-        return Vec2::zero;
-
+        x -= _value;
+        y -= _value;
+        return *this;
     }
 
-    constexpr Vec2 &Vec2::operator*=(const float &_value) noexcept
+    constexpr Vec2 &Vec2::operator*=(float _value) noexcept
     {
-        /*TODO*/
-        return Vec2::zero;
-
+        x *= _value;
+        y *= _value;
+        return *this;
     }
 
-    constexpr Vec2 &Vec2::operator/=(const float &_value) noexcept
+    constexpr Vec2 &Vec2::operator/=(float _value) noexcept
     {
-        /*TODO*/
-        return Vec2::zero;
-
+        x /= _value;
+        y /= _value;
+        return *this;
     }
 
-    constexpr float Vec2::operator[](const size_t _index) const noexcept
+    constexpr Vec2 Vec2::operator-() noexcept
     {
-        /*TODO*/
-        return 0;
-
+        return Vec2(-x,-y);
     }
 
-    /*constexpr float& Vec2::operator[](const size_t _index) noexcept
+    constexpr Vec2 operator * (float _value, const Vec2& _vec) noexcept
     {
-        TODO
-    }*/
+        return _vec.getScaled(_value);
+    }
+
+    constexpr Vec2 operator / (float _value, const Vec2& _vec)
+    {
+        return _vec.getUnscaled(_value);
+    }
+
 #pragma endregion
 
 }
