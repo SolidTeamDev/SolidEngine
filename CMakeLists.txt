@@ -76,6 +76,5 @@ ADD_CUSTOM_COMMAND (TARGET SolidEditor POST_BUILD
 # DEBUG
 COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Lib/glfw3.dll ${CMAKE_BINARY_DIR}/
 COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Lib/assimp-vc142-mtd.dll ${CMAKE_BINARY_DIR}/
-COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Lib/IrrXML.dll ${CMAKE_BINARY_DIR}/
 # Output Message
 COMMENT "Copying binaries" VERBATIM)

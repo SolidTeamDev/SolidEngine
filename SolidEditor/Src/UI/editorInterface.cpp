@@ -1,7 +1,7 @@
-#include "UI/editorInterface.hpp"
-
 #include <imgui.h>
 #include <imgui_internal.h>
+
+#include "UI/editorInterface.hpp"
 #include "UI/solidUI.hpp"
 
 using namespace Solid;
@@ -17,6 +17,8 @@ void EditorInterface::Update()
 
     DrawMainFrame();
     sceneInterface.Draw();
+    inspectorInterface.Draw();
+    hierarchyTreeInterface.Draw();
 
     UIContext::RenderFrame();
 }
@@ -59,26 +61,18 @@ void EditorInterface::DrawMainFrame()
     ImGuiWindowFlags windowFlags = 0;
     windowFlags |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar;
     windowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoFocusOnAppearing;
-    windowFlags |= ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_DockNodeHost;
+    windowFlags |= ImGuiWindowFlags_MenuBar;
     windowFlags |= ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoResize;
     windowFlags |= ImGuiWindowFlags_NoDocking;
 
     if (UI::Begin("mainFrame", &p_open, windowFlags))
     {
         dockID = UI::GetID("mainDockSpace");
-
-            /*ImGui::DockBuilderRemoveNode(dockID); // Clear out existing layout
-            ImGuiID fullNode = ImGui::DockBuilderAddNode(dockID); // Add empty node
-            UI::DockBuilderSetNodeSize(fullNode, UI::GetMainViewport()->Size);
-            UI::DockBuilderSetNodePos(fullNode, ImVec2(0,0));
-
-            ImGuiID leftNode = ImGui::DockBuilderSplitNode(fullNode, ImGuiDir_Down, 0.20f, NULL, nullptr);
-
-            ImGui::DockBuilderDockWindow("SceneInterface", leftNode);
-            ImGui::DockBuilderFinish(dockID);*/
-
-
-        UI::DockSpace(dockID, ImVec2(0.f, 0.f));
+        ImVec2 winSize = UI::GetMainViewport()->Size;
+        ImGuiDockNodeFlags dockFlags = 0;
+        dockFlags |= ImGuiDockNodeFlags_NoCloseButton | ImGuiDockNodeFlags_NoWindowMenuButton;
+        dockFlags |= ImGuiDockNodeFlags_NoDockingOverMe;
+        UI::DockSpace(dockID, winSize, dockFlags);
     }
 
     DrawMenuBar();
