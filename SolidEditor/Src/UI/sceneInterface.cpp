@@ -1,17 +1,21 @@
 #include "UI/sceneInterface.hpp"
 
 #include <imgui.h>
+#include <imgui_internal.h>
 
 namespace Solid
 {
     void SceneInterface::Draw()
     {
+        UI::SetNextWindowSize(ImVec2(250,250));
 
-        UI::PushStyleColor(ImGuiCol_ChildBg, ImVec4(1.0f, 0.0f, 0.0f, 1.0f)); // Set window background to red
-        UI::Begin("SceneInterface", &p_open,
-        ImGuiWindowFlags_NoCollapse);
-        UI::PopStyleColor();
-        UI::Text("YOOOOOOOOOO");
+        ImGuiWindowFlags windowFlags = 0;
+        windowFlags |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize;
+
+
+        UI::Begin("Scene", &p_open, windowFlags);
+
+        UI::TextWrapped("Welcome on the Solid Scene!");
         UI::End();
     }
 }
