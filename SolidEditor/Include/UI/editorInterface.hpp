@@ -33,7 +33,6 @@ namespace Solid
          * @debrief updates the whole UI
          */
         void Update();
-        void PushColors();
         void PopColors();
 
         void DrawMenuBar();

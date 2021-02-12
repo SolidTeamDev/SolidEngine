@@ -11,5 +11,6 @@ namespace Solid
         ~HierarchyTreeInterface() = default;
 
         void Draw();
+        void DrawCreateObject();
     };
 }
