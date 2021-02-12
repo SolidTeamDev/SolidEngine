@@ -24,7 +24,6 @@ int main()
     fs::create_directory(computeShaderP);
 
     Loader.LoadRessource(computeShaderP);
-
-    std::system("Pause");
+    
     return EXIT_SUCCESS;
 }
