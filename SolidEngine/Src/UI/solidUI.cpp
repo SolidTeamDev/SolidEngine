@@ -34,7 +34,7 @@ namespace Solid::UIContext
         ImGui_ImplGlfw_NewFrame();
         UI::NewFrame();
 
-        UI::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(5.f, 1.5f));
+        UI::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(5.f, 3.f));
         UI::PushStyleVar(ImGuiStyleVar_WindowTitleAlign, ImVec2(0.5f, 0.5f));
 
         UI::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 1.5f);
