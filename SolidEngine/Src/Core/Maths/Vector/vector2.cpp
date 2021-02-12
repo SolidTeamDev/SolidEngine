@@ -42,55 +42,54 @@ namespace Solid
 #pragma endregion
 #pragma region Static Methods
 
-    Vec2 Vec2::zero{0,0};
-    Vec2 Vec2::up{0,1};
-    Vec2 Vec2::down{0,-1};
-    Vec2 Vec2::left{-1,0};
-    Vec2 Vec2::right{1,0};
+    Vec2 Vec2::Zero{0,0};
+    Vec2 Vec2::Up{0,1};
+    Vec2 Vec2::Down{0,-1};
+    Vec2 Vec2::Left{-1,0};
+    Vec2 Vec2::Right{1,0};
 
-    constexpr float Vec2::dot(const Vec2& _v1,const Vec2 &_v2) noexcept
+    constexpr float Vec2::Dot(const Vec2& _v1,const Vec2 &_v2) noexcept
     {
 
         return _v1.x * _v2.x +
                 _v1.y * _v2.y;
     }
 
-    constexpr float Vec2::cross(const Vec2& _v1,const Vec2 &_v2) noexcept
+    constexpr float Vec2::Cross(const Vec2& _v1,const Vec2 &_v2) noexcept
     {
         return _v1.x * _v2.y +
                 _v1.y * _v2.x;
     }
 
-    Vec2 Vec2::lerp(const Vec2 &_v1, const Vec2 &_v2, float _r) noexcept
+    Vec2 Vec2::Lerp(const Vec2 &_v1, const Vec2 &_v2, float _r) noexcept
     {
-        //return Maths::lerp(_v1,_v2, _r);
-        return Vec2::zero;
+        return Maths::Lerp(_v1,_v2, _r);
     }
 
     Vec2 Vec2::Nlerp(const Vec2 &_v1, const Vec2 &_v2, float _r) noexcept
     {
-        return Maths::lerp(_v1,_v2,_r).getNormalize();
+        return Maths::Lerp(_v1,_v2,_r).GetNormalize();
     }
 
-    Vec2 Vec2::slerp(const Vec2 &_v1, const Vec2 &_v2, float _r) noexcept
+    Vec2 Vec2::Slerp(const Vec2 &_v1, const Vec2 &_v2, float _r) noexcept
     {
-        return Maths::slerp(_v1,_v2, _r);
+        return Maths::Slerp(_v1,_v2, _r);
     }
 
 #pragma endregion
 #pragma region Methods
 
-    constexpr float Vec2::sqrtLength() const noexcept
+    constexpr float Vec2::SqrtLength() const noexcept
     {
         return x * x + y * y;
     }
 
-    constexpr float Vec2::length() const noexcept
+    constexpr float Vec2::Length() const noexcept
     {
-        return Maths::sqrt(x * x + y * y);
+        return Maths::Sqrt(x * x + y * y);
     }
 
-    Vec2& Vec2::scale(float _scale) noexcept
+    Vec2& Vec2::Scale(float _scale) noexcept
     {
         x *= _scale;
         y *= _scale;
@@ -98,14 +97,14 @@ namespace Solid
 
     }
 
-    constexpr Vec2 Vec2::getScaled(float _scale) const noexcept
+    constexpr Vec2 Vec2::GetScaled(float _scale) const noexcept
     {
 
         return Vec2(x*_scale, y*_scale);
 
     }
 
-    Vec2& Vec2::unscale(float _scale) noexcept
+    Vec2& Vec2::Unscale(float _scale) noexcept
     {
         if(_scale == 0)
         {
@@ -117,7 +116,7 @@ namespace Solid
         return *this;
     }
 
-    constexpr Vec2 Vec2::getUnscaled(float _scale) const noexcept
+    constexpr Vec2 Vec2::GetUnscaled(float _scale) const noexcept
     {
         if(_scale == 0)
         {
@@ -128,9 +127,9 @@ namespace Solid
 
     }
 
-    Vec2& Vec2::normalize() noexcept
+    Vec2& Vec2::Normalize() noexcept
     {
-        float len = length();
+        float len = Length();
         if(len == 0)
         {
             Log::Send("normalize function: length = 0 impossible to compute");
@@ -143,9 +142,9 @@ namespace Solid
 
     }
 
-    constexpr Vec2 Vec2::getNormalize() const noexcept
+    constexpr Vec2 Vec2::GetNormalize() const noexcept
     {
-        float len = length();
+        float len = Length();
         if(len == 0)
         {
             Log::Send("normalize function: length = 0 impossible to compute");
@@ -154,9 +153,24 @@ namespace Solid
         return Vec2(x/len, y/len);
     }
 
-    constexpr  bool Vec2::isEquals(const Vec2 &vec) const noexcept
+    constexpr  bool Vec2::IsEquals(const Vec2 &vec) const noexcept
     {
-        return Solid::Maths::equals(x,vec.x) && Solid::Maths::equals(y,vec.y);
+        return Solid::Maths::Equals(x,vec.x) && Solid::Maths::Equals(y,vec.y);
+    }
+
+    constexpr float Vec2::Dist(const Vec2 &vec) const noexcept
+    {
+        return (*this - vec).Length();
+    }
+
+    constexpr float Vec2::SqrtDist(const Vec2 &vec) const noexcept
+    {
+        return (*this - vec).SqrtLength();
+    }
+
+    std::string Vec2::ToString() noexcept
+    {
+        return "[" + std::to_string(x) + "," + std::to_string(y) + "]";
     }
 
 #pragma endregion
@@ -164,12 +178,12 @@ namespace Solid
 
     constexpr bool Vec2::operator==(const Vec2 &_vec) const noexcept
     {
-        return isEquals(_vec);
+        return IsEquals(_vec);
     }
 
     constexpr bool Vec2::operator!=(const Vec2 &_vec) const noexcept
     {
-        return !isEquals(_vec);
+        return !IsEquals(_vec);
     }
 
     constexpr Vec2 Vec2::operator+(const Vec2 &_vec) const noexcept
@@ -275,12 +289,12 @@ namespace Solid
 
     constexpr Vec2 operator * (float _value, const Vec2& _vec) noexcept
     {
-        return _vec.getScaled(_value);
+        return _vec.GetScaled(_value);
     }
 
     constexpr Vec2 operator / (float _value, const Vec2& _vec)
     {
-        return _vec.getUnscaled(_value);
+        return _vec.GetUnscaled(_value);
     }
 
 #pragma endregion

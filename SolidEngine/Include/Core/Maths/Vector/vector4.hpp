@@ -4,9 +4,9 @@
 
 namespace Solid
 {
-    struct Vec3;
+    struct Vec4;
 
-    struct Vec2;
+    struct Vec4;
 
     struct SOLID_API Vec4
     {
@@ -16,15 +16,109 @@ namespace Solid
         float w;
 
         constexpr Vec4() noexcept = default;
-        constexpr Vec4(const float& _value)noexcept;
-        constexpr Vec4(const float& _x,const float& _y = 0, const float& _z = 0, const float& _w = 1)noexcept;
+        constexpr Vec4(float _value)noexcept;
+        constexpr Vec4(float _x, float _y = 0, float _z = 0, float _w = 1)noexcept;
         constexpr Vec4(const Vec3& _copy)noexcept;
         constexpr Vec4(const Vec4& _copy)noexcept;
 
-
-
         ~Vec4() = default;
 
+#pragma region Static Methods
+
+        static Vec4 Zero;
+        static Vec4 Up;
+        static Vec4 Down;
+        static Vec4 Left;
+        static Vec4 Right;
+        static Vec4 Forward;
+        static Vec4 Back;
+
+        static constexpr float Dot(const Vec4 &_v1,const Vec4 &_v2) noexcept;
+
+        static constexpr float Cross(const Vec4 &_v1,const Vec4 &_v2) noexcept;
+
+        static Vec4 Lerp(const Vec4& _v1,const Vec4& _v2, float _r) noexcept;
+
+        static Vec4 Nlerp(const Vec4& _v1,const Vec4& _v2, float _r) noexcept;
+
+        static Vec4 Slerp(const Vec4& _v1,const Vec4& _v2, float _r) noexcept;
+
+#pragma endregion
+#pragma region Methods
+
+        constexpr float SqrtLength() const noexcept;
+
+        constexpr float Length() const noexcept;
+
+        Vec4 &Scale(float _scale) noexcept;
+
+        constexpr Vec4 GetScaled(float _scale) const noexcept;
+
+        Vec4 &Unscale(float _scale) noexcept;
+
+        constexpr Vec4 GetUnscaled(float _scale) const noexcept;
+
+        Vec4 &Normalize() noexcept;
+
+        constexpr Vec4 GetNormalize() const noexcept;
+
+        constexpr bool IsEquals(const Vec4& vec) const noexcept;
+
+        constexpr float Dist(const Vec4& vec) const noexcept;
+
+        constexpr float SqrtDist(const Vec4& vec) const noexcept;
+
+        constexpr Vec3 ToVector3() const noexcept;
+
+        std::string ToString() noexcept;
+
+#pragma endregion
+#pragma region Operator
+
+        constexpr Vec4 &operator = (const Vec4& vec) noexcept = default;
+
+        constexpr bool operator == (const Vec4 &_vec) const noexcept;
+
+        constexpr bool operator != (const Vec4 &_vec) const noexcept;
+
+        constexpr Vec4 operator + (const Vec4 &_vec) const noexcept;
+
+        constexpr Vec4 operator - (const Vec4 &_vec) const noexcept;
+
+        constexpr Vec4 operator * (const Vec4 &_vec) const noexcept;
+
+        constexpr Vec4 operator / (const Vec4 &_vec) const noexcept;
+
+        constexpr Vec4 &operator += (const Vec4 &_vec) noexcept;
+
+        constexpr Vec4 &operator -= (const Vec4 &_vec) noexcept;
+
+        constexpr Vec4 &operator *= (const Vec4 &_vec) noexcept;
+
+        constexpr Vec4 &operator /= (const Vec4 &_vec) noexcept;
+
+        constexpr Vec4 operator + (float _value) const noexcept;
+
+        constexpr Vec4 operator - (float _value) const noexcept;
+
+        constexpr Vec4 operator * (float _value) const noexcept;
+
+        constexpr Vec4 operator / (float _value) const noexcept;
+
+        constexpr Vec4 &operator += (float _value) noexcept;
+
+        constexpr Vec4 &operator -= (float _value) noexcept;
+
+        constexpr Vec4 &operator *= (float _value) noexcept;
+
+        constexpr Vec4 &operator /= (float _value) noexcept;
+
+        constexpr Vec4 operator -() noexcept;
+
+#pragma endregion
+
     };
+    constexpr Vec4 operator * (float _value, const Vec4& vec) noexcept;
+    constexpr Vec4 operator / (float _value, const Vec4& vec) ;
 
 };

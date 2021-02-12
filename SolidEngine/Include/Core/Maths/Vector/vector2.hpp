@@ -31,42 +31,48 @@ namespace Solid
 
 #pragma region Static Methods
 
-        static Vec2 zero;
-        static Vec2 up;
-        static Vec2 down;
-        static Vec2 left;
-        static Vec2 right;
+        static Vec2 Zero;
+        static Vec2 Up;
+        static Vec2 Down;
+        static Vec2 Left;
+        static Vec2 Right;
 
-        static constexpr float dot(const Vec2 &_v1,const Vec2 &_v2) noexcept;
+        static constexpr float Dot(const Vec2 &_v1,const Vec2 &_v2) noexcept;
 
-        static constexpr float cross(const Vec2 &_v1,const Vec2 &_v2) noexcept;
+        static constexpr float Cross(const Vec2 &_v1,const Vec2 &_v2) noexcept;
 
-        static Vec2 lerp(const Vec2& _v1,const Vec2& _v2, float _r) noexcept;
+        static Vec2 Lerp(const Vec2& _v1,const Vec2& _v2, float _r) noexcept;
 
         static Vec2 Nlerp(const Vec2& _v1,const Vec2& _v2, float _r) noexcept;
 
-        static Vec2 slerp(const Vec2& _v1,const Vec2& _v2, float _r) noexcept;
+        static Vec2 Slerp(const Vec2& _v1,const Vec2& _v2, float _r) noexcept;
 
 #pragma endregion
 #pragma region Methods
 
-        constexpr float sqrtLength() const noexcept;
+        constexpr float SqrtLength() const noexcept;
 
-        constexpr float length() const noexcept;
+        constexpr float Length() const noexcept;
 
-        Vec2 &scale(float _scale) noexcept;
+        Vec2 &Scale(float _scale) noexcept;
 
-        constexpr Vec2 getScaled(float _scale) const noexcept;
+        constexpr Vec2 GetScaled(float _scale) const noexcept;
 
-        Vec2 &unscale(float _scale) noexcept;
+        Vec2 &Unscale(float _scale) noexcept;
 
-        constexpr Vec2 getUnscaled(float _scale) const noexcept;
+        constexpr Vec2 GetUnscaled(float _scale) const noexcept;
 
-        Vec2 &normalize() noexcept;
+        Vec2 &Normalize() noexcept;
 
-        constexpr Vec2 getNormalize() const noexcept;
+        constexpr Vec2 GetNormalize() const noexcept;
 
-        constexpr bool isEquals(const Vec2& vec) const noexcept;
+        constexpr bool IsEquals(const Vec2& vec) const noexcept;
+
+        constexpr float Dist(const Vec2& vec) const noexcept;
+
+        constexpr float SqrtDist(const Vec2& vec) const noexcept;
+
+        std::string ToString() noexcept;
 
 #pragma endregion
 #pragma region Operator
