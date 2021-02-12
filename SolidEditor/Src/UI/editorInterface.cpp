@@ -1,8 +1,8 @@
-#include <imgui.h>
-#include <imgui_internal.h>
-
 #include "UI/editorInterface.hpp"
 #include "UI/solidUI.hpp"
+
+#include <imgui_internal.h>
+
 
 using namespace Solid;
 
@@ -16,6 +16,8 @@ void EditorInterface::Update()
     UIContext::BeginFrame();
 
     DrawMainFrame();
+
+    filesInterface.Draw();
     sceneInterface.Draw();
     inspectorInterface.Draw();
     hierarchyTreeInterface.Draw();
@@ -61,9 +63,9 @@ void EditorInterface::DrawMainFrame()
     ImGuiWindowFlags windowFlags = 0;
     windowFlags |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar;
     windowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoFocusOnAppearing;
-    windowFlags |= ImGuiWindowFlags_MenuBar;
+    windowFlags |= ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
     windowFlags |= ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoResize;
-    windowFlags |= ImGuiWindowFlags_NoDocking;
+    windowFlags |= ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar;
 
     if (UI::Begin("mainFrame", &p_open, windowFlags))
     {
@@ -71,7 +73,6 @@ void EditorInterface::DrawMainFrame()
         ImVec2 winSize = UI::GetMainViewport()->Size;
         ImGuiDockNodeFlags dockFlags = 0;
         dockFlags |= ImGuiDockNodeFlags_NoCloseButton | ImGuiDockNodeFlags_NoWindowMenuButton;
-        dockFlags |= ImGuiDockNodeFlags_NoDockingOverMe;
         UI::DockSpace(dockID, winSize, dockFlags);
     }
 

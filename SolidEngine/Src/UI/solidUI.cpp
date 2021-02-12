@@ -46,23 +46,29 @@ namespace Solid::UIContext
         UI::PushStyleColor(ImGuiCol_ResizeGripHovered, ImVec4(0.35f, 0.35f, 0.35f, 1.f));
         UI::PushStyleColor(ImGuiCol_ResizeGrip, ImVec4(0.35f, 0.35f, 0.35f, 1.f));
 
+        UI::PushStyleColor(ImGuiCol_Separator, ImVec4(0.1f, 0.1f, 0.1f, 1.f));
+        UI::PushStyleColor(ImGuiCol_SeparatorActive, ImVec4(0.1f, 0.1f, 0.1f, 1.f));
+        UI::PushStyleColor(ImGuiCol_SeparatorHovered, ImVec4(0.1f, 0.1f, 0.1f, 1.f));
+
 
         UI::PushStyleColor(ImGuiCol_Tab, ImVec4(0.2f, 0.2f, 0.2f, 1.f));
         UI::PushStyleColor(ImGuiCol_TabActive, ImVec4(0.25f, 0.25f, 0.25f, 1.f));
         UI::PushStyleColor(ImGuiCol_TabHovered, ImVec4(0.3f, 0.3f, 0.3f, 1.f));
         UI::PushStyleColor(ImGuiCol_TabUnfocused, ImVec4(0.03f, 0.03f, 0.03f, 1.f));
+        UI::PushStyleColor(ImGuiCol_TabUnfocusedActive, ImVec4(0.15f, 0.15f, 0.15f, 1.f));
 
         UI::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(1.5f, 1.5f));
         UI::PushStyleVar(ImGuiStyleVar_WindowTitleAlign, ImVec2(0.5f, 0.5f));
 
-        UI::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.5f);
+        UI::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 1.5f);
         UI::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.8f);
+        UI::PushStyleVar(ImGuiStyleVar_TabRounding, 2.f);
     }
 
     void RenderFrame()
     {
-        UI::PopStyleVar(4);
-        UI::PopStyleColor(13);
+        UI::PopStyleVar(5);
+        UI::PopStyleColor(17);
 
         UI::Render();
         ImGui_ImplOpenGL3_RenderDrawData(UI::GetDrawData());

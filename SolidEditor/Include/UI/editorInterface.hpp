@@ -1,9 +1,12 @@
 #pragma once
 
 #include "Window/window.hpp"
+#include <imgui.h>
+
 #include "UI/sceneInterface.hpp"
 #include "UI/inspectorInterface.hpp"
 #include "UI/hierarchyTreeInterface.hpp"
+#include "UI/filesInterface.hpp"
 
 namespace Solid
 {
@@ -13,12 +16,14 @@ namespace Solid
         bool        p_open = true;
         Window*     window;
 
+        FilesInterface          filesInterface;
         SceneInterface          sceneInterface;
         InspectorInterface      inspectorInterface;
         HierarchyTreeInterface  hierarchyTreeInterface;
+
     public:
         EditorInterface() = default;
-        EditorInterface(Window* window);
+        explicit EditorInterface(Window* window);
 
         ~EditorInterface() = default;
 

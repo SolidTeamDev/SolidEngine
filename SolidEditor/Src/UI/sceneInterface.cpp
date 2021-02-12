@@ -13,16 +13,9 @@ namespace Solid
         windowFlags |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize;
 
 
-        UI::Begin("SceneInterface", &p_open, windowFlags);
+        UI::Begin("Scene", &p_open, windowFlags);
 
-        /*ImGuiID currID = UI::GetID("SceneDock");
-
-        UI::DockBuilderRemoveNode(currID);
-        UI::DockBuilderFinish(currID);
-
-        UI::DockSpace(currID, ImVec2(0,0));*/
-
-        UI::Text("Welcome on the Solid Scene!");
+        UI::TextWrapped("Welcome on the Solid Scene!");
         UI::End();
     }
 }

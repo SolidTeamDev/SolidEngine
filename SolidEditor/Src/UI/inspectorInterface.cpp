@@ -8,9 +8,9 @@ namespace Solid
     {
         UI::SetNextWindowSize(ImVec2(250,250));
 
-        UI::Begin("InspectorInterface", &p_open,
+        UI::Begin("Inspector", &p_open,
                   ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
-        UI::Text("Welcome on the Solid inspector!");
+        UI::TextWrapped("Welcome on the Solid inspector!");
         UI::End();
     }
 }
