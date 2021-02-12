@@ -14,7 +14,9 @@ namespace Solid
     {
     private:
         bool        p_open = true;
+        bool        colorOpen = false;
         Window*     window;
+        ImGuiStyle& editorStyle;
 
         FilesInterface          filesInterface;
         SceneInterface          sceneInterface;
@@ -22,7 +24,7 @@ namespace Solid
         HierarchyTreeInterface  hierarchyTreeInterface;
 
     public:
-        EditorInterface() = default;
+        EditorInterface();
         explicit EditorInterface(Window* window);
 
         ~EditorInterface() = default;
@@ -31,8 +33,11 @@ namespace Solid
          * @debrief updates the whole UI
          */
         void Update();
+        void PushColors();
+        void PopColors();
 
         void DrawMenuBar();
         void DrawMainFrame();
+        void DrawChangeColors();
     };
 }
