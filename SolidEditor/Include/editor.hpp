@@ -7,6 +7,8 @@ namespace Solid
 
     class Editor final : public Engine
     {
+    private:
+        InputManager<int> editorInputManager;
     public:
         Editor();
         ~Editor() final = default;

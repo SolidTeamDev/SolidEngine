@@ -3,6 +3,7 @@
 #include "Build/solidAPI.hpp"
 #include "Rendering/renderer.hpp"
 #include "Time/time.hpp"
+#include "InputManager/inputManager.hpp"
 
 namespace Solid
 {
@@ -18,6 +19,7 @@ namespace Solid
     protected:
 
         Renderer* renderer;
+        InputManager<int> inputManager;
 
     public:
 

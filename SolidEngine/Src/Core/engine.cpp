@@ -8,6 +8,7 @@ namespace Solid
     Engine::Engine()
     {
         InitializeRenderer();
+        inputManager = InputManager<int>(renderer->GetWindow()->GetHandle());
         UIContext::InitializeSolidUI(renderer->GetWindow()->GetHandle());
     }
 

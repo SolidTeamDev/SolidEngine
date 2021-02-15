@@ -1,14 +1,15 @@
 #include "editor.hpp"
 #include "UI/solidUI.hpp"
 #include "UI/editorInterface.hpp"
+#include "Inputs/editorInputs.hpp"
 
 #include <string>
 
 namespace Solid
 {
-    Editor::Editor()
+    Editor::Editor() : editorInputManager(renderer->GetWindow()->GetHandle())
     {
-
+        InitEditorInputList(editorInputManager);
     }
 
     void Editor::Loop()
@@ -18,9 +19,10 @@ namespace Solid
 
         glfwSwapInterval(0);
 
-        while (glfwWindowShouldClose(window) == false)
+        while (!glfwWindowShouldClose(window) && !editorInputManager.IsPressed(EInputList::ESCAPE))
         {
             glfwPollEvents();
+            editorInputManager.Update();
 
             renderer->Clear();
 

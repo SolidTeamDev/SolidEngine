@@ -41,8 +41,8 @@
             bool isPressed;
             bool isReleased;
         };
-        GLFWwindow* _window;
-        std::unordered_map<T,Input> _inputList;
+        GLFWwindow* window;
+        std::unordered_map<T,Input> inputList;
 
         static void joystickCallBack(int jid, int event)
         {
@@ -65,12 +65,12 @@
         {
             if(input.inputType == InputType::KEY)
             {
-                if(glfwGetKey(_window,input.key) == GLFW_PRESS)
+                if(glfwGetKey(window,input.key) == GLFW_PRESS)
                     return true;
             }
             else if(input.inputType == InputType::MOUSE)
             {
-                if(glfwGetMouseButton(_window,input.key) == GLFW_PRESS)
+                if(glfwGetMouseButton(window,input.key) == GLFW_PRESS)
                     return true;
             }
             else
@@ -90,18 +90,26 @@
         }
     public:
         /**
+         * @brief Construct input manager without window set
+         */
+        InputManager()
+        {
+            window = nullptr;
+        }
+
+        /**
          * @brief Construct a new Input Manager object
          * 
-         * @param window The pointer of the GLFW window
+         * @param _window The pointer of the GLFW _window
          */
-        InputManager(GLFWwindow* window)
+        InputManager(GLFWwindow* _window)
         {
-            _window = window;
+            window = _window;
 
             glfwSetJoystickCallback(joystickCallBack);
         }
 
-        ~InputManager(){}
+        ~InputManager() = default;
 
         /**
          * @brief Add keyboard input to list
@@ -110,9 +118,9 @@
          * @param key GLFW_KEY input
          * @param detectionType Type of input
          */
-        void addKeyInput(T id, int key, ImEnumDetectionType detectionType)
+        void AddKeyInput(T id, int key, ImEnumDetectionType detectionType)
         {
-            _inputList.insert({id,{detectionType,InputType::KEY,key,-1,false,true}});
+            inputList.insert({id,{detectionType,InputType::KEY,key,-1,false,true}});
         }
 
         /**
@@ -122,9 +130,9 @@
          * @param key GLFW_MOUSE input
          * @param detectionType Type of input
          */
-        void addMouseInput(T id, int key, ImEnumDetectionType detectionType)
+        void AddMouseInput(T id, int key, ImEnumDetectionType detectionType)
         {
-            _inputList.insert({id,{detectionType,InputType::MOUSE,key,-1,false,true}});
+            inputList.insert({id,{detectionType,InputType::MOUSE,key,-1,false,true}});
         }
 
         /**
@@ -135,18 +143,18 @@
          * @param key GLFW_MOUSE input
          * @param detectionType Type of input
          */
-        void addControllerInput(T id, int glfwJoystick, int key, ImEnumDetectionType detectionType)
+        void AddControllerInput(T id, int glfwJoystick, int key, ImEnumDetectionType detectionType)
         {
-            _inputList.insert({id,{detectionType,InputType::CONTROLLER,key,glfwJoystick,false,true}});
+            inputList.insert({id,{detectionType,InputType::CONTROLLER,key,glfwJoystick,false,true}});
         }
         
         /**
          * @brief Update every input added. Update each frame
          * 
          */
-        void update()
+        void Update()
         {
-            for (auto i = _inputList.begin(); i != _inputList.end(); i++)
+            for (auto i = inputList.begin(); i != inputList.end(); i++)
             {
                 Input& input = i->second;
 
@@ -193,9 +201,9 @@
          * @param id the id of input
          * @return true if the input id is pressed, false instead
          */
-        bool isPressed(T id)
+        bool IsPressed(T id)
         {
-            Input& input = _inputList.at(id);
+            Input& input = inputList.at(id);
             bool isPressed = input.isPressed;
 
             return isPressed;
@@ -207,9 +215,9 @@
          * @param id the id of input
          * @return true if the input id is released, flase instead
          */
-        bool isReleased(T id)
+        bool IsReleased(T id)
         {
-            return _inputList.at(id).isReleased;
+            return inputList.at(id).isReleased;
         }
 
         /**
@@ -218,9 +226,9 @@
          * @param _posx set the x pos value of cursor
          * @param _posy set the y pos value of cursor
          */ 
-        void getCursorPos(double& _posx, double& _posy)
+        void GetCursorPos(double& _posx, double& _posy)
         {
-            glfwGetCursorPos(_window,&_posx,&_posy);
+            glfwGetCursorPos(window,&_posx,&_posy);
         }
         
         #if 0 // 0 = Vector2 not included, 1 = Vector2 included
@@ -233,7 +241,7 @@
         {
             Vector2 pos[2];
 
-            glfwGetCursorPos(_window,&pos.x,&pos.y);
+            glfwGetCursorPos(window,&pos.x,&pos.y);
 
             return pos;
         }
@@ -246,7 +254,7 @@
          * @param _axeId The joystick axis id
          * @param _pos store the result
          */
-        void getAxis(int _jid, int _axeId, float& _pos)
+        void GetAxis(int _jid, int _axeId, float& _pos)
         {
             int count;
             const float* axes = glfwGetJoystickAxes(_jid,&count);
@@ -266,7 +274,7 @@
          * @param _axeId The joystick axis id
          * @return Value of the joystick axis
          */
-        float getAxis(int _jid, int _axeId)
+        float GetAxis(int _jid, int _axeId)
         {
             int count;
             const float* axes = glfwGetJoystickAxes(_jid,&count);
@@ -288,7 +296,7 @@
          * @param _hatId Id of the hat
          * @param _value Store the value of the hat
          */
-        void getHat(int _jid, int _hatId, int& _value)
+        void GetHat(int _jid, int _hatId, int& _value)
         {
             int count;
             const unsigned char* hats = glfwGetJoystickHats(_jid,&count);
@@ -306,7 +314,7 @@
          * @param _hatId Id of the hat
          * @return the value of the hat
          */
-        int getHat(int _jid, int _hatId)
+        int GetHat(int _jid, int _hatId)
         {
             int count;
             const unsigned char* hats = glfwGetJoystickHats(_jid,&count);
