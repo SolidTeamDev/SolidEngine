@@ -191,28 +191,27 @@ void EditorInterface::DrawChangeColors()
     if (UI::Button("Light Theme"))
         LightTheme();
 
-
-    UI::ColorButton("Text Preview", editorStyle.Colors[0]);
+    UI::ColorEdit4("##Text Preview",(float*)&editorStyle.Colors[0],ImGuiColorEditFlags_NoInputs);
     UI::SameLine();
     UI::DragFloat4("Text", (float*)&editorStyle.Colors[0], 0.005f, 0.f, 1.f);
 
-    UI::ColorButton("BG Preview", editorStyle.Colors[2]);
+    UI::ColorEdit4("##BG Preview",(float*)&editorStyle.Colors[2],ImGuiColorEditFlags_NoInputs);
     UI::SameLine();
     UI::DragFloat4("Background", (float*)&editorStyle.Colors[2], 0.005f, 0.f, 1.f);
     editorStyle.Colors[ImGuiCol_ChildBg] = editorStyle.Colors[2];
 
-    UI::ColorButton("Border Preview", editorStyle.Colors[6]);
+    UI::ColorEdit4("##Border Preview",(float*)&editorStyle.Colors[6],ImGuiColorEditFlags_NoInputs);
     UI::SameLine();
     UI::DragFloat4("Border", (float*)&editorStyle.Colors[6], 0.005f, 0.f, 1.f);
 
-    UI::ColorButton("Tab Unfocused Active Preview",
-                    editorStyle.Colors[ImGuiCol_TabUnfocusedActive]);
+    UI::ColorEdit4("##Tab Unfocused Active Preview",(float*)&editorStyle.Colors[ImGuiCol_TabUnfocusedActive],
+                   ImGuiColorEditFlags_NoInputs);
     UI::SameLine();
     UI::DragFloat4("Tab Unfocused Active",
                (float*)&editorStyle.Colors[ImGuiCol_TabUnfocusedActive], 0.005f, 0.f, 1.f);
 
-    UI::ColorButton("Tab Active Preview",
-                    editorStyle.Colors[ImGuiCol_TabActive]);
+    UI::ColorEdit4("##Tab Unfocused Active",(float*)&editorStyle.Colors[ImGuiCol_TabActive],
+                   ImGuiColorEditFlags_NoInputs);
     UI::SameLine();
     UI::DragFloat4("Tab Active",
                    (float*)&editorStyle.Colors[ImGuiCol_TabActive], 0.005f, 0.f, 1.f);
