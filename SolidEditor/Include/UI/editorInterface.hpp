@@ -39,5 +39,6 @@ namespace Solid
         void DrawMenuBar();
         void DrawMainFrame();
         void DrawChangeColors();
+        void DrawPerfOverlay();
     };
 }

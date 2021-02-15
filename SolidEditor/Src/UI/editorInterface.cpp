@@ -1,9 +1,10 @@
 #include "UI/editorInterface.hpp"
 #include "UI/solidUI.hpp"
+#include "Time/time.hpp"
 
 #include <iostream>
 #include <imgui_internal.h>
-
+#include <string>
 
 using namespace Solid;
 
@@ -31,6 +32,7 @@ void EditorInterface::Update()
     hierarchyTreeInterface.Draw();
     if (colorOpen)
         DrawChangeColors();
+    DrawPerfOverlay();
 
     UIContext::RenderFrame();
 }
@@ -219,4 +221,19 @@ void EditorInterface::DrawChangeColors()
     UI::End();
 }
 
+void EditorInterface::DrawPerfOverlay()
+{
+    UI::SetNextWindowBgAlpha(0.2);
+    UI::SetNextWindowSize(ImVec2(150,150));
+    UI::SetNextWindowViewport(UI::GetID(UI::GetMainViewport()));
+    ImGuiWindowFlags flags = 0;
+    flags |= ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse;
+    flags |= ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDocking;
+    flags |= ImGuiWindowFlags_NoTitleBar;
+    UI::Begin("PerfOverlay", &p_open, flags);
+    std::string fps = std::to_string(Time::Fps()) + " fps";
+    UI::Text(fps.c_str());
 
+    UI::End();
+
+}
