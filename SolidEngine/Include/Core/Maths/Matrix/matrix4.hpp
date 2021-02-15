@@ -23,7 +23,9 @@ namespace Solid
         Mat4(T e0 , T e1 , T e2  , T e3,
              T e4 , T e5 , T e6  , T e7,
              T e8 , T e9 , T e10 , T e11
-             T e12, T e13, T e14 , T e15)
+             T e12, T e13, T e14 , T e15);
+
+        Mat4(std::array<T, 16> _elements);
 
         ~Mat4() = default;
 
@@ -89,3 +91,5 @@ namespace Solid
 
     };
 }
+
+include "matrix.inl";

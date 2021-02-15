@@ -143,5 +143,11 @@ namespace Solid
         {
             return Abs(_a - _b) < _epsilon;
         }
+
+        template <typename T>
+        constexpr bool Equals0(T _value)
+        {
+            return Equals(_value, 0);
+        }
     }
 }

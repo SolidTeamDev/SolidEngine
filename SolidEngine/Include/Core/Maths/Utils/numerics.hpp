@@ -182,6 +182,17 @@ namespace Solid
          */
         template <typename T>
         constexpr bool Equals(T _a, T _b, float _epsilon = S_EPSILON);
+
+        /**
+         * @brief test if the number is equal to 0
+         * @tparam T Type of value
+         * @param  _value is value
+         * @return if value is equal to 0
+         */
+        template <typename T>
+        constexpr bool Equals0(T _value);
+
+
     }
 }
 
