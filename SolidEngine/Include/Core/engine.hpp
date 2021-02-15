@@ -2,6 +2,7 @@
 
 #include "Build/solidAPI.hpp"
 #include "Rendering/renderer.hpp"
+#include "Time/time.hpp"
 
 namespace Solid
 {
