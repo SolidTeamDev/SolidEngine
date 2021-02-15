@@ -27,6 +27,7 @@ namespace Solid
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
         glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
 
         window = glfwCreateWindow(_wParam.windowSize.x,_wParam.windowSize.y,_wParam.title.c_str(), nullptr, nullptr);
 

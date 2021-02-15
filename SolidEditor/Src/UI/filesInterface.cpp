@@ -12,7 +12,29 @@ namespace Solid
         UI::Begin("Files", &p_open,
                   ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
         UI::TextWrapped("Welcome on the Solid files explorer!");
+        DrawCreateFile();
         UI::End();
 
+    }
+
+    void FilesInterface::DrawCreateFile()
+    {
+        if(UI::BeginPopupContextWindow("createFile"))
+        {
+            if(UI::BeginMenu("New"))
+            {
+                if(UI::MenuItem("Create .hpp"))
+                {
+
+                }
+                if(UI::MenuItem("Create .cpp"))
+                {
+
+                }
+                UI::EndMenu();
+            }
+
+            UI::EndPopup();
+        }
     }
 }

@@ -11,5 +11,6 @@ namespace Solid
         ~FilesInterface() = default;
 
         void Draw();
+        void DrawCreateFile();
     };
 }
