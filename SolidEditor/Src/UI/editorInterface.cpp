@@ -40,29 +40,78 @@ void EditorInterface::Update()
  */
 void EditorInterface::DarkTheme()
 {
-    editorStyle.Colors[ImGuiCol_WindowBg] = ImVec4(0.2f, 0.2f, 0.2f, 1.f);
+    editorStyle.Colors[ImGuiCol_WindowBg]       = ImVec4(0.15f, 0.15f, 0.15f, 1.f);
     editorStyle.Colors[ImGuiCol_DockingEmptyBg] = ImVec4(0.02f, 0.02f, 0.02f, 1.f);
-    editorStyle.Colors[ImGuiCol_ChildBg] = ImVec4(0.2f, 0.2f, 0.2f, 1.f);
+    editorStyle.Colors[ImGuiCol_ChildBg]        = ImVec4(0.1f, 0.1f, 0.1f, 1.f);
 
-    editorStyle.Colors[ImGuiCol_DockingPreview]= ImVec4(0.25f, 0.25f, 0.25f, 1.f);
+    editorStyle.Colors[ImGuiCol_DockingPreview] = ImVec4(0.25f, 0.25f, 0.25f, 1.f);
 
     editorStyle.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.1f, 0.1f, 0.1f, 1.f);
-    editorStyle.Colors[ImGuiCol_Border] = ImVec4(0.1f, 0.1f, 0.1f, 1.f);
+    editorStyle.Colors[ImGuiCol_TitleBg]   = ImVec4(0.1f, 0.1f, 0.1f, 1.f);
+    editorStyle.Colors[ImGuiCol_MenuBarBg] = ImVec4(0.3f, 0.3f, 0.3f, 1.f);
+    editorStyle.Colors[ImGuiCol_Border]        = ImVec4(0.1f, 0.1f, 0.1f, 1.f);
 
-    editorStyle.Colors[ImGuiCol_ResizeGripActive] = ImVec4(0.45f, 0.45f, 0.45f, 1.f);
+    editorStyle.Colors[ImGuiCol_ResizeGripActive]  = ImVec4(0.45f, 0.45f, 0.45f, 1.f);
     editorStyle.Colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.35f, 0.35f, 0.35f, 1.f);
-    editorStyle.Colors[ImGuiCol_ResizeGrip] = ImVec4(0.35f, 0.35f, 0.35f, 1.f);
+    editorStyle.Colors[ImGuiCol_ResizeGrip]        = ImVec4(0.35f, 0.35f, 0.35f, 1.f);
 
-    editorStyle.Colors[ImGuiCol_Separator] = ImVec4(0.1f, 0.1f, 0.1f, 1.f);
-    editorStyle.Colors[ImGuiCol_SeparatorActive] = ImVec4(0.1f, 0.1f, 0.1f, 1.f);
-    editorStyle.Colors[ImGuiCol_SeparatorHovered] = ImVec4(0.1f, 0.1f, 0.1f, 1.f);
+    editorStyle.Colors[ImGuiCol_Separator]        = ImVec4(0.05f, 0.05f, 0.05f, 1.f);
+    editorStyle.Colors[ImGuiCol_SeparatorActive]  = ImVec4(0.05f, 0.05f, 0.05f, 1.f);
+    editorStyle.Colors[ImGuiCol_SeparatorHovered] = ImVec4(0.05f, 0.05f, 0.05f, 1.f);
 
 
-    editorStyle.Colors[ImGuiCol_Tab] = ImVec4(0.2f, 0.2f, 0.2f, 1.f);
-    editorStyle.Colors[ImGuiCol_TabActive] = ImVec4(0.25f, 0.25f, 0.25f, 1.f);
-    editorStyle.Colors[ImGuiCol_TabHovered] = ImVec4(0.3f, 0.3f, 0.3f, 1.f);
-    editorStyle.Colors[ImGuiCol_TabUnfocused] = ImVec4(0.03f, 0.03f, 0.03f, 1.f);
+    editorStyle.Colors[ImGuiCol_Tab]                = ImVec4(0.2f, 0.2f, 0.2f, 1.f);
+    editorStyle.Colors[ImGuiCol_TabActive]          = ImVec4(0.25f, 0.25f, 0.25f, 1.f);
+    editorStyle.Colors[ImGuiCol_TabHovered]         = ImVec4(0.3f, 0.3f, 0.3f, 1.f);
+    editorStyle.Colors[ImGuiCol_TabUnfocused]       = ImVec4(0.03f, 0.03f, 0.03f, 1.f);
     editorStyle.Colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.15f, 0.15f, 0.15f, 1.f);
+
+    editorStyle.Colors[ImGuiCol_Text] = ImVec4(0.95f, 0.95f, 0.95f, 1.f);
+
+    editorStyle.Colors[ImGuiCol_Button]        = ImVec4(0.3f, 0.3f, 0.3f, 1.f);
+    editorStyle.Colors[ImGuiCol_ButtonActive]  = ImVec4(0.25f, 0.25f, 0.25f, 1.f);
+    editorStyle.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.35f, 0.35f, 0.35f, 1.f);
+
+    editorStyle.Colors[ImGuiCol_FrameBg]        = ImVec4(0.3f, 0.3f, 0.3f, 1.f);
+    editorStyle.Colors[ImGuiCol_FrameBgActive]  = ImVec4(0.25f, 0.25f, 0.25f, 1.f);
+    editorStyle.Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.35f, 0.35f, 0.35f, 1.f);
+}
+
+void EditorInterface::LightTheme() {
+    editorStyle.Colors[ImGuiCol_WindowBg]       = ImVec4(0.85f, 0.85f, 0.85f, 1.f);
+    editorStyle.Colors[ImGuiCol_DockingEmptyBg] = ImVec4(0.7f, 0.7f, 0.7f, 1.f);
+    editorStyle.Colors[ImGuiCol_ChildBg]        = ImVec4(0.85f, 0.85f, 0.85f, 1.f);
+
+    editorStyle.Colors[ImGuiCol_DockingPreview] = ImVec4(0.6, 0.6f, 0.6f, 1.f);
+
+    editorStyle.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.7f, 0.7f, 0.7f, 1.f);
+    editorStyle.Colors[ImGuiCol_TitleBg]   = ImVec4(0.7f, 0.7f, 0.7f, 1.f);
+    editorStyle.Colors[ImGuiCol_MenuBarBg] = ImVec4(0.65f, 0.65f, 0.65f, 1.f);
+    editorStyle.Colors[ImGuiCol_Border]        = ImVec4(0.6f, 0.6f, 0.6f, 1.f);
+
+    editorStyle.Colors[ImGuiCol_ResizeGripActive]  = ImVec4(0.45f, 0.45f, 0.45f, 1.f);
+    editorStyle.Colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.35f, 0.35f, 0.35f, 1.f);
+    editorStyle.Colors[ImGuiCol_ResizeGrip]        = ImVec4(0.35f, 0.35f, 0.35f, 1.f);
+
+    editorStyle.Colors[ImGuiCol_Separator]        = ImVec4(0.75f, 0.75f, 0.75f, 1.f);
+    editorStyle.Colors[ImGuiCol_SeparatorActive]  = ImVec4(0.75f, 0.75f, 0.75f, 1.f);
+    editorStyle.Colors[ImGuiCol_SeparatorHovered] = ImVec4(0.75f, 0.75f, 0.75f, 1.f);
+
+    editorStyle.Colors[ImGuiCol_Tab]                = ImVec4(0.8f, 0.8f, 0.8f, 1.f);
+    editorStyle.Colors[ImGuiCol_TabActive]          = ImVec4(0.85f, 0.85f, 0.85f, 1.f);
+    editorStyle.Colors[ImGuiCol_TabHovered]         = ImVec4(0.9f, 0.9f, 0.9f, 1.f);
+    editorStyle.Colors[ImGuiCol_TabUnfocused]       = ImVec4(0.75f, 0.75f, 0.75f, 1.f);
+    editorStyle.Colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.8f, 0.8f, 0.8f, 1.f);
+
+    editorStyle.Colors[ImGuiCol_Text] = ImVec4(0.05f, 0.05f, 0.05f, 1.f);
+
+    editorStyle.Colors[ImGuiCol_Button]        = ImVec4(0.6f, 0.6f, 0.6f, 1.f);
+    editorStyle.Colors[ImGuiCol_ButtonActive]  = ImVec4(0.55f, 0.55f, 0.55f, 1.f);
+    editorStyle.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.65f, 0.65f, 0.65f, 1.f);
+
+    editorStyle.Colors[ImGuiCol_FrameBg]        = ImVec4(0.6f, 0.6f, 0.6f, 1.f);
+    editorStyle.Colors[ImGuiCol_FrameBgActive]  = ImVec4(0.55f, 0.55f, 0.55f, 1.f);
+    editorStyle.Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.65f, 0.65f, 0.65f, 1.f);
 }
 
 void EditorInterface::DrawMenuBar()
@@ -136,6 +185,9 @@ void EditorInterface::DrawChangeColors()
 
     if (UI::Button("Dark Theme"))
         DarkTheme();
+    UI::SameLine();
+    if (UI::Button("Light Theme"))
+        LightTheme();
 
 
     UI::ColorButton("Text Preview", editorStyle.Colors[0]);

@@ -34,6 +34,7 @@ namespace Solid
          */
         void Update();
         void DarkTheme();
+        void LightTheme();
 
         void DrawMenuBar();
         void DrawMainFrame();
