@@ -39,7 +39,8 @@ namespace Solid
             }
             {
                 std::lock_guard<std::mutex> Lock(selfInternalMutex);
-                TaskSystem* manager = self_Internal->TaskManager;
+
+                TaskManager* manager = self_Internal->TaskManager;
                 if(manager == nullptr)
                 {
                     std::this_thread::yield();
@@ -49,17 +50,24 @@ namespace Solid
                 if(task == nullptr)
                 {
                     task = manager->GetFirstAvailableTask();
-                    if(task== nullptr)
-                    {
-                        std::this_thread::yield();
-                        continue;
-                    }
+
 
                 }
-                task->operator()();
-                task->UnDispatch();
-                if(self_Internal->bWaitForThread)
-                    self_Internal->bWaitForThread = false;
+                if(task== nullptr)
+                {
+                    if(self_Internal->bWaitForThread)
+                        self_Internal->bWaitForThread = false;
+                    std::this_thread::yield();
+
+                }
+                else
+                {
+                    task->operator()();
+                    task->UnDispatch();
+                    if(self_Internal->bWaitForThread)
+                        self_Internal->bWaitForThread = false;
+                }
+
             }
             {
                 std::lock_guard<std::mutex> Lock(selfInternalMutex);
@@ -67,19 +75,19 @@ namespace Solid
                 isPaused = self_Internal->bPauseThread;
             }
         }
-        //std::cout << "Terminating" << std::endl;
+       ///Terminate thread
 
         self_Internal->StopWaitForThread(selfInternalMutex);
 
     }
 
-    ThreadManager::ThreadManager()
+    ThreadManager::ThreadManager(TaskManager* Manager)
     {
         MaxNumThread = std::thread::hardware_concurrency();
         int i = MaxNumThread;
         ThreadPool.reserve(MaxNumThread);
         for (int j = 0; j < MaxNumThread; ++j) {
-            ThreadPool.emplace_back(new Thread(&i));
+            ThreadPool.emplace_back(new Thread(Manager, &i));
         }
 
 
@@ -97,7 +105,13 @@ namespace Solid
         }
         return *this;
     }
-
+    ThreadManager &ThreadManager::PauseAllThreads()
+    {
+        for (Thread* thread : ThreadPool) {
+            thread->Pause();
+        }
+        return *this;
+    }
     ThreadManager &ThreadManager::joinAllThread() {
 
         for (Thread* thread : ThreadPool) {

@@ -7,8 +7,9 @@
 #include <iostream>
 #include <functional>
 #include <mutex>
+#include "../Build/solidAPI.hpp"
 #include "Task.hpp"
-#include "TaskSystem.hpp"
+#include "TaskManager.hpp"
 #include "ThreadManager.hpp"
 
 #endif //SOLIDENGINE_SOLIDMULTITHREAD_HPP

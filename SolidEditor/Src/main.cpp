@@ -2,32 +2,28 @@
 #include "Core/engine.hpp"
 #include "Ressources/Ressources.hpp"
 #include "editor.hpp"
+#include <chrono>
 int main()
 {
     Solid::Editor editor;
 
-    Solid::ResourceManager Manager;
+
     Solid::ResourcesLoader Loader;
-    Loader.SetManager(&Manager);
-    fs::path zShaderP = fs::current_path();
-    fs::path computeShaderP = fs::current_path();
-    fs::path SzShaderP = fs::current_path();
-    fs::path ScomputeShaderP = fs::current_path();
-    zShaderP.append("Resources");
-    computeShaderP.append("Resources");
-    zShaderP.append("ZShader");
-    computeShaderP.append("ComputeShader");
-    fs::create_directory(zShaderP);
-    fs::create_directory(computeShaderP);
+    Loader.SetManager(editor.RManager);
+    editor.EnableMultiThread(true);
+    fs::path ResourcesPath = fs::current_path().append("SolidResources");
+    auto before = std::chrono::high_resolution_clock::now();
+    Loader.LoadResourcesFromFolder(ResourcesPath);
+    auto after = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::ratio<1,1000>> fp_s = after - before;
+    std::cout << "Loading has Taken " << fp_s.count() << " milliseconds\n";
 
-    SzShaderP.append("Solid");
-    ScomputeShaderP.append("Solid");
-    SzShaderP.append("ZShader.SVertFrag");
-    ScomputeShaderP.append("ComputeShader.SCompute");
-
-    Loader.LoadRessource(SzShaderP);
-    Loader.LoadRessource(ScomputeShaderP);
-
+    editor.EnableMultiThread(false);
+    before = std::chrono::high_resolution_clock::now();
+    Loader.LoadResourcesFromFolder(ResourcesPath);
+    after = std::chrono::high_resolution_clock::now();
+    fp_s = after - before;
+    std::cout << "Loading Mono has Taken " << fp_s.count() << " milliseconds\n";
     std::system("Pause");
     return EXIT_SUCCESS;
 }

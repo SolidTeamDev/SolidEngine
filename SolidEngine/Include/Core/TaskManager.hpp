@@ -2,22 +2,25 @@
 // Created by ryan1 on 10/02/2021.
 //
 
-#ifndef SOLIDENGINE_TASKSYSTEM_HPP
-#define SOLIDENGINE_TASKSYSTEM_HPP
+#ifndef SOLIDENGINE_TASKMANAGER_HPP
+#define SOLIDENGINE_TASKMANAGER_HPP
 
 
 namespace Solid
 {
 
-    class TaskSystem {
+    class SOLID_API TaskManager {
         std::mutex TaskSystemGuard;
         std::vector<Task> TaskPool;
     public:
 
-        TaskSystem()
+        TaskManager()
         {
+
             TaskPool.reserve(50);
         }
+
+        TaskManager(TaskManager&) = delete;
         Task* getTaskByType(const TaskType& s)
         {
             std::lock_guard<std::mutex> Lock(TaskSystemGuard);
@@ -72,13 +75,13 @@ namespace Solid
             }
             return nullptr;
         }
-        TaskSystem& AddTask(Task&& t)
+        Task& AddTask(Task&& t)
         {
             std::lock_guard<std::mutex> Lock(TaskSystemGuard);
             TaskPool.push_back(std::move(t));
-            return *this;
+            return TaskPool.back();
         }
-        TaskSystem& RemoveTaskById(const std::string_view& s)
+        TaskManager& RemoveTaskById(const std::string_view& s)
         {
             std::lock_guard<std::mutex> Lock(TaskSystemGuard);
             for(int i = 0; i < TaskPool.size(); ++i)
@@ -114,4 +117,4 @@ namespace Solid
 }
 
 
-#endif //SOLIDENGINE_TASKSYSTEM_HPP
+#endif //SOLIDENGINE_TASKMANAGER_HPP

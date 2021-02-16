@@ -11,9 +11,10 @@
 #include "assimp\postprocess.h"
 #include <sstream>
 #include "glad/glad.h"
+#include "Core/engine.hpp"
 using namespace Solid;
 
-
+#define SASSET_GEN 0
 
 ///
 /// ResourceManager 
@@ -28,6 +29,10 @@ std::vector<Resource *> & ResourceManager::GetList()
     return ResourceList;
 }
 
+Engine* ResourceManager::GetEngine()
+{
+    return EnginePtr;
+}
 
 ///
 /// ResourcesLoader Base
@@ -39,14 +44,22 @@ void ResourcesLoader::SetManager(ResourceManager *m)
     Manager = m;
 }
 
-void ResourcesLoader::LoadRessource(const fs::path &Rpath) 
+void  ResourcesLoader::LoadRessourceNoAdd(const fs::path &Rpath, ResourcePtrWrapper &wrapper)
 {
     if(!fs::exists(Rpath))
         return;
-
+    Resource* r = nullptr;
     if(fs::is_directory(Rpath))
     {
-        LoadShader(Rpath);
+        std::string name = Rpath.filename().string();
+        std::transform(name.begin(), name.end(), name.begin(),
+                       [](unsigned char c){ return std::tolower(c); });
+        if(name.find("shader") != std::string::npos || name.find("compute") != std::string::npos)
+             r=LoadShader(Rpath);
+        else
+        {
+            return;
+        }
     }
 
     std::string extension = Rpath.extension().string();
@@ -56,15 +69,15 @@ void ResourcesLoader::LoadRessource(const fs::path &Rpath)
         ///Solid Asset Loading
 
     if(extension == ".simage")
-        LoadSolidImage(Rpath);
+        r=LoadSolidImage(Rpath);
     if(extension == ".stexture")
         ;
     if(extension == ".smesh")
-        LoadSolidMesh(Rpath);
+        r=LoadSolidMesh(Rpath);
     if(extension == ".scompute")
-        LoadSolidComputeShader(Rpath);
+        r=LoadSolidComputeShader(Rpath);
     if(extension == ".svertfrag")
-        LoadSolidShader(Rpath);
+        r=LoadSolidShader(Rpath);
     if(extension == ".smaterial")
         ;
     if(extension == ".sanim")
@@ -72,27 +85,133 @@ void ResourcesLoader::LoadRessource(const fs::path &Rpath)
 
     /// Image Loading
     if(extension == ".bmp")
-        LoadImage(Rpath);
+        r=LoadImage(Rpath);
     if(extension == ".png")
-        LoadImage(Rpath);
+        r=LoadImage(Rpath);
     if(extension == ".jpg")
-        LoadImage(Rpath);
+        r=LoadImage(Rpath);
     if(extension == ".jpeg")
-        LoadImage(Rpath);
+        r=LoadImage(Rpath);
 
     ///Mesh Loading
     if(extension == ".obj")
-        LoadMesh(Rpath);
+        r=LoadMesh(Rpath);
     if(extension == ".fbx")
-        LoadMesh(Rpath);
+        r=LoadMesh(Rpath);
 
+    wrapper.r = r;
+}
+void ResourcesLoader::LoadRessource(const fs::path &Rpath)
+{
+    ResourcePtrWrapper RWrapper {nullptr};
+    LoadRessourceNoAdd(Rpath, RWrapper);
+    if(RWrapper.r != nullptr)
+        Manager->AddResource(RWrapper.r);
+}
+
+struct ShaderLoaderWrapper
+{
+    fs::path p;
+    int i;
+};
+
+void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
+{
+    if(!fs::exists(Rpath))
+        return;
+    ///MultiThread Loading
+    if(Manager->GetEngine()->MultiThreadEnabled())
+    {
+        TaskManager& TaskMan = Manager->GetEngine()->MultiTask;
+        using fp = bool (*)( const fs::path&);
+        auto shaderFind = [](const fs::path&item)
+                {
+                    if(fs::is_directory(item))
+                    {
+                        std::string name = item.filename().string();
+                        std::transform(name.begin(), name.end(), name.begin(),
+                                       [](unsigned char c){ return std::tolower(c); });
+                        return (name.find("shader") != std::string::npos || name.find("compute") != std::string::npos);
+
+                    }
+                    return false;
+                };
+        const std::size_t numOffiles = std::count_if(fs::directory_iterator(Rpath), fs::directory_iterator{}, (fp)fs::is_regular_file);
+        const std::size_t numOfShader = std::count_if(fs::directory_iterator(Rpath), fs::directory_iterator{}, (fp)shaderFind);
+        ResourcePtrWrapper* RessourceArray = new ResourcePtrWrapper[numOffiles + numOfShader];
+        auto Lambda = [this](const fs::path *Rpath, ResourcePtrWrapper *wrapper){LoadRessourceNoAdd(*Rpath,*wrapper); delete Rpath;};
+        int i =0;
+        std::vector<ShaderLoaderWrapper> Shaders;
+        Shaders.reserve(5);
+        for (auto& item : fs::directory_iterator(Rpath))
+        {
+            std::string name = item.path().filename().string();
+            fs::path* newP = new fs::path(item.path());
+            if(fs::is_directory(item))
+            {
+                std::transform(name.begin(), name.end(), name.begin(),
+                               [](unsigned char c){ return std::tolower(c); });
+                if(name.find("shader") != std::string::npos || name.find("compute") != std::string::npos)
+                {
+                    Shaders.push_back({item, i});
+                    ++i;
+                }
+                continue; //recursive func
+            }
+            else
+            {
+                std::string extension = item.path().extension().string();
+                std::transform(extension.begin(), extension.end(), extension.begin(),
+                               [](unsigned char c){ return std::tolower(c); });
+                if(extension == ".scompute" || extension == ".svertfrag")
+                {
+                    Shaders.push_back({item, i});
+                    ++i;
+                    continue;
+                }
+                TaskMan.AddTask(Task(Task::MakeID("Load " + name),TaskType::RESOURCES_LOADER, Lambda,newP, &RessourceArray[i]));
+                ++i;
+            }
+
+        }
+        for(auto& s : Shaders)
+            LoadRessourceNoAdd(s.p, RessourceArray[s.i]);
+        Manager->GetEngine()->ThreadPool.joinAllThread();
+
+        for (int j = 0; j < numOffiles + numOfShader; ++j) {
+
+            if(RessourceArray[j].r!= nullptr)
+                Manager->AddResource(RessourceArray[j].r);
+        }
+    }
+    /// MonoThread Loading
+    else
+    {
+        for (auto& item : fs::directory_iterator(Rpath))
+        {
+            if(fs::is_directory(item))
+            {
+                std::string name = Rpath.filename().string();
+                std::transform(name.begin(), name.end(), name.begin(),
+                               [](unsigned char c){ return std::tolower(c); });
+                if(name.find("shader") != std::string::npos || name.find("compute") != std::string::npos)
+                    LoadRessource(item);
+                else
+                {
+                    return; //recursive func
+                }
+            }
+            else
+                LoadRessource(item);
+        }
+    }
 }
 
 ///
 /// Base Asset Loader
 ///
 
-void ResourcesLoader::LoadImage(const fs::path &Rpath)
+Resource * ResourcesLoader::LoadImage(const fs::path &Rpath)
 {
     ImageResource* Image = new ImageResource();
     Image->_name = Rpath.filename().string();
@@ -102,40 +221,38 @@ void ResourcesLoader::LoadImage(const fs::path &Rpath)
     Image->image.resize(Image->x * Image->y * Image->ChannelsNum);
     std::memcpy(Image->image.data(), img, Image->image.size());
 
-#if 1
+#if SASSET_GEN
+    //printf("Generate .SImage\n");
     std::vector<char> Data;
     Image->ToDataBuffer(Data);
-
-
-
-
-    fs::path cachePath = Rpath.parent_path();
+    fs::path cachePath = SolidPath;
     cachePath.append(Rpath.filename().string() + ".SImage");
     std::ofstream cacheFile(cachePath, std::fstream::binary | std::fstream::trunc);
-
-
     if(cacheFile.is_open())
     {
         cacheFile.write(Data.data(), Data.size());
     }
 #endif
     stbi_image_free(img);
-    Manager->AddResource(Image);
+    return Image;
 }
 
 
 
 
 
-void ResourcesLoader::LoadMesh(const fs::path &Rpath)
+Resource * ResourcesLoader::LoadMesh(const fs::path &Rpath)
 {
     MeshResource* Mesh = new MeshResource;
     Assimp::Importer importer;
     std::string str = Rpath.string();
+    Mesh->_name = Rpath.filename().string();
 
     const aiScene* scene = importer.ReadFile(str,  aiProcess_JoinIdenticalVertices | aiProcess_OptimizeMeshes| aiProcess_SplitLargeMeshes| aiProcess_Triangulate  | aiProcess_SortByPType | aiProcess_PreTransformVertices );
     if(!scene) {
         printf("Unable to load mesh: %s\n", importer.GetErrorString());
+        delete Mesh;
+        return nullptr;
     }
 
     for(int i = 0; i < scene->mNumMeshes; ++i) {
@@ -160,14 +277,15 @@ void ResourcesLoader::LoadMesh(const fs::path &Rpath)
                 std::memcpy(&(Sub.vertices[j].TexCoords), &(scene->mMeshes[i]->mTextureCoords[j]), 2 * sizeof(float));
         }
     }
-#if 1
+#if SASSET_GEN
+    printf("generate .Smesh\n");
     std::vector<char> Data;
     Mesh->ToDataBuffer(Data);
 
 
 
 
-    fs::path cachePath = Rpath.parent_path();
+    fs::path cachePath = SolidPath;
     cachePath.append(Rpath.filename().string() + ".SMesh");
     std::ofstream cacheFile(cachePath, std::fstream::binary | std::fstream::trunc);
 
@@ -178,13 +296,17 @@ void ResourcesLoader::LoadMesh(const fs::path &Rpath)
         cacheFile.write(Data.data(), Data.size());
     }
 #endif
-    Manager->AddResource(Mesh);
+
+    return Mesh;
+
+
 
 }
 
 // Type = GL_VERTEX_SHADER / GL_FRAGMENT_SHADER / GL_COMPUTE_SHADER
 GLuint CreateShader(GLenum type, int sourceCount, std::vector<char*>& sources)
 {
+
     GLuint shader = glCreateShader(type);
 
     glShaderSource(shader, sourceCount, sources.data(), nullptr);
@@ -201,7 +323,7 @@ GLuint CreateShader(GLenum type, int sourceCount, std::vector<char*>& sources)
     return shader;
 }
 
-void ResourcesLoader::LoadShader(const fs::path &Rpath)
+Resource * ResourcesLoader::LoadShader(const fs::path &Rpath)
 {
     std::string FolderName = Rpath.filename().string();
     std::string FolderNameLower = FolderName;
@@ -210,7 +332,6 @@ void ResourcesLoader::LoadShader(const fs::path &Rpath)
 
     if(FolderNameLower.find("compute") != std::string::npos)
     {
-        std::cout << "Compute Shader Loading" << "\n";
 
         std::vector<char*> ComputeSources(1);
         bool found = false;
@@ -239,7 +360,7 @@ void ResourcesLoader::LoadShader(const fs::path &Rpath)
 
         }
         if(!found)
-            return;
+            return nullptr;
         GLuint cShader = CreateShader(GL_COMPUTE_SHADER, 1, ComputeSources);
         GLuint program = glCreateProgram();
         glAttachShader(program, cShader);
@@ -254,19 +375,21 @@ void ResourcesLoader::LoadShader(const fs::path &Rpath)
             GLchar infoLog[1024];
             glGetProgramInfoLog(program, ARRAYSIZE(infoLog), nullptr, infoLog);
             printf("Program link error: %s", infoLog);
-            return;
+            //TODO : Cleanup at return
+            return nullptr;
         }
         ComputeShaderResource* Compute = new ComputeShaderResource(cShader, program, ComputeSources[0]);
         Compute->_name = Rpath.filename().string();
-        Manager->AddResource(Compute);
-#if 1
+
+#if SASSET_GEN
+        printf("generate .SCompute\n");
         std::vector<char> Data;
         Compute->ToDataBuffer(Data);
 
 
 
 
-        fs::path cachePath = Rpath.parent_path();
+        fs::path cachePath = SolidPath;
         cachePath.append(Rpath.filename().string() + ".SCompute");
         std::ofstream cacheFile(cachePath, std::fstream::binary | std::fstream::trunc);
 
@@ -278,6 +401,7 @@ void ResourcesLoader::LoadShader(const fs::path &Rpath)
         }
 #endif
         delete[] ComputeSources[0];
+        return Compute;
 
 
     }
@@ -327,8 +451,8 @@ void ResourcesLoader::LoadShader(const fs::path &Rpath)
             }
         }
         if(!vert || !frag)
-            return;
-        std::cout << "Vertex Shader Loading" << "\n";
+            return nullptr;
+        //TODO Cleanup at return
 
         GLuint vShader = CreateShader(GL_VERTEX_SHADER, 1, VertexSources);
         GLuint fShader = CreateShader(GL_FRAGMENT_SHADER, 1, fragSources);
@@ -347,19 +471,21 @@ void ResourcesLoader::LoadShader(const fs::path &Rpath)
             GLchar infoLog[1024];
             glGetProgramInfoLog(program, ARRAYSIZE(infoLog), nullptr, infoLog);
             printf("Program link error: %s", infoLog);
-            return;
+            //TODO : cleanup at return
+            return nullptr;
         }
         ShaderResource* Shader = new ShaderResource(vShader,fShader, program, VertexSources[0], fragSources[0]);
         Shader->_name = Rpath.filename().string();
-        Manager->AddResource(Shader);
-#if 1
+
+#if SASSET_GEN
+        printf("generate .SVertFrag\n");
         std::vector<char> Data;
         Shader->ToDataBuffer(Data);
 
 
 
 
-        fs::path cachePath = Rpath.parent_path();
+        fs::path cachePath =SolidPath;
         cachePath.append(Rpath.filename().string() + ".SVertFrag");
         std::ofstream cacheFile(cachePath, std::fstream::binary | std::fstream::trunc);
 
@@ -372,6 +498,8 @@ void ResourcesLoader::LoadShader(const fs::path &Rpath)
 #endif
         delete[] VertexSources[0];
         delete[] fragSources[0];
+        return Shader;
+
     }
 }
 
@@ -407,7 +535,7 @@ void ResourcesLoader::ReadFromBuffer(char* DataBuffer, void *Data, std::uint64_t
 /// Solid Assets Loader
 ///
 
-void ResourcesLoader::LoadSolidImage(const fs::path &Rpath)
+Resource * ResourcesLoader::LoadSolidImage(const fs::path &Rpath)
 {
         ImageResource* Image = new ImageResource();
 
@@ -419,11 +547,11 @@ void ResourcesLoader::LoadSolidImage(const fs::path &Rpath)
         ifs.seekg(0, std::ios::beg);
         ifs.read(&buffer[0], pos);
         Image->FromDataBuffer(buffer.data(), buffer.size());
-        Manager->AddResource(Image);
+    return Image;
 }
 
 
-void ResourcesLoader::LoadSolidMesh(const fs::path &Rpath)
+Resource * ResourcesLoader::LoadSolidMesh(const fs::path &Rpath)
 {
     MeshResource* Mesh = new MeshResource();
 
@@ -436,12 +564,12 @@ void ResourcesLoader::LoadSolidMesh(const fs::path &Rpath)
     ifs.read(&buffer[0], pos);
 
     Mesh->FromDataBuffer(buffer.data(), buffer.size());
-    Manager->AddResource(Mesh);
+    return Mesh;
+
 }
 
-void ResourcesLoader::LoadSolidComputeShader(const fs::path &Rpath)
+Resource * ResourcesLoader::LoadSolidComputeShader(const fs::path &Rpath)
 {
-    std::cout << "Solid Compute Shader Loading" << "\n";
     ComputeShaderResource* cs = new ComputeShaderResource();
     std::ifstream ifs(Rpath, std::ios::binary|std::ios::ate);
     std::ifstream::pos_type pos = ifs.tellg();
@@ -452,12 +580,12 @@ void ResourcesLoader::LoadSolidComputeShader(const fs::path &Rpath)
     ifs.read(&buffer[0], pos);
 
     cs->FromDataBuffer(buffer.data(), buffer.size());
-    Manager->AddResource(cs);
+    return cs;
+
 
 }
-void ResourcesLoader::LoadSolidShader(const fs::path &Rpath)
+Resource * ResourcesLoader::LoadSolidShader(const fs::path &Rpath)
 {
-    std::cout << "Solid Vertex Shader Loading" << "\n";
     ShaderResource* s = new ShaderResource();
     std::ifstream ifs(Rpath, std::ios::binary|std::ios::ate);
     std::ifstream::pos_type pos = ifs.tellg();
@@ -468,7 +596,8 @@ void ResourcesLoader::LoadSolidShader(const fs::path &Rpath)
     ifs.read(&buffer[0], pos);
 
     s->FromDataBuffer(buffer.data(), buffer.size());
-    Manager->AddResource(s);
+    return s;
+
 }
 
 

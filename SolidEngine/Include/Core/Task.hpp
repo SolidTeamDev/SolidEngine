@@ -13,7 +13,7 @@ namespace Solid
 
 
 
-    class TaskPairInterface
+  /*  class SOLID_API TaskPairInterface
     {
     public:
         TaskPairInterface() =default;
@@ -21,15 +21,15 @@ namespace Solid
         virtual ~TaskPairInterface() =default;
 
     };
+*/
 
 
-    template<typename FuncType, typename... Args>
-    class TaskPair : public TaskPairInterface
+    class SOLID_API TaskPair //: public TaskPairInterface
     {
     public:
         std::function<void()> func;
 
-
+        template<typename FuncType, typename... Args>
         explicit TaskPair( FuncType&& function,  Args&&... argument)
         {
             func =  std::function<void()>(std::bind(function, argument...));
@@ -41,15 +41,16 @@ namespace Solid
         }
         TaskPair(const TaskPair& pair)
         {
-            func =  std::function<void(Args...)>(pair.func);
+            func =  std::function<void()>(pair.func);
         }
         TaskPair& operator=(const TaskPair& pair)
         {
-            func =  std::function<void(Args...)>(pair.func);
+            func =  std::function<void()>(pair.func);
+            return *this;
         }
-        ~TaskPair() override = default;
+        ~TaskPair() /*override*/ = default;
 
-        void operator()() override
+        void operator()() //override
         {
             if(!func)
                 return ;
@@ -60,7 +61,7 @@ namespace Solid
 
 
 
-    enum class TaskType : int
+    enum class SOLID_API TaskType : int
     {
 
         RESOURCES_LOADER = 0,
@@ -69,7 +70,7 @@ namespace Solid
         GENERAL = 3,
     };
 
-    class Task
+    class SOLID_API Task
     {
     public:
 
@@ -80,13 +81,14 @@ namespace Solid
         bool bDispatched = false;
         bool bInProgress = false;
         bool bExceptionCatch = false;
+        std::string_view ExceptionBuffer;
         struct ID_Internal
         {
             std::string ID;
         };
     public:
 
-        std::shared_ptr<TaskPairInterface> PairData = nullptr;
+        std::shared_ptr<TaskPair> PairData = nullptr;
         template<typename FuncType, typename... Args>
         explicit Task( FuncType&& function,  Args&&... args);
         template<typename FuncType, typename... Args>
@@ -109,9 +111,27 @@ namespace Solid
             bExceptionCatch = (t.bExceptionCatch);
             PairData = t.PairData;
         }
-        Task(const Task& t) = delete;
-        Task& operator=(const Task& t) = delete;
-
+        Task(const Task& t) //= delete;
+        {
+            Type = (t.Type);
+            ID = t.ID;
+            ExceptionBuffer = t.ExceptionBuffer;
+            bHasRun = (t.bHasRun);
+            bDispatched = (t.bDispatched);
+            bExceptionCatch = (t.bExceptionCatch);
+            PairData = std::make_shared<TaskPair>(*t.PairData);
+        }
+        Task& operator=(const Task& t)// = delete;
+        {
+            Type = (t.Type);
+            ID = t.ID;
+            ExceptionBuffer = t.ExceptionBuffer;
+            bHasRun = (t.bHasRun);
+            bDispatched = (t.bDispatched);
+            bExceptionCatch = (t.bExceptionCatch);
+            PairData = std::make_shared<TaskPair>(*t.PairData);
+            return *this;
+        }
         Task& operator=(Task&& t) noexcept
         {
             Type = (t.Type);
@@ -136,6 +156,10 @@ namespace Solid
                     bInProgress = false;
                     bHasRun = true;
                 }
+                else
+                {
+                    throw std::exception ("Task PairData is Nullptr");
+                }
             }
             catch(const std::exception& e)
             {
@@ -143,16 +167,9 @@ namespace Solid
                 bExceptionCatch = true;
                 bHasRun = true;
                 bInProgress = false;
-                std::cerr << e.what() << std::endl;
-            }
-            catch(const std::string_view& e)
-            {
+                ExceptionBuffer = "[ERROR]: Task ID " + ID +" has encountered an exception. Message:(\"" + e.what() +"\")";
 
-                bExceptionCatch = true;
-                bHasRun = true;
-                std::cerr <<"[ERROR]: Task ID " << ID <<" has encountered an exception. Message:(\"" << e <<"\")"<< std::endl;
             }
-
             bHasRun = true;
         }
 
@@ -192,7 +209,7 @@ namespace Solid
     {
         if(PairData != nullptr)
             PairData = nullptr;
-        PairData = std::make_shared<TaskPair<FuncType, Args...>>(std::forward<FuncType>(function), std::forward<Args>(args)...);
+        PairData = std::make_shared<TaskPair>(std::forward<FuncType>(function), std::forward<Args>(args)...);
         bHasRun = false;
     }
     template<typename FuncType, typename... Args>
@@ -202,7 +219,7 @@ namespace Solid
         Type = level;
         if(PairData != nullptr)
             PairData = nullptr;
-        PairData = std::make_shared<TaskPair<FuncType, Args...>>(std::forward<FuncType>(function), std::forward<Args>(args)...);
+        PairData = std::make_shared<TaskPair>(std::forward<FuncType>(function), std::forward<Args>(args)...);
         bHasRun = false;
     }
     template<typename FuncType, typename... Args>
@@ -211,7 +228,7 @@ namespace Solid
         ID = id.ID;
         if(PairData != nullptr)
             PairData = nullptr;
-        PairData = std::make_shared<TaskPair<FuncType, Args...>>(std::forward<FuncType>(function), std::forward<Args>(args)...);
+        PairData = std::make_shared<TaskPair>(std::forward<FuncType>(function), std::forward<Args>(args)...);
         bHasRun = false;
     }
 
@@ -222,7 +239,7 @@ namespace Solid
     {
         if(PairData != nullptr)
             PairData = nullptr;
-        PairData = std::make_shared<TaskPair<FuncType, Args...>>(std::forward<FuncType&&>(function), std::forward<Args>(args)...);
+        PairData = std::make_shared<TaskPair>(std::forward<FuncType&&>(function), std::forward<Args>(args)...);
         bHasRun = false;
 
         return this;

@@ -2,7 +2,7 @@
 
 #include "Build/solidAPI.hpp"
 #include "Rendering/renderer.hpp"
-
+#include "SolidMultiThread.hpp"
 namespace Solid
 {
     /**
@@ -17,9 +17,19 @@ namespace Solid
     protected:
 
         Renderer* renderer;
-
+        bool MTEnabled = false;
     public:
 
+        class ResourceManager* RManager;
+        TaskManager MultiTask;
+        ThreadManager ThreadPool;
+        bool MultiThreadEnabled()const {return MTEnabled;}
+        void EnableMultiThread(bool b)
+        {
+            MTEnabled = b;
+            if(b){ThreadPool.PlayAllThreads();}
+            else{ThreadPool.PauseAllThreads();}
+        }
         Engine();
         Engine(const Engine& _copy) = delete;
         Engine(Engine&& _move) = delete;
