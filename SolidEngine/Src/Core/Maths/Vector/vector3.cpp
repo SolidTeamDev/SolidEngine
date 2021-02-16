@@ -21,7 +21,7 @@ namespace Solid
     z{_z}
     {}
 
-    constexpr Vec3::Vec3(const Vec2& _copy)noexcept:
+    constexpr Vec3::Vec3(const Vec4& _copy)noexcept:
     x{_copy.x},
     y{_copy.y},
     z{0}
