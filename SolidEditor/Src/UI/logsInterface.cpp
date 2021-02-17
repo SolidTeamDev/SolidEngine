@@ -22,15 +22,19 @@ namespace Solid
             switch (currLog.logSeverity)
             {
                 case Log::ELogSeverity::INFO:
+                    currMsg = "[INFO] " + currMsg;
                     UI::PushStyleColor(ImGuiCol_Text, ImVec4(0.6, 0.8, 1.0, 1.0));
                     break;
                 case Log::ELogSeverity::DEBUG:
+                    currMsg = "[DEBUG] " + currMsg;
                     UI::PushStyleColor(ImGuiCol_Text, ImVec4(0.5, 0.5, 0.5, 1.0));
                     break;
                 case Log::ELogSeverity::WARNING:
+                    currMsg = "[WARNING] " + currMsg;
                     UI::PushStyleColor(ImGuiCol_Text, ImVec4(1.0, 0.9, 0.0, 1.0));
                     break;
                 default:
+                    currMsg = "[CRITICAL] " + currMsg;
                     UI::PushStyleColor(ImGuiCol_Text, ImVec4(1.0, 0.1, 0.1, 1.0));
                     break;
             }
