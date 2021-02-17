@@ -5,15 +5,19 @@
 namespace Solid
 {
 
-    class Editor final : public Engine
+    class Editor
     {
     private:
-        InputManager<int> editorInputManager;
+        InputManager<int>* editorInputManager = nullptr;
+        Engine engine;
     public:
+
+        static Framebuffer sceneFramebuffer;
+
         Editor();
-        ~Editor() final = default;
+        ~Editor();
         
-        void Loop() final;
+        void Loop();
     };
 
 } //!namespace

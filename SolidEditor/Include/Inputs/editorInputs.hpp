@@ -18,9 +18,9 @@ namespace Solid
      * @brief Add every editor input list
      * @param _inputManager
      */
-    void InitEditorInputList(InputManager<int>& _inputManager)
+    void InitEditorInputList(InputManager<int>* _inputManager)
     {
-        _inputManager.AddKeyInput(EInputList::ESCAPE,GLFW_KEY_ESCAPE,ImEnumDetectionType::PRESSED);
+        _inputManager->AddKeyInput(EInputList::ESCAPE,GLFW_KEY_ESCAPE,ImEnumDetectionType::PRESSED);
     }
 
 } // !namespace

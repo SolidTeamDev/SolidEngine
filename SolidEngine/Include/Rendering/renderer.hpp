@@ -1,13 +1,19 @@
 #pragma once
 
 #include "Window/window.hpp"
+#include "Rendering/framebuffer.hpp"
 
 namespace Solid
 {
 
+    enum class ERendererType
+    {
+        OpenGl45
+    };
+
     struct SOLID_API RendererParams
     {
-        WindowParams windowParams;
+        ERendererType rendererType;
     };
 
     /**
@@ -15,22 +21,17 @@ namespace Solid
      */
     class SOLID_API Renderer
     {
-    protected:
-
-        Window* window = nullptr;
-
-        virtual void Release() = 0;
-
+    private:
     public:
         virtual ~Renderer() = default;
 
-        virtual void Initialize(const RendererParams& _rParams) = 0;
-
         //TODO: Wrapping functions
-        virtual void Clear(const Float4& _clearColor = {0,0,0,1}) const = 0;
-
-        [[nodiscard]]
-        Window* GetWindow() const;
+        virtual void Clear(const Int2& _windowSize) const = 0;
+        virtual void ClearColor(const Int4& _clearColor) const = 0;
+        virtual Framebuffer CreateFramebuffer(const Int2& _size) const = 0;
+        virtual void UpdateFramebuffer(const Framebuffer& _framebuffer) const = 0;
+        virtual void BeginFramebuffer(const Framebuffer& _framebuffer) const = 0;
+        virtual void EndFramebuffer() const = 0;
     };
 
 } //!namespace

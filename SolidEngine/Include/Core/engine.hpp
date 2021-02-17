@@ -13,22 +13,26 @@ namespace Solid
     class SOLID_API Engine
     {
     private:
-
-        void InitializeRenderer();
-
-    protected:
-
-        Renderer* renderer;
-        InputManager<int> inputManager;
-
+        bool engineContextInit = false;
     public:
+        Window* window;
+        Renderer* renderer = nullptr;
 
         Engine();
         Engine(const Engine& _copy) = delete;
         Engine(Engine&& _move) = delete;
 
-        virtual ~Engine();
+        /**
+         * @brief Init GLFW window context and Renderer (Minimum required)
+         */
+        void InitEngineContext(const WindowParams& _windowParams, const RendererParams& _rendererParams);
 
-        virtual void Loop() = 0;
+        /**
+         * @brief
+         * @return
+         */
+        bool IsEngineContextInitialized();
+
+        ~Engine();
     };
 } //!namespace

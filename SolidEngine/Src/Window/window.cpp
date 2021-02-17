@@ -3,17 +3,7 @@
 namespace Solid
 {
 
-    Window::~Window()
-    {
-        Release();
-    }
-
-    void Window::GLFWErrorCallback(int error_code, const char *description)
-    {
-        std::cout << "GLFW Error : (" << error_code << ") " << description << std::endl;
-    }
-
-    void Window::CreateWindow(const WindowParams &_wParam)
+    Window::Window(const WindowParams &_wParam)
     {
         windowSize  = _wParam.windowSize;
         title       = _wParam.title;
@@ -37,9 +27,22 @@ namespace Solid
         glfwSwapInterval(1); // v-sync
     }
 
-    void Window::update()
+    Window::~Window()
+    {
+        if(window != nullptr)
+            glfwDestroyWindow(window);
+        glfwTerminate();
+    }
+
+    void Window::GLFWErrorCallback(int error_code, const char *description)
+    {
+        std::cout << "GLFW Error : (" << error_code << ") " << description << std::endl;
+    }
+
+    void Window::SwapBuffers()
     {
         glfwGetWindowSize(window,&windowSize.x, &windowSize.y);
+        glfwSwapBuffers(window);
     }
 
     GLFWwindow* Window::GetHandle() const
@@ -50,13 +53,6 @@ namespace Solid
     Int2 Window::GetWindowSize() const
     {
         return windowSize;
-    }
-
-    void Window::Release()
-    {
-        if(window != nullptr)
-            glfwDestroyWindow(window);
-        glfwTerminate();
     }
 
 } //!namespace
