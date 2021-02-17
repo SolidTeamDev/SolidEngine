@@ -5,12 +5,18 @@ namespace Solid
 {
     void LogsInterface::Draw()
     {
+
         UI::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.4, 0.4, 0.4, 1.0));
 
         UI::SetNextWindowSize(ImVec2(250, 250));
         UI::Begin("Logs", &p_open,
                   ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
-
+        if (!UI::IsWindowFocused())
+        {
+            UI::PopStyleColor();
+            UI::End();
+            return;
+        }
         UI::TextWrapped("Welcome on the Solid Play Scene!");
 
         for (unsigned int i = maxLogMessage-1; i > 0; i--)

@@ -51,7 +51,7 @@ namespace Solid {
         if (window == nullptr)
             return;
 
-        if (UI::BeginMenuBar())
+        if (UI::BeginMainMenuBar())
         {
             if (UI::BeginMenu("File"))
             {
@@ -75,7 +75,7 @@ namespace Solid {
 
                 UI::EndMenu();
             }
-            UI::EndMenuBar();
+            UI::EndMainMenuBar();
         }
 
 
@@ -83,11 +83,19 @@ namespace Solid {
 
     void EditorInterface::DrawMainFrame()
     {
+        DrawMenuBar();
 
+        ImGuiDockNodeFlags dockFlags = 0;
+        dockFlags |= ImGuiDockNodeFlags_NoCloseButton | ImGuiDockNodeFlags_NoWindowMenuButton;
+        UI::DockSpaceOverViewport(UI::GetMainViewport(), dockFlags);
+
+        /* Deprecated
+         *
         Int2 windowSize = window->GetWindowSize();
         ImGuiViewport *mainViewport = UI::GetMainViewport();
 
         UI::SetNextWindowSize(ImVec2((float) windowSize.x, (float) windowSize.y));
+        UI::SetNextWindowContentSize(ImVec2((float) windowSize.x - 5, (float) windowSize.y - 22));
 
         ImVec2 pos = mainViewport->GetWorkPos();
         UI::SetNextWindowPos(pos);
@@ -96,25 +104,38 @@ namespace Solid {
         ImGuiWindowFlags windowFlags = 0;
         windowFlags |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar;
         windowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoFocusOnAppearing;
-        windowFlags |= ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+        windowFlags |= ImGuiWindowFlags_NoDocking;
         windowFlags |= ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoResize;
         windowFlags |= ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar;
 
         if (UI::Begin("mainFrame", &p_open, windowFlags))
         {
+            ImVec2 vMin = ImGui::GetWindowContentRegionMin();
+            ImVec2 vMax = ImGui::GetWindowContentRegionMax();
+            vMin.x += ImGui::GetWindowPos().x;
+            vMin.y += ImGui::GetWindowPos().y;
+            vMax.x += ImGui::GetWindowPos().x;
+            vMax.y += ImGui::GetWindowPos().y;
+
+            ImGui::GetForegroundDrawList()->AddRect( vMin, vMax, IM_COL32( 255, 255, 0, 255 ) );
+
+
             ImGuiID dockID = UI::GetID("mainDockSpace");
             ImVec2 winSize = UI::GetMainViewport()->Size;
             ImGuiDockNodeFlags dockFlags = 0;
             dockFlags |= ImGuiDockNodeFlags_NoCloseButton | ImGuiDockNodeFlags_NoWindowMenuButton;
+
             UI::DockSpace(dockID, winSize, dockFlags);
         }
 
-        DrawMenuBar();
         UI::End();
+        *
+        */
     }
 
     void EditorInterface::DrawChangeColors()
     {
+
         ImVec2 size((float) (window->GetWindowSize().x) / 3.f, (float) (window->GetWindowSize().y) / 1.5f);
         UI::SetNextWindowSize(size);
         ImGuiWindowFlags flags = 0;
