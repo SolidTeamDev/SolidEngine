@@ -4,36 +4,44 @@
 #include "Rendering/OpenGL45/openGl45Renderer.hpp"
 #include "UI/solidUI.hpp"
 #include "Ressources/Ressources.hpp"
+
 namespace Solid
 {
     Engine::Engine() :
     ThreadPool(&MultiTask)
     {
         RManager = new ResourceManager(this);
-        InitializeRenderer();
-        inputManager = InputManager<int>(renderer->GetWindow()->GetHandle());
-        UIContext::InitializeSolidUI(renderer->GetWindow()->GetHandle());
     }
 
     Engine::~Engine()
     {
 
         UIContext::ReleaseSolidUI();
+        delete window;
         delete renderer;
         ThreadPool.TerminateAllThreads();
     }
 
-    void Engine::InitializeRenderer()
+    void Engine::InitEngineContext(const WindowParams& _windowParams, const RendererParams& _rendererParams)
     {
-        RendererParams rendererParams
+        window   = new Window(_windowParams);
+        switch (_rendererParams.rendererType)
         {
-            {
-                "Solid Engine",
-                {1280,720}
-            }
-        };
-        renderer = new OpenGL45Renderer();
-        renderer->Initialize(rendererParams);
+            case ERendererType::OpenGl45:
+                renderer = new OpenGL45Renderer();
+                break;
+        }
+
+        /// TEMPORARY
+        UIContext::InitializeSolidUI(window->GetHandle());
+        ///
+
+        if(window != nullptr && renderer != nullptr)
+            engineContextInit = true;
     }
 
+    bool Engine::IsEngineContextInitialized()
+    {
+        return engineContextInit;
+    }
 } //!namespace

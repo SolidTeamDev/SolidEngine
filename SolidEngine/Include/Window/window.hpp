@@ -18,7 +18,7 @@ namespace Solid
     };
 
     /**
-     * @brief Window class. Store and manage GLFWwindow (Only support one instantiation)
+     * @brief Window class. Store and manage GLFWwindow (Only support one window)
      */
     class SOLID_API Window
     {
@@ -26,11 +26,9 @@ namespace Solid
         GLFWwindow* window = nullptr;
         std::string title = "SolidWindow";
         Int2 windowSize = {1280,720};
-
-        void Release();
     public:
 
-        Window() = default;
+        Window(const WindowParams& _wParam);
         Window(const Window& _copy) = delete;
         Window(Window&& _move) = delete;
 
@@ -38,9 +36,7 @@ namespace Solid
 
         static void GLFWErrorCallback(int error_code, const char* description);
 
-        void CreateWindow(const WindowParams& _wParam);
-
-        void update();
+        void SwapBuffers();
 
         [[nodiscard]]
         GLFWwindow* GetHandle() const;

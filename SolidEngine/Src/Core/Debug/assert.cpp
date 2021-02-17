@@ -4,7 +4,7 @@
 
 namespace Solid
 {
-    void assert(bool expr, int line, const std::string& file)
+    void s_assert(bool expr, int line, const std::string& file)
     {
         if(expr)
             return;

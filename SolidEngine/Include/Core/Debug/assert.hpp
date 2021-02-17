@@ -12,6 +12,6 @@ namespace Solid
      * @param line The line of the called function
      * @param file The file of the called function
      */
-    void SOLID_API assert(bool expr, int line, const std::string& file);
+    void SOLID_API s_assert(bool expr, int line, const std::string& file);
     #define sAssert(expr) assert(expr,__LINE__,__FILE__)
 } //!namespace

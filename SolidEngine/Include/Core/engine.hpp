@@ -19,15 +19,14 @@ namespace Solid
 
         Log log;
 
-        void InitializeRenderer();
-
     protected:
 
-        Renderer* renderer;
         bool MTEnabled = false;
-        InputManager<int> inputManager;
+        bool engineContextInit = false;
 
     public:
+        Window* window;
+        Renderer* renderer = nullptr;
 
         class ResourceManager* RManager;
         TaskManager MultiTask;
@@ -43,8 +42,17 @@ namespace Solid
         Engine(const Engine& _copy) = delete;
         Engine(Engine&& _move) = delete;
 
-        virtual ~Engine();
+        /**
+         * @brief Init GLFW window context and Renderer (Minimum required)
+         */
+        void InitEngineContext(const WindowParams& _windowParams, const RendererParams& _rendererParams);
 
-        virtual void Loop() = 0;
+        /**
+         * @brief Return if the engine context is initialized
+         * @return Engine context init
+         */
+        bool IsEngineContextInitialized();
+
+        ~Engine();
     };
 } //!namespace
