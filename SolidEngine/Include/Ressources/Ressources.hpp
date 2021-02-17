@@ -29,6 +29,7 @@ namespace Solid
         Mesh,
         Anim,
         Shader,
+        Compute,
         Material,
         Texture,
         NONE,
@@ -143,12 +144,23 @@ namespace Solid
     };
     class SOLID_API ShaderResource : public Resource
     {
-        unsigned int ShaderID;
+        unsigned int VertShaderID;
+        unsigned int FragShaderID;
+        unsigned int ProgramID;
         std::string VertexSource;
         std::string FragSource;
         //programs ID ?
     public:
 
+        ShaderResource(unsigned int vid, unsigned int fid, unsigned int pid, const char* vs, const char* fs)
+        {
+            _type = ResourceType::Shader;
+            VertShaderID = vid;
+            FragShaderID = fid;
+            ProgramID = pid;
+            VertexSource = vs;
+            FragSource = fs;
+        }
         ShaderResource()
         {
             _type = ResourceType::Shader;
@@ -157,22 +169,34 @@ namespace Solid
         {
 
         }
+        void ToDataBuffer(std::vector<char>& buffer);
+        void FromDataBuffer(char* buffer, int bSize);
     };
     class SOLID_API ComputeShaderResource : public Resource
     {
         unsigned int ShaderID;
+        unsigned int ProgramID;
         std::string ComputeSource;
         //programs ID ?
     public:
 
+        ComputeShaderResource(unsigned int sid,unsigned int pid, const char* cSource)
+        {
+            _type = ResourceType::Compute;
+            ShaderID = sid;
+            ProgramID = pid;
+            ComputeSource = cSource;
+        }
         ComputeShaderResource()
         {
-            _type = ResourceType::Shader;
+            _type = ResourceType::Compute;
         }
         ~ComputeShaderResource()
         {
 
         }
+        void ToDataBuffer(std::vector<char>& buffer);
+        void FromDataBuffer(char* buffer, int bSize);
     };
 
     class SOLID_API MaterialResource : public Resource
@@ -203,8 +227,12 @@ namespace Solid
     class SOLID_API ResourceManager
     {
         std::vector<Resource*> ResourceList;
+        class Engine* EnginePtr = nullptr;
     public:
-        ResourceManager() = default;
+        explicit ResourceManager(class Engine* _engine)
+        {
+            EnginePtr =_engine;
+        }
         ~ResourceManager()
         {
             for(Resource* r : ResourceList)
@@ -213,38 +241,53 @@ namespace Solid
                     delete r;
             }
         }
-
+        class Engine* GetEngine();
         void AddResource(Resource* r);
         std::vector<Resource*>& GetList();
     };
 
+
+    struct SOLID_API ResourcePtrWrapper
+    {
+        Resource* r;
+    };
+
+
     class SOLID_API ResourcesLoader
     {
         ResourceManager* Manager;
-        void LoadImage(const fs::path& Rpath);
+        fs::path SolidPath = fs::current_path().append("SolidResources");
+        static Resource * LoadImage(const fs::path& Rpath);
         ///void LoadMeshOBJ(const fs::path& Rpath);
-        void LoadMesh(const fs::path& Rpath);
-        void LoadAnim(const fs::path& Rpath);
-        void LoadShader(const fs::path& Rpath);
-        void LoadMaterial(const fs::path& Rpath);
-        void LoadTexture(const fs::path& Rpath);
+        static Resource * LoadMesh(const fs::path& Rpath);
+        static Resource * LoadAnim(const fs::path& Rpath);
+        static Resource * LoadShader(const fs::path& Rpath);
+        static Resource * LoadMaterial(const fs::path& Rpath);
+        static Resource * LoadTexture(const fs::path& Rpath);
 
-        void LoadSolidImage(const fs::path& Rpath);
-        void LoadSolidTex(const fs::path& Rpath);
-        void LoadSolidMesh(const fs::path& Rpath);
-        void LoadSolidShader(const fs::path& Rpath);
-        void LoadSolidMaterial(const fs::path& Rpath);
-        void LoadSolidAnim(const fs::path& Rpath);
+        static Resource * LoadSolidImage(const fs::path& Rpath);
+        static Resource * LoadSolidTex(const fs::path& Rpath);
+        static Resource * LoadSolidMesh(const fs::path& Rpath);
+        static Resource * LoadSolidShader(const fs::path& Rpath);
+        static Resource * LoadSolidComputeShader(const fs::path& Rpath);
+        static Resource * LoadSolidMaterial(const fs::path& Rpath);
+        static Resource * LoadSolidAnim(const fs::path& Rpath);
+
 
 
 
 
     public:
 
-        ResourcesLoader() = default;
+        ResourcesLoader()
+        {
+            fs::create_directory(SolidPath);
+        };
         ~ResourcesLoader() = default;
         void SetManager(ResourceManager* m);
         void LoadRessource(const fs::path& Rpath);
+        void LoadRessourceNoAdd(const fs::path &Rpath, ResourcePtrWrapper &wrapper);
+        void LoadResourcesFromFolder(const fs::path& Rpath);
         inline static void Append(std::vector<char>& DataBuffer, void* Data, std::uint64_t sizeInByte);
         //inline static void ReadFromBuffer(std::vector<char>& DataBuffer, void* Data, std::uint64_t sizeInByte, std::uint64_t& ReadPos);
         inline static void ReadFromBuffer(char* DataBuffer, void* Data, std::uint64_t sizeInByte, std::uint64_t& ReadPos);

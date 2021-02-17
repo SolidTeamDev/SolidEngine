@@ -3,10 +3,13 @@
 #include <iostream>
 #include "Rendering/OpenGL45/openGl45Renderer.hpp"
 #include "UI/solidUI.hpp"
+#include "Ressources/Ressources.hpp"
 namespace Solid
 {
-    Engine::Engine()
+    Engine::Engine() :
+    ThreadPool(&MultiTask)
     {
+        RManager = new ResourceManager(this);
         InitializeRenderer();
         inputManager = InputManager<int>(renderer->GetWindow()->GetHandle());
         UIContext::InitializeSolidUI(renderer->GetWindow()->GetHandle());
@@ -14,8 +17,10 @@ namespace Solid
 
     Engine::~Engine()
     {
+
         UIContext::ReleaseSolidUI();
         delete renderer;
+        ThreadPool.TerminateAllThreads();
     }
 
     void Engine::InitializeRenderer()
