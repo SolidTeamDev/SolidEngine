@@ -5,6 +5,8 @@
 #include "Time/time.hpp"
 #include "InputManager/inputManager.hpp"
 
+#include "Core/Debug/debug.hpp"
+
 namespace Solid
 {
     /**
@@ -13,6 +15,8 @@ namespace Solid
     class SOLID_API Engine
     {
     private:
+
+        Log log;
 
         void InitializeRenderer();
 
