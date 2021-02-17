@@ -38,13 +38,14 @@ namespace Solid::UIContext
         UI::PushStyleVar(ImGuiStyleVar_WindowTitleAlign, ImVec2(0.5f, 0.5f));
 
         UI::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 1.5f);
-        UI::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.8f);
         UI::PushStyleVar(ImGuiStyleVar_TabRounding, 2.f);
+        UI::PushStyleVar(ImGuiStyleVar_FrameRounding, 3);
+        UI::PushStyleVar(ImGuiStyleVar_WindowRounding, 3);
     }
 
     void RenderFrame()
     {
-        UI::PopStyleVar(5);
+        UI::PopStyleVar(6);
 
         UI::Render();
         ImGui_ImplOpenGL3_RenderDrawData(UI::GetDrawData());
