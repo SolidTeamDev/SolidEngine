@@ -30,7 +30,7 @@ namespace Solid
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    void OpenGL45Renderer::ClearColor(const Int4 &_clearColor) const
+    void OpenGL45Renderer::ClearColor(const Float4 &_clearColor) const
     {
         glClearColor(_clearColor.x,_clearColor.y,_clearColor.z,_clearColor.w);
     }

@@ -16,7 +16,7 @@ namespace Solid
                                     const GLchar* message, const void* userParam);
 
         void Clear(const Int2& _windowSize) const final;
-        void ClearColor(const Int4& _clearColor) const final;
+        void ClearColor(const Float4& _clearColor) const final;
         [[nodiscard]]
         Framebuffer CreateFramebuffer(const Int2& _size) const final;
 

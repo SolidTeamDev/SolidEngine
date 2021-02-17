@@ -7,7 +7,7 @@ int main()
     try
     {
         Solid::Editor editor;
-        editor.Loop();
+        editor.Run();
     }
     catch(const std::runtime_error& e)
     {

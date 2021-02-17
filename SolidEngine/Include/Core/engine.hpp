@@ -28,8 +28,8 @@ namespace Solid
         void InitEngineContext(const WindowParams& _windowParams, const RendererParams& _rendererParams);
 
         /**
-         * @brief
-         * @return
+         * @brief Return if the engine context is initialized
+         * @return Engine context init
          */
         bool IsEngineContextInitialized();
 

@@ -17,7 +17,7 @@ namespace Solid
         Editor();
         ~Editor();
         
-        void Loop();
+        void Run();
     };
 
 } //!namespace

@@ -29,7 +29,7 @@ namespace Solid
 
         /// TEMPORARY
         UIContext::InitializeSolidUI(window->GetHandle());
-        /// \brief
+        ///
 
         if(window != nullptr && renderer != nullptr)
             engineContextInit = true;

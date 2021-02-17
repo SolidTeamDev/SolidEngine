@@ -40,7 +40,7 @@ namespace Solid
         delete editorInputManager;
     }
 
-    void Editor::Loop()
+    void Editor::Run()
     {
         Window* window = engine.window;
         Renderer* renderer = engine.renderer;
@@ -53,18 +53,19 @@ namespace Solid
             glfwPollEvents();
             editorInputManager->Update();
 
+            renderer->ClearColor({0,0,0,1});
             renderer->Clear(window->GetWindowSize());
 
             renderer->BeginFramebuffer(sceneFramebuffer);
-            renderer->ClearColor({1,0,0,1});
+            renderer->ClearColor({0.3f,0.3f,0.3f,1});
             renderer->Clear(window->GetWindowSize());
             renderer->EndFramebuffer();
-            renderer->ClearColor({0,0,0,1});
 
             editorInterface.Update();
 
             renderer->UpdateFramebuffer(sceneFramebuffer);
             Time::Update();
+
             window->SwapBuffers();
         }
 
