@@ -14,7 +14,7 @@
 #include "Core/engine.hpp"
 using namespace Solid;
 
-#define SASSET_GEN 0
+#define SASSET_GEN 1
 
 ///
 /// ResourceManager 
@@ -564,6 +564,8 @@ Resource * ResourcesLoader::LoadSolidMesh(const fs::path &Rpath)
     ifs.read(&buffer[0], pos);
 
     Mesh->FromDataBuffer(buffer.data(), buffer.size());
+
+    printf("Mesh loaded \n");
     return Mesh;
 
 }

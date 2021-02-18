@@ -3,6 +3,8 @@
 #include "UI/editorInterface.hpp"
 #include "Inputs/editorInputs.hpp"
 
+#include "Ressources/Ressources.hpp"
+
 #include <string>
 
 namespace Solid
@@ -45,6 +47,19 @@ namespace Solid
         Window* window = engine.window;
         Renderer* renderer = engine.renderer;
         EditorInterface editorInterface(window);
+
+        engine.EnableMultiThread(true);
+
+        ResourcesLoader loader;
+
+        loader.SetManager(engine.RManager);
+        fs::path p = fs::current_path().append("SolidResources");
+
+        auto before = std::chrono::high_resolution_clock::now();
+        loader.LoadResourcesFromFolder(p);
+        auto after = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double, std::ratio<1,1000>> fp_s = after - before;
+        std::cout << "Loading has Taken " << fp_s.count() << " milliseconds\n";
 
         glfwSwapInterval(0);
 

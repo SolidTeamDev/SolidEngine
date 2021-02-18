@@ -34,6 +34,7 @@ namespace Solid
                     if(self_Internal->bWaitForThread)
                         self_Internal->bWaitForThread = false;
                 }
+                //std::this_thread::sleep_for(std::chrono::milliseconds(5));
                 std::this_thread::yield();
 
             }
@@ -43,6 +44,7 @@ namespace Solid
                 TaskManager* manager = self_Internal->TaskManager;
                 if(manager == nullptr)
                 {
+                    //std::this_thread::sleep_for(std::chrono::milliseconds(5));
                     std::this_thread::yield();
                     continue;
                 }
@@ -57,6 +59,7 @@ namespace Solid
                 {
                     if(self_Internal->bWaitForThread)
                         self_Internal->bWaitForThread = false;
+                    //std::this_thread::sleep_for(std::chrono::milliseconds(5));
                     std::this_thread::yield();
 
                 }

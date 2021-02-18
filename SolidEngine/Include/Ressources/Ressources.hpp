@@ -257,21 +257,21 @@ namespace Solid
     {
         ResourceManager* Manager;
         fs::path SolidPath = fs::current_path().append("SolidResources");
-        static Resource * LoadImage(const fs::path& Rpath);
+        Resource * LoadImage(const fs::path& Rpath);
         ///void LoadMeshOBJ(const fs::path& Rpath);
-        static Resource * LoadMesh(const fs::path& Rpath);
-        static Resource * LoadAnim(const fs::path& Rpath);
-        static Resource * LoadShader(const fs::path& Rpath);
-        static Resource * LoadMaterial(const fs::path& Rpath);
-        static Resource * LoadTexture(const fs::path& Rpath);
+        Resource * LoadMesh(const fs::path& Rpath);
+        Resource * LoadAnim(const fs::path& Rpath);
+        Resource * LoadShader(const fs::path& Rpath);
+        Resource * LoadMaterial(const fs::path& Rpath);
+        Resource * LoadTexture(const fs::path& Rpath);
 
-        static Resource * LoadSolidImage(const fs::path& Rpath);
-        static Resource * LoadSolidTex(const fs::path& Rpath);
-        static Resource * LoadSolidMesh(const fs::path& Rpath);
-        static Resource * LoadSolidShader(const fs::path& Rpath);
-        static Resource * LoadSolidComputeShader(const fs::path& Rpath);
-        static Resource * LoadSolidMaterial(const fs::path& Rpath);
-        static Resource * LoadSolidAnim(const fs::path& Rpath);
+        Resource * LoadSolidImage(const fs::path& Rpath);
+        Resource * LoadSolidTex(const fs::path& Rpath);
+        Resource * LoadSolidMesh(const fs::path& Rpath);
+        Resource * LoadSolidShader(const fs::path& Rpath);
+        Resource * LoadSolidComputeShader(const fs::path& Rpath);
+        Resource * LoadSolidMaterial(const fs::path& Rpath);
+        Resource * LoadSolidAnim(const fs::path& Rpath);
 
 
 
