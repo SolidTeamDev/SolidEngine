@@ -16,7 +16,7 @@ namespace Solid
 
         constexpr Vec3() noexcept = default;
         constexpr Vec3(float _value)noexcept;
-        constexpr Vec3(float _x,float _y = 0, float _z = 0)noexcept;
+        constexpr Vec3(float _x, float _y, float _z)noexcept;
         constexpr Vec3(const Vec4& _copy)noexcept;
         constexpr Vec3(const Vec3& _copy)noexcept;
 
@@ -35,7 +35,7 @@ namespace Solid
 
         static constexpr float Dot(const Vec3 &_v1,const Vec3 &_v2) noexcept;
 
-        static constexpr float Cross(const Vec3 &_v1,const Vec3 &_v2) noexcept;
+        static constexpr Vec3 Cross(const Vec3 &_v1,const Vec3 &_v2) noexcept;
 
         static Vec3 Lerp(const Vec3& _v1,const Vec3& _v2, float _r) noexcept;
 

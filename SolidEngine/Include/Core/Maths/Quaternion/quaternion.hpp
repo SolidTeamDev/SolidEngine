@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "Build/SolidAPI.hpp"
 #include "../Utils/constants.hpp"
 
@@ -11,7 +13,7 @@ namespace Solid
         constexpr Quat() noexcept = default;
         constexpr Quat(float _value) noexcept;
         constexpr Quat(float _x,float _y = 0, float _z = 0, float _w = 1) noexcept;
-        constexpr Quat(float _angle, const Vec3& _axis) noexcept;
+        constexpr Quat(const Vec3& _axis) noexcept;
         constexpr Quat(const Quat& _copy) noexcept = default;
 
         ~Quat() = default;
@@ -56,7 +58,7 @@ namespace Solid
 
         constexpr Quat GetNormalize() const noexcept;
 
-        constexpr Quat Inverse();
+        constexpr Quat& Inverse();
 
         constexpr Quat GetInversed() const;
 
@@ -124,4 +126,7 @@ namespace Solid
 #pragma endregion
 
     };
+
+    constexpr Quat operator * (float _value, const Quat& _quat) noexcept;
+    constexpr Quat operator / (float _value, const Quat& _quat) ;
 }

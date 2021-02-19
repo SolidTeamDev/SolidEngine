@@ -10,9 +10,9 @@ int main()
         Solid::Editor editor;
         editor.Run();
     }
-    catch(const std::runtime_error& e)
+    catch(const Solid::ThrowError& e)
     {
-        std::cerr << e.what() << std::endl;
+        std::cerr << "Error (" << (int)e.ErrorCode() << ") " << e.What() << std::endl;
     }
     
     return EXIT_SUCCESS;

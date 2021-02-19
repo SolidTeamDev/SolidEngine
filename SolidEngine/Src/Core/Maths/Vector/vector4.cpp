@@ -57,9 +57,9 @@ namespace Solid
                _v1.w * _v2.w;
     }
 
-    constexpr float Vec4::Cross(const Vec4& _v1,const Vec4 &_v2) noexcept
+    constexpr Vec4 Vec4::Cross(const Vec4& _v1,const Vec4 &_v2) noexcept
     {
-        return (_v1.y * _v2.z - _v1.z * _v2.y,
+        return Vec4(_v1.y * _v2.z - _v1.z * _v2.y,
                 _v1.z * _v2.x - _v1.x * _v2.z,
                 _v1.x * _v2.y - _v1.y * _v2.x, _v1.w * _v2.w);
     }
@@ -159,7 +159,7 @@ namespace Solid
             Log::Send("normalize function: length = 0 impossible to compute");
             return *this;
         }
-        return Vec4(x/len, y/len,z/len);
+        return Vec4(x/len, y/len,z/len,1);
     }
 
     constexpr  bool Vec4::IsEquals(const Vec4 &vec) const noexcept

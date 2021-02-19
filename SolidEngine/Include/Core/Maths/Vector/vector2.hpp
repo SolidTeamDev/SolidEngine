@@ -19,7 +19,7 @@ namespace Solid
 
         constexpr Vec2(const float &_value) noexcept;
 
-        constexpr Vec2(float _x, float _y = 0) noexcept;
+        constexpr Vec2(float _x, float _y) noexcept;
 
         constexpr Vec2(const Vec2 &_copy) noexcept;
 

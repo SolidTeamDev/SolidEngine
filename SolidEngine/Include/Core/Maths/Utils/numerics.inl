@@ -21,13 +21,13 @@ namespace Solid
         }
 
         template<typename T>
-        T Lerp(T _start, T _end, float _ratio) noexcept
+        T Lerp(const T& _start, const T& _end, float _ratio) noexcept
         {
-            return (1.f - _ratio) * _start + _ratio *_end;
+            return (1.f - _ratio) * _start + _ratio * _end;
         }
 
         template<typename T>
-        T Slerp(T _start, T _end, float _ratio) noexcept
+        T Slerp(const T& _start, T _end, float _ratio) noexcept
         {
              float dot = T::Dot(_start,_end);
              if(dot < 0.f)
@@ -147,7 +147,7 @@ namespace Solid
         template <typename T>
         constexpr bool Equals0(T _value)
         {
-            return Equals(_value, 0);
+            return Equals<T>(_value, static_cast<T>(0));
         }
     }
 }

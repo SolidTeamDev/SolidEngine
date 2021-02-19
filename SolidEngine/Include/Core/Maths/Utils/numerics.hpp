@@ -26,7 +26,7 @@ namespace Solid
         * @return interpolation between _start and _end
         */
         template<typename T>
-        T Lerp(T _start, T _end, float _ratio) noexcept;
+        T Lerp(const T& _start, const T& _end, float _ratio) noexcept;
 
         /**
          * @brief  slerp from _start to _end at time.
@@ -37,7 +37,7 @@ namespace Solid
          * @return interpolation between _start and _end
          */
         template<typename T>
-        T Slerp(T _start, T _end, float _ratio) noexcept;
+        T Slerp(const T& _start, T _end, float _ratio) noexcept;
 
         /**
          * @brief Convert degrees value into radiant

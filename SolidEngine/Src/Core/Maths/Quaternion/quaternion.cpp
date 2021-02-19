@@ -12,20 +12,39 @@ namespace Solid
             w{_value}
     {}
 
-    constexpr Quat::Quat(float _x, float _y = 0, float _z = 0, float _w = 1) noexcept:
+    constexpr Quat::Quat(float _x, float _y, float _z, float _w) noexcept:
             x{_x},
             y{_y},
             z{_z},
             w{_w}
     {}
 
+    constexpr Quat::Quat(const Vec3 &_axis) noexcept :
+    x{0},
+    y{0},
+    z{0},
+    w{0}
+    {
+        float cosX = Maths::Cos(_axis.x*0.5);
+        float cosY = Maths::Cos(_axis.y*0.5);
+        float cosZ = Maths::Cos(_axis.z*0.5);
+        float sinX = Maths::Sin(_axis.x*0.5);
+        float sinY = Maths::Sin(_axis.y*0.5);
+        float sinZ = Maths::Sin(_axis.z*0.5);
+
+        w = cosX * cosY * cosZ - sinX * sinY * sinZ;
+        x = sinX * cosY * cosZ + cosX * sinY * sinZ;
+        y = cosX * sinY * cosZ - sinX * cosY * sinZ;
+        z = cosX * cosY * sinZ + sinX * sinY * cosZ;
+    }
+
 #pragma region Static Methods
 
-    Quat const Quat::Zero{0, 0, 0, 0};
+    Quat Quat::Zero{0, 0, 0, 0};
 
-    Quat const Quat::Identity{1, 0, 0, 0};
+    Quat Quat::Identity{1, 0, 0, 0};
 
-    constexpr float Quat::Dot(const Quat &_q1, const Quat &_q2)
+    constexpr float Quat::Dot(const Quat &_q1, const Quat &_q2) noexcept
     {
         return _q1.w * _q1.w +
                _q1.x * _q1.x +
@@ -35,17 +54,17 @@ namespace Solid
 
     Quat Quat::Lerp(const Quat &_q1, const Quat &_q2, float _r) noexcept
     {
-        return Maths::Lerp(_q1, _q2, _r);
+        return Maths::Lerp<Quat>(_q1, _q2, _r);
     }
 
     Quat Quat::Nlerp(const Quat &_q1, const Quat &_q2, float _r) noexcept
     {
-        return Maths::Lerp(_q1, _q2, _r).GetNormalize();
+        return Maths::Lerp<Quat>(_q1, _q2, _r).GetNormalize();
     }
 
     Quat Quat::Slerp(const Quat &_q1, const Quat &_q2, float _r) noexcept
     {
-        return Maths::Slerp(_q1, _q2, _r);
+        return Maths::Slerp<Quat>(_q1, _q2, _r);
     }
 
 #pragma endregion
@@ -78,7 +97,7 @@ namespace Solid
 
     constexpr Quat Quat::GetScaled(float _scale) const noexcept
     {
-        return Vec4(x * _scale, y * _scale, z * _scale, w * _scale);
+        return Quat(x * _scale, y * _scale, z * _scale, w * _scale);
     }
 
     Quat &Quat::Unscale(float _scale) noexcept
@@ -102,7 +121,7 @@ namespace Solid
             Log::Send("getUnscale function: scale is null is impossible to divide by 0", Log::ELogSeverity::ERROR);
             return *this;
         }
-        return Vec4(x / _scale, y / _scale, z / _scale, w / _scale);
+        return Quat(x / _scale, y / _scale, z / _scale, w / _scale);
 
     }
 
@@ -130,10 +149,10 @@ namespace Solid
             Log::Send("normalize function: length = 0 impossible to compute");
             return *this;
         }
-        return Vec4(x / len, y / len, z / len);
+        return Quat(x / len, y / len, z / len);
     }
 
-    constexpr Quat Quat::Inverse()
+    constexpr Quat& Quat::Inverse()
     {
         if (IsNormalized())
         {
@@ -160,7 +179,7 @@ namespace Solid
 
     constexpr bool Quat::IsNormalized() const noexcept
     {
-        return Maths::Equals(SqrtLength(), 3.f * S_EPSILON);
+        return Maths::Equals<float>(SqrtLength(), 3.f * S_EPSILON);
     }
 
 
@@ -177,7 +196,7 @@ namespace Solid
         if(IsNormalized())
         {
             Log::Send("Rotate function: Quaternion must be normalized");
-            return *this;
+            return Vec3::Zero;
         }
 
         Vec3 v1 = Vec3(x,y,z);
@@ -206,7 +225,7 @@ namespace Solid
         if(IsNormalized())
         {
             Log::Send("Rotate function: Quaternion must be normalized");
-            return *this;
+            return Vec3::Zero;
         }
 
         return GetInversed().Rotate(_vec);
@@ -223,7 +242,7 @@ namespace Solid
         return GetInversed().Rotate(_quat);
     }
 
-    std::string ToString() noexcept
+    std::string Quat::ToString() noexcept
     {
         return "[" + std::to_string(x) + "," + std::to_string(y) + "," +
                std::to_string(z) + "," + std::to_string(w) + "]";
@@ -244,12 +263,12 @@ namespace Solid
 
     constexpr Quat Quat::operator+(float _scale) const noexcept
     {
-        return Quat(x + _scale, y + _scale, z + _scale, w + _scale)
+        return Quat(x + _scale, y + _scale, z + _scale, w + _scale);
     }
 
     constexpr Quat Quat::operator-(float _scale) const noexcept
     {
-        return Quat(x - _scale, y - _scale, z - _scale, w - _scale)
+        return Quat(x - _scale, y - _scale, z - _scale, w - _scale);
 
     }
 
@@ -321,18 +340,66 @@ namespace Solid
 
     constexpr bool Quat::operator==(const Quat &_quat)
     {
-        return Maths::Equals(*this, _quat);
+        return (x == _quat.x && y == _quat.y && z == _quat.z && w == _quat.w);
     }
 
     constexpr bool Quat::operator!=(const Quat &_quat)
     {
-        return !Maths::Equals(*this, _quat);
+        return !(x == _quat.x && y == _quat.y && z == _quat.z && w == _quat.w);
 
     }
 
     constexpr Quat Quat::operator-() const noexcept
     {
         return Quat(-x, -y, -z, -w);
+    }
+    constexpr Quat operator * (float _value, const Quat& _quat) noexcept
+    {
+        return _quat * _value;
+    }
+    constexpr Quat operator / (float _value, const Quat& _quat)
+    {
+        return Quat(_value/_quat.x,
+                    _value/_quat.y,
+                    _value/_quat.z,
+                    _value/_quat.w);
+    }
+
+    constexpr Quat Quat::operator+(const Quat &_quat) const noexcept
+    {
+        return Quat(x + _quat.x,
+                    y + _quat.y,
+                    z + _quat.z,
+                    w + _quat.w);
+    }
+
+    constexpr Quat Quat::operator-(const Quat &_quat) const noexcept
+    {
+        return Quat(x - _quat.x,
+                    y - _quat.y,
+                    z - _quat.z,
+                    w - _quat.w);
+    }
+
+    Quat &Quat::operator+=(float _scale)
+    {
+        x += _scale;
+        y += _scale;
+        z += _scale;
+        w += _scale;
+
+        return *this;
+
+    }
+
+    Quat &Quat::operator-=(float _scale)
+    {
+        x -= _scale;
+        y -= _scale;
+        z -= _scale;
+        w -= _scale;
+
+        return *this;
     }
 
 #pragma endregion
