@@ -77,10 +77,10 @@ namespace Solid
     private:
         TaskType Type = TaskType::RESOURCES_LOADER;
         std::string ID = "NO_ID";
-        bool bHasRun  = false;
-        bool bDispatched = false;
-        bool bInProgress = false;
-        bool bExceptionCatch = false;
+        std::atomic_bool bHasRun ;
+        std::atomic_bool  bDispatched ;
+        std::atomic_bool  bInProgress ;
+        std::atomic_bool  bExceptionCatch ;
         std::string_view ExceptionBuffer;
         struct ID_Internal
         {
@@ -101,18 +101,25 @@ namespace Solid
         Task* SetTask( FuncType&& function,  Args&&... args);
 
 
-        Task() { PairData = nullptr;}
+        Task()
+        {
+            bHasRun = false;
+            bInProgress = false;
+            bDispatched = false;
+            bExceptionCatch = false;
+            PairData = nullptr;
+        }
         Task(Task&& t) noexcept
         {
             Type = (t.Type);
             ID = std::move(t.ID);
-            bHasRun = (t.bHasRun);
-            bDispatched = (t.bDispatched);
-            bExceptionCatch = (t.bExceptionCatch);
+            bHasRun = (t.bHasRun.load());
+            bDispatched = (t.bDispatched.load());
+            bExceptionCatch = (t.bExceptionCatch.load());
             PairData = t.PairData;
         }
-        Task(const Task& t) //= delete;
-        {
+        Task(const Task& t) = delete;
+        /*{
             Type = (t.Type);
             ID = t.ID;
             ExceptionBuffer = t.ExceptionBuffer;
@@ -120,9 +127,9 @@ namespace Solid
             bDispatched = (t.bDispatched);
             bExceptionCatch = (t.bExceptionCatch);
             PairData = std::make_shared<TaskPair>(*t.PairData);
-        }
-        Task& operator=(const Task& t)// = delete;
-        {
+        }*/
+        Task& operator=(const Task& t) = delete;
+        /*{
             Type = (t.Type);
             ID = t.ID;
             ExceptionBuffer = t.ExceptionBuffer;
@@ -131,14 +138,14 @@ namespace Solid
             bExceptionCatch = (t.bExceptionCatch);
             PairData = std::make_shared<TaskPair>(*t.PairData);
             return *this;
-        }
-        Task& operator=(Task&& t) noexcept
+        }*/
+        Task& operator=(Task&& t)  noexcept
         {
             Type = (t.Type);
             ID = std::move(t.ID);
-            bHasRun = (t.bHasRun);
-            bDispatched = (t.bDispatched);
-            bExceptionCatch = (t.bExceptionCatch);
+            bHasRun = (t.bHasRun.load());
+            bDispatched = (t.bDispatched.load());
+            bExceptionCatch = (t.bExceptionCatch.load());
             PairData = t.PairData;
             return *this;
         }
@@ -176,9 +183,9 @@ namespace Solid
         Task* SetType(const TaskType&& p) { Type = p; return this;}
 
         [[nodiscard]] TaskType GetType()  const { return Type;}
-        [[nodiscard]] bool IsFinished()   const { return bHasRun;}
-        [[nodiscard]] bool IsInProgress() const { return bInProgress;}
-        [[nodiscard]] bool IsDispatched() const { return bDispatched;}
+        [[nodiscard]] bool IsFinished()   const { return bHasRun.load();}
+        [[nodiscard]] bool IsInProgress() const { return bInProgress.load();}
+        [[nodiscard]] bool IsDispatched() const { return bDispatched.load();}
         Task* Dispatch()
         {
             bDispatched = true;
@@ -189,7 +196,7 @@ namespace Solid
             bDispatched = false;
             return this;
         }
-        [[nodiscard]] bool Error() const { return bExceptionCatch;}
+        [[nodiscard]] bool Error() const { return bExceptionCatch.load();}
         void ResetRunning() { bHasRun = false; bExceptionCatch = false;}
         static ID_Internal MakeID(const std::string& sw) { return ID_Internal{sw};}
         std::string_view getID(){return std::forward<std::string_view>(std::string_view(ID));}

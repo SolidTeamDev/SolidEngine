@@ -115,6 +115,12 @@ struct ShaderLoaderWrapper
     int i;
 };
 
+struct IDWrapper
+{
+    std::string Name;
+    int i;
+};
+
 void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 {
     if(!fs::exists(Rpath))
@@ -139,9 +145,12 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
         const std::size_t numOffiles = std::count_if(fs::directory_iterator(Rpath), fs::directory_iterator{}, (fp)fs::is_regular_file);
         const std::size_t numOfShader = std::count_if(fs::directory_iterator(Rpath), fs::directory_iterator{}, (fp)shaderFind);
         ResourcePtrWrapper* RessourceArray = new ResourcePtrWrapper[numOffiles + numOfShader];
+
         auto Lambda = [this](const fs::path *Rpath, ResourcePtrWrapper *wrapper){LoadRessourceNoAdd(*Rpath,*wrapper); delete Rpath;};
         int i =0;
         std::vector<ShaderLoaderWrapper> Shaders;
+        std::vector<IDWrapper> IDS;
+        IDS.reserve(10);
         Shaders.reserve(5);
         for (auto& item : fs::directory_iterator(Rpath))
         {
@@ -170,23 +179,44 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
                     continue;
                 }
                 TaskMan.AddTask(Task(Task::MakeID("Load " + name),TaskType::RESOURCES_LOADER, Lambda,newP, &RessourceArray[i]));
+                IDS.push_back( {"Load " + name, i});
+
                 ++i;
             }
 
         }
-        for(auto& s : Shaders)
+        for(auto& s : Shaders) {
             LoadRessourceNoAdd(s.p, RessourceArray[s.i]);
-        Manager->GetEngine()->ThreadPool.joinAllThread();
-
-        for (int j = 0; j < numOffiles + numOfShader; ++j) {
-
-            if(RessourceArray[j].r!= nullptr)
-                Manager->AddResource(RessourceArray[j].r);
         }
+
+        bool b = true;
+        while(b)
+        {
+            b = false;
+            for (int j = 0; j <IDS.size(); ++j) {
+                Task* t= TaskMan.getTaskByID(IDS.at(j).Name);
+                if(t == nullptr)
+                    continue;
+                if(!t->IsFinished())
+                {
+                    b = true;
+                }
+                else
+                {
+                    IDS[j].Name = "";
+                    if(RessourceArray[j].r!= nullptr) {
+                        Manager->AddResource(RessourceArray[j].r);
+                    }
+                }
+            }
+        }
+
+
     }
     /// MonoThread Loading
     else
     {
+
         for (auto& item : fs::directory_iterator(Rpath))
         {
             if(fs::is_directory(item))
@@ -195,15 +225,23 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
                 std::transform(name.begin(), name.end(), name.begin(),
                                [](unsigned char c){ return std::tolower(c); });
                 if(name.find("shader") != std::string::npos || name.find("compute") != std::string::npos)
+                {
+
                     LoadRessource(item);
+                }
                 else
                 {
-                    return; //recursive func
+
+                    continue; //recursive func
                 }
             }
             else
+            {
                 LoadRessource(item);
+
+            }
         }
+
     }
 }
 
@@ -565,7 +603,7 @@ Resource * ResourcesLoader::LoadSolidMesh(const fs::path &Rpath)
 
     Mesh->FromDataBuffer(buffer.data(), buffer.size());
 
-    printf("Mesh loaded \n");
+
     return Mesh;
 
 }
