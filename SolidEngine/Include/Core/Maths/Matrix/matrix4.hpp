@@ -33,8 +33,8 @@ namespace Solid
 
 #pragma region Static Methods
 
-        static Mat4 Zero;
-        static Mat4 Identity;
+        static const Mat4 Zero;
+        static const Mat4 Identity;
 
         static Mat4 Translate(const Vec3& _pos);
         static Mat4 Rotation(const Quat& _rot);

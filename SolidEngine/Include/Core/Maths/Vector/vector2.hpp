@@ -31,11 +31,11 @@ namespace Solid
 
 #pragma region Static Methods
 
-        static Vec2 Zero;
-        static Vec2 Up;
-        static Vec2 Down;
-        static Vec2 Left;
-        static Vec2 Right;
+        static const Vec2 Zero;
+        static const Vec2 Up;
+        static const Vec2 Down;
+        static const Vec2 Left;
+        static const Vec2 Right;
 
         static constexpr float Dot(const Vec2 &_v1,const Vec2 &_v2) noexcept;
 

@@ -47,16 +47,16 @@ namespace Solid
 #pragma region Static Methods
 
     template<typename T>
-    Mat4<T> Mat4<T>::Zero = {0, 0, 0, 0,
-                             0, 0, 0, 0,
-                             0, 0, 0, 0,
-                             0, 0, 0, 0};
+    Mat4<T> const Mat4<T>::Zero = {0, 0, 0, 0,
+                                   0, 0, 0, 0,
+                                   0, 0, 0, 0,
+                                   0, 0, 0, 0};
 
     template<typename T>
-    Mat4<T> Mat4<T>::Identity = {1, 0, 0, 0,
-                                 0, 1, 0, 0,
-                                 0, 0, 1, 0,
-                                 0, 0, 0, 1};
+    Mat4<T> const Mat4<T>::Identity = {1, 0, 0, 0,
+                                       0, 1, 0, 0,
+                                       0, 0, 1, 0,
+                                       0, 0, 0, 1};
 
     template<typename T>
     Mat4<T> Mat4<T>::Translate(const Vec3 &_pos)

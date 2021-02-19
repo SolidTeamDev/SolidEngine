@@ -42,11 +42,11 @@ namespace Solid
 #pragma endregion
 #pragma region Static Methods
 
-    Vec2 Vec2::Zero{0,0};
-    Vec2 Vec2::Up{0,1};
-    Vec2 Vec2::Down{0,-1};
-    Vec2 Vec2::Left{-1,0};
-    Vec2 Vec2::Right{1,0};
+    Vec2 const Vec2::Zero{0,0};
+    Vec2 const Vec2::Up{0,1};
+    Vec2 const Vec2::Down{0,-1};
+    Vec2 const Vec2::Left{-1,0};
+    Vec2 const Vec2::Right{1,0};
 
     constexpr float Vec2::Dot(const Vec2& _v1,const Vec2 &_v2) noexcept
     {

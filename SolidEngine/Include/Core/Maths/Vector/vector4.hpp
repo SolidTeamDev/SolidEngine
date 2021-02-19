@@ -25,13 +25,13 @@ namespace Solid
 
 #pragma region Static Methods
 
-        static Vec4 Zero;
-        static Vec4 Up;
-        static Vec4 Down;
-        static Vec4 Left;
-        static Vec4 Right;
-        static Vec4 Forward;
-        static Vec4 Back;
+        static const Vec4 Zero;
+        static const Vec4 Up;
+        static const Vec4 Down;
+        static const Vec4 Left;
+        static const Vec4 Right;
+        static const Vec4 Forward;
+        static const Vec4 Back;
 
         static constexpr float Dot(const Vec4 &_v1,const Vec4 &_v2) noexcept;
 
@@ -61,6 +61,7 @@ namespace Solid
         Vec4 &Normalize() noexcept;
 
         constexpr Vec4 GetNormalize() const noexcept;
+
 
         constexpr bool IsEquals(const Vec4& vec) const noexcept;
 

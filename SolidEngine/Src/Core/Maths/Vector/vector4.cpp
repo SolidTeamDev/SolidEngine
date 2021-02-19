@@ -40,13 +40,13 @@ namespace Solid
 #pragma endregion
 #pragma region Static Methods
 
-    Vec4 Vec4::Zero{0,0,0,1};
-    Vec4 Vec4::Up{0,1,0,1};
-    Vec4 Vec4::Down{0,-1,0,1};
-    Vec4 Vec4::Left{-1,0,0,1};
-    Vec4 Vec4::Right{1,0,0,1};
-    Vec4 Vec4::Forward{1,0,1,1};
-    Vec4 Vec4::Back{0,0,-1,1};
+    Vec4 const Vec4::Zero{0,0,0,1};
+    Vec4 const Vec4::Up{0,1,0,1};
+    Vec4 const Vec4::Down{0,-1,0,1};
+    Vec4 const Vec4::Left{-1,0,0,1};
+    Vec4 const Vec4::Right{1,0,0,1};
+    Vec4 const Vec4::Forward{1,0,1,1};
+    Vec4 const Vec4::Back{0,0,-1,1};
 
     constexpr float Vec4::Dot(const Vec4& _v1,const Vec4 &_v2) noexcept
     {
@@ -166,7 +166,8 @@ namespace Solid
     {
         return  Solid::Maths::Equals(x,vec.x) &&
                 Solid::Maths::Equals(y,vec.y) &&
-                Solid::Maths::Equals(z,vec.z);
+                Solid::Maths::Equals(z,vec.z) &&
+                Solid::Maths::Equals(w,vec.w) ;
     }
 
     constexpr float Vec4::Dist(const Vec4 &vec) const noexcept

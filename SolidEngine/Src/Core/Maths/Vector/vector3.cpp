@@ -36,14 +36,14 @@ namespace Solid
 #pragma endregion
 #pragma region Static Methods
 
-    Vec3 Vec3::Zero{0,0,0};
-    Vec3 Vec3::One{1,1,1};
-    Vec3 Vec3::Up{0,1,0};
-    Vec3 Vec3::Down{0,-1,0};
-    Vec3 Vec3::Left{-1,0,0};
-    Vec3 Vec3::Right{1,0,0};
-    Vec3 Vec3::Forward{1,0,1};
-    Vec3 Vec3::Back{0,0,-1};
+    Vec3 const Vec3::Zero{0,0,0};
+    Vec3 const Vec3::One{1,1,1};
+    Vec3 const Vec3::Up{0,1,0};
+    Vec3 const Vec3::Down{0,-1,0};
+    Vec3 const Vec3::Left{-1,0,0};
+    Vec3 const Vec3::Right{1,0,0};
+    Vec3 const Vec3::Forward{1,0,1};
+    Vec3 const Vec3::Back{0,0,-1};
 
     constexpr float Vec3::Dot(const Vec3& _v1,const Vec3 &_v2) noexcept
     {
