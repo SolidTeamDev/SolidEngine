@@ -59,7 +59,8 @@ namespace Solid
         loader.LoadResourcesFromFolder(p);
         auto after = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double, std::ratio<1,1000>> fp_s = after - before;
-        std::cout << "Loading has Taken " << fp_s.count() << " milliseconds\n";
+        std::cout << "Loading MT has Taken " << fp_s.count() << " milliseconds\n";
+        
 
         glfwSwapInterval(0);
 
