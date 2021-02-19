@@ -12,7 +12,8 @@ namespace Solid
     enum class ESolidErrorCode : int
     {
         S_NO_ERROR  = 0,
-        S_ASSERT    = 1     // Assertion error code
+        S_ASSERT    = 1,     // Assertion error code
+        S_INIT_ERROR= 2,
     };
 
     /**

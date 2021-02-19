@@ -27,7 +27,7 @@ namespace Solid
         engine.InitEngineContext(windowParams, rendererParams);
 
         if(!engine.IsEngineContextInitialized())
-            throw std::runtime_error("Engine not correctly initialized !");
+            throw ThrowError("Engine not correctly initialized !",ESolidErrorCode::S_INIT_ERROR);
 
         const Window* window = engine.window;
 
