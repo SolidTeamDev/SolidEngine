@@ -7,6 +7,7 @@
 #include <iostream>
 #include <functional>
 #include <mutex>
+#include <atomic>
 #include "../Build/solidAPI.hpp"
 #include "Task.hpp"
 #include "TaskManager.hpp"

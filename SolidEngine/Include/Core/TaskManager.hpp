@@ -51,14 +51,12 @@ namespace Solid
         }
         Task* getTaskByID(const std::string_view& s)
         {
-            std::lock_guard<std::mutex> Lock(TaskSystemGuard);
+            //std::lock_guard<std::mutex> Lock(TaskSystemGuard);
             for(auto& element : TaskPool)
             {
 
                 if(element.getID() == s)
                 {
-                    if(element.IsDispatched())
-                        return nullptr;
                     return &element;
                 }
             }
