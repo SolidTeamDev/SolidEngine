@@ -6,6 +6,7 @@
 #include "Ressources/Ressources.hpp"
 
 #include "ECS/Components/transform.hpp"
+#include "ECS/Components/meshRenderer.hpp"
 
 namespace Solid
 {
@@ -30,6 +31,7 @@ namespace Solid
         ecsManager.Init();
 
         ecsManager.RegisterComponent<Transform>();
+        ecsManager.RegisterComponent<MeshRenderer>();
     }
 
     void Engine::InitEngineContext(const WindowParams& _windowParams, const RendererParams& _rendererParams)
