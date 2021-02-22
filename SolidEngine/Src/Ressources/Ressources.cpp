@@ -15,23 +15,125 @@
 using namespace Solid;
 
 #define SASSET_GEN 1
+int Resource::NoNameNum = 0;
+
+struct ShaderLoaderWrapper
+{
+    fs::path p;
+    int i;
+};
+
+struct IDWrapper
+{
+    std::string Name;
+    int i;
+};
+
+
 
 ///
 /// ResourceManager 
 ///
 
-void ResourceManager::AddResource(Resource *r) 
-{
-    ResourceList.push_back(r);
-}
-std::vector<Resource *> & ResourceManager::GetList() 
-{
-    return ResourceList;
-}
+
+
 
 Engine* ResourceManager::GetEngine()
 {
     return EnginePtr;
+}
+
+Resource * ResourceManager::GetResourceByName(const char* name)
+{
+    std::string StrName =name;
+    if(EnginePtr == nullptr || !EnginePtr->MultiThreadEnabled())
+    {
+        Resource* r = TextureList.Find(name);
+        if(r != nullptr)
+            return r;
+        r = MeshList.Find(name);
+        if(r != nullptr)
+            return r;
+        r = MaterialList.Find(name);
+        if(r != nullptr)
+            return r;
+        r = ShaderList.Find(name);
+        if(r != nullptr)
+            return r;
+        r = AnimList.Find(name);
+        if(r != nullptr)
+            return r;
+        r = ImageList.Find(name);
+        if(r != nullptr)
+            return r;
+        r = ComputeList.Find(name);
+        if(r != nullptr)
+            return r;
+        return nullptr;
+    }
+    else
+    {
+        const int ResourceTypeNum = 7;
+        Resource* MtResource[ResourceTypeNum] {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
+        // for templated lambda you can use l= [](auto& var) {}; or l= []<typename T>(t& var) {};
+        auto Lambda =[]<typename  T>(ResourceList<T>* List, Resource** PtrWrapper, const char* _name)
+        {
+            *PtrWrapper = List->Find(_name);
+        };
+        //Lambda(MeshList, &MtResource[0], name);
+        TaskManager& TaskMan = EnginePtr->MultiTask;
+        IDWrapper IDS[ResourceTypeNum];
+
+        {
+            int i = 0;
+            TaskMan.AddTask(Task(Task::MakeID("Find " + std::to_string(i) + name),TaskType::GENERAL, Lambda,&TextureList,&MtResource[i], name));
+            IDS[i] = {"Find "+ std::to_string(i) + name, i};
+            ++i;
+            TaskMan.AddTask(Task(Task::MakeID("Find " + std::to_string(i) + name),TaskType::GENERAL, Lambda,&MeshList,&MtResource[i], name));
+            IDS[i] = {"Find "+ std::to_string(i) + name, i};
+            ++i;
+            TaskMan.AddTask(Task(Task::MakeID("Find " + std::to_string(i) + name),TaskType::GENERAL, Lambda,&MaterialList,&MtResource[i], name));
+            IDS[i] = {"Find "+ std::to_string(i) + name, i};
+            ++i;
+            TaskMan.AddTask(Task(Task::MakeID("Find " + std::to_string(i) + name),TaskType::GENERAL, Lambda,&ShaderList,&MtResource[i], name));
+            IDS[i] = {"Find "+ std::to_string(i) + name, i};
+            ++i;
+            TaskMan.AddTask(Task(Task::MakeID("Find " + std::to_string(i) + name),TaskType::GENERAL, Lambda,&AnimList,&MtResource[i], name));
+            IDS[i] = {"Find "+ std::to_string(i) + name, i};
+            ++i;
+            TaskMan.AddTask(Task(Task::MakeID("Find " + std::to_string(i) + name),TaskType::GENERAL, Lambda,&ImageList,&MtResource[i], name));
+            IDS[i] = {"Find "+ std::to_string(i) + name, i};
+            ++i;
+            TaskMan.AddTask(Task(Task::MakeID("Find " + std::to_string(i) + name),TaskType::GENERAL, Lambda,&ComputeList,&MtResource[i], name));
+            IDS[i] = {"Find "+ std::to_string(i) + name, i};
+            ++i;
+        }
+
+        bool b = true;
+        while(b)
+        {
+            b = false;
+            for (int j = 0; j <ResourceTypeNum; ++j) {
+                Task* t= TaskMan.getTaskByID(IDS[j].Name);
+                if(t == nullptr)
+                    continue;
+                if(!t->IsFinished())
+                {
+                    b = true;
+                }
+                else
+                {
+                    IDS[j].Name = "";
+                    int k = IDS[j].i;
+                    if(MtResource[k] != nullptr) {
+                        return MtResource[k];
+                    }
+                }
+            }
+        }
+
+    }
+    return nullptr;
 }
 
 ///
@@ -109,17 +211,7 @@ void ResourcesLoader::LoadRessource(const fs::path &Rpath)
         Manager->AddResource(RWrapper.r);
 }
 
-struct ShaderLoaderWrapper
-{
-    fs::path p;
-    int i;
-};
 
-struct IDWrapper
-{
-    std::string Name;
-    int i;
-};
 
 void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 {
@@ -144,7 +236,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
                 };
         const std::size_t numOffiles = std::count_if(fs::directory_iterator(Rpath), fs::directory_iterator{}, (fp)fs::is_regular_file);
         const std::size_t numOfShader = std::count_if(fs::directory_iterator(Rpath), fs::directory_iterator{}, (fp)shaderFind);
-        ResourcePtrWrapper* RessourceArray = new ResourcePtrWrapper[numOffiles + numOfShader];
+        ResourcePtrWrapper* RessourceArray = new ResourcePtrWrapper[numOffiles + numOfShader] {nullptr};
 
         auto Lambda = [this](const fs::path *Rpath, ResourcePtrWrapper *wrapper){LoadRessourceNoAdd(*Rpath,*wrapper); delete Rpath;};
         int i =0;
@@ -204,8 +296,9 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
                 else
                 {
                     IDS[j].Name = "";
-                    if(RessourceArray[j].r!= nullptr) {
-                        Manager->AddResource(RessourceArray[j].r);
+                    int k = IDS[j].i;
+                    if(RessourceArray[k].r!= nullptr) {
+                        Manager->AddResource(RessourceArray[k].r);
                     }
                 }
             }
@@ -585,6 +678,11 @@ Resource * ResourcesLoader::LoadSolidImage(const fs::path &Rpath)
         ifs.seekg(0, std::ios::beg);
         ifs.read(&buffer[0], pos);
         Image->FromDataBuffer(buffer.data(), buffer.size());
+        if(Image->_name == "")
+        {
+            Image->_name = "NoName" + std::to_string(Resource::NoNameNum);
+            Resource::NoNameNum++;
+        }
     return Image;
 }
 
@@ -602,7 +700,11 @@ Resource * ResourcesLoader::LoadSolidMesh(const fs::path &Rpath)
     ifs.read(&buffer[0], pos);
 
     Mesh->FromDataBuffer(buffer.data(), buffer.size());
-
+    if(Mesh->_name == "")
+    {
+        Mesh->_name = "NoName" + std::to_string(Resource::NoNameNum);
+        Resource::NoNameNum++;
+    }
 
     return Mesh;
 
@@ -620,6 +722,11 @@ Resource * ResourcesLoader::LoadSolidComputeShader(const fs::path &Rpath)
     ifs.read(&buffer[0], pos);
 
     cs->FromDataBuffer(buffer.data(), buffer.size());
+    if(cs->_name == "")
+    {
+        cs->_name = "NoName" + std::to_string(Resource::NoNameNum);
+        Resource::NoNameNum++;
+    }
     return cs;
 
 
@@ -636,6 +743,11 @@ Resource * ResourcesLoader::LoadSolidShader(const fs::path &Rpath)
     ifs.read(&buffer[0], pos);
 
     s->FromDataBuffer(buffer.data(), buffer.size());
+    if(s->_name == "")
+    {
+        s->_name = "NoName" + std::to_string(Resource::NoNameNum);
+        Resource::NoNameNum++;
+    }
     return s;
 
 }
