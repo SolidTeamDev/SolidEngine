@@ -5,6 +5,7 @@
 #include "SolidMultiThread.hpp"
 #include "Time/time.hpp"
 #include "InputManager/inputManager.hpp"
+#include "ECS/ecsManager.hpp"
 
 #include "Core/Debug/debug.hpp"
 
@@ -24,10 +25,12 @@ namespace Solid
         bool MTEnabled = false;
         bool engineContextInit = false;
 
+        void InitEcs();
+
     public:
         Window* window;
         Renderer* renderer = nullptr;
-
+        ECSManager ecsManager;
         class ResourceManager* RManager;
         TaskManager MultiTask;
         ThreadManager ThreadPool;
@@ -51,7 +54,7 @@ namespace Solid
          * @brief Return if the engine context is initialized
          * @return Engine context init
          */
-        bool IsEngineContextInitialized();
+        bool IsEngineContextInitialized() const;
 
         ~Engine();
     };

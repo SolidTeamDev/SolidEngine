@@ -5,12 +5,15 @@
 #include "UI/solidUI.hpp"
 #include "Ressources/Ressources.hpp"
 
+#include "ECS/Components/transform.hpp"
+
 namespace Solid
 {
     Engine::Engine() :
     ThreadPool(&MultiTask)
     {
         RManager = new ResourceManager(this);
+        InitEcs();
     }
 
     Engine::~Engine()
@@ -20,6 +23,13 @@ namespace Solid
         delete window;
         delete renderer;
         ThreadPool.TerminateAllThreads();
+    }
+
+    void Engine::InitEcs()
+    {
+        ecsManager.Init();
+
+        ecsManager.RegisterComponent<Transform>();
     }
 
     void Engine::InitEngineContext(const WindowParams& _windowParams, const RendererParams& _rendererParams)
@@ -40,7 +50,7 @@ namespace Solid
             engineContextInit = true;
     }
 
-    bool Engine::IsEngineContextInitialized()
+    bool Engine::IsEngineContextInitialized() const
     {
         return engineContextInit;
     }
