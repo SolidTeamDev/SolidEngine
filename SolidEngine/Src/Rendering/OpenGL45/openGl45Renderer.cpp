@@ -1,12 +1,14 @@
 #include "Rendering/OpenGL45/openGl45Renderer.hpp"
 
+#include "Core/Debug/debug.hpp"
+
 namespace Solid
 {
 
     OpenGL45Renderer::OpenGL45Renderer()
     {
         if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
-            throw std::runtime_error("Failed to load glad !");
+            throw ThrowError("Failed to load glad !",ESolidErrorCode::S_INIT_ERROR);
 
         if (GLAD_GL_KHR_debug)
         {
@@ -64,7 +66,7 @@ namespace Solid
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, framebuffer.depthBuffer);
 
         if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-            std::cerr << "Error : Framebuffer is not complete" << std::endl;
+            Log::Send("Framebuffer is not complete",Log::ELogSeverity::ERROR);
 
         glBindFramebuffer(GL_FRAMEBUFFER,0);
 
@@ -85,7 +87,7 @@ namespace Solid
     void OpenGL45Renderer::BeginFramebuffer(const Framebuffer &_framebuffer) const
     {
         if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-            std::cerr << "Error : Framebuffer is not complete" << std::endl;
+            Log::Send("Framebuffer is not complete",Log::ELogSeverity::ERROR);
 
         glBindFramebuffer(GL_FRAMEBUFFER, _framebuffer.id);
     }

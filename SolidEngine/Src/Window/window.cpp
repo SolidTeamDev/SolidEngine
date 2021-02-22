@@ -1,5 +1,7 @@
 #include "Window/window.hpp"
 
+#include "Core/Debug/debug.hpp"
+
 namespace Solid
 {
 
@@ -9,7 +11,7 @@ namespace Solid
         title       = _wParam.title;
 
         if(!glfwInit())
-            throw std::runtime_error("GLFW initialisation failed !");
+            throw ThrowError("GLFW initialisation failed !",ESolidErrorCode::S_INIT_ERROR);
 
         glfwSetErrorCallback(GLFWErrorCallback);
 
@@ -21,7 +23,7 @@ namespace Solid
         window = glfwCreateWindow(_wParam.windowSize.x,_wParam.windowSize.y,_wParam.title.c_str(), nullptr, nullptr);
 
         if(window == nullptr)
-            throw std::runtime_error("GLFW create window failed !");
+            throw ThrowError("GLFW create window failed !",ESolidErrorCode::S_INIT_ERROR);
 
         glfwMakeContextCurrent(window);
         glfwSwapInterval(1); // v-sync
