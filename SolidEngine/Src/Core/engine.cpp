@@ -7,6 +7,7 @@
 
 #include "ECS/Components/transform.hpp"
 #include "ECS/Components/meshRenderer.hpp"
+#include "ECS/Components/camera.hpp"
 
 namespace Solid
 {
@@ -30,8 +31,19 @@ namespace Solid
     {
         ecsManager.Init();
 
+        //Components Registration
         ecsManager.RegisterComponent<Transform>();
         ecsManager.RegisterComponent<MeshRenderer>();
+        ecsManager.RegisterComponent<Camera>();
+
+        //Register Signature
+        rendererSystem = ecsManager.RegisterSystem<RendererSystem>();
+        {
+            Signature signature;
+            signature.set(ecsManager.GetComponentType<Transform>());
+            signature.set(ecsManager.GetComponentType<MeshRenderer>());
+            ecsManager.SetSystemSignature<RendererSystem>(signature);
+        }
     }
 
     void Engine::InitEngineContext(const WindowParams& _windowParams, const RendererParams& _rendererParams)

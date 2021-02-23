@@ -47,16 +47,16 @@ namespace Solid
 #pragma region Static Methods
 
     template<typename T>
-    Mat4<T> const Mat4<T>::Zero = {0, 0, 0, 0,
-                                   0, 0, 0, 0,
-                                   0, 0, 0, 0,
-                                   0, 0, 0, 0};
+    Mat4<T> Mat4<T>::Zero = {0, 0, 0, 0,
+                             0, 0, 0, 0,
+                             0, 0, 0, 0,
+                             0, 0, 0, 0};
 
     template<typename T>
-    Mat4<T> const Mat4<T>::Identity = {1, 0, 0, 0,
-                                       0, 1, 0, 0,
-                                       0, 0, 1, 0,
-                                       0, 0, 0, 1};
+    Mat4<T> Mat4<T>::Identity = {1, 0, 0, 0,
+                                 0, 1, 0, 0,
+                                 0, 0, 1, 0,
+                                 0, 0, 0, 1};
 
     template<typename T>
     Mat4<T> Mat4<T>::Translate(const Vec3 &_pos)
@@ -126,7 +126,7 @@ namespace Solid
 
         Mat4<T> m;
 
-        float temp = far - near;
+        float temp = _far - _near;
 
         m.elements[0] = 1 / xmax;
         m.elements[1] = 0.0;
@@ -138,11 +138,11 @@ namespace Solid
         m.elements[7] = 0.0;
         m.elements[8] = 0.f;
         m.elements[9] = 0.f;
-        m.elements[10] = -(far + near) / temp;
+        m.elements[10] = -(_far + _near) / temp;
         m.elements[11] = -1;
         m.elements[12] = 0.0;
         m.elements[13] = 0.0;
-        m.elements[14] = -2 * (far * near) / temp;
+        m.elements[14] = -2 * (_far * _near) / temp;
         m.elements[15] = 0.0;
 
         return m;

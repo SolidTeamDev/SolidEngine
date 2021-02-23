@@ -3,11 +3,11 @@
 #include <iostream>
 #include <unordered_map>
 #include <memory>
-
+#include "Build/solidAPI.hpp"
 #include "system.hpp"
 #include "types.hpp"
 
-class SystemManager
+class SOLID_API SystemManager
 {
 private:
 
@@ -18,7 +18,7 @@ private:
 public:
 
     template<typename T>
-    std::shared_ptr<T> RegisterSystem()
+    std::shared_ptr<T> RegisterSystem(ECSManager& _ecsManager)
     {
         const char* typeName = typeid(T).name();
 
@@ -28,7 +28,7 @@ public:
             return nullptr;
         }
 
-        auto system = std::make_shared<T>();
+        auto system = std::make_shared<T>(_ecsManager);
         systems.insert({typeName,system});
 
         return system;

@@ -3,10 +3,10 @@
 #include <iostream>
 #include <queue>
 #include <array>
-
+#include "Build/solidAPI.hpp"
 #include "ECS/types.hpp"
 
-class EntityManager
+class SOLID_API EntityManager
 {
 private:
     std::queue<Entity> availableEntities {};

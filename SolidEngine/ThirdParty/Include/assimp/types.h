@@ -179,31 +179,31 @@ struct aiColor3D {
         return *this;
     }
 
-    /** Component-wise comparison */
+    /** Components-wise comparison */
     // TODO: add epsilon?
     bool operator==(const aiColor3D &other) const { return r == other.r && g == other.g && b == other.b; }
 
-    /** Component-wise inverse comparison */
+    /** Components-wise inverse comparison */
     // TODO: add epsilon?
     bool operator!=(const aiColor3D &other) const { return r != other.r || g != other.g || b != other.b; }
 
-    /** Component-wise comparison */
+    /** Components-wise comparison */
     // TODO: add epsilon?
     bool operator<(const aiColor3D &other) const {
         return r < other.r || (r == other.r && (g < other.g || (g == other.g && b < other.b)));
     }
 
-    /** Component-wise addition */
+    /** Components-wise addition */
     aiColor3D operator+(const aiColor3D &c) const {
         return aiColor3D(r + c.r, g + c.g, b + c.b);
     }
 
-    /** Component-wise subtraction */
+    /** Components-wise subtraction */
     aiColor3D operator-(const aiColor3D &c) const {
         return aiColor3D(r - c.r, g - c.g, b - c.b);
     }
 
-    /** Component-wise multiplication */
+    /** Components-wise multiplication */
     aiColor3D operator*(const aiColor3D &c) const {
         return aiColor3D(r * c.r, g * c.g, b * c.b);
     }

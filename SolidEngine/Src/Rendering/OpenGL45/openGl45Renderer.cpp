@@ -1,5 +1,7 @@
 #include "Rendering/OpenGL45/openGl45Renderer.hpp"
 
+#include <GLFW/glfw3.h>
+
 #include "Core/Debug/debug.hpp"
 
 namespace Solid
@@ -23,7 +25,21 @@ namespace Solid
     void OpenGL45Renderer::GLDebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
                                            const GLchar *message, const void *userParam)
     {
-        std::cout << "OpenGL Debug : " << message << std::endl;
+        Log::ELogSeverity logSeverity = Log::ELogSeverity::DEBUG;
+        switch (severity)
+        {
+            case GL_DEBUG_SEVERITY_HIGH:
+                logSeverity = Log::ELogSeverity::ERROR;
+                break;
+            case GL_DEBUG_SEVERITY_MEDIUM:
+                logSeverity = Log::ELogSeverity::WARNING;
+                break;
+            case GL_DEBUG_SEVERITY_LOW:
+                logSeverity = Log::ELogSeverity::INFO;
+                break;
+        }
+
+        Log::Send("OpenGL Debug : " + std::string(message),logSeverity);
     }
 
     void OpenGL45Renderer::Clear(const Int2& _windowSize) const

@@ -2,6 +2,8 @@
 
 #include "Types/extendedTypes.hpp"
 
+#include <glad/glad.h>
+
 namespace Solid
 {
 

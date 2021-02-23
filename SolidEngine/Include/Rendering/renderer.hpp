@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Window/window.hpp"
+#include "Build/solidAPI.hpp"
+
 #include "Rendering/framebuffer.hpp"
 
 namespace Solid

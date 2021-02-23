@@ -5,6 +5,9 @@
 
 #include "Ressources/Ressources.hpp"
 
+#include "ECS/Components/transform.hpp"
+#include "ECS/Components/meshRenderer.hpp"
+
 #include <string>
 
 namespace Solid
@@ -48,6 +51,10 @@ namespace Solid
         Renderer* renderer = engine.renderer;
         EditorInterface editorInterface(window);
 
+        Entity entity = engine.ecsManager.CreateEntity();
+        engine.ecsManager.AddComponent(entity,Transform());
+        engine.ecsManager.AddComponent(entity,MeshRenderer());
+
         engine.EnableMultiThread(true);
 
         ResourcesLoader loader;
@@ -60,7 +67,6 @@ namespace Solid
         auto after = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double, std::ratio<1,1000>> fp_s = after - before;
         std::cout << "Loading MT has Taken " << fp_s.count() << " milliseconds\n";
-        
 
         glfwSwapInterval(0);
 
@@ -75,6 +81,7 @@ namespace Solid
             renderer->BeginFramebuffer(sceneFramebuffer);
             renderer->ClearColor({0.3f,0.3f,0.3f,1});
             renderer->Clear(window->GetWindowSize());
+            engine.rendererSystem->Update();
             renderer->EndFramebuffer();
 
             editorInterface.Update();
