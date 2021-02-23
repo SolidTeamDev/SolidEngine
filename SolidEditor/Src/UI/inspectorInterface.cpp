@@ -6,6 +6,9 @@ namespace Solid
 {
     void InspectorInterface::Draw()
     {
+        if(!p_open)
+            return;
+
         UI::SetNextWindowSize(ImVec2(250,250));
 
         UI::Begin("Inspector", &p_open,

@@ -7,6 +7,9 @@ namespace Solid
 {
     void FilesInterface::Draw()
     {
+        if(!p_open)
+            return;
+
         UI::SetNextWindowSize(ImVec2(250,250));
 
         UI::Begin("Files", &p_open,

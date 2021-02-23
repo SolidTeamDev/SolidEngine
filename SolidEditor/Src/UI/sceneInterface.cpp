@@ -9,6 +9,9 @@ namespace Solid
 {
     void SceneInterface::Draw()
     {
+        if(!p_open)
+            return;
+
         UI::SetNextWindowSize(ImVec2(250,250));
 
         ImGuiWindowFlags windowFlags = 0;

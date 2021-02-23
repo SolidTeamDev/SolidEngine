@@ -63,16 +63,40 @@ namespace Solid {
                     UI::MenuItem("Linux");
                     UI::EndMenu();
                 }
-                if (UI::MenuItem("Colors Settings"))
-                {
-                    colorOpen = true;
-                    Log::Send("Opened Colors Settings", Log::ELogSeverity::WARNING);
-                }
-                if (UI::MenuItem("Performance Overlay", nullptr, &perfOpen))
-                    Log::Send("Perf Overlay opened or closed", Log::ELogSeverity::CRITICAL);
-                if (UI::MenuItem("Show UI Demo", nullptr, &demoOpen))
-                    Log::Send("Opened Show Demo UI", Log::ELogSeverity::DEBUG);
 
+
+                UI::EndMenu();
+            }
+            if(UI::BeginMenu("Windows"))
+            {
+                if (UI::BeginMenu("Tools"))
+                {
+                    if (UI::MenuItem("Colors Settings", nullptr, &colorOpen))
+                        Log::Send("Opened Colors Settings", Log::ELogSeverity::WARNING);
+                    if (UI::MenuItem("Performance Overlay", nullptr, &perfOpen))
+                        Log::Send("Perf Overlay opened or closed", Log::ELogSeverity::CRITICAL);
+                    if (UI::MenuItem("Show UI Demo", nullptr, &demoOpen))
+                        Log::Send("Opened Show Demo UI", Log::ELogSeverity::DEBUG);
+
+                    UI::EndMenu();
+                }
+                if (UI::BeginMenu("Modules"))
+                {
+                    if (UI::MenuItem("Files", nullptr, &filesInterface.p_open))
+                        Log::Send("Opened/closed files module", Log::ELogSeverity::INFO);
+                    if (UI::MenuItem("Hierarchy Tree", nullptr, &hierarchyTreeInterface.p_open))
+                        Log::Send("Opened/closed hierarchy tree module", Log::ELogSeverity::INFO);
+                    if (UI::MenuItem("Inspector", nullptr, &inspectorInterface.p_open))
+                        Log::Send("Open/closed inspector module", Log::ELogSeverity::INFO);
+                    if (UI::MenuItem("Logs", nullptr, &logsInterface.p_open))
+                        Log::Send("Opened/closed logs module", Log::ELogSeverity::INFO);
+                    if (UI::MenuItem("Play", nullptr, &playInterface.p_open))
+                        Log::Send("Opened/closed play module", Log::ELogSeverity::INFO);
+                    if (UI::MenuItem("Scene", nullptr, &sceneInterface.p_open))
+                        Log::Send("Opened/closed scene module", Log::ELogSeverity::INFO);
+
+                    UI::EndMenu();
+                }
                 UI::EndMenu();
             }
             UI::EndMainMenuBar();

@@ -4,13 +4,13 @@ namespace Solid
 {
     class FilesInterface
     {
-    private:
-        bool p_open = true;
     public:
         FilesInterface()  = default;
         ~FilesInterface() = default;
 
         void Draw();
         void DrawCreateFile();
+
+        bool p_open = true;
     };
 }
