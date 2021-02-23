@@ -8,6 +8,7 @@
 #include "UI/sceneInterface.hpp"
 #include "UI/inspectorInterface.hpp"
 #include "UI/hierarchyTreeInterface.hpp"
+#include "UI/logsInterface.hpp"
 
 namespace Solid
 {
@@ -22,6 +23,7 @@ namespace Solid
         Window*     window;
         ImGuiStyle& editorStyle;
 
+        LogsInterface           logsInterface;
         PlayInterface           playInterface;
         FilesInterface          filesInterface;
         SceneInterface          sceneInterface;

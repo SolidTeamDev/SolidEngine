@@ -5,6 +5,7 @@
 namespace Solid
 {
     int Log::logIndex = 0;
+    int Log::logCount = 0;
     std::array<Log::LogMessage,maxLogMessage> Log::logMessageList;
     std::ofstream Log::logFile;
 
@@ -20,13 +21,15 @@ namespace Solid
 
     void Log::Send(const std::string &_logMessage, const Log::ELogSeverity &_severity)
     {
-        if(logMessageList.size() == maxLogMessage)
+        if(logCount == maxLogMessage)
         {
             for (size_t i = 1; i < maxLogMessage ; i++)
             {
                 logMessageList.at(i-1) = logMessageList.at(i);
             }
         }
+        else
+            logCount++;
 
         LogMessage logMessage
         {
@@ -63,6 +66,11 @@ namespace Solid
             std::cout << severityName << ": " << _logMessage << std::endl;
         #endif
 
-        logIndex = logIndex == maxLogMessage ? logIndex : logIndex+1;
+        logIndex = logIndex == maxLogMessage - 1 ? logIndex : logIndex+1;
     }
-} //!namespace
+
+    Log::LogMessage Log::GetLogAt(unsigned int idx)
+    {
+        return logMessageList.at(idx);
+    }
+}

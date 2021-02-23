@@ -8,17 +8,14 @@
 
 constexpr int maxLogMessage = 100;
 
-namespace Solid
-{
+namespace Solid {
     /**
      * @brief Class used for store every log during the program lifetime
      */
-    class SOLID_API Log
-    {
+    class SOLID_API Log {
     public:
 
-        enum class ELogSeverity
-        {
+        enum class ELogSeverity {
             INFO,       // Display info information
             DEBUG,      // Used to debug something
             WARNING,    // Warning message
@@ -28,19 +25,20 @@ namespace Solid
 
     private:
 
-        struct LogMessage
-        {
+        struct LogMessage {
             ELogSeverity logSeverity;
-            std::string  logMessage;
+            std::string logMessage;
         };
-        static std::array<LogMessage,maxLogMessage> logMessageList;
+        static std::array<LogMessage, maxLogMessage> logMessageList;
         static int logIndex;
+        static int logCount;
         static std::ofstream logFile;
     public:
 
         Log();
         ~Log();
 
-        static void Send(const std::string& _logMessage, const ELogSeverity& _severity = ELogSeverity::INFO);
+        static void Send(const std::string &_logMessage, const ELogSeverity &_severity = ELogSeverity::INFO);
+        static LogMessage GetLogAt(unsigned int idx);
     };
-} //!namespace
+}
