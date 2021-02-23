@@ -10,6 +10,7 @@ namespace Solid
 
         void Draw();
 
-        bool p_open = true;
+        bool p_open = true; //is the window rendered
+        bool cursorInv = false; //is the cursor invisible
     };
 }

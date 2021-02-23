@@ -43,7 +43,10 @@ namespace Solid
 
         [[nodiscard]]
         Int2 GetWindowSize() const;
+
     };
+
+    void SOLID_API SetCursorPos(float _x, float _y);
 
 } //!namespace
 
