@@ -5,8 +5,10 @@ namespace Solid
 {
     void LogsInterface::Draw()
     {
+        if(!p_open)
+            return;
 
-        UI::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.4, 0.4, 0.4, 1.0));
+        UI::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.3, 0.3, 0.3, 1.0));
 
         UI::SetNextWindowSize(ImVec2(250, 250));
         UI::Begin("Logs", &p_open,
@@ -17,7 +19,6 @@ namespace Solid
             UI::End();
             return;
         }
-        UI::TextWrapped("Welcome on the Solid Play Scene!");
 
         for (unsigned int i = maxLogMessage-1; i > 0; i--)
         {
@@ -33,16 +34,21 @@ namespace Solid
                     break;
                 case Log::ELogSeverity::DEBUG:
                     currMsg = "[DEBUG] " + currMsg;
-                    UI::PushStyleColor(ImGuiCol_Text, ImVec4(0.5, 0.5, 0.5, 1.0));
+                    UI::PushStyleColor(ImGuiCol_Text, ImVec4(0.8, 0.8, 0.8, 1.0));
                     break;
                 case Log::ELogSeverity::WARNING:
                     currMsg = "[WARNING] " + currMsg;
                     UI::PushStyleColor(ImGuiCol_Text, ImVec4(1.0, 0.9, 0.0, 1.0));
                     break;
-                default:
+                case Log::ELogSeverity::CRITICAL:
                     currMsg = "[CRITICAL] " + currMsg;
                     UI::PushStyleColor(ImGuiCol_Text, ImVec4(1.0, 0.1, 0.1, 1.0));
                     break;
+                case Log::ELogSeverity::ERROR:
+                    currMsg = "[ERROR] " + currMsg;
+                    UI::PushStyleColor(ImGuiCol_Text, ImVec4(1.0, 0.1, 0.1, 1.0));
+                    break;
+
             }
             UI::Text("%s", currMsg.c_str());
             UI::PopStyleColor(1);

@@ -57,4 +57,8 @@ namespace Solid
         return windowSize;
     }
 
+    void SOLID_API SetCursorPos(float _x, float _y)
+    {
+        glfwSetCursorPos(glfwGetCurrentContext(), _x, _y);
+    }
 } //!namespace
