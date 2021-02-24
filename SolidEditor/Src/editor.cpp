@@ -67,7 +67,12 @@ namespace Solid
         auto after = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double, std::ratio<1,1000>> fp_s = after - before;
         std::cout << "Loading MT has Taken " << fp_s.count() << " milliseconds\n";
-
+        engine.EnableMultiThread(false);
+        //std::vector<Resource*>* Meshes= engine.RManager->GetResourcesVecByType<MeshResource>();
+        //if(Meshes == nullptr);
+            //Ressource Manager do not have this type of resourcesList
+        //else;
+             //Resource Manager Have a ResourceList for this type
         glfwSwapInterval(0);
 
         while (!glfwWindowShouldClose(window->GetHandle()) && !editorInputManager->IsPressed(EInputList::ESCAPE))
