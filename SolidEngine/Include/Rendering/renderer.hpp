@@ -33,6 +33,7 @@ namespace Solid
         virtual void UpdateFramebuffer(const Framebuffer& _framebuffer) const = 0;
         virtual void BeginFramebuffer(const Framebuffer& _framebuffer) const = 0;
         virtual void EndFramebuffer() const = 0;
+        virtual void InitMesh(class MeshResource* m)const = 0;
     };
 
 } //!namespace

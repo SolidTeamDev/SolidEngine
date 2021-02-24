@@ -286,7 +286,10 @@ namespace Solid
             if(r == nullptr)
                 return;
             if(r->GetType() == ResourceType::Mesh)
+            {
+                EnginePtr->renderer->InitMesh((MeshResource*)r);
                 MeshList.List.push_back(r);
+            }
 
             if(r->GetType() == ResourceType::Shader)
                 ShaderList.List.push_back(r);

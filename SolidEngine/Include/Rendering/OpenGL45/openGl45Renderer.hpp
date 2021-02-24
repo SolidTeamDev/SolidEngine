@@ -24,7 +24,7 @@ namespace Solid
 
         void BeginFramebuffer(const Framebuffer& _framebuffer) const final;
         void EndFramebuffer() const final;
-        void InitMesh(class MeshResource* m);
+        void InitMesh(class MeshResource* m)const final;
     };
 
 } //!namespace
