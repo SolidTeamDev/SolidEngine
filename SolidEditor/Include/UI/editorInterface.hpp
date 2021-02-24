@@ -23,6 +23,7 @@ namespace Solid
         Window*     window;
         ImGuiStyle& editorStyle;
 
+        //All interfaces
         LogsInterface           logsInterface;
         PlayInterface           playInterface;
         FilesInterface          filesInterface;
@@ -37,27 +38,59 @@ namespace Solid
         ~EditorInterface() = default;
 
         /**
-         * @debrief updates the whole UI
+         * @debrief Updates the whole UI
          */
         void Update();
 
         /**
-         * @debrief updates the UI style to a dark theme
+         * @debrief Updates the UI style to a dark theme
          */
         void DarkTheme();
 
         /**
-         * @debrief updates the UI style to a dark theme
+         * @debrief Updates the UI style to a light theme
          */
         void LightTheme();
 
+        /**
+         * @brief Creates the main menu bar
+         */
         void DrawMenuBar();
+
+        /**
+         * @brief Creates the Files menu
+         */
+        void DrawMenuFiles();
+
+        /**
+         * @brief Creates the Windows menu
+         */
+        void DrawMenuWindows();
+
+        /**
+         * @brief Creates the Modules menu
+         */
+        void DrawMenuModules();
+
+        /**
+         * @brief Creates the Tools menu
+         */
+        void DrawMenuTools();
+
+
+        /**
+         * @brief Creates the main frame in which the editor will be drawn
+         */
         void DrawMainFrame();
 
         /**
-         * @debrief draws the UI window to change editor colors
+         * @debrief Draws the window to change editor colors
          */
         void DrawChangeColors();
+
+        /**
+         * @brief Draws the performances overlay
+         */
         void DrawPerfOverlay();
     };
 }
