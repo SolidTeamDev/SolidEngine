@@ -16,6 +16,7 @@ namespace Solid
                   T e8, T e9, T e10, T e11,
                   T e12, T e13, T e14, T e15)
     {
+        //TODO MAKE CONTRUCTOR ROW CONVENTION
         elements[0] = e0;
         elements[1] = e1;
         elements[2] = e2;
@@ -28,11 +29,11 @@ namespace Solid
 
         elements[8] = e8;
         elements[9] = e9;
-        elements[10] = elements[4];
-        elements[11] = elements[5];
+        elements[10]= e10;
+        elements[11]= e11;
 
-        elements[12] = elements[6];
-        elements[13] = elements[7];
+        elements[12] = e12;
+        elements[13] = e13;
         elements[14] = e14;
         elements[15] = e15;
 
@@ -63,9 +64,9 @@ namespace Solid
     {
         Mat4<T> tranlate = Mat4<T>::Identity;
 
-        tranlate.elements[3] = _pos.x;
-        tranlate.elements[7] = _pos.y;
-        tranlate.elements[11] = _pos.z;
+        tranlate.elements[12] = _pos.x;
+        tranlate.elements[13] = _pos.y;
+        tranlate.elements[14] = _pos.z;
 
         return tranlate;
     }
@@ -104,8 +105,8 @@ namespace Solid
     {
         Mat4 result;
 
-        result.elements[5] = _scale.y;
         result.elements[0] = _scale.x;
+        result.elements[5] = _scale.y;
         result.elements[10] = _scale.z;
         result.elements[15] = 1;
 
@@ -115,7 +116,8 @@ namespace Solid
     template<typename T>
     Mat4<T> Mat4<T>::Transform(const Vec3 &_pos, const Quat &_rot, const Vec3 &_scale)
     {
-        return Translate(_pos) * Rotation(_rot) * Scale(_scale);
+        Mat4<T> TRS = Translate(_pos)*Rotation(_rot)*Scale(_scale);
+        return TRS ;
     }
 
     template<typename T>
@@ -505,41 +507,42 @@ namespace Solid
     template<typename T>
     constexpr Mat4<T> Mat4<T>::operator*(const Mat4<T> &_mat) const noexcept
     {
+        //TODO mAKE MULTIPLICATION LINE CONVENTION
         return Mat4<T>(
                 elements[0] * _mat.elements[0] + elements[1] * _mat.elements[4] + elements[2] * _mat.elements[8] +
-                elements[3] * _mat.elements[3],
+                elements[3] * _mat.elements[12],
                 elements[0] * _mat.elements[1] + elements[1] * _mat.elements[5] + elements[2] * _mat.elements[9] +
-                elements[3] * _mat.elements[7],
+                elements[3] * _mat.elements[13],
                 elements[0] * _mat.elements[2] + elements[1] * _mat.elements[6] + elements[2] * _mat.elements[10] +
-                elements[3] * _mat.elements[11],
+                elements[3] * _mat.elements[14],
                 elements[0] * _mat.elements[3] + elements[1] * _mat.elements[7] + elements[2] * _mat.elements[11] +
                 elements[3] * _mat.elements[15],
 
                 elements[4] * _mat.elements[0] + elements[5] * _mat.elements[4] + elements[6] * _mat.elements[8] +
-                elements[7] * _mat.elements[3],
+                elements[7] * _mat.elements[12],
                 elements[4] * _mat.elements[1] + elements[5] * _mat.elements[5] + elements[6] * _mat.elements[9] +
-                elements[7] * _mat.elements[7],
+                elements[7] * _mat.elements[13],
                 elements[4] * _mat.elements[2] + elements[5] * _mat.elements[6] + elements[6] * _mat.elements[10] +
-                elements[7] * _mat.elements[11],
+                elements[7] * _mat.elements[14],
                 elements[4] * _mat.elements[3] + elements[5] * _mat.elements[7] + elements[6] * _mat.elements[11] +
                 elements[7] * _mat.elements[15],
 
                 elements[8] * _mat.elements[0] + elements[9] * _mat.elements[4] + elements[10] * _mat.elements[8] +
-                elements[11] * _mat.elements[3],
+                elements[11] * _mat.elements[12],
                 elements[8] * _mat.elements[1] + elements[9] * _mat.elements[5] + elements[10] * _mat.elements[9] +
-                elements[11] * _mat.elements[7],
+                elements[11] * _mat.elements[13],
                 elements[8] * _mat.elements[2] + elements[9] * _mat.elements[6] + elements[10] * _mat.elements[10] +
-                elements[11] * _mat.elements[11],
+                elements[11] * _mat.elements[14],
                 elements[8] * _mat.elements[3] + elements[9] * _mat.elements[7] + elements[10] * _mat.elements[11] +
                 elements[11] * _mat.elements[15],
 
-                elements[3] * _mat.elements[0] + elements[7] * _mat.elements[4] + elements[11] * _mat.elements[8] +
-                elements[15] * _mat.elements[3],
-                elements[3] * _mat.elements[1] + elements[7] * _mat.elements[5] + elements[11] * _mat.elements[9] +
-                elements[15] * _mat.elements[7],
-                elements[3] * _mat.elements[2] + elements[7] * _mat.elements[6] + elements[11] * _mat.elements[10] +
-                elements[15] * _mat.elements[11],
-                elements[3] * _mat.elements[3] + elements[7] * _mat.elements[7] + elements[11] * _mat.elements[11] +
+                elements[12] * _mat.elements[0] + elements[13] * _mat.elements[4] + elements[14] * _mat.elements[8] +
+                elements[15] * _mat.elements[12],
+                elements[12] * _mat.elements[1] + elements[13] * _mat.elements[5] + elements[14] * _mat.elements[9] +
+                elements[15] * _mat.elements[13],
+                elements[12] * _mat.elements[2] + elements[13] * _mat.elements[6] + elements[14] * _mat.elements[10] +
+                elements[15] * _mat.elements[14],
+                elements[12] * _mat.elements[3] + elements[13] * _mat.elements[7] + elements[14] * _mat.elements[11] +
                 elements[15] * _mat.elements[15]
         );
     }

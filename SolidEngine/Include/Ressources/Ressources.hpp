@@ -179,6 +179,7 @@ namespace Solid
         }
         void ToDataBuffer(std::vector<char>& buffer);
         void FromDataBuffer(char* buffer, int bSize);
+        unsigned int GetProgram();
     };
     class SOLID_API ComputeShaderResource : public Resource
     {

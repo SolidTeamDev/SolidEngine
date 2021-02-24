@@ -5,7 +5,7 @@
 
 namespace Solid
 {
-    void RendererSystem::Update()
+    void RendererSystem::Update(const Renderer* _renderer, Camera& _camera)
     {
         for (auto entity : entities)
         {
@@ -15,10 +15,8 @@ namespace Solid
 
             auto transform = ecsManager.GetComponent<Transform>(entity);
 
-            for (auto& subMesh : meshRenderer.mesh->Meshes)
-            {
-
-            }
+            _renderer->SetShaderMVP(meshRenderer.shader,transform,_camera);
+            _renderer->DrawMesh(meshRenderer.mesh);
         }
     }
 } //!namespace

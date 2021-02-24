@@ -1,9 +1,10 @@
+#include "Ressources/Ressources.hpp"
+
 #include "Rendering/OpenGL45/openGl45Renderer.hpp"
 
 #include <GLFW/glfw3.h>
 
 #include "Core/Debug/debug.hpp"
-#include "Ressources/Ressources.hpp"
 
 namespace Solid
 {
@@ -60,8 +61,7 @@ namespace Solid
 
         //Framebuffer
         framebuffer.size = _size;
-        glGenFramebuffers(1, &framebuffer.id);
-        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer.id);
+
 
         //Texture
         glGenTextures(1,&framebuffer.texture);
@@ -79,9 +79,12 @@ namespace Solid
         glBindRenderbuffer(GL_RENDERBUFFER,0);
 
         //Attachment
+        glGenFramebuffers(1, &framebuffer.id);
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer.id);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebuffer.texture, 0);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, framebuffer.depthBuffer);
-
+        GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0 };
+        glDrawBuffers(1, drawBuffers);
         if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
             Log::Send("Framebuffer is not complete",Log::ELogSeverity::ERROR);
 
@@ -114,7 +117,7 @@ namespace Solid
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    void OpenGL45Renderer::InitMesh(MeshResource *m)
+    void OpenGL45Renderer::InitMesh(MeshResource *m) const
     {
         if(m->isInit)
             return;
@@ -142,6 +145,27 @@ namespace Solid
 
 
         m->isInit=true;
+    }
+
+    void OpenGL45Renderer::DrawMesh(const MeshResource *_mesh) const
+    {
+        glEnable(GL_DEPTH_TEST);
+        glBindVertexArray(_mesh->VAO);
+        for (auto& subMesh : _mesh->Meshes)
+        {
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,subMesh.EBO);
+            glDrawElements(GL_TRIANGLES, subMesh.indices.size(),GL_UNSIGNED_INT, nullptr);
+        }
+    }
+
+    void OpenGL45Renderer::SetShaderMVP(ShaderResource *_shader, Transform& _model, Camera& _camera) const
+    {
+        unsigned int program = _shader->GetProgram();
+        glUseProgram(program);
+
+        glUniformMatrix4fv(glGetUniformLocation(program,"proj"),1,GL_FALSE,_camera.GetProjection().elements.data());
+        glUniformMatrix4fv(glGetUniformLocation(program,"view"),1,GL_FALSE,_camera.GetView().elements.data());
+        glUniformMatrix4fv(glGetUniformLocation(program,"model"),1,GL_FALSE,_model.GetMatrix().elements.data());
     }
 
 } //!namespace

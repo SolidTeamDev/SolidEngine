@@ -2,6 +2,8 @@
 
 #include "Core/engine.hpp"
 
+#include "ECS/Components/camera.hpp"
+
 namespace Solid
 {
 
@@ -10,6 +12,7 @@ namespace Solid
     private:
         InputManager<int>* editorInputManager = nullptr;
         Engine engine;
+        Camera editorCamera;
     public:
 
         static Framebuffer sceneFramebuffer;

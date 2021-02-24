@@ -25,6 +25,8 @@ namespace Solid
         void BeginFramebuffer(const Framebuffer& _framebuffer) const final;
         void EndFramebuffer() const final;
         void InitMesh(class MeshResource* m)const final;
+        void DrawMesh(const class MeshResource* _mesh)const final;
+        void SetShaderMVP(class ShaderResource* _shader, Transform& _model, Camera& _camera)const final;
     };
 
 } //!namespace

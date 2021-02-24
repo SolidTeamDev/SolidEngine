@@ -71,9 +71,13 @@ namespace Solid
              //Resource Manager Have a ResourceList for this type
 
         Entity entity = engine.ecsManager.CreateEntity();
-        engine.ecsManager.AddComponent(entity,Transform());
+        engine.ecsManager.AddComponent(entity,Transform{
+                {0,0,-10},
+                {0,0,0,1},
+                {1,1,1}
+        });
         engine.ecsManager.AddComponent(entity,MeshRenderer{
-                .mesh   = dynamic_cast<MeshResource*>(engine.RManager->GetResourceByName("cube.obj")),
+                .mesh   = dynamic_cast<MeshResource*>(engine.RManager->GetResourceByName("towerWNorms.obj")),
                 .shader = dynamic_cast<ShaderResource*>(engine.RManager->GetResourceByName("ZShader"))
         });
 
@@ -83,14 +87,15 @@ namespace Solid
         {
             glfwPollEvents();
             editorInputManager->Update();
+            editorCamera.UpdateCamera(sceneFramebuffer.size);
 
             renderer->ClearColor({0,0,0,1});
             renderer->Clear(window->GetWindowSize());
 
             renderer->BeginFramebuffer(sceneFramebuffer);
-            renderer->ClearColor({0.3f,0.3f,0.3f,1});
-            renderer->Clear(window->GetWindowSize());
-            engine.rendererSystem->Update();
+            renderer->ClearColor({0.f,0.f,0.f,1});
+            renderer->Clear(sceneFramebuffer.size);
+            engine.rendererSystem->Update(renderer,editorCamera);
             renderer->EndFramebuffer();
 
             editorInterface.Update();

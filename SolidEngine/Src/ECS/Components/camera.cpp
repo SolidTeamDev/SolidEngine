@@ -5,8 +5,8 @@ namespace Solid
     Camera::Camera() :
     transform()
     {
-        projection = Mat4<float>::Perspective();
-        view       = Mat4<float>::Identity;
+        projection = Mat4<>::Perspective();
+        view = Mat4<>::Identity;
 
         fov  = 45.f;
         near = 0.01f;
@@ -18,14 +18,19 @@ namespace Solid
         return view;
     }
 
-    Mat4<float> Camera::GetProjection()
+    Mat4<float> Camera::GetProjection() const
     {
         return projection;
     }
 
-    void Camera::UpdateFreeFly(const Int2 _spaceScreen)
+    void Camera::UpdateCamera(const Int2 _spaceScreen)
     {
-        projection = Mat4<float>::Perspective(fov,(float)_spaceScreen.x / (float)_spaceScreen.y,near,far);
+        view       = transform.GetMatrix();
+        projection = Mat4<>::Perspective(fov,(float)_spaceScreen.x / (float)_spaceScreen.y,near,far);
+    }
+
+    void Camera::UpdateFreeFly()
+    {
 
     }
 } //!namespace

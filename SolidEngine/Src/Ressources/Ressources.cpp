@@ -304,6 +304,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
         }
         for(auto& s : Shaders) {
             LoadRessourceNoAdd(s.p, RessourceArray[s.i]);
+            Manager->AddResource(RessourceArray[s.i].r);
         }
 
         bool b = true;
@@ -1094,4 +1095,9 @@ void ShaderResource::FromDataBuffer(char *buffer, int bSize)
             printf("programID = %u is not the name of an existing program object .\n", this->ProgramID);
         }
     }
+}
+
+unsigned int ShaderResource::GetProgram()
+{
+    return ProgramID;
 }

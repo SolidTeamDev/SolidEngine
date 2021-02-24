@@ -19,7 +19,7 @@ namespace Solid
         ImVec2 windowSize = UI::GetWindowSize();
         windowSize.y -= 25.f;
         Editor::sceneFramebuffer.size = {(int)windowSize.x,(int)windowSize.y};
-        UI::Image((ImTextureID)(size_t)Editor::sceneFramebuffer.id,windowSize);
+        UI::Image((ImTextureID)(size_t)Editor::sceneFramebuffer.texture,windowSize,ImVec2{1,1},ImVec2{0,0});
 
         UI::End();
     }

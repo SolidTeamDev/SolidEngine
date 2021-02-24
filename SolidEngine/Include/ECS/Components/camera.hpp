@@ -7,7 +7,7 @@
 
 namespace Solid
 {
-    class Camera
+    class SOLID_API Camera
     {
     private:
         Mat4<float> projection;
@@ -22,8 +22,10 @@ namespace Solid
         Camera();
 
         Mat4<float> GetView();
-        Mat4<float> GetProjection();
+        Mat4<float> GetProjection() const;
 
-        void UpdateFreeFly(const Int2 _spaceScreen);
+        void UpdateCamera(const Int2 _spaceScreen);
+
+        void UpdateFreeFly();
     };
 } //!namespace
