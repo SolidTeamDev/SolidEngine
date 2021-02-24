@@ -12,7 +12,7 @@
 
 #include <vector>
 #include <string>
-//#include <string_view>
+#include <string_view>
 #include <filesystem>
 #include <fstream>
 #include <algorithm>
@@ -114,14 +114,19 @@ namespace Solid
     {
 
 
-
     public:
+        unsigned int VAO = 0;
         class SubMesh{
         public:
+            unsigned int VBO = 0;
+            unsigned int EBO = 0;
             std::vector<Vertex> vertices;
             std::vector<unsigned int> indices;
         };
         std::vector<SubMesh> Meshes;
+
+
+        bool isInit = false;
         MeshResource()
         {
             _type = ResourceType::Mesh;
@@ -307,7 +312,7 @@ namespace Solid
         template<typename T>
         std::vector<Resource*> * GetResourcesVecByType()
         {
-            const char* type_value = typeid(T*).name();
+            std::string_view type_value = typeid(T*).name();
             if(type_value == ImageList.type_value)
                 return &(ImageList.List);
 

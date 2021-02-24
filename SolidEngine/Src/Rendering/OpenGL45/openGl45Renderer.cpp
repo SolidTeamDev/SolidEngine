@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 
 #include "Core/Debug/debug.hpp"
+#include "Ressources/Ressources.hpp"
 
 namespace Solid
 {
@@ -111,6 +112,36 @@ namespace Solid
     void OpenGL45Renderer::EndFramebuffer() const
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
+    void OpenGL45Renderer::InitMesh(MeshResource *m)
+    {
+        if(m->isInit)
+            return;
+
+        glGenVertexArrays(1, &m->VAO);
+        for (MeshResource::SubMesh& sub : m->Meshes) {
+            glGenBuffers(1, &sub.VBO);
+            glGenBuffers(1, &sub.EBO);
+            glBindVertexArray(m->VAO);
+            glBindBuffer(GL_ARRAY_BUFFER, sub.VBO);
+            glBufferData(GL_ARRAY_BUFFER, sub.vertices.size() * 8 *sizeof(GLfloat), sub.vertices.data(), GL_STATIC_DRAW);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 *sizeof(GLfloat), (void*)0);
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 *sizeof(GLfloat), (void*)(3*sizeof(GLfloat)));
+            glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 *sizeof(GLfloat), (void*)(6*sizeof(GLfloat)));
+            glEnableVertexAttribArray(0);
+            glEnableVertexAttribArray(1);
+            glEnableVertexAttribArray(2);
+
+
+
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sub.EBO);
+
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER,  sub.indices.size()*sizeof(unsigned int), sub.indices.data(), GL_STATIC_DRAW);
+        }
+
+
+        m->isInit=true;
     }
 
 } //!namespace
