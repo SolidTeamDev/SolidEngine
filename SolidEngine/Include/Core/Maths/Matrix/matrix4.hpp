@@ -97,7 +97,7 @@ namespace Solid
         Mat4& operator *= (Mat4& _mat) noexcept;
         Mat4& operator /= (Mat4& _mat) noexcept;
 
-        T& Mat4<T>::operator[](unsigned int _index);
+        T& operator[](unsigned int _index);
 
 #pragma endregion
 

@@ -43,6 +43,31 @@ Engine* ResourceManager::GetEngine()
     return EnginePtr;
 }
 
+void ResourceManager::AddResource(Resource *r)
+{
+    if(r == nullptr)
+        return;
+    if(r->GetType() == ResourceType::Mesh)
+    {
+        EnginePtr->renderer->InitMesh((MeshResource*)r);
+        MeshList.List.push_back(r);
+    }
+    if(r->GetType() == ResourceType::Shader)
+        ShaderList.List.push_back(r);
+    if(r->GetType() == ResourceType::Material)
+        MaterialList.List.push_back(r);
+    if(r->GetType() == ResourceType::Compute)
+        ComputeList.List.push_back(r);
+    if(r->GetType() == ResourceType::Image)
+        ImageList.List.push_back(r);
+    if(r->GetType() == ResourceType::Texture)
+        TextureList.List.push_back(r);
+    if(r->GetType() == ResourceType::Anim)
+        AnimList.List.push_back(r);
+
+}
+
+
 Resource * ResourceManager::GetResourceByName(const char* name)
 {
     std::string StrName =name;
