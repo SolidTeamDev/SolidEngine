@@ -83,7 +83,7 @@ namespace Solid
 
         glfwSwapInterval(0);
 
-        while (!glfwWindowShouldClose(window->GetHandle()) && !editorInputManager->IsPressed(EInputList::ESCAPE))
+        while (!glfwWindowShouldClose(window->GetHandle()))
         {
             glfwPollEvents();
             editorInputManager->Update();

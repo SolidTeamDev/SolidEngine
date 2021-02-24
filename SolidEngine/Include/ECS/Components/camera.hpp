@@ -25,7 +25,5 @@ namespace Solid
         Mat4<float> GetProjection() const;
 
         void UpdateCamera(const Int2 _spaceScreen);
-
-        void UpdateFreeFly();
     };
 } //!namespace

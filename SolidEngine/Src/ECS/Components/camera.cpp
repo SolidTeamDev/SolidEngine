@@ -28,9 +28,4 @@ namespace Solid
         view       = transform.GetMatrix();
         projection = Mat4<>::Perspective(fov,(float)_spaceScreen.x / (float)_spaceScreen.y,near,far);
     }
-
-    void Camera::UpdateFreeFly()
-    {
-
-    }
 } //!namespace

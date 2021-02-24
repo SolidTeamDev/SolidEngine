@@ -33,20 +33,20 @@ namespace Solid
 
     void Transform::Translate(const Vec3 &_vec)
     {
-
+        position += _vec;
         hasToUpdateMat = true;
-
     }
 
     void Transform::Rotate(const Quat &_quat)
     {
+        rotation.Rotate(_quat);
 
         hasToUpdateMat = true;
     }
 
     void Transform::Scale(const Vec3 &_vec)
     {
-
+        scale += _vec;
         hasToUpdateMat = true;
     }
 

@@ -2,7 +2,11 @@
 
     #include <unordered_map>
 
+    #include "Core/Debug/log.hpp"
     #include <GLFW/glfw3.h>
+
+namespace Solid
+{
 
     /**
      * @enum ImEnumDetectionType
@@ -52,12 +56,12 @@
                     _isJoystickXbox.insert({jid,true});
                 else
                     _isJoystickXbox.insert({jid,false});*/
-                std::cout << "Controller " << jid << " connected" << std::endl;
+                Log::Send("Controller " + std::to_string(jid) + " connected",Log::ELogSeverity::INFO);
             }
             else if(event == GLFW_DISCONNECTED)
             {
                 //_isJoystickXbox.erase(jid);
-                std::cout << "Controller " << jid << " disconnected" << std::endl;
+                Log::Send("Controller " + std::to_string(jid) + " disconnected",Log::ELogSeverity::INFO);
             }
         }
 
@@ -325,4 +329,5 @@
             return hats[_hatId];
         }
     };
-    
+
+} //!namespace
