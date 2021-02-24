@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/engine.hpp"
+#include "GameCompiler/GameCompiler.hpp"
 
 namespace Solid
 {
@@ -10,6 +11,7 @@ namespace Solid
     private:
         InputManager<int>* editorInputManager = nullptr;
         Engine engine;
+        GameCompiler Compiler;
     public:
 
         static Framebuffer sceneFramebuffer;

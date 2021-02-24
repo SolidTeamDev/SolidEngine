@@ -66,7 +66,10 @@ namespace Solid
             //Ressource Manager do not have this type of resourcesList
         //else;
              //Resource Manager Have a ResourceList for this type
-        glfwSwapInterval(0);
+
+             Compiler.CreateCmake();
+             Compiler.LaunchCompile();
+        glfwSwapInterval(1);
 
         while (!glfwWindowShouldClose(window->GetHandle()) && !editorInputManager->IsPressed(EInputList::ESCAPE))
         {
