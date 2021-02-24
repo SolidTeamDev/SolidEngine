@@ -56,7 +56,7 @@ namespace Solid
         ResourcesLoader loader;
 
         loader.SetManager(engine.RManager);
-        fs::path p = fs::current_path().append("SolidResources");
+        fs::path p = fs::current_path().append("Resources");
 
         auto before = std::chrono::high_resolution_clock::now();
         loader.LoadResourcesFromFolder(p);

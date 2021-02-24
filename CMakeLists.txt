@@ -71,10 +71,19 @@ add_executable(SolidEditor ${EDITOR_SOURCE_FILES})
 target_link_libraries(SolidEditor ${EDITOR_LIBS})
 target_compile_definitions(SolidEditor PRIVATE "IMGUI_API=__declspec(dllimport)")
 
+# ========= DLL ==========
 
 ADD_CUSTOM_COMMAND (TARGET SolidEditor POST_BUILD
-# DEBUG
+
 COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Lib/glfw3.dll ${CMAKE_BINARY_DIR}/
 COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Lib/assimp-vc142-mtd.dll ${CMAKE_BINARY_DIR}/
 # Output Message
 COMMENT "Copying binaries" VERBATIM)
+
+# ========= RESOURCES ==========
+
+ADD_CUSTOM_COMMAND (TARGET SolidEditor POST_BUILD
+
+COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/Resources ${CMAKE_BINARY_DIR}/Resources
+# Output Message
+COMMENT "Copying Resources folder" VERBATIM)
