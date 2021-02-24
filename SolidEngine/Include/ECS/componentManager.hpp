@@ -3,24 +3,24 @@
 #include <iostream>
 #include <unordered_map>
 #include <memory>
-
+#include <string_view>
 #include "types.hpp"
 #include "componentArray.hpp"
 
-class ComponentManager
+class SOLID_API ComponentManager
 {
 private:
 
-    std::unordered_map<const char*, ComponentType> componentTypes {};
+    std::unordered_map<std::string_view, ComponentType> componentTypes {};
 
-    std::unordered_map<const char*, std::shared_ptr<IComponentArray>> componentArrays {};
+    std::unordered_map<std::string_view, std::shared_ptr<IComponentArray>> componentArrays {};
 
     ComponentType nextComponentType {};
 
     template<typename T>
     std::shared_ptr<ComponentArray<T>> GetComponentArray()
     {
-        const char* typeName = typeid(T).name();
+        std::string_view typeName = typeid(T).name();
 
         try
         {
@@ -56,7 +56,7 @@ public:
     template<typename T>
     ComponentType GetComponentType()
     {
-        const char* typeName = typeid(T).name();
+        std::string_view typeName = typeid(T).name();
 
         if(componentTypes.find(typeName) == componentTypes.end())
         {

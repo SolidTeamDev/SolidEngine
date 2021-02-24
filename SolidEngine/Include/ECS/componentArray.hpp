@@ -1,11 +1,12 @@
 #pragma once
 
+#include "Build/solidAPI.hpp"
 #include <array>
 #include <unordered_map>
 
 #include "ECS/types.hpp"
 
-class IComponentArray
+class SOLID_API IComponentArray
 {
 public:
     virtual ~IComponentArray() = default;
@@ -15,7 +16,7 @@ public:
 
 
 template<typename T>
-class ComponentArray : public IComponentArray
+class SOLID_API ComponentArray : public IComponentArray
 {
 private:
 

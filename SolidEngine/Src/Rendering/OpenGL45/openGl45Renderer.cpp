@@ -1,4 +1,8 @@
+#include "Ressources/Ressources.hpp"
+
 #include "Rendering/OpenGL45/openGl45Renderer.hpp"
+
+#include <GLFW/glfw3.h>
 
 #include "Core/Debug/debug.hpp"
 
@@ -23,7 +27,21 @@ namespace Solid
     void OpenGL45Renderer::GLDebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
                                            const GLchar *message, const void *userParam)
     {
-        std::cout << "OpenGL Debug : " << message << std::endl;
+        Log::ELogSeverity logSeverity = Log::ELogSeverity::DEBUG;
+        switch (severity)
+        {
+            case GL_DEBUG_SEVERITY_HIGH:
+                logSeverity = Log::ELogSeverity::ERROR;
+                break;
+            case GL_DEBUG_SEVERITY_MEDIUM:
+                logSeverity = Log::ELogSeverity::WARNING;
+                break;
+            case GL_DEBUG_SEVERITY_LOW:
+                logSeverity = Log::ELogSeverity::INFO;
+                break;
+        }
+
+        Log::Send("OpenGL Debug : " + std::string(message),logSeverity);
     }
 
     void OpenGL45Renderer::Clear(const Int2& _windowSize) const
@@ -43,8 +61,7 @@ namespace Solid
 
         //Framebuffer
         framebuffer.size = _size;
-        glGenFramebuffers(1, &framebuffer.id);
-        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer.id);
+
 
         //Texture
         glGenTextures(1,&framebuffer.texture);
@@ -62,9 +79,12 @@ namespace Solid
         glBindRenderbuffer(GL_RENDERBUFFER,0);
 
         //Attachment
+        glGenFramebuffers(1, &framebuffer.id);
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer.id);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebuffer.texture, 0);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, framebuffer.depthBuffer);
-
+        GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0 };
+        glDrawBuffers(1, drawBuffers);
         if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
             Log::Send("Framebuffer is not complete",Log::ELogSeverity::ERROR);
 
@@ -95,6 +115,57 @@ namespace Solid
     void OpenGL45Renderer::EndFramebuffer() const
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
+    void OpenGL45Renderer::InitMesh(MeshResource *m) const
+    {
+        if(m->isInit)
+            return;
+
+        glGenVertexArrays(1, &m->VAO);
+        for (MeshResource::SubMesh& sub : m->Meshes) {
+            glGenBuffers(1, &sub.VBO);
+            glGenBuffers(1, &sub.EBO);
+            glBindVertexArray(m->VAO);
+            glBindBuffer(GL_ARRAY_BUFFER, sub.VBO);
+            glBufferData(GL_ARRAY_BUFFER, sub.vertices.size() * 8 *sizeof(GLfloat), sub.vertices.data(), GL_STATIC_DRAW);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 *sizeof(GLfloat), (void*)0);
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 *sizeof(GLfloat), (void*)(3*sizeof(GLfloat)));
+            glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 *sizeof(GLfloat), (void*)(6*sizeof(GLfloat)));
+            glEnableVertexAttribArray(0);
+            glEnableVertexAttribArray(1);
+            glEnableVertexAttribArray(2);
+
+
+
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sub.EBO);
+
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER,  sub.indices.size()*sizeof(unsigned int), sub.indices.data(), GL_STATIC_DRAW);
+        }
+
+
+        m->isInit=true;
+    }
+
+    void OpenGL45Renderer::DrawMesh(const MeshResource *_mesh) const
+    {
+        glEnable(GL_DEPTH_TEST);
+        glBindVertexArray(_mesh->VAO);
+        for (auto& subMesh : _mesh->Meshes)
+        {
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,subMesh.EBO);
+            glDrawElements(GL_TRIANGLES, subMesh.indices.size(),GL_UNSIGNED_INT, nullptr);
+        }
+    }
+
+    void OpenGL45Renderer::SetShaderMVP(ShaderResource *_shader, Transform& _model, Camera& _camera) const
+    {
+        unsigned int program = _shader->GetProgram();
+        glUseProgram(program);
+
+        glUniformMatrix4fv(glGetUniformLocation(program,"proj"),1,GL_FALSE,_camera.GetProjection().elements.data());
+        glUniformMatrix4fv(glGetUniformLocation(program,"view"),1,GL_FALSE,_camera.GetView().elements.data());
+        glUniformMatrix4fv(glGetUniformLocation(program,"model"),1,GL_FALSE,_model.GetMatrix().elements.data());
     }
 
 } //!namespace

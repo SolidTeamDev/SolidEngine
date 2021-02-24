@@ -2,11 +2,15 @@
 
 #include "Build/solidAPI.hpp"
 #include "Rendering/renderer.hpp"
+#include "Window/window.hpp"
 #include "SolidMultiThread.hpp"
 #include "Time/time.hpp"
 #include "InputManager/inputManager.hpp"
 
 #include "Core/Debug/debug.hpp"
+
+#include "ECS/ecsManager.hpp"
+#include "ECS/System/rendererSystem.hpp"
 
 namespace Solid
 {
@@ -19,15 +23,16 @@ namespace Solid
 
         Log log;
 
-    protected:
-
         bool MTEnabled = false;
         bool engineContextInit = false;
+
+        void InitEcs();
 
     public:
         Window* window;
         Renderer* renderer = nullptr;
-
+        ECSManager ecsManager;
+        std::shared_ptr<RendererSystem> rendererSystem;
         class ResourceManager* RManager;
         TaskManager MultiTask;
         ThreadManager ThreadPool;
@@ -51,7 +56,7 @@ namespace Solid
          * @brief Return if the engine context is initialized
          * @return Engine context init
          */
-        bool IsEngineContextInitialized();
+        bool IsEngineContextInitialized() const;
 
         ~Engine();
     };

@@ -1,12 +1,12 @@
 #pragma once
 
 #include <memory>
-
+#include "Build/solidAPI.hpp"
 #include "componentManager.hpp"
 #include "entityManager.hpp"
 #include "systemManager.hpp"
 
-class ECSManager
+class SOLID_API ECSManager
 {
 private:
     std::unique_ptr<ComponentManager> componentManager;
@@ -80,7 +80,7 @@ public:
     template<typename T>
     std::shared_ptr<T> RegisterSystem()
     {
-        return systemManager->RegisterSystem<T>();
+        return systemManager->RegisterSystem<T>(*this);
     }
 
     template<typename T>

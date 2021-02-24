@@ -10,7 +10,7 @@ namespace Solid
     struct Vec3;
     struct SOLID_API Quat
     {
-        constexpr Quat() noexcept = default;
+        constexpr Quat()noexcept:x(0),y(0),z(0),w(1){}
         constexpr Quat(float _value) noexcept;
         constexpr Quat(float _x,float _y = 0, float _z = 0, float _w = 1) noexcept;
         constexpr Quat(const Vec3& _axis) noexcept;

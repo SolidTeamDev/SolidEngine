@@ -1,7 +1,10 @@
 #pragma once
 
-#include "Window/window.hpp"
+#include "Build/solidAPI.hpp"
+
 #include "Rendering/framebuffer.hpp"
+#include "ECS/Components/transform.hpp"
+#include "ECS/Components/camera.hpp"
 
 namespace Solid
 {
@@ -32,6 +35,9 @@ namespace Solid
         virtual void UpdateFramebuffer(const Framebuffer& _framebuffer) const = 0;
         virtual void BeginFramebuffer(const Framebuffer& _framebuffer) const = 0;
         virtual void EndFramebuffer() const = 0;
+        virtual void InitMesh(class MeshResource* m)const = 0;
+        virtual void DrawMesh(const class MeshResource* _mesh)const = 0;
+        virtual void SetShaderMVP(class ShaderResource* _shader, Transform& _model, Camera& _camera)const = 0;
     };
 
 } //!namespace

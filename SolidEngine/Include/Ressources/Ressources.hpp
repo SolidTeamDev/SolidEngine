@@ -12,10 +12,11 @@
 
 #include <vector>
 #include <string>
-//#include <string_view>
+#include <string_view>
 #include <filesystem>
 #include <fstream>
 #include <algorithm>
+#include <iostream>
 
 
 
@@ -47,11 +48,13 @@ namespace Solid
         {
 
         }
+        static int NoNameNum;
     protected:
         ResourceType _type;
         fs::path _path;
     public:
         std::string _name;
+        ResourceType GetType(){return _type;}
 
     };
 
@@ -111,14 +114,19 @@ namespace Solid
     {
 
 
-
     public:
+        unsigned int VAO = 0;
         class SubMesh{
         public:
+            unsigned int VBO = 0;
+            unsigned int EBO = 0;
             std::vector<Vertex> vertices;
             std::vector<unsigned int> indices;
         };
         std::vector<SubMesh> Meshes;
+
+
+        bool isInit = false;
         MeshResource()
         {
             _type = ResourceType::Mesh;
@@ -171,6 +179,7 @@ namespace Solid
         }
         void ToDataBuffer(std::vector<char>& buffer);
         void FromDataBuffer(char* buffer, int bSize);
+        unsigned int GetProgram();
     };
     class SOLID_API ComputeShaderResource : public Resource
     {
@@ -226,8 +235,42 @@ namespace Solid
 
     class SOLID_API ResourceManager
     {
-        std::vector<Resource*> ResourceList;
+        template<class T>
+        struct ResourceList
+        {
+            std::vector<Resource*> List;
+            const char* type_value = typeid(T*).name();
+            ~ResourceList()
+            {
+                for(Resource* r : List)
+                {
+                    if(r != nullptr)
+                        delete r;
+                }
+            }
+            Resource* Find(const char* name)
+            {
+                for(Resource* r : List)
+                {
+                    if(r == nullptr)
+                        continue;
+                    if(r->_name == name)
+                        return (r);
+                }
+                return nullptr;
+            }
+        };
+
+        ResourceList<ImageResource>          ImageList;
+        ResourceList<MeshResource>           MeshList;
+        ResourceList<AnimResource>           AnimList;
+        ResourceList<ShaderResource>         ShaderList;
+        ResourceList<ComputeShaderResource>  ComputeList;
+        ResourceList<MaterialResource>       MaterialList;
+        ResourceList<TextureResource>        TextureList;
         class Engine* EnginePtr = nullptr;
+
+
     public:
         explicit ResourceManager(class Engine* _engine)
         {
@@ -235,15 +278,43 @@ namespace Solid
         }
         ~ResourceManager()
         {
-            for(Resource* r : ResourceList)
-            {
-                if(r != nullptr)
-                    delete r;
-            }
         }
         class Engine* GetEngine();
+
+
         void AddResource(Resource* r);
-        std::vector<Resource*>& GetList();
+
+
+        Resource* GetResourceByName(const char* name);
+
+        template<typename T>
+        std::vector<Resource*> * GetResourcesVecByType()
+        {
+            std::string_view type_value = typeid(T*).name();
+            if(type_value == ImageList.type_value)
+                return &(ImageList.List);
+
+            if(type_value == MeshList.type_value)
+                return &(MeshList.List);
+
+            if(type_value == AnimList.type_value)
+                return &(AnimList.List);
+
+            if(type_value == ShaderList.type_value)
+                return &(ShaderList.List);
+
+            if(type_value == ComputeList.type_value)
+                return &(ComputeList.List);
+
+            if(type_value == MaterialList.type_value)
+                return &(MaterialList.List);
+
+            if(type_value == TextureList.type_value)
+                return &(TextureList.List);
+
+            return nullptr;
+        }
+
     };
 
 

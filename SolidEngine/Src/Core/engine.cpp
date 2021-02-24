@@ -5,12 +5,17 @@
 #include "UI/solidUI.hpp"
 #include "Ressources/Ressources.hpp"
 
+#include "ECS/Components/transform.hpp"
+#include "ECS/Components/meshRenderer.hpp"
+#include "ECS/Components/camera.hpp"
+
 namespace Solid
 {
     Engine::Engine() :
     ThreadPool(&MultiTask)
     {
         RManager = new ResourceManager(this);
+        InitEcs();
     }
 
     Engine::~Engine()
@@ -20,6 +25,25 @@ namespace Solid
         delete window;
         delete renderer;
         ThreadPool.TerminateAllThreads();
+    }
+
+    void Engine::InitEcs()
+    {
+        ecsManager.Init();
+
+        //Components Registration
+        ecsManager.RegisterComponent<Transform>();
+        ecsManager.RegisterComponent<MeshRenderer>();
+        ecsManager.RegisterComponent<Camera>();
+
+        //Register Signature
+        rendererSystem = ecsManager.RegisterSystem<RendererSystem>();
+        {
+            Signature signature;
+            signature.set(ecsManager.GetComponentType<Transform>());
+            signature.set(ecsManager.GetComponentType<MeshRenderer>());
+            ecsManager.SetSystemSignature<RendererSystem>(signature);
+        }
     }
 
     void Engine::InitEngineContext(const WindowParams& _windowParams, const RendererParams& _rendererParams)
@@ -40,7 +64,7 @@ namespace Solid
             engineContextInit = true;
     }
 
-    bool Engine::IsEngineContextInitialized()
+    bool Engine::IsEngineContextInitialized() const
     {
         return engineContextInit;
     }
