@@ -51,10 +51,6 @@ namespace Solid
         Renderer* renderer = engine.renderer;
         EditorInterface editorInterface(window);
 
-        Entity entity = engine.ecsManager.CreateEntity();
-        engine.ecsManager.AddComponent(entity,Transform());
-        engine.ecsManager.AddComponent(entity,MeshRenderer());
-
         engine.EnableMultiThread(true);
 
         ResourcesLoader loader;
@@ -73,6 +69,14 @@ namespace Solid
             //Ressource Manager do not have this type of resourcesList
         //else;
              //Resource Manager Have a ResourceList for this type
+
+        Entity entity = engine.ecsManager.CreateEntity();
+        engine.ecsManager.AddComponent(entity,Transform());
+        engine.ecsManager.AddComponent(entity,MeshRenderer{
+                .mesh   = dynamic_cast<MeshResource*>(engine.RManager->GetResourceByName("cube.obj")),
+                .shader = dynamic_cast<ShaderResource*>(engine.RManager->GetResourceByName("ZShader"))
+        });
+
         glfwSwapInterval(0);
 
         while (!glfwWindowShouldClose(window->GetHandle()) && !editorInputManager->IsPressed(EInputList::ESCAPE))
