@@ -2,8 +2,6 @@
 #include "UI/solidUI.hpp"
 #include "Time/time.hpp"
 
-#include "Core/Debug/debug.hpp"
-
 #include <imgui_internal.h>
 #include <string>
 
@@ -45,7 +43,7 @@ namespace Solid {
         UIContext::RenderFrame();
     }
 
-
+#pragma region MainMenuBar
     void EditorInterface::DrawMenuBar()
     {
         if (window == nullptr)
@@ -53,58 +51,78 @@ namespace Solid {
 
         if (UI::BeginMainMenuBar())
         {
-            if (UI::BeginMenu("File"))
-            {
-                UI::MenuItem("Save");
-                if (UI::BeginMenu("Build"))
-                {
-                    if (UI::MenuItem("Windows"))
-                        Log::Send("Building for Windows", Log::ELogSeverity::ERROR);
-                    UI::MenuItem("Linux");
-                    UI::EndMenu();
-                }
+            DrawMenuFiles();
+            DrawMenuWindows();
 
-
-                UI::EndMenu();
-            }
-            if(UI::BeginMenu("Windows"))
-            {
-                if (UI::BeginMenu("Tools"))
-                {
-                    if (UI::MenuItem("Colors Settings", nullptr, &colorOpen))
-                        Log::Send("Opened Colors Settings", Log::ELogSeverity::WARNING);
-                    if (UI::MenuItem("Performance Overlay", nullptr, &perfOpen))
-                        Log::Send("Perf Overlay opened or closed", Log::ELogSeverity::CRITICAL);
-                    if (UI::MenuItem("Show UI Demo", nullptr, &demoOpen))
-                        Log::Send("Opened Show Demo UI", Log::ELogSeverity::DEBUG);
-
-                    UI::EndMenu();
-                }
-                if (UI::BeginMenu("Modules"))
-                {
-                    if (UI::MenuItem("Files", nullptr, &filesInterface.p_open))
-                        Log::Send("Opened/closed files module", Log::ELogSeverity::INFO);
-                    if (UI::MenuItem("Hierarchy Tree", nullptr, &hierarchyTreeInterface.p_open))
-                        Log::Send("Opened/closed hierarchy tree module", Log::ELogSeverity::INFO);
-                    if (UI::MenuItem("Inspector", nullptr, &inspectorInterface.p_open))
-                        Log::Send("Open/closed inspector module", Log::ELogSeverity::INFO);
-                    if (UI::MenuItem("Logs", nullptr, &logsInterface.p_open))
-                        Log::Send("Opened/closed logs module", Log::ELogSeverity::INFO);
-                    if (UI::MenuItem("Play", nullptr, &playInterface.p_open))
-                        Log::Send("Opened/closed play module", Log::ELogSeverity::INFO);
-                    if (UI::MenuItem("Scene", nullptr, &sceneInterface.p_open))
-                        Log::Send("Opened/closed scene module", Log::ELogSeverity::INFO);
-
-                    UI::EndMenu();
-                }
-                UI::EndMenu();
-            }
             UI::EndMainMenuBar();
         }
+    }
 
+    void EditorInterface::DrawMenuFiles()
+    {
+        if (UI::BeginMenu("Files"))
+        {
+            UI::MenuItem("Save");
+            if (UI::BeginMenu("Build"))
+            {
+                if (UI::MenuItem("Windows"))
+                    Log::Send("Building for Windows", Log::ELogSeverity::ERROR);
+                UI::MenuItem("Linux");
+                UI::EndMenu();
+            }
+            UI::EndMenu();
+        }
+    }
+
+    void EditorInterface::DrawMenuWindows()
+    {
+        if(UI::BeginMenu("Windows"))
+        {
+            DrawMenuModules();
+            DrawMenuTools();
+            UI::EndMenu();
+        }
 
     }
 
+    void EditorInterface::DrawMenuTools()
+    {
+        if (UI::BeginMenu("Tools"))
+        {
+            if (UI::MenuItem("Colors Settings", nullptr, &colorOpen))
+                Log::Send("Opened Colors Settings", Log::ELogSeverity::WARNING);
+            if (UI::MenuItem("Performance Overlay", nullptr, &perfOpen))
+                Log::Send("Perf Overlay opened or closed", Log::ELogSeverity::CRITICAL);
+            if (UI::MenuItem("Show UI Demo", nullptr, &demoOpen))
+                Log::Send("Opened Show Demo UI", Log::ELogSeverity::DEBUG);
+
+            UI::EndMenu();
+        }
+    }
+
+    void EditorInterface::DrawMenuModules()
+    {
+        if (UI::BeginMenu("Modules"))
+        {
+            if (UI::MenuItem("Files", nullptr, &filesInterface.p_open))
+                Log::Send("Opened/closed files module", Log::ELogSeverity::INFO);
+            if (UI::MenuItem("Hierarchy Tree", nullptr, &hierarchyTreeInterface.p_open))
+                Log::Send("Opened/closed hierarchy tree module", Log::ELogSeverity::INFO);
+            if (UI::MenuItem("Inspector", nullptr, &inspectorInterface.p_open))
+                Log::Send("Open/closed inspector module", Log::ELogSeverity::INFO);
+            if (UI::MenuItem("Logs", nullptr, &logsInterface.p_open))
+                Log::Send("Opened/closed logs module", Log::ELogSeverity::INFO);
+            if (UI::MenuItem("Play", nullptr, &playInterface.p_open))
+                Log::Send("Opened/closed play module", Log::ELogSeverity::INFO);
+            if (UI::MenuItem("Scene", nullptr, &sceneInterface.p_open))
+                Log::Send("Opened/closed scene module", Log::ELogSeverity::INFO);
+
+            UI::EndMenu();
+        }
+    }
+
+#pragma endregion
+#pragma region Windows
     void EditorInterface::DrawMainFrame()
     {
         DrawMenuBar();
@@ -112,50 +130,28 @@ namespace Solid {
         ImGuiDockNodeFlags dockFlags = 0;
         dockFlags |= ImGuiDockNodeFlags_NoCloseButton | ImGuiDockNodeFlags_NoWindowMenuButton;
         UI::DockSpaceOverViewport(UI::GetMainViewport(), dockFlags);
+    }
 
-        /* Deprecated
-         *
-        Int2 windowSize = window->GetWindowSize();
-        ImGuiViewport *mainViewport = UI::GetMainViewport();
+    void EditorInterface::DrawPerfOverlay()
+    {
+        UI::SetNextWindowBgAlpha(0.4);
+        UI::SetNextWindowSize(ImVec2(150, 150));
+        UI::SetNextWindowViewport(UI::GetID(UI::GetMainViewport()));
 
-        UI::SetNextWindowSize(ImVec2((float) windowSize.x, (float) windowSize.y));
-        UI::SetNextWindowContentSize(ImVec2((float) windowSize.x - 5, (float) windowSize.y - 22));
+        ImGuiWindowFlags flags = 0;
+        flags |= ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse;
+        flags |= ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDocking;
+        flags |= ImGuiWindowFlags_NoTitleBar;
 
-        ImVec2 pos = mainViewport->GetWorkPos();
-        UI::SetNextWindowPos(pos);
-        UI::SetNextWindowViewport(mainViewport->ID);
+        UI::Begin("PerfOverlay", &perfOpen, flags);
 
-        ImGuiWindowFlags windowFlags = 0;
-        windowFlags |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar;
-        windowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoFocusOnAppearing;
-        windowFlags |= ImGuiWindowFlags_NoDocking;
-        windowFlags |= ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoResize;
-        windowFlags |= ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar;
-
-        if (UI::Begin("mainFrame", &p_open, windowFlags))
-        {
-            ImVec2 vMin = ImGui::GetWindowContentRegionMin();
-            ImVec2 vMax = ImGui::GetWindowContentRegionMax();
-            vMin.x += ImGui::GetWindowPos().x;
-            vMin.y += ImGui::GetWindowPos().y;
-            vMax.x += ImGui::GetWindowPos().x;
-            vMax.y += ImGui::GetWindowPos().y;
-
-            ImGui::GetForegroundDrawList()->AddRect( vMin, vMax, IM_COL32( 255, 255, 0, 255 ) );
-
-
-            ImGuiID dockID = UI::GetID("mainDockSpace");
-            ImVec2 winSize = UI::GetMainViewport()->Size;
-            ImGuiDockNodeFlags dockFlags = 0;
-            dockFlags |= ImGuiDockNodeFlags_NoCloseButton | ImGuiDockNodeFlags_NoWindowMenuButton;
-
-            UI::DockSpace(dockID, winSize, dockFlags);
-        }
+        std::string fps = std::to_string(Time::Fps()) + " fps";
+        UI::Text("%s", fps.c_str());
 
         UI::End();
-        *
-        */
+
     }
+
 
     void EditorInterface::DrawChangeColors()
     {
@@ -205,30 +201,9 @@ namespace Solid {
         UI::End();
     }
 
-    void EditorInterface::DrawPerfOverlay()
-    {
-        UI::SetNextWindowBgAlpha(0.4);
-        UI::SetNextWindowSize(ImVec2(150, 150));
-        UI::SetNextWindowViewport(UI::GetID(UI::GetMainViewport()));
+#pragma endregion
+#pragma region Colors
 
-        ImGuiWindowFlags flags = 0;
-        flags |= ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse;
-        flags |= ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDocking;
-        flags |= ImGuiWindowFlags_NoTitleBar;
-
-        UI::Begin("PerfOverlay", &perfOpen, flags);
-
-        std::string fps = std::to_string(Time::Fps()) + " fps";
-        UI::Text("%s", fps.c_str());
-
-        UI::End();
-
-    }
-
-
-    /*
-     *  Some cool colors following our theme
-     */
     void EditorInterface::DarkTheme()
     {
         Log::Send("Changed to Dark theme", Log::ELogSeverity::INFO);
@@ -327,3 +302,5 @@ namespace Solid {
         editorStyle.Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.35f, 0.35f, 0.35f, 1.f);
     }
 }
+
+#pragma endregion

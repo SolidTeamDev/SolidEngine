@@ -52,6 +52,10 @@ namespace Solid
         void LightTheme();
 
         void DrawMenuBar();
+        void DrawMenuFiles();
+        void DrawMenuWindows();
+        void DrawMenuModules();
+        void DrawMenuTools();
         void DrawMainFrame();
 
         /**
