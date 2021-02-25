@@ -50,6 +50,22 @@ namespace Solid
         hasToUpdateMat = true;
     }
 
+    Vec3 Transform::GetPosition() const
+    {
+        return position;
+    }
+
+    Quat Transform::GetRotation() const
+    {
+        return rotation;
+    }
+
+    Vec3 Transform::GetScale() const
+    {
+        return scale;
+    }
+
+
     Mat4<float> Transform::GetMatrix()
     {
         if(hasToUpdateMat)

@@ -13,6 +13,8 @@ namespace Solid
         InputManager<int>* editorInputManager = nullptr;
         Engine engine;
         Camera editorCamera;
+
+        void UpdateEditorCamera();
     public:
 
         static Framebuffer sceneFramebuffer;

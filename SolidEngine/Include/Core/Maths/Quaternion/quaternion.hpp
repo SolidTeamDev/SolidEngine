@@ -72,6 +72,8 @@ namespace Solid
         constexpr Vec3 Unrotate(const Vec3& _vec) const;
         constexpr Quat Unrotate(const Quat& _quat) const;
 
+        Vec3 GetEuler() const;
+
         std::string ToString() noexcept;
 
 #pragma endregion

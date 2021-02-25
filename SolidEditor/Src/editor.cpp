@@ -87,7 +87,7 @@ namespace Solid
         {
             glfwPollEvents();
             editorInputManager->Update();
-            editorCamera.UpdateCamera(sceneFramebuffer.size);
+            UpdateEditorCamera();
 
             renderer->ClearColor({0,0,0,1});
             renderer->Clear(window->GetWindowSize());
@@ -106,5 +106,68 @@ namespace Solid
             window->SwapBuffers();
         }
 
+    }
+
+    void Editor::UpdateEditorCamera()
+    {
+        editorCamera.UpdateCamera(sceneFramebuffer.size);
+
+        Transform& editorCameraT = editorCamera.transform;
+
+        //== Mouse
+
+        Double2 mousePos{};
+        editorInputManager->GetCursorPos(mousePos.x,mousePos.y);
+        Double2 deltaPos {mousePos.x - sceneFramebuffer.size.x/2,
+                          mousePos.y - sceneFramebuffer.size.y/2};
+
+        float mouseSensitivity = 0.1f;
+
+        deltaPos.x *= mouseSensitivity * Time::DeltaTime();
+        deltaPos.y *= mouseSensitivity * Time::DeltaTime();
+
+        Vec3 rot = editorCameraT.GetRotation().GetEuler();
+
+        /*rot.x += deltaPos.x;
+        rot.y += deltaPos.y;
+
+        if(rot.x >= S_PI_2)
+            rot.x = S_PI_2;
+        else if (rot.x <= -S_PI_2)
+            rot.x = -S_PI_2;
+
+        editorCameraT.SetRotation(Quat(rot));*/
+
+        //== Movement
+        float camSpeed = (float)(4 * Time::DeltaTime());
+        float forwardVelocity = 0;
+
+        if(editorInputManager->IsPressed(EInputList::UP))
+            forwardVelocity = camSpeed;
+        if(editorInputManager->IsPressed(EInputList::DOWN))
+            forwardVelocity = -camSpeed;
+
+        float strafeVelocity = 0;
+
+        if(editorInputManager->IsPressed(EInputList::LEFT))
+            strafeVelocity = -camSpeed;
+        if(editorInputManager->IsPressed(EInputList::RIGHT))
+            strafeVelocity = camSpeed;
+
+        /*editorCameraT.Translate(Vec3(forwardVelocity,
+                                     -forwardVelocity,
+                                     forwardVelocity));
+
+        editorCameraT.Translate(Vec3(strafeVelocity,
+                                     0,
+                                     strafeVelocity));*/
+
+        editorCameraT.Translate(Vec3(sin(-rot.y) * cos(-rot.x) * forwardVelocity,
+                                     -(sin(rot.x) * forwardVelocity),
+                                     cos(rot.y) * cos(rot.x) * forwardVelocity));
+
+        editorCameraT.Translate(Vec3(cos(rot.y)  * strafeVelocity,
+                                     0,
+                                     sin(rot.y)  * strafeVelocity));
     }
 } //!namespace

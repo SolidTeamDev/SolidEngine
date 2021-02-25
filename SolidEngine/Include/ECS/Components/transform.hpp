@@ -31,6 +31,10 @@ namespace Solid
         void Rotate(const Quat& _quat);
         void Scale(const Vec3& _vec);
 
+        Vec3 GetPosition() const;
+        Quat GetRotation() const;
+        Vec3 GetScale() const;
+
         Mat4<float> GetMatrix();
     };
 } //!namespace

@@ -13,5 +13,5 @@ void main()
 {
     gl_Position = proj * view * model * vec4(inPos, 1.0f);
 
-    color = vec3(1);
+    color = vec3(gl_Position.z);
 }
