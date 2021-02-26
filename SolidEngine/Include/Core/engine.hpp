@@ -3,7 +3,7 @@
 #include "Build/solidAPI.hpp"
 #include "Rendering/renderer.hpp"
 #include "Window/window.hpp"
-#include "SolidMultiThread.hpp"
+#include "solidMultiThread.hpp"
 #include "Time/time.hpp"
 #include "InputManager/inputManager.hpp"
 
@@ -23,7 +23,7 @@ namespace Solid
 
         Log log;
 
-        bool MTEnabled = false;
+        bool mtEnabled = false;
         bool engineContextInit = false;
 
         void InitEcs();
@@ -33,15 +33,15 @@ namespace Solid
         Renderer* renderer = nullptr;
         ECSManager ecsManager;
         std::shared_ptr<RendererSystem> rendererSystem;
-        class ResourceManager* RManager;
-        TaskManager MultiTask;
-        ThreadManager ThreadPool;
-        bool MultiThreadEnabled()const {return MTEnabled;}
-        void EnableMultiThread(bool b)
+        class ResourceManager* resourceManager;
+        TaskManager taskManager;
+        ThreadManager threadPool;
+        bool MultiThreadEnabled()const {return mtEnabled;}
+        void EnableMultiThread(bool _b)
         {
-            MTEnabled = b;
-            if(b){ThreadPool.PlayAllThreads();}
-            else{ThreadPool.PauseAllThreads();}
+            mtEnabled = _b;
+            if(_b){threadPool.PlayAllThreads();}
+            else{threadPool.PauseAllThreads();}
         }
         Engine();
         Engine(const Engine& _copy) = delete;

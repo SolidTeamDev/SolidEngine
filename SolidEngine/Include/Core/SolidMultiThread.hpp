@@ -9,8 +9,8 @@
 #include <mutex>
 #include <atomic>
 #include "../Build/solidAPI.hpp"
-#include "Task.hpp"
-#include "TaskManager.hpp"
-#include "ThreadManager.hpp"
+#include "task.hpp"
+#include "taskManager.hpp"
+#include "threadManager.hpp"
 
 #endif //SOLIDENGINE_SOLIDMULTITHREAD_HPP
