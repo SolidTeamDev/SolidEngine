@@ -2,7 +2,7 @@
 // Created by ryan1 on 23/02/2021.
 //
 
-#include "GameCompiler/GameCompiler.hpp"
+#include "GameCompiler/ameCompiler.hpp"
 #include <fstream>
 
 // ifstream = read  / ofstream = write

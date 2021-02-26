@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/engine.hpp"
-#include "GameCompiler/GameCompiler.hpp"
+#include "GameCompiler/ameCompiler.hpp"
 
 #include "ECS/Components/camera.hpp"
 

@@ -2,8 +2,8 @@
 // Created by ryan1 on 23/02/2021.
 //
 
-#ifndef SOLIDEDITOR_GAMECOMPILER_HPP
-#define SOLIDEDITOR_GAMECOMPILER_HPP
+#ifndef SOLIDEDITOR_AMECOMPILER_HPP
+#define SOLIDEDITOR_AMECOMPILER_HPP
 
 #include <filesystem>
 
@@ -26,4 +26,4 @@ namespace Solid
 
 }
 
-#endif //SOLIDEDITOR_GAMECOMPILER_HPP
+#endif //SOLIDEDITOR_AMECOMPILER_HPP
