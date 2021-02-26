@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/engine.hpp"
+#include "GameCompiler/GameCompiler.hpp"
 
 #include "ECS/Components/camera.hpp"
 
@@ -12,6 +13,7 @@ namespace Solid
     private:
         InputManager<int>* editorInputManager = nullptr;
         Engine engine;
+        GameCompiler Compiler;
         Camera editorCamera;
 
         void UpdateEditorCamera();
