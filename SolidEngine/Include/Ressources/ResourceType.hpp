@@ -100,15 +100,15 @@ namespace Solid {
 
 
     public:
-        unsigned int VAO = 0;
+        uint VAO = 0;
 
         class SubMesh
         {
         public:
-            unsigned int VBO = 0;
-            unsigned int EBO = 0;
+            uint VBO = 0;
+            uint EBO = 0;
             std::vector<Vertex> vertices;
-            std::vector<unsigned int> indices;
+            std::vector<uint> indices;
         };
 
         std::vector<SubMesh> Meshes;
@@ -147,15 +147,14 @@ namespace Solid {
 
     class SOLID_API ShaderResource : public Resource
     {
-        unsigned int VertShaderID;
-        unsigned int FragShaderID;
-        unsigned int ProgramID;
+        uint VertShaderID;
+        uint FragShaderID;
+        uint ProgramID;
         std::string VertexSource;
         std::string FragSource;
 //programs ID ?
     public:
-
-        ShaderResource(unsigned int vid, unsigned int fid, unsigned int pid, const char *vs, const char *fs)
+        ShaderResource(uint vid, uint fid, uint pid, const char *vs, const char *fs)
         {
             _type = ResourceType::Shader;
             VertShaderID = vid;
@@ -174,7 +173,7 @@ namespace Solid {
         {
 
         }
-
+        uint GetProgram() const;
         void ToDataBuffer(std::vector<char> &buffer);
 
         void FromDataBuffer(char *buffer, int bSize);
@@ -182,13 +181,13 @@ namespace Solid {
 
     class SOLID_API ComputeShaderResource : public Resource
     {
-        unsigned int ShaderID;
-        unsigned int ProgramID;
+        uint ShaderID;
+        uint ProgramID;
         std::string ComputeSource;
 //programs ID ?
     public:
 
-        ComputeShaderResource(unsigned int sid, unsigned int pid, const char *cSource)
+        ComputeShaderResource(uint sid, uint pid, const char *cSource)
         {
             _type = ResourceType::Compute;
             ShaderID = sid;

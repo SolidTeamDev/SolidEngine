@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <iostream>
 namespace fs = std::filesystem;
+using uint = unsigned int ;
 
 #include "ResourceType.hpp"
 #include "ResourceMan.hpp"

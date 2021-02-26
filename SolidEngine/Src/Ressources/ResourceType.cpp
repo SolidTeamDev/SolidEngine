@@ -3,40 +3,24 @@
 //
 
 #include "Ressources/Ressources.hpp"
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-#include "OBJ_Loader.h"
-#include "assimp/scene.h"
-#include "assimp/mesh.h"
-#include "assimp/Importer.hpp"
-#include "assimp\postprocess.h"
 #include <sstream>
 #include "glad/glad.h"
 #include "Core/engine.hpp"
 
 using namespace Solid;
 
-#define SASSET_GEN 1
-struct ShaderLoaderWrapper
-{
-    fs::path p;
-    int i;
-};
+int Resource::NoNameNum = 0;
 
-struct IDWrapper
-{
-    std::string Name;
-    int i;
-};
+#define SASSET_GEN 1
+
 
 ///
 /// Resources Classes
 ///
-ImageResource::~ImageResource()
-{
+ImageResource::~ImageResource() = default;
 
-}
 
+uint ShaderResource::GetProgram() const {return ProgramID;};
 
 
 ///
@@ -72,8 +56,8 @@ void ImageResource::ToDataBuffer(std::vector<char> &buffer)
 
 void ImageResource::FromDataBuffer(char* buffer , int bSize)
 {
+    //WARNING : No test for read overflow
     std::uint64_t ReadPos = 0;
-
     ResourcesLoader::ReadFromBuffer(buffer, &(this->_type), sizeof(this->_type), ReadPos);
 
     //recup path string
@@ -138,6 +122,7 @@ void MeshResource::ToDataBuffer(std::vector<char> &buffer)
 
 void MeshResource::FromDataBuffer(char *buffer, int bSize)
 {
+    //WARNING : No test for read overflow
     std::uint64_t ReadPos = 0;
 
     ResourcesLoader::ReadFromBuffer(buffer, &(this->_type), sizeof(this->_type), ReadPos);
@@ -211,6 +196,7 @@ void ComputeShaderResource::ToDataBuffer(std::vector<char> &buffer)
 }
 void ComputeShaderResource::FromDataBuffer(char *buffer, int bSize)
 {
+    //WARNING : No test for read overflow
     std::uint64_t ReadPos = 0;
 
     ResourcesLoader::ReadFromBuffer(buffer, &(this->_type), sizeof(this->_type), ReadPos);
@@ -246,6 +232,7 @@ void ComputeShaderResource::FromDataBuffer(char *buffer, int bSize)
     GLenum ErrorCode = glGetError();
     while (ErrorCode != GL_NO_ERROR)
     {
+
         if(ErrorCode == GL_INVALID_ENUM)
         {
             printf("Binary Format = %u is not a value recognized by the implementation.\n", bFormat);
@@ -254,6 +241,7 @@ void ComputeShaderResource::FromDataBuffer(char *buffer, int bSize)
         {
             printf("programID = %u is not the name of an existing program object .\n", this->ProgramID);
         }
+        ErrorCode = glGetError();
     }
 
 
@@ -295,6 +283,7 @@ void ShaderResource::ToDataBuffer(std::vector<char> &buffer)
 }
 void ShaderResource::FromDataBuffer(char *buffer, int bSize)
 {
+    //WARNING : No test for read overflow
     std::uint64_t ReadPos = 0;
 
     ResourcesLoader::ReadFromBuffer(buffer, &(this->_type), sizeof(this->_type), ReadPos);
@@ -344,5 +333,6 @@ void ShaderResource::FromDataBuffer(char *buffer, int bSize)
         {
             printf("programID = %u is not the name of an existing program object .\n", this->ProgramID);
         }
+        ErrorCode = glGetError();
     }
 }

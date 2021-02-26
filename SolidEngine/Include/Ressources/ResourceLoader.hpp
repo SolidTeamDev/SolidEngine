@@ -48,9 +48,9 @@ namespace Solid
         void LoadRessource(const fs::path& Rpath);
         void LoadRessourceNoAdd(const fs::path &Rpath, ResourcePtrWrapper &wrapper);
         void LoadResourcesFromFolder(const fs::path& Rpath);
-        inline static void Append(std::vector<char>& DataBuffer, void* Data, std::uint64_t sizeInByte);
+        static void Append(std::vector<char>& DataBuffer, void* Data, std::uint64_t sizeInByte);
         //inline static void ReadFromBuffer(std::vector<char>& DataBuffer, void* Data, std::uint64_t sizeInByte, std::uint64_t& ReadPos);
-        inline static void ReadFromBuffer(char* DataBuffer, void* Data, std::uint64_t sizeInByte, std::uint64_t& ReadPos);
+        static void ReadFromBuffer(char* DataBuffer, void* Data, std::uint64_t sizeInByte, std::uint64_t& ReadPos);
     };
 
 

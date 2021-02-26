@@ -4,7 +4,7 @@
 
 #include "Ressources/Ressources.hpp"
 
-#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_IMPLEMENTATION 1
 #include "stb_image.h"
 #include "OBJ_Loader.h"
 #include "assimp/scene.h"
