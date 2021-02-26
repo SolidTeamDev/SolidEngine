@@ -3,7 +3,7 @@
 #include "UI/editorInterface.hpp"
 #include "Inputs/editorInputs.hpp"
 
-#include "Ressources/essources.hpp"
+#include "Ressources/ressources.hpp"
 
 #include "ECS/Components/transform.hpp"
 #include "ECS/Components/meshRenderer.hpp"

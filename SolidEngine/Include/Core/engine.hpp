@@ -3,7 +3,7 @@
 #include "Build/solidAPI.hpp"
 #include "Rendering/renderer.hpp"
 #include "Window/window.hpp"
-#include "olidMultiThread.hpp"
+#include "solidMultiThread.hpp"
 #include "Time/time.hpp"
 #include "InputManager/inputManager.hpp"
 

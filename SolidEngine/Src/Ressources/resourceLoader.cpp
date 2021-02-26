@@ -2,7 +2,7 @@
 // Created by ryan1 on 26/02/2021.
 //
 
-#include "Ressources/essources.hpp"
+#include "Ressources/ressources.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION 1
 #include "stb_image.h"

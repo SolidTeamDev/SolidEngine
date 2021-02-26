@@ -2,8 +2,8 @@
 // Created by ryan1 on 26/02/2021.
 //
 
-#ifndef SOLIDEDITOR_ESOURCEMAN_HPP
-#define SOLIDEDITOR_ESOURCEMAN_HPP
+#ifndef SOLIDEDITOR_RESOURCEMAN_HPP
+#define SOLIDEDITOR_RESOURCEMAN_HPP
 #include <mutex>
 namespace fs = std::filesystem;
 namespace Solid
@@ -104,4 +104,4 @@ namespace Solid
 }
 
 
-#endif //SOLIDEDITOR_ESOURCEMAN_HPP
+#endif //SOLIDEDITOR_RESOURCEMAN_HPP

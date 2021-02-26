@@ -2,8 +2,8 @@
 // Created by ryan1 on 26/02/2021.
 //
 
-#ifndef SOLIDEDITOR_ESOURCETYPE_HPP
-#define SOLIDEDITOR_ESOURCETYPE_HPP
+#ifndef SOLIDEDITOR_RESOURCETYPE_HPP
+#define SOLIDEDITOR_RESOURCETYPE_HPP
 #include <filesystem>
 namespace fs = std::filesystem;
 namespace Solid {
@@ -241,4 +241,4 @@ namespace Solid {
         }
     };
 }
-#endif //SOLIDEDITOR_ESOURCETYPE_HPP
+#endif //SOLIDEDITOR_RESOURCETYPE_HPP
