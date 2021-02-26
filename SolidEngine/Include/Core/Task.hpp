@@ -61,7 +61,7 @@ namespace Solid
 
 
 
-    enum class SOLID_API TaskType : int
+    enum class SOLID_API ETaskType : int
     {
 
         RESOURCES_LOADER = 0,
@@ -75,30 +75,30 @@ namespace Solid
     public:
 
     private:
-        TaskType Type = TaskType::RESOURCES_LOADER;
+        ETaskType taskType = ETaskType::RESOURCES_LOADER;
         std::string ID = "NO_ID";
         std::atomic_bool bHasRun ;
         std::atomic_bool  bDispatched ;
         std::atomic_bool  bInProgress ;
         std::atomic_bool  bExceptionCatch ;
-        std::string_view ExceptionBuffer;
+        std::string_view exceptionBuffer;
         struct ID_Internal
         {
             std::string ID;
         };
     public:
 
-        std::shared_ptr<TaskPair> PairData = nullptr;
+        std::shared_ptr<TaskPair> pairData = nullptr;
         template<typename FuncType, typename... Args>
-        explicit Task( FuncType&& function,  Args&&... args);
+        explicit Task( FuncType&& _function,  Args&&... _args);
         template<typename FuncType, typename... Args>
-        explicit Task(ID_Internal&& id, TaskType level, FuncType&& function, Args&&... args);
+        explicit Task(ID_Internal&& _id, ETaskType _level, FuncType&& _function, Args&&... _args);
 
         template<typename FuncType, typename... Args>
-        explicit Task( ID_Internal&& id, FuncType&& function,  Args&&... args);
+        explicit Task( ID_Internal&& _id, FuncType&& _function,  Args&&... _args);
 
         template<typename FuncType, typename... Args>
-        Task* SetTask( FuncType&& function,  Args&&... args);
+        Task* SetTask( FuncType&& _function,  Args&&... _args);
 
 
         Task()
@@ -107,18 +107,18 @@ namespace Solid
             bInProgress = false;
             bDispatched = false;
             bExceptionCatch = false;
-            PairData = nullptr;
+            pairData = nullptr;
         }
-        Task(Task&& t) noexcept
+        Task(Task&& _t) noexcept
         {
-            Type = (t.Type);
-            ID = std::move(t.ID);
-            bHasRun = (t.bHasRun.load());
-            bDispatched = (t.bDispatched.load());
-            bExceptionCatch = (t.bExceptionCatch.load());
-            PairData = t.PairData;
+            taskType = (_t.taskType);
+            ID = std::move(_t.ID);
+            bHasRun = (_t.bHasRun.load());
+            bDispatched = (_t.bDispatched.load());
+            bExceptionCatch = (_t.bExceptionCatch.load());
+            pairData = _t.pairData;
         }
-        Task(const Task& t) = delete;
+        Task(const Task& _t) = delete;
         /*{
             Type = (t.Type);
             ID = t.ID;
@@ -128,7 +128,7 @@ namespace Solid
             bExceptionCatch = (t.bExceptionCatch);
             PairData = std::make_shared<TaskPair>(*t.PairData);
         }*/
-        Task& operator=(const Task& t) = delete;
+        Task& operator=(const Task& _t) = delete;
         /*{
             Type = (t.Type);
             ID = t.ID;
@@ -139,14 +139,14 @@ namespace Solid
             PairData = std::make_shared<TaskPair>(*t.PairData);
             return *this;
         }*/
-        Task& operator=(Task&& t)  noexcept
+        Task& operator=(Task&& _t)  noexcept
         {
-            Type = (t.Type);
-            ID = std::move(t.ID);
-            bHasRun = (t.bHasRun.load());
-            bDispatched = (t.bDispatched.load());
-            bExceptionCatch = (t.bExceptionCatch.load());
-            PairData = t.PairData;
+            taskType = (_t.taskType);
+            ID = std::move(_t.ID);
+            bHasRun = (_t.bHasRun.load());
+            bDispatched = (_t.bDispatched.load());
+            bExceptionCatch = (_t.bExceptionCatch.load());
+            pairData = _t.pairData;
             return *this;
         }
 
@@ -156,10 +156,10 @@ namespace Solid
             try
             {
 
-                if(PairData != nullptr)
+                if(pairData != nullptr)
                 {
                     bInProgress = true;
-                    (*PairData)();
+                    (*pairData)();
                     bInProgress = false;
                     bHasRun = true;
                 }
@@ -174,15 +174,15 @@ namespace Solid
                 bExceptionCatch = true;
                 bHasRun = true;
                 bInProgress = false;
-                ExceptionBuffer = "[ERROR]: Task ID " + ID +" has encountered an exception. Message:(\"" + e.what() +"\")";
+                exceptionBuffer = "[ERROR]: Task ID " + ID + " has encountered an exception. Message:(\"" + e.what() + "\")";
 
             }
             bHasRun = true;
         }
 
-        Task* SetType(const TaskType&& p) { Type = p; return this;}
+        Task* SetType(const ETaskType&& p) { taskType = p; return this;}
 
-        [[nodiscard]] TaskType GetType()  const { return Type;}
+        [[nodiscard]] ETaskType GetType()  const { return taskType;}
         [[nodiscard]] bool IsFinished()   const { return bHasRun.load();}
         [[nodiscard]] bool IsInProgress() const { return bInProgress.load();}
         [[nodiscard]] bool IsDispatched() const { return bDispatched.load();}
@@ -198,12 +198,12 @@ namespace Solid
         }
         [[nodiscard]] bool Error() const { return bExceptionCatch.load();}
         void ResetRunning() { bHasRun = false; bExceptionCatch = false;}
-        static ID_Internal MakeID(const std::string& sw) { return ID_Internal{sw};}
+        static ID_Internal MakeID(const std::string& _sw) { return ID_Internal{_sw};}
         std::string_view getID(){return std::forward<std::string_view>(std::string_view(ID));}
         virtual ~Task(){
-            if(PairData != nullptr)
+            if(pairData != nullptr)
             {
-                PairData = nullptr;
+                pairData = nullptr;
             }
         }
 
@@ -212,41 +212,41 @@ namespace Solid
 
 
     template<typename FuncType, typename... Args>
-    Task::Task( FuncType&& function,  Args&&... args)
+    Task::Task( FuncType&& _function,  Args&&... _args)
     {
-        if(PairData != nullptr)
-            PairData = nullptr;
-        PairData = std::make_shared<TaskPair>(std::forward<FuncType>(function), std::forward<Args>(args)...);
+        if(pairData != nullptr)
+            pairData = nullptr;
+        pairData = std::make_shared<TaskPair>(std::forward<FuncType>(_function), std::forward<Args>(_args)...);
         bHasRun = false;
     }
     template<typename FuncType, typename... Args>
-    Task::Task(ID_Internal&& id, TaskType level, FuncType&& function, Args&&... args)
+    Task::Task(ID_Internal&& _id, ETaskType _level, FuncType&& _function, Args&&... _args)
     {
-        ID = id.ID;
-        Type = level;
-        if(PairData != nullptr)
-            PairData = nullptr;
-        PairData = std::make_shared<TaskPair>(std::forward<FuncType>(function), std::forward<Args>(args)...);
+        ID = _id.ID;
+        taskType = _level;
+        if(pairData != nullptr)
+            pairData = nullptr;
+        pairData = std::make_shared<TaskPair>(std::forward<FuncType>(_function), std::forward<Args>(_args)...);
         bHasRun = false;
     }
     template<typename FuncType, typename... Args>
-    Task::Task( ID_Internal&& id, FuncType&& function,  Args&&... args)
+    Task::Task( ID_Internal&& _id, FuncType&& _function,  Args&&... _args)
     {
-        ID = id.ID;
-        if(PairData != nullptr)
-            PairData = nullptr;
-        PairData = std::make_shared<TaskPair>(std::forward<FuncType>(function), std::forward<Args>(args)...);
+        ID = _id.ID;
+        if(pairData != nullptr)
+            pairData = nullptr;
+        pairData = std::make_shared<TaskPair>(std::forward<FuncType>(_function), std::forward<Args>(_args)...);
         bHasRun = false;
     }
 
 
 
     template<typename FuncType, typename... Args>
-    Task* Task::SetTask( FuncType&& function,  Args&&... args)
+    Task* Task::SetTask( FuncType&& _function,  Args&&... _args)
     {
-        if(PairData != nullptr)
-            PairData = nullptr;
-        PairData = std::make_shared<TaskPair>(std::forward<FuncType&&>(function), std::forward<Args>(args)...);
+        if(pairData != nullptr)
+            pairData = nullptr;
+        pairData = std::make_shared<TaskPair>(std::forward<FuncType&&>(_function), std::forward<Args>(_args)...);
         bHasRun = false;
 
         return this;

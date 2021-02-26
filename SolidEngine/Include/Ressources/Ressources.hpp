@@ -20,9 +20,9 @@
 namespace fs = std::filesystem;
 using uint = unsigned int ;
 
-#include "ResourceType.hpp"
-#include "ResourceMan.hpp"
-#include "ResourceLoader.hpp"
+#include "resourceType.hpp"
+#include "resourceMan.hpp"
+#include "resourceLoader.hpp"
 
 
 #endif //SOLIDEDITOR_RESSOURCES_HPP

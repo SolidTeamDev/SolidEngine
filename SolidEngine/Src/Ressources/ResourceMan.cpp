@@ -2,15 +2,17 @@
 // Created by ryan1 on 26/02/2021.
 //
 
-#include "Ressources/Ressources.hpp"
+#include "Ressources/ressources.hpp"
 #include <sstream>
 #include "glad/glad.h"
 #include "Core/engine.hpp"
+#include "Core/Debug/throwError.hpp"
 using namespace Solid;
 
 #define SASSET_GEN 1
 
-
+ResourceManager* ResourceManager::instance = nullptr;
+std::mutex ResourceManager::mutex = std::mutex();
 struct IDWrapper
 {
     std::string Name;
@@ -32,22 +34,22 @@ void ResourceManager::AddResource(Resource *r)
 {
     if(r == nullptr)
         return;
-    if(r->GetType() == ResourceType::Mesh)
+    if(r->GetType() == EResourceType::Mesh)
     {
         EnginePtr->renderer->InitMesh((MeshResource*)r);
         MeshList.List.push_back(r);
     }
-    if(r->GetType() == ResourceType::Shader)
+    if(r->GetType() == EResourceType::Shader)
         ShaderList.List.push_back(r);
-    if(r->GetType() == ResourceType::Material)
+    if(r->GetType() == EResourceType::Material)
         MaterialList.List.push_back(r);
-    if(r->GetType() == ResourceType::Compute)
+    if(r->GetType() == EResourceType::Compute)
         ComputeList.List.push_back(r);
-    if(r->GetType() == ResourceType::Image)
+    if(r->GetType() == EResourceType::Image)
         ImageList.List.push_back(r);
-    if(r->GetType() == ResourceType::Texture)
+    if(r->GetType() == EResourceType::Texture)
         TextureList.List.push_back(r);
-    if(r->GetType() == ResourceType::Anim)
+    if(r->GetType() == EResourceType::Anim)
         AnimList.List.push_back(r);
 
 }
@@ -91,30 +93,30 @@ Resource * ResourceManager::GetResourceByName(const char* name)
             *PtrWrapper = List->Find(_name);
         };
         //Lambda(MeshList, &MtResource[0], name);
-        TaskManager& TaskMan = EnginePtr->MultiTask;
+        TaskManager& TaskMan = EnginePtr->taskManager;
         IDWrapper IDS[ResourceTypeNum];
 
         {
             int i = 0;
-            TaskMan.AddTask(Task(Task::MakeID("Find " + std::to_string(i) + name),TaskType::GENERAL, Lambda,&TextureList,&MtResource[i], name));
+            TaskMan.AddTask(Task(Task::MakeID("Find " + std::to_string(i) + name), ETaskType::GENERAL, Lambda, &TextureList, &MtResource[i], name));
             IDS[i] = {"Find "+ std::to_string(i) + name, i};
             ++i;
-            TaskMan.AddTask(Task(Task::MakeID("Find " + std::to_string(i) + name),TaskType::GENERAL, Lambda,&MeshList,&MtResource[i], name));
+            TaskMan.AddTask(Task(Task::MakeID("Find " + std::to_string(i) + name), ETaskType::GENERAL, Lambda, &MeshList, &MtResource[i], name));
             IDS[i] = {"Find "+ std::to_string(i) + name, i};
             ++i;
-            TaskMan.AddTask(Task(Task::MakeID("Find " + std::to_string(i) + name),TaskType::GENERAL, Lambda,&MaterialList,&MtResource[i], name));
+            TaskMan.AddTask(Task(Task::MakeID("Find " + std::to_string(i) + name), ETaskType::GENERAL, Lambda, &MaterialList, &MtResource[i], name));
             IDS[i] = {"Find "+ std::to_string(i) + name, i};
             ++i;
-            TaskMan.AddTask(Task(Task::MakeID("Find " + std::to_string(i) + name),TaskType::GENERAL, Lambda,&ShaderList,&MtResource[i], name));
+            TaskMan.AddTask(Task(Task::MakeID("Find " + std::to_string(i) + name), ETaskType::GENERAL, Lambda, &ShaderList, &MtResource[i], name));
             IDS[i] = {"Find "+ std::to_string(i) + name, i};
             ++i;
-            TaskMan.AddTask(Task(Task::MakeID("Find " + std::to_string(i) + name),TaskType::GENERAL, Lambda,&AnimList,&MtResource[i], name));
+            TaskMan.AddTask(Task(Task::MakeID("Find " + std::to_string(i) + name), ETaskType::GENERAL, Lambda, &AnimList, &MtResource[i], name));
             IDS[i] = {"Find "+ std::to_string(i) + name, i};
             ++i;
-            TaskMan.AddTask(Task(Task::MakeID("Find " + std::to_string(i) + name),TaskType::GENERAL, Lambda,&ImageList,&MtResource[i], name));
+            TaskMan.AddTask(Task(Task::MakeID("Find " + std::to_string(i) + name), ETaskType::GENERAL, Lambda, &ImageList, &MtResource[i], name));
             IDS[i] = {"Find "+ std::to_string(i) + name, i};
             ++i;
-            TaskMan.AddTask(Task(Task::MakeID("Find " + std::to_string(i) + name),TaskType::GENERAL, Lambda,&ComputeList,&MtResource[i], name));
+            TaskMan.AddTask(Task(Task::MakeID("Find " + std::to_string(i) + name), ETaskType::GENERAL, Lambda, &ComputeList, &MtResource[i], name));
             IDS[i] = {"Find "+ std::to_string(i) + name, i};
             ++i;
         }
@@ -144,4 +146,21 @@ Resource * ResourceManager::GetResourceByName(const char* name)
 
     }
     return nullptr;
+}
+
+ResourceManager * ResourceManager::Initialize(Engine* e)
+{
+    std::lock_guard<std::mutex>lck(mutex);
+    if(instance != nullptr)
+        ThrowError("ResourceManager is already Initialized", ESolidErrorCode::S_INIT_ERROR);
+
+    return new ResourceManager(e);
+}
+
+ResourceManager * ResourceManager::GetInstance()
+{
+    std::lock_guard<std::mutex>lck(mutex);
+    if(instance == nullptr)
+        ThrowError("ResourceManager is not Initialized", ESolidErrorCode::S_INIT_ERROR);
+    return instance;
 }

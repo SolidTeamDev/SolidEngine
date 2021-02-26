@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Ressources/Ressources.hpp"
+#include "Ressources/ressources.hpp"
 
 namespace Solid
 {

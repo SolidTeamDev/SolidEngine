@@ -4,6 +4,7 @@
 
 #ifndef SOLIDEDITOR_RESOURCEMAN_HPP
 #define SOLIDEDITOR_RESOURCEMAN_HPP
+#include <mutex>
 namespace fs = std::filesystem;
 namespace Solid
 {
@@ -45,7 +46,9 @@ namespace Solid
         class Engine* EnginePtr = nullptr;
 
 
-    public:
+    private:
+        static std::mutex mutex;
+        static ResourceManager* instance;
         explicit ResourceManager(class Engine* _engine)
         {
             EnginePtr =_engine;
@@ -53,6 +56,14 @@ namespace Solid
         ~ResourceManager()
         {
         }
+
+    public:
+        ResourceManager(ResourceManager&) = delete;
+        void operator=(const ResourceManager&) = delete;
+
+        static ResourceManager* Initialize(class Engine* e);
+        static ResourceManager* GetInstance();
+
         class Engine* GetEngine();
 
 
@@ -91,4 +102,6 @@ namespace Solid
 
     };
 }
+
+
 #endif //SOLIDEDITOR_RESOURCEMAN_HPP

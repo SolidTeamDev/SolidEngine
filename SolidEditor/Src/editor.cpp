@@ -3,7 +3,7 @@
 #include "UI/editorInterface.hpp"
 #include "Inputs/editorInputs.hpp"
 
-#include "Ressources/Ressources.hpp"
+#include "Ressources/ressources.hpp"
 
 #include "ECS/Components/transform.hpp"
 #include "ECS/Components/meshRenderer.hpp"
@@ -55,7 +55,7 @@ namespace Solid
 
         ResourcesLoader loader;
 
-        loader.SetManager(engine.RManager);
+        loader.SetManager(engine.resourceManager);
         fs::path p = fs::current_path().append("Resources");
 
         auto before = std::chrono::high_resolution_clock::now();
@@ -64,7 +64,7 @@ namespace Solid
         std::chrono::duration<double, std::ratio<1,1000>> fp_s = after - before;
         std::cout << "Loading MT has Taken " << fp_s.count() << " milliseconds\n";
         engine.EnableMultiThread(false);
-        //std::vector<Resource*>* Meshes= engine.RManager->GetResourcesVecByType<MeshResource>();
+        //std::vector<Resource*>* Meshes= engine.resourceManager->GetResourcesVecByType<MeshResource>();
         //if(Meshes == nullptr);
             //Ressource Manager do not have this type of resourcesList
         //else;
@@ -77,8 +77,8 @@ namespace Solid
                 {1,1,1}
         });
         engine.ecsManager.AddComponent(entity,MeshRenderer{
-                .mesh   = dynamic_cast<MeshResource*>(engine.RManager->GetResourceByName("towerWNorms.obj")),
-                .shader = dynamic_cast<ShaderResource*>(engine.RManager->GetResourceByName("ZShader"))
+                .mesh   = dynamic_cast<MeshResource*>(engine.resourceManager->GetResourceByName("towerWNorms.obj")),
+                .shader = dynamic_cast<ShaderResource*>(engine.resourceManager->GetResourceByName("ZShader"))
         });
 
         glfwSwapInterval(0);

@@ -2,7 +2,7 @@
 // Created by ryan1 on 26/02/2021.
 //
 
-#include "Ressources/Ressources.hpp"
+#include "Ressources/ressources.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION 1
 #include "stb_image.h"
@@ -113,7 +113,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
     ///MultiThread Loading
     if(Manager->GetEngine()->MultiThreadEnabled())
     {
-        TaskManager& TaskMan = Manager->GetEngine()->MultiTask;
+        TaskManager& TaskMan = Manager->GetEngine()->taskManager;
         using fp = bool (*)( const fs::path&);
         auto shaderFind = [](const fs::path&item)
         {
@@ -163,7 +163,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
                     ++i;
                     continue;
                 }
-                TaskMan.AddTask(Task(Task::MakeID("Load " + name),TaskType::RESOURCES_LOADER, Lambda,newP, &RessourceArray[i]));
+                TaskMan.AddTask(Task(Task::MakeID("Load " + name), ETaskType::RESOURCES_LOADER, Lambda, newP, &RessourceArray[i]));
                 IDS.push_back( {"Load " + name, i});
 
                 ++i;
@@ -172,6 +172,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
         }
         for(auto& s : Shaders) {
             LoadRessourceNoAdd(s.p, RessourceArray[s.i]);
+            Manager->AddResource(RessourceArray[s.i].r);
         }
 
         bool b = true;
@@ -327,28 +328,12 @@ Resource * ResourcesLoader::LoadMesh(const fs::path &Rpath)
 
 }
 
-// Type = GL_VERTEX_SHADER / GL_FRAGMENT_SHADER / GL_COMPUTE_SHADER
-GLuint CreateShader(GLenum type, int sourceCount, std::vector<char*>& sources)
-{
 
-    GLuint shader = glCreateShader(type);
 
-    glShaderSource(shader, sourceCount, sources.data(), nullptr);
-    glCompileShader(shader);
-    GLint compileStatus;
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &compileStatus);
-    if (compileStatus == GL_FALSE)
-    {
-        GLchar infoLog[1024];
-        glGetShaderInfoLog(shader, 1024, nullptr, infoLog);
-        printf("Shader compilation error: %s", infoLog);
-    }
-
-    return shader;
-}
 
 Resource * ResourcesLoader::LoadShader(const fs::path &Rpath)
 {
+    Renderer* r=Renderer::GetInstance();
     std::string FolderName = Rpath.filename().string();
     std::string FolderNameLower = FolderName;
     std::transform(FolderNameLower.begin(), FolderNameLower.end(), FolderNameLower.begin(),
@@ -385,32 +370,19 @@ Resource * ResourcesLoader::LoadShader(const fs::path &Rpath)
         }
         if(!found)
             return nullptr;
-        GLuint cShader = CreateShader(GL_COMPUTE_SHADER, 1, ComputeSources);
-        GLuint program = glCreateProgram();
-        glAttachShader(program, cShader);
-        glLinkProgram(program);
-        GLint linkStatus;
-        glGetProgramiv(program, GL_LINK_STATUS, &linkStatus);
-        if (linkStatus == GL_FALSE)
+        Renderer::CShader program = r->CreateComputeProgram(ComputeSources);
+        if(program.error)
         {
-#ifndef ARRAYSIZE
-#define ARRAYSIZE(arr) (sizeof(arr) / sizeof(arr[0]))
-#endif
-            GLchar infoLog[1024];
-            glGetProgramInfoLog(program, ARRAYSIZE(infoLog), nullptr, infoLog);
-            printf("Program link error: %s", infoLog);
-            //TODO : Cleanup at return
+            //CLEAN
             return nullptr;
         }
-        ComputeShaderResource* Compute = new ComputeShaderResource(cShader, program, ComputeSources[0]);
+        ComputeShaderResource* Compute = new ComputeShaderResource(program.sID, program.pID, ComputeSources[0]);
         Compute->_name = Rpath.filename().string();
 
 #if SASSET_GEN
         printf("generate .SCompute\n");
         std::vector<char> Data;
         Compute->ToDataBuffer(Data);
-
-
 
 
         fs::path cachePath = SolidPath;
@@ -477,28 +449,10 @@ Resource * ResourcesLoader::LoadShader(const fs::path &Rpath)
         if(!vert || !frag)
             return nullptr;
         //TODO Cleanup at return
-
-        GLuint vShader = CreateShader(GL_VERTEX_SHADER, 1, VertexSources);
-        GLuint fShader = CreateShader(GL_FRAGMENT_SHADER, 1, fragSources);
-
-        GLuint program = glCreateProgram();
-        glAttachShader(program, vShader);
-        glAttachShader(program, fShader);
-        glLinkProgram(program);
-        GLint linkStatus;
-        glGetProgramiv(program, GL_LINK_STATUS, &linkStatus);
-        if (linkStatus == GL_FALSE)
-        {
-#ifndef ARRAYSIZE
-#define ARRAYSIZE(arr) (sizeof(arr) / sizeof(arr[0]))
-#endif
-            GLchar infoLog[1024];
-            glGetProgramInfoLog(program, ARRAYSIZE(infoLog), nullptr, infoLog);
-            printf("Program link error: %s", infoLog);
-            //TODO : cleanup at return
+        Renderer::VFShader shader = r->CreateVertFragProgram(VertexSources, fragSources);
+        if(shader.error)
             return nullptr;
-        }
-        ShaderResource* Shader = new ShaderResource(vShader,fShader, program, VertexSources[0], fragSources[0]);
+        ShaderResource* Shader = new ShaderResource(shader.vID,shader.fID, shader.pID, VertexSources[0], fragSources[0]);
         Shader->_name = Rpath.filename().string();
 
 #if SASSET_GEN

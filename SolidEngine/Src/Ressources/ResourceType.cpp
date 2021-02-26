@@ -2,7 +2,7 @@
 // Created by ryan1 on 26/02/2021.
 //
 
-#include "Ressources/Ressources.hpp"
+#include "Ressources/ressources.hpp"
 #include <sstream>
 #include "glad/glad.h"
 #include "Core/engine.hpp"
@@ -184,15 +184,12 @@ void ComputeShaderResource::ToDataBuffer(std::vector<char> &buffer)
     ResourcesLoader::Append(buffer, &(size), sizeof(size));
     ResourcesLoader::Append(buffer, (void *) (this->ComputeSource.c_str()), size * sizeof(std::string::value_type));
     // Write Program Binary
-    int pSize = 0;
-    glGetProgramiv(ProgramID, GL_PROGRAM_BINARY_LENGTH, &pSize);
-    char* binary = new char[pSize];
-    GLenum BFormat = 0;
-    glGetProgramBinary(ProgramID, pSize, nullptr, &BFormat, (void*)binary);
-    std::uint32_t PSize = pSize;
+    Renderer::ShaderBinary binary =Renderer::GetInstance()->GetShaderBinary(this->ProgramID);
+    std::uint32_t PSize = binary.size;
     ResourcesLoader::Append(buffer, &PSize, sizeof  (PSize));
-    ResourcesLoader::Append(buffer, &BFormat, sizeof  (BFormat));
-    ResourcesLoader::Append(buffer, binary, sizeof  (char) * pSize);
+    ResourcesLoader::Append(buffer, &binary.format, sizeof  (binary.format));
+    ResourcesLoader::Append(buffer, binary.b, sizeof  (char) * binary.size);
+    delete[] binary.b;
 }
 void ComputeShaderResource::FromDataBuffer(char *buffer, int bSize)
 {
@@ -227,23 +224,9 @@ void ComputeShaderResource::FromDataBuffer(char *buffer, int bSize)
     ResourcesLoader::ReadFromBuffer(buffer, &(bFormat), sizeof(bFormat), ReadPos);
     char* binary = new char[size];
     ResourcesLoader::ReadFromBuffer(buffer, binary, sizeof(char) * size, ReadPos);
-    this->ProgramID = glCreateProgram();
-    glProgramBinary(this->ProgramID, bFormat, (void*)binary, size);
-    GLenum ErrorCode = glGetError();
-    while (ErrorCode != GL_NO_ERROR)
-    {
-
-        if(ErrorCode == GL_INVALID_ENUM)
-        {
-            printf("Binary Format = %u is not a value recognized by the implementation.\n", bFormat);
-        }
-        if(ErrorCode == GL_INVALID_OPERATION )
-        {
-            printf("programID = %u is not the name of an existing program object .\n", this->ProgramID);
-        }
-        ErrorCode = glGetError();
-    }
-
+    Renderer::ShaderBinary b {.size =size ,.format=bFormat,.b=binary};
+    this->ProgramID =Renderer::GetInstance()->CreateShaderFromBinary(b);
+    delete[] binary;
 
 }
 
@@ -270,16 +253,12 @@ void ShaderResource::ToDataBuffer(std::vector<char> &buffer)
     ResourcesLoader::Append(buffer, (void *) (this->FragSource.c_str()), size * sizeof(std::string::value_type));
 
     // Write Program Binary
-    int pSize = 0;
-    glGetProgramiv(ProgramID, GL_PROGRAM_BINARY_LENGTH, &pSize);
-    char* binary = new char[pSize];
-    GLenum BFormat = 0;
-    glGetProgramBinary(ProgramID, pSize, nullptr, &BFormat, (void*)binary);
-    std::uint32_t PSize = pSize;
+    Renderer::ShaderBinary binary =Renderer::GetInstance()->GetShaderBinary(this->ProgramID);
+    std::uint32_t PSize = binary.size;
     ResourcesLoader::Append(buffer, &PSize, sizeof  (PSize));
-    ResourcesLoader::Append(buffer, &BFormat, sizeof  (BFormat));
-    ResourcesLoader::Append(buffer, binary, sizeof  (char) * pSize);
-    delete[] binary;
+    ResourcesLoader::Append(buffer, &binary.format, sizeof  (binary.format));
+    ResourcesLoader::Append(buffer, binary.b, sizeof  (char) * binary.size);
+    delete[] binary.b;
 }
 void ShaderResource::FromDataBuffer(char *buffer, int bSize)
 {
@@ -320,19 +299,7 @@ void ShaderResource::FromDataBuffer(char *buffer, int bSize)
     ResourcesLoader::ReadFromBuffer(buffer, &(bFormat), sizeof(bFormat), ReadPos);
     char* binary = new char[size];
     ResourcesLoader::ReadFromBuffer(buffer, binary, sizeof(char) * size, ReadPos);
-    this->ProgramID = glCreateProgram();
-    glProgramBinary(this->ProgramID, bFormat, (void*)binary, size);
-    GLenum ErrorCode = glGetError();
-    while (ErrorCode != GL_NO_ERROR)
-    {
-        if(ErrorCode == GL_INVALID_ENUM)
-        {
-            printf("Binary Format = %u is not a value recognized by the implementation.\n", bFormat);
-        }
-        if(ErrorCode == GL_INVALID_OPERATION )
-        {
-            printf("programID = %u is not the name of an existing program object .\n", this->ProgramID);
-        }
-        ErrorCode = glGetError();
-    }
+    Renderer::ShaderBinary b {.size =size ,.format=bFormat,.b=binary};
+    this->ProgramID =Renderer::GetInstance()->CreateShaderFromBinary(b);
+    delete[] binary;
 }

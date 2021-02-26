@@ -5,22 +5,22 @@
 // Created by ryan1 on 26/11/2020.
 //
 
-#include "Core/SolidMultiThread.hpp"
+#include "Core/solidMultiThread.hpp"
 namespace Solid
 {
 
-    void RunThread(Thread* self, T_Internal* self_Internal, std::mutex& selfInternalMutex)
+    void RunThread(struct Thread *_self, T_Internal* _self_Internal, std::mutex& _selfInternalMutex)
     {
-        if(self == nullptr)
+        if(_self == nullptr)
             return;
 
 
         bool terminate;
         bool isPaused ;
         {
-            std::lock_guard<std::mutex> Lock(selfInternalMutex);
-            terminate = self_Internal->bTerminateThread;
-            isPaused = self_Internal->bPauseThread;
+            std::lock_guard<std::mutex> Lock(_selfInternalMutex);
+            terminate = _self_Internal->bTerminateThread;
+            isPaused = _self_Internal->bPauseThread;
         }
 
         while (!(terminate))
@@ -29,26 +29,26 @@ namespace Solid
             while (isPaused)
             {
                 {
-                    std::lock_guard<std::mutex> Lock(selfInternalMutex);
-                    isPaused = self_Internal->bPauseThread;
-                    if(self_Internal->bWaitForThread)
-                        self_Internal->bWaitForThread = false;
+                    std::lock_guard<std::mutex> Lock(_selfInternalMutex);
+                    isPaused = _self_Internal->bPauseThread;
+                    if(_self_Internal->bWaitForThread)
+                        _self_Internal->bWaitForThread = false;
                 }
                 std::this_thread::sleep_for(std::chrono::microseconds (100));
                 std::this_thread::yield();
 
             }
             {
-                std::lock_guard<std::mutex> Lock(selfInternalMutex);
+                std::lock_guard<std::mutex> Lock(_selfInternalMutex);
 
-                TaskManager* manager = self_Internal->TaskManager;
+                TaskManager* manager = _self_Internal->taskManager;
                 if(manager == nullptr)
                 {
                     std::this_thread::sleep_for(std::chrono::microseconds (10));
                     std::this_thread::yield();
                     continue;
                 }
-                Task* task = manager->getTaskByType(self->GetThreadType());
+                Task* task = manager->getTaskByType(_self->GetThreadType());
                 if(task == nullptr)
                 {
                     task = manager->GetFirstAvailableTask();
@@ -57,8 +57,8 @@ namespace Solid
                 }
                 if(task== nullptr)
                 {
-                    if(self_Internal->bWaitForThread)
-                        self_Internal->bWaitForThread = false;
+                    if(_self_Internal->bWaitForThread)
+                        _self_Internal->bWaitForThread = false;
                     std::this_thread::sleep_for(std::chrono::microseconds (10));
                     std::this_thread::yield();
 
@@ -67,29 +67,29 @@ namespace Solid
                 {
                     task->operator()();
                     task->UnDispatch();
-                    if(self_Internal->bWaitForThread)
-                        self_Internal->bWaitForThread = false;
+                    if(_self_Internal->bWaitForThread)
+                        _self_Internal->bWaitForThread = false;
                 }
 
             }
             {
-                std::lock_guard<std::mutex> Lock(selfInternalMutex);
-                terminate = self_Internal->bTerminateThread;
-                isPaused = self_Internal->bPauseThread;
+                std::lock_guard<std::mutex> Lock(_selfInternalMutex);
+                terminate = _self_Internal->bTerminateThread;
+                isPaused = _self_Internal->bPauseThread;
             }
         }
        ///Terminate thread
 
-        self_Internal->StopWaitForThread(selfInternalMutex);
+        _self_Internal->StopWaitForThread(_selfInternalMutex);
     }
 
     ThreadManager::ThreadManager(TaskManager* Manager)
     {
-        MaxNumThread = std::thread::hardware_concurrency();
-        int i = MaxNumThread;
-        ThreadPool.reserve(MaxNumThread);
-        for (int j = 0; j < MaxNumThread; ++j) {
-            ThreadPool.emplace_back(new Thread(Manager, &i));
+        maxNumThread = std::thread::hardware_concurrency();
+        int i = maxNumThread;
+        threadPool.reserve(maxNumThread);
+        for (int j = 0; j < maxNumThread; ++j) {
+            threadPool.emplace_back(new Thread(Manager, &i));
         }
 
 
@@ -102,21 +102,21 @@ namespace Solid
 
     ThreadManager &ThreadManager::PlayAllThreads()
     {
-        for (Thread* thread : ThreadPool) {
+        for (Thread* thread : threadPool) {
             thread->Play();
         }
         return *this;
     }
     ThreadManager &ThreadManager::PauseAllThreads()
     {
-        for (Thread* thread : ThreadPool) {
+        for (Thread* thread : threadPool) {
             thread->Pause();
         }
         return *this;
     }
     ThreadManager &ThreadManager::joinAllThread() {
 
-        for (Thread* thread : ThreadPool) {
+        for (Thread* thread : threadPool) {
             thread->join();
         }
         return *this;
@@ -126,7 +126,7 @@ namespace Solid
 
     ThreadManager &ThreadManager::joinAllThread(TerminateAfterJoin t) {
 
-        for (Thread* thread : ThreadPool) {
+        for (Thread* thread : threadPool) {
             thread->join(t);
         }
         return *this;
@@ -134,9 +134,9 @@ namespace Solid
 
     void ThreadManager::TerminateAllThreads()
     {
-        for(int i = 0; i <MaxNumThread; ++i)
+        for(int i = 0; i < maxNumThread; ++i)
         {
-            Thread* element = ThreadPool[i];
+            Thread* element = threadPool[i];
             element->join( TerminateAfterJoin{});
         }
     }
