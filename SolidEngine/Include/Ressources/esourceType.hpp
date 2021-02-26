@@ -2,8 +2,8 @@
 // Created by ryan1 on 26/02/2021.
 //
 
-#ifndef SOLIDEDITOR_RESOURCETYPE_HPP
-#define SOLIDEDITOR_RESOURCETYPE_HPP
+#ifndef SOLIDEDITOR_ESOURCETYPE_HPP
+#define SOLIDEDITOR_ESOURCETYPE_HPP
 #include <filesystem>
 namespace fs = std::filesystem;
 namespace Solid {
@@ -24,7 +24,7 @@ namespace Solid {
     public:
 
 
-        Resource() : _type(EResourceType::NONE) {
+        Resource() : type(EResourceType::NONE) {
 
         }
 
@@ -34,12 +34,12 @@ namespace Solid {
 
         static int NoNameNum;
     protected:
-        EResourceType _type;
-        fs::path _path;
+        EResourceType type;
+        fs::path path;
     public:
-        std::string _name;
+        std::string name;
 
-        EResourceType GetType() { return _type; }
+        EResourceType GetType() { return type; }
 
     };
 
@@ -52,7 +52,7 @@ namespace Solid {
         std::vector<unsigned char> image;
 
         ImageResource() {
-            _type = EResourceType::Image;
+            type = EResourceType::Image;
         }
 
         ~ImageResource();
@@ -121,7 +121,7 @@ namespace Solid {
 
         MeshResource()
         {
-            _type = EResourceType::Mesh;
+            type = EResourceType::Mesh;
         }
 
         ~MeshResource()
@@ -139,7 +139,7 @@ namespace Solid {
     public:
         AnimResource()
         {
-            _type = EResourceType::Anim;
+            type = EResourceType::Anim;
         }
 
         ~AnimResource()
@@ -159,7 +159,7 @@ namespace Solid {
     public:
         ShaderResource(uint vid, uint fid, uint pid, const char *vs, const char *fs)
         {
-            _type = EResourceType::Shader;
+            type = EResourceType::Shader;
             VertShaderID = vid;
             FragShaderID = fid;
             ProgramID = pid;
@@ -169,7 +169,7 @@ namespace Solid {
 
         ShaderResource()
         {
-            _type = EResourceType::Shader;
+            type = EResourceType::Shader;
         }
 
         ~ShaderResource()
@@ -192,7 +192,7 @@ namespace Solid {
 
         ComputeShaderResource(uint sid, uint pid, const char *cSource)
         {
-            _type = EResourceType::Compute;
+            type = EResourceType::Compute;
             ShaderID = sid;
             ProgramID = pid;
             ComputeSource = cSource;
@@ -200,7 +200,7 @@ namespace Solid {
 
         ComputeShaderResource()
         {
-            _type = EResourceType::Compute;
+            type = EResourceType::Compute;
         }
 
         ~ComputeShaderResource()
@@ -218,7 +218,7 @@ namespace Solid {
     public:
         MaterialResource()
         {
-            _type = EResourceType::Material;
+            type = EResourceType::Material;
         }
 
         ~MaterialResource()
@@ -232,7 +232,7 @@ namespace Solid {
     public:
         TextureResource()
         {
-            _type = EResourceType::Texture;
+            type = EResourceType::Texture;
         }
 
         ~TextureResource()
@@ -241,4 +241,4 @@ namespace Solid {
         }
     };
 }
-#endif //SOLIDEDITOR_RESOURCETYPE_HPP
+#endif //SOLIDEDITOR_ESOURCETYPE_HPP

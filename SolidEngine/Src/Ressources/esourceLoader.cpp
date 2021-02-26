@@ -2,7 +2,7 @@
 // Created by ryan1 on 26/02/2021.
 //
 
-#include "Ressources/ressources.hpp"
+#include "Ressources/essources.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION 1
 #include "stb_image.h"
@@ -239,7 +239,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 Resource * ResourcesLoader::LoadImage(const fs::path &Rpath)
 {
     ImageResource* Image = new ImageResource();
-    Image->_name = Rpath.filename().string();
+    Image->name = Rpath.filename().string();
     unsigned char* img =stbi_load(Rpath.string().c_str(), &Image->x, &Image->y, &Image->ChannelsNum, STBI_rgb_alpha);
     //test convert to const char*
     //or vector<char>
@@ -271,7 +271,7 @@ Resource * ResourcesLoader::LoadMesh(const fs::path &Rpath)
     MeshResource* Mesh = new MeshResource;
     Assimp::Importer importer;
     std::string str = Rpath.string();
-    Mesh->_name = Rpath.filename().string();
+    Mesh->name = Rpath.filename().string();
 
     const aiScene* scene = importer.ReadFile(str,  aiProcess_JoinIdenticalVertices | aiProcess_OptimizeMeshes| aiProcess_SplitLargeMeshes| aiProcess_Triangulate  | aiProcess_SortByPType | aiProcess_PreTransformVertices );
     if(!scene) {
@@ -377,7 +377,7 @@ Resource * ResourcesLoader::LoadShader(const fs::path &Rpath)
             return nullptr;
         }
         ComputeShaderResource* Compute = new ComputeShaderResource(program.sID, program.pID, ComputeSources[0]);
-        Compute->_name = Rpath.filename().string();
+        Compute->name = Rpath.filename().string();
 
 #if SASSET_GEN
         printf("generate .SCompute\n");
@@ -453,7 +453,7 @@ Resource * ResourcesLoader::LoadShader(const fs::path &Rpath)
         if(shader.error)
             return nullptr;
         ShaderResource* Shader = new ShaderResource(shader.vID,shader.fID, shader.pID, VertexSources[0], fragSources[0]);
-        Shader->_name = Rpath.filename().string();
+        Shader->name = Rpath.filename().string();
 
 #if SASSET_GEN
         printf("generate .SVertFrag\n");
@@ -525,9 +525,9 @@ Resource * ResourcesLoader::LoadSolidImage(const fs::path &Rpath)
     ifs.seekg(0, std::ios::beg);
     ifs.read(&buffer[0], pos);
     Image->FromDataBuffer(buffer.data(), buffer.size());
-    if(Image->_name == "")
+    if(Image->name == "")
     {
-        Image->_name = "NoName" + std::to_string(Resource::NoNameNum);
+        Image->name = "NoName" + std::to_string(Resource::NoNameNum);
         Resource::NoNameNum++;
     }
     return Image;
@@ -547,9 +547,9 @@ Resource * ResourcesLoader::LoadSolidMesh(const fs::path &Rpath)
     ifs.read(&buffer[0], pos);
 
     Mesh->FromDataBuffer(buffer.data(), buffer.size());
-    if(Mesh->_name == "")
+    if(Mesh->name == "")
     {
-        Mesh->_name = "NoName" + std::to_string(Resource::NoNameNum);
+        Mesh->name = "NoName" + std::to_string(Resource::NoNameNum);
         Resource::NoNameNum++;
     }
 
@@ -569,9 +569,9 @@ Resource * ResourcesLoader::LoadSolidComputeShader(const fs::path &Rpath)
     ifs.read(&buffer[0], pos);
 
     cs->FromDataBuffer(buffer.data(), buffer.size());
-    if(cs->_name == "")
+    if(cs->name == "")
     {
-        cs->_name = "NoName" + std::to_string(Resource::NoNameNum);
+        cs->name = "NoName" + std::to_string(Resource::NoNameNum);
         Resource::NoNameNum++;
     }
     return cs;
@@ -590,9 +590,9 @@ Resource * ResourcesLoader::LoadSolidShader(const fs::path &Rpath)
     ifs.read(&buffer[0], pos);
 
     s->FromDataBuffer(buffer.data(), buffer.size());
-    if(s->_name == "")
+    if(s->name == "")
     {
-        s->_name = "NoName" + std::to_string(Resource::NoNameNum);
+        s->name = "NoName" + std::to_string(Resource::NoNameNum);
         Resource::NoNameNum++;
     }
     return s;

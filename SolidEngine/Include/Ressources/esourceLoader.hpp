@@ -2,8 +2,8 @@
 // Created by ryan1 on 26/02/2021.
 //
 
-#ifndef SOLIDEDITOR_RESOURCELOADER_HPP
-#define SOLIDEDITOR_RESOURCELOADER_HPP
+#ifndef SOLIDEDITOR_ESOURCELOADER_HPP
+#define SOLIDEDITOR_ESOURCELOADER_HPP
 namespace fs = std::filesystem;
 namespace Solid
 {
@@ -57,4 +57,4 @@ namespace Solid
 
 }
 
-#endif //SOLIDEDITOR_RESOURCELOADER_HPP
+#endif //SOLIDEDITOR_ESOURCELOADER_HPP

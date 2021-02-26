@@ -3,7 +3,7 @@
 #include <iostream>
 #include "Rendering/OpenGL45/openGl45Renderer.hpp"
 #include "UI/solidUI.hpp"
-#include "Ressources/ressources.hpp"
+#include "Ressources/essources.hpp"
 
 #include "ECS/Components/transform.hpp"
 #include "ECS/Components/meshRenderer.hpp"

@@ -5,7 +5,7 @@
 // Created by ryan1 on 26/11/2020.
 //
 
-#include "Core/solidMultiThread.hpp"
+#include "Core/olidMultiThread.hpp"
 namespace Solid
 {
 

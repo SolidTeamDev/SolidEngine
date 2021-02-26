@@ -2,8 +2,8 @@
 // Created by ryan1 on 27/01/2021.
 //
 
-#ifndef SOLIDEDITOR_RESSOURCES_HPP
-#define SOLIDEDITOR_RESSOURCES_HPP
+#ifndef SOLIDEDITOR_ESSOURCES_HPP
+#define SOLIDEDITOR_ESSOURCES_HPP
 
 
 #ifndef SOLID_API
@@ -20,9 +20,9 @@
 namespace fs = std::filesystem;
 using uint = unsigned int ;
 
-#include "resourceType.hpp"
-#include "resourceMan.hpp"
-#include "resourceLoader.hpp"
+#include "esourceType.hpp"
+#include "esourceMan.hpp"
+#include "esourceLoader.hpp"
 
 
-#endif //SOLIDEDITOR_RESSOURCES_HPP
+#endif //SOLIDEDITOR_ESSOURCES_HPP

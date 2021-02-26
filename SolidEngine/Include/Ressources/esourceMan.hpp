@@ -2,8 +2,8 @@
 // Created by ryan1 on 26/02/2021.
 //
 
-#ifndef SOLIDEDITOR_RESOURCEMAN_HPP
-#define SOLIDEDITOR_RESOURCEMAN_HPP
+#ifndef SOLIDEDITOR_ESOURCEMAN_HPP
+#define SOLIDEDITOR_ESOURCEMAN_HPP
 #include <mutex>
 namespace fs = std::filesystem;
 namespace Solid
@@ -29,7 +29,7 @@ namespace Solid
                 {
                     if(r == nullptr)
                         continue;
-                    if(r->_name == name)
+                    if(r->name == name)
                         return (r);
                 }
                 return nullptr;
@@ -104,4 +104,4 @@ namespace Solid
 }
 
 
-#endif //SOLIDEDITOR_RESOURCEMAN_HPP
+#endif //SOLIDEDITOR_ESOURCEMAN_HPP

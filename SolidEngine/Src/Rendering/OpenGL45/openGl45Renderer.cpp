@@ -1,4 +1,4 @@
-#include "Ressources/ressources.hpp"
+#include "Ressources/essources.hpp"
 
 #include "Rendering/OpenGL45/openGl45Renderer.hpp"
 
