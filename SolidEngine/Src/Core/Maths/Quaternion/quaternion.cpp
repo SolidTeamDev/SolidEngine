@@ -25,17 +25,21 @@ namespace Solid
     z{0},
     w{0}
     {
-        float cosX = Maths::Cos(_axis.x*0.5);
-        float cosY = Maths::Cos(_axis.y*0.5);
-        float cosZ = Maths::Cos(_axis.z*0.5);
-        float sinX = Maths::Sin(_axis.x*0.5);
-        float sinY = Maths::Sin(_axis.y*0.5);
-        float sinZ = Maths::Sin(_axis.z*0.5);
+        Vec3 half = _axis * 05;
+
+        float cosX = Maths::Cos(half.x);
+        float cosY = Maths::Cos(half.y);
+        float cosZ = Maths::Cos(half.z);
+        float sinX = Maths::Sin(half.x);
+        float sinY = Maths::Sin(half.y);
+        float sinZ = Maths::Sin(half.z);
 
         w = cosX * cosY * cosZ - sinX * sinY * sinZ;
         x = sinX * cosY * cosZ + cosX * sinY * sinZ;
         y = cosX * sinY * cosZ - sinX * cosY * sinZ;
         z = cosX * cosY * sinZ + sinX * sinY * cosZ;
+
+
     }
 
 #pragma region Static Methods
@@ -149,7 +153,7 @@ namespace Solid
             Log::Send("normalize function: length = 0 impossible to compute");
             return *this;
         }
-        return Quat(x / len, y / len, z / len);
+        return Quat(x / len, y / len, z / len, w / len);
     }
 
     constexpr Quat& Quat::Inverse()

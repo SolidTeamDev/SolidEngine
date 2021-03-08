@@ -174,7 +174,7 @@ namespace Solid
 
     std::string Vec3::ToString() noexcept
     {
-        return "[" + std::to_string(x) + "," + std::to_string(y) + "," + std::to_string(z) + "]";
+        return "[" + std::to_string(Maths::RadToDeg(x)) + "," + std::to_string(Maths::RadToDeg(y)) + "," + std::to_string(Maths::RadToDeg(z)) + "]";
     }
 
 #pragma endregion
