@@ -110,5 +110,11 @@ namespace Solid
         {
             systemManager->SetSignature<T>(_signature);
         }
+
+        template<typename T>
+        bool GotComponent(Entity _entity)
+        {
+            return componentManager->GotComponent<T>(_entity);
+        }
     };
 } //!namespace

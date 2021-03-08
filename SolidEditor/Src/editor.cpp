@@ -78,6 +78,7 @@ namespace Solid
                 .mesh   = dynamic_cast<MeshResource*>(engine.resourceManager->GetResourceByName("towerWNorms.obj")),
                 .shader = dynamic_cast<ShaderResource*>(engine.resourceManager->GetResourceByName("ZShader"))
         });
+
         glfwSwapInterval(0);
 
         while (!glfwWindowShouldClose(window->GetHandle()))
