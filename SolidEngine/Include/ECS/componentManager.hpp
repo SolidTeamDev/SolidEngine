@@ -87,6 +87,12 @@ namespace Solid
             return GetComponentArray<T>()->GetData(_entity);
         }
 
+        template<typename T>
+        bool GotComponent(Entity _entity)
+        {
+            return GetComponentArray<T>()->GotComponent(_entity);
+        }
+
         void EntityDestroyed(Entity _entity)
         {
             for (auto const &pair : componentArrays)

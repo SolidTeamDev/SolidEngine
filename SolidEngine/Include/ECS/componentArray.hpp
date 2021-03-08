@@ -4,6 +4,8 @@
 #include <array>
 #include <unordered_map>
 
+#include "Core/Debug/debug.hpp"
+
 #include "ECS/types.hpp"
 
 namespace Solid
@@ -35,7 +37,7 @@ namespace Solid
         {
             if(entityToIndexMap.find(_entity) != entityToIndexMap.end())
             {
-                std::cerr << "Error : Cannot add component (Component already exist)" << std::endl;
+                Log::Send("Cannot add component (Component already exist)",Log::ELogSeverity::ERROR);
                 return;
             }
 
@@ -51,7 +53,7 @@ namespace Solid
         {
             if(entityToIndexMap.find(_entity) == entityToIndexMap.end())
             {
-                std::cerr << "Error : Cannot remove component (Component doesn't exist)" << std::endl;
+                Log::Send("Error : Cannot remove component (Component doesn't exist)",Log::ELogSeverity::ERROR);
                 return;
             }
 
@@ -77,9 +79,13 @@ namespace Solid
             }
             catch (const std::exception& e)
             {
-                std::cerr << "Error : Cannot get component (Component doesn't exist)" << std::endl;
-                abort();
+                throw ThrowError("Error : Cannot get component (Component doesn't exist)",ESolidErrorCode::S_ASSERT);
             }
+        }
+
+        bool GotComponent(Entity _entity)
+        {
+            return entityToIndexMap.find(_entity) != entityToIndexMap.end();
         }
 
         void EntityDestroyed(Entity _entity) final
