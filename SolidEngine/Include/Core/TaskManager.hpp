@@ -10,25 +10,25 @@ namespace Solid
 {
 
     class SOLID_API TaskManager {
-        std::mutex TaskSystemGuard;
-        std::vector<Task> TaskPool;
+        std::mutex taskSystemGuard;
+        std::vector<Task> taskPool;
     public:
 
         TaskManager()
         {
 
-            TaskPool.reserve(50);
+            taskPool.reserve(50);
         }
 
         TaskManager(TaskManager&) = delete;
-        Task* getTaskByType(const TaskType& s)
+        Task* getTaskByType(const ETaskType& _s)
         {
-            std::lock_guard<std::mutex> Lock(TaskSystemGuard);
-            for(auto& element : TaskPool)
+            std::lock_guard<std::mutex> Lock(taskSystemGuard);
+            for(auto& element : taskPool)
             {
                 if(element.IsInProgress() || element.Error() || element.IsFinished() || element.IsDispatched())
                     continue;
-                if(element.GetType() == s)
+                if(element.GetType() == _s)
                 {
                     element.Dispatch();
                     return &element;
@@ -38,8 +38,8 @@ namespace Solid
         }
         Task* GetFirstAvailableTask()
         {
-            std::lock_guard<std::mutex> Lock(TaskSystemGuard);
-            for(auto& element : TaskPool)
+            std::lock_guard<std::mutex> Lock(taskSystemGuard);
+            for(auto& element : taskPool)
             {
                 if(element.IsInProgress() || element.Error() || element.IsFinished() || element.IsDispatched())
                     continue;
@@ -49,47 +49,47 @@ namespace Solid
             }
             return nullptr;
         }
-        Task* getTaskByID(const std::string_view& s)
+        Task* getTaskByID(const std::string_view& _s)
         {
             //std::lock_guard<std::mutex> Lock(TaskSystemGuard);
-            for(auto& element : TaskPool)
+            for(auto& element : taskPool)
             {
 
-                if(element.getID() == s)
+                if(element.getID() == _s)
                 {
                     return &element;
                 }
             }
             return nullptr;
         }
-        Task* getTaskByIndex(int index)
+        Task* getTaskByIndex(int _index)
         {
-            std::lock_guard<std::mutex> Lock(TaskSystemGuard);
-            if(TaskPool.size()-1 < index)
+            std::lock_guard<std::mutex> Lock(taskSystemGuard);
+            if(taskPool.size() - 1 < _index)
             {
-                if(TaskPool[index].IsDispatched())
+                if(taskPool[_index].IsDispatched())
                     return nullptr;
-                return &(TaskPool[index]);
+                return &(taskPool[_index]);
             }
             return nullptr;
         }
-        Task& AddTask(Task&& t)
+        Task& AddTask(Task&& _t)
         {
-            std::lock_guard<std::mutex> Lock(TaskSystemGuard);
-            TaskPool.push_back(std::move(t));
-            return TaskPool.back();
+            std::lock_guard<std::mutex> Lock(taskSystemGuard);
+            taskPool.push_back(std::move(_t));
+            return taskPool.back();
         }
-        TaskManager& RemoveTaskById(const std::string_view& s)
+        TaskManager& RemoveTaskById(const std::string_view& _s)
         {
-            std::lock_guard<std::mutex> Lock(TaskSystemGuard);
-            for(int i = 0; i < TaskPool.size(); ++i)
+            std::lock_guard<std::mutex> Lock(taskSystemGuard);
+            for(int i = 0; i < taskPool.size(); ++i)
             {
-                auto& element = TaskPool.at(i);
-                if(element.getID() == s)
+                auto& element = taskPool.at(i);
+                if(element.getID() == _s)
                 {
                     if(!element.IsDispatched())
                     {
-                        TaskPool.erase(TaskPool.begin() + i);
+                        taskPool.erase(taskPool.begin() + i);
                         break;
                     }
 
@@ -99,9 +99,9 @@ namespace Solid
         }
         bool IsEmpty()
         {
-            std::lock_guard<std::mutex> Lock(TaskSystemGuard);
+            std::lock_guard<std::mutex> Lock(taskSystemGuard);
             bool b = true;
-            for(auto & element : TaskPool)
+            for(auto & element : taskPool)
             {
                 if(element.IsFinished() || element.IsInProgress() || element.Error() || element.IsDispatched())
                     continue;

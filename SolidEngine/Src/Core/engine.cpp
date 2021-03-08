@@ -3,7 +3,7 @@
 #include <iostream>
 #include "Rendering/OpenGL45/openGl45Renderer.hpp"
 #include "UI/solidUI.hpp"
-#include "Ressources/Ressources.hpp"
+#include "Ressources/ressources.hpp"
 
 #include "ECS/Components/transform.hpp"
 #include "ECS/Components/meshRenderer.hpp"
@@ -12,9 +12,9 @@
 namespace Solid
 {
     Engine::Engine() :
-    ThreadPool(&MultiTask)
+            threadPool(&taskManager)
     {
-        RManager = new ResourceManager(this);
+        resourceManager = ResourceManager::Initialize(this);
         InitEcs();
     }
 
@@ -23,8 +23,7 @@ namespace Solid
 
         UIContext::ReleaseSolidUI();
         delete window;
-        delete renderer;
-        ThreadPool.TerminateAllThreads();
+        threadPool.TerminateAllThreads();
     }
 
     void Engine::InitEcs()
@@ -52,7 +51,7 @@ namespace Solid
         switch (_rendererParams.rendererType)
         {
             case ERendererType::OpenGl45:
-                renderer = new OpenGL45Renderer();
+                renderer = OpenGL45Renderer::InitRenderer();
                 break;
         }
 

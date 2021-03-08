@@ -1,4 +1,4 @@
-#include "Ressources/Ressources.hpp"
+#include "Ressources/ressources.hpp"
 
 #include "Rendering/OpenGL45/openGl45Renderer.hpp"
 
@@ -9,6 +9,16 @@
 namespace Solid
 {
 
+    Renderer * OpenGL45Renderer::InitRenderer()
+    {
+        std::lock_guard<std::mutex>lck(mutex);
+        if(pInstance != nullptr)
+        {
+            ThrowError("Renderer Already Initialzed", ESolidErrorCode::S_INIT_ERROR);
+        }
+        pInstance = new OpenGL45Renderer();
+        return pInstance;
+    }
     OpenGL45Renderer::OpenGL45Renderer()
     {
         if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
@@ -24,11 +34,11 @@ namespace Solid
         }
     }
 
-    void OpenGL45Renderer::GLDebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
-                                           const GLchar *message, const void *userParam)
+    void OpenGL45Renderer::GLDebugCallback(GLenum _source, GLenum _type, GLuint _id, GLenum _severity, GLsizei _length,
+                                           const GLchar *_message, const void *_userParam)
     {
         Log::ELogSeverity logSeverity = Log::ELogSeverity::DEBUG;
-        switch (severity)
+        switch (_severity)
         {
             case GL_DEBUG_SEVERITY_HIGH:
                 logSeverity = Log::ELogSeverity::ERROR;
@@ -41,7 +51,7 @@ namespace Solid
                 break;
         }
 
-        Log::Send("OpenGL Debug : " + std::string(message),logSeverity);
+        Log::Send("OpenGL Debug : " + std::string(_message), logSeverity);
     }
 
     void OpenGL45Renderer::Clear(const Int2& _windowSize) const
@@ -117,16 +127,16 @@ namespace Solid
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    void OpenGL45Renderer::InitMesh(MeshResource *m) const
+    void OpenGL45Renderer::InitMesh(MeshResource *_m) const
     {
-        if(m->isInit)
+        if(_m->isInit)
             return;
 
-        glGenVertexArrays(1, &m->VAO);
-        for (MeshResource::SubMesh& sub : m->Meshes) {
+        glGenVertexArrays(1, &_m->VAO);
+        for (MeshResource::SubMesh& sub : _m->Meshes) {
             glGenBuffers(1, &sub.VBO);
             glGenBuffers(1, &sub.EBO);
-            glBindVertexArray(m->VAO);
+            glBindVertexArray(_m->VAO);
             glBindBuffer(GL_ARRAY_BUFFER, sub.VBO);
             glBufferData(GL_ARRAY_BUFFER, sub.vertices.size() * 8 *sizeof(GLfloat), sub.vertices.data(), GL_STATIC_DRAW);
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 *sizeof(GLfloat), (void*)0);
@@ -144,7 +154,7 @@ namespace Solid
         }
 
 
-        m->isInit=true;
+        _m->isInit=true;
     }
 
     void OpenGL45Renderer::DrawMesh(const MeshResource *_mesh) const
@@ -168,4 +178,113 @@ namespace Solid
         glUniformMatrix4fv(glGetUniformLocation(program,"model"),1,GL_FALSE,_model.GetMatrix().elements.data());
     }
 
+
+
+
+// Type = GL_VERTEX_SHADER / GL_FRAGMENT_SHADER / GL_COMPUTE_SHADER
+    Renderer::CShader OpenGL45Renderer::CreateShader(GLenum _type, int _sourceCount, std::vector<char*>& _sources) const
+    {
+        CShader compute;
+        compute.sID = glCreateShader(_type);
+
+        glShaderSource(compute.sID, _sourceCount, _sources.data(), nullptr);
+        glCompileShader(compute.sID);
+        GLint compileStatus;
+        glGetShaderiv(compute.sID, GL_COMPILE_STATUS, &compileStatus);
+        if (compileStatus == GL_FALSE)
+        {
+            GLchar infoLog[1024];
+            glGetShaderInfoLog(compute.sID, 1024, nullptr, infoLog);
+            printf("Shader compilation error: %s", infoLog);
+            compute.error = true;
+        }
+
+        return compute;
+    }
+
+    Renderer::CShader OpenGL45Renderer::CreateComputeProgram(std::vector<char*>& _sources) const
+    {
+
+        CShader compute = CreateShader(GL_COMPUTE_SHADER, 1, _sources);
+        if(compute.error)
+            return compute;
+        compute.pID = glCreateProgram();
+        glAttachShader(compute.pID, compute.sID);
+        glLinkProgram(compute.pID);
+        GLint linkStatus;
+        glGetProgramiv(compute.pID, GL_LINK_STATUS, &linkStatus);
+        if (linkStatus == GL_FALSE)
+        {
+#ifndef ARRAYSIZE
+#define ARRAYSIZE(arr) (sizeof(arr) / sizeof(arr[0]))
+#endif
+
+            GLchar infoLog[1024];
+            glGetProgramInfoLog(compute.pID, ARRAYSIZE(infoLog), nullptr, infoLog);
+            printf("Program link error: %s", infoLog);
+            //TODO : Cleanup at return
+            compute.error = true;
+        }
+        return compute;
+    }
+
+    Renderer::VFShader OpenGL45Renderer::CreateVertFragProgram(std::vector<char*>& _VertexSources, std::vector<char*>& _fragSources) const
+    {
+        CShader vShader = CreateShader(GL_VERTEX_SHADER, 1, _VertexSources);
+        CShader fShader = CreateShader(GL_FRAGMENT_SHADER, 1, _fragSources);
+
+        if(vShader.error || fShader.error)
+            return VFShader{true, 0, 0};
+        VFShader shader {.error=false, .vID=vShader.sID, .fID=fShader.sID,.pID=0};
+        shader.pID = glCreateProgram();
+        glAttachShader(shader.pID, vShader.sID);
+        glAttachShader(shader.pID, fShader.sID);
+        glLinkProgram(shader.pID);
+        GLint linkStatus;
+        glGetProgramiv(shader.pID, GL_LINK_STATUS, &linkStatus);
+        if (linkStatus == GL_FALSE)
+        {
+#ifndef ARRAYSIZE
+#define ARRAYSIZE(arr) (sizeof(arr) / sizeof(arr[0]))
+#endif
+            GLchar infoLog[1024];
+            glGetProgramInfoLog(shader.pID, ARRAYSIZE(infoLog), nullptr, infoLog);
+            printf("Program link error: %s", infoLog);
+            //TODO : cleanup at return
+            shader.error=true;
+        }
+        return shader;
+    }
+
+    Renderer::ShaderBinary OpenGL45Renderer::GetShaderBinary(uint _PID) const
+    {
+
+        int pSize = 0;
+        glGetProgramiv(_PID, GL_PROGRAM_BINARY_LENGTH, &pSize);
+        char* binary = new char[pSize];
+        GLenum BFormat = 0;
+        glGetProgramBinary(_PID, pSize, nullptr, &BFormat, (void*)binary);
+        return {.size=(uint)pSize,.format=BFormat, .b=binary};
+    }
+
+    uint OpenGL45Renderer::CreateShaderFromBinary(ShaderBinary _binary) const
+    {
+        uint ID = glCreateProgram();
+        glProgramBinary(ID, _binary.format, (void*)_binary.b, _binary.size);
+        GLenum ErrorCode = glGetError();
+        while (ErrorCode != GL_NO_ERROR)
+        {
+
+            if(ErrorCode == GL_INVALID_ENUM)
+            {
+                printf("Binary Format = %u is not a value recognized by the implementation.\n", _binary.format);
+            }
+            if(ErrorCode == GL_INVALID_OPERATION )
+            {
+                printf("programID = %u is not the name of an existing program object .\n", ID);
+            }
+            ErrorCode = glGetError();
+        }
+        return ID;
+    }
 } //!namespace

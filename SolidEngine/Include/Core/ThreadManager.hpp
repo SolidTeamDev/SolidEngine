@@ -13,13 +13,13 @@ namespace Solid
     struct T_Internal
     {
 
-        TaskManager* TaskManager = nullptr;
+        TaskManager* taskManager = nullptr;
         bool bTerminateThread = false;
         bool bPauseThread = true;
         bool bWaitForThread = false;
-        void StopWaitForThread(std::mutex& InternalDataMutex)
+        void StopWaitForThread(std::mutex& _InternalDataMutex)
         {
-            std::lock_guard<std::mutex> Lock(InternalDataMutex);
+            std::lock_guard<std::mutex> Lock(_InternalDataMutex);
             bWaitForThread = false;
 
         }
@@ -27,11 +27,11 @@ namespace Solid
     };
 
 
-    void SOLID_API RunThread(class Thread* self, T_Internal* self_Internal, std::mutex& selfInternalMutex);
+    void SOLID_API RunThread(struct Thread *_self, T_Internal* _self_Internal, std::mutex& _selfInternalMutex);
     class SOLID_API Thread
     {
         std::mutex internalDataMutex;
-        TaskType ThreadType = TaskType::GENERAL;
+        ETaskType threadType = ETaskType::GENERAL;
         std::thread* thread = nullptr;
         T_Internal internal;
     public:
@@ -42,23 +42,23 @@ namespace Solid
             //internalDataMutex = new std::mutex();
             thread = new std::thread(RunThread, this, &(this->internal), std::ref(internalDataMutex));
         }
-        Thread(TaskManager* m)
+        Thread(TaskManager* _m)
         {
             //internalDataMutex = new std::mutex();
-            internal.TaskManager = m;
+            internal.taskManager = _m;
             thread = new std::thread(RunThread, this, &(this->internal), std::ref(internalDataMutex));
         }
         Thread(Thread& t) = delete;
 
-        Thread(TaskManager* m, int* i)
+        Thread(TaskManager* _m, int* _i)
         {
             //internalDataMutex = new std::mutex();
-            internal.TaskManager = m;
-            internal.ID = *i;
+            internal.taskManager = _m;
+            internal.ID = *_i;
             thread = new std::thread(RunThread, this, &(this->internal), std::ref(internalDataMutex));
 
 
-            *i -=1;
+            *_i -=1;
         }
         ~Thread()
         {
@@ -68,7 +68,7 @@ namespace Solid
         }
         void SetManager(TaskManager* m)
         {
-            internal.TaskManager = m;
+            internal.taskManager = m;
         }
 
 
@@ -98,13 +98,13 @@ namespace Solid
             std::lock_guard<std::mutex> Lock(internalDataMutex);
             internal.bTerminateThread = true;
         }
-        [[nodiscard]] TaskType GetThreadType()
+        [[nodiscard]] ETaskType GetThreadType()
         {
-            return ThreadType ;
+            return threadType ;
         }
-        void SetThreadType(TaskType t)
+        void SetThreadType(ETaskType t)
         {
-            ThreadType = t;
+            threadType = t;
         }
 
         void join()
@@ -127,7 +127,7 @@ namespace Solid
                 }
             }
         }
-        void join(TerminateAfterJoin t)
+        void join(TerminateAfterJoin _t)
         {
             {
                 std::lock_guard<std::mutex> Lock(internalDataMutex);
@@ -154,29 +154,29 @@ namespace Solid
 
     class SOLID_API ThreadManager
     {
-        uint8_t MaxNumThread ;
-        uint8_t MaxStandAloneThread ;
-        std::vector<Thread*> ThreadPool ;
+        uint8_t maxNumThread ;
+        uint8_t maxStandAloneThread ;
+        std::vector<Thread*> threadPool ;
     public:
-        ThreadManager(TaskManager* Manager);
+        ThreadManager(TaskManager* _Manager);
         ~ThreadManager() = default;
         [[maybe_unused]] ThreadManager& PlayAllThreads();
         [[maybe_unused]] ThreadManager& PauseAllThreads();
         [[maybe_unused]] ThreadManager& joinAllThread();
         [[maybe_unused]] ThreadManager& joinAllThread(TerminateAfterJoin);
         [[maybe_unused]] void           TerminateAllThreads();
-        [[maybe_unused]] uint8_t        GetMaxNumThread()        const {return MaxNumThread;}
-        [[maybe_unused]] uint8_t        GetMaxStandAloneThread() const {return MaxStandAloneThread;}
-        [[maybe_unused]] ThreadManager& SetMaxStandAloneThread(uint8_t n)
+        [[maybe_unused]] uint8_t        GetMaxNumThread()        const {return maxNumThread;}
+        [[maybe_unused]] uint8_t        GetMaxStandAloneThread() const {return maxStandAloneThread;}
+        [[maybe_unused]] ThreadManager& SetMaxStandAloneThread(uint8_t _n)
         {
-            MaxStandAloneThread = n;
-            if(MaxStandAloneThread > MaxNumThread)
+            maxStandAloneThread = _n;
+            if(maxStandAloneThread > maxNumThread)
             {
-                MaxStandAloneThread = MaxNumThread;
+                maxStandAloneThread = maxNumThread;
             }
-            else if(MaxStandAloneThread < 0)
+            else if(maxStandAloneThread < 0)
             {
-                MaxStandAloneThread = 0;
+                maxStandAloneThread = 0;
             }
             return *this;
         }
