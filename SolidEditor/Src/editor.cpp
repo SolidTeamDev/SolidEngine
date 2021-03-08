@@ -78,7 +78,6 @@ namespace Solid
                 .mesh   = dynamic_cast<MeshResource*>(engine.resourceManager->GetResourceByName("towerWNorms.obj")),
                 .shader = dynamic_cast<ShaderResource*>(engine.resourceManager->GetResourceByName("ZShader"))
         });
-
         glfwSwapInterval(0);
 
         while (!glfwWindowShouldClose(window->GetHandle()))
@@ -140,9 +139,9 @@ namespace Solid
         float camSpeed = (float)(4 * Time::DeltaTime());
         float forwardVelocity = 0;
 
-        if(editorInputManager->IsPressed(EInputList::UP))
+        if(editorInputManager->IsPressed(EInputList::FORWARD))
             forwardVelocity = camSpeed;
-        if(editorInputManager->IsPressed(EInputList::DOWN))
+        if(editorInputManager->IsPressed(EInputList::BACK))
             forwardVelocity = -camSpeed;
 
         float strafeVelocity = 0;
@@ -151,6 +150,12 @@ namespace Solid
             strafeVelocity = -camSpeed;
         if(editorInputManager->IsPressed(EInputList::RIGHT))
             strafeVelocity = camSpeed;
+
+        if(editorInputManager->IsPressed(EInputList::UP))
+            editorCameraT.Translate(Vec3(0,-camSpeed,0));
+        if(editorInputManager->IsPressed(EInputList::DOWN))
+            editorCameraT.Translate(Vec3(0,camSpeed,0));
+
 
         /*editorCameraT.Translate(Vec3(forwardVelocity,
                                      -forwardVelocity,
