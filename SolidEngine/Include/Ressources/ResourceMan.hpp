@@ -36,6 +36,7 @@ namespace Solid
             }
         };
 
+        // RC: USE UNORDERED MAP.
         ResourceList<ImageResource>          ImageList;
         ResourceList<MeshResource>           MeshList;
         ResourceList<AnimResource>           AnimList;

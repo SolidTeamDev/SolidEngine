@@ -1,7 +1,7 @@
 //
 // Created by ryan1 on 26/02/2021.
 //
-
+// RC: Folder is reSSources ?
 #include "Ressources/ressources.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION 1
@@ -63,6 +63,7 @@ void  ResourcesLoader::LoadRessourceNoAdd(const fs::path &Rpath, ResourcePtrWrap
 
     ///Solid Asset Loading
 
+    // RC: USE ELSE IF.
     if(extension == ".simage")
         r=LoadSolidImage(Rpath);
     if(extension == ".stexture")
@@ -293,6 +294,7 @@ Resource * ResourcesLoader::LoadMesh(const fs::path &Rpath)
             WritePos+= scene->mMeshes[i]->mFaces[j].mNumIndices;
         }
 
+        // RC: opti?
         for (int j = 0; j < scene->mMeshes[i]->mNumVertices; ++j) {
             if(scene->mMeshes[i]->HasPositions())
                 std::memcpy(&(Sub.vertices[j].Pos), &(scene->mMeshes[i]->mVertices[j]), 3 * sizeof(float));

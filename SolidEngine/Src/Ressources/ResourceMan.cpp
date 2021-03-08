@@ -1,6 +1,12 @@
 //
 // Created by ryan1 on 26/02/2021.
+// 
+// RC: Use official copyright mark:
+// Copyright (c) 2021 Solid Engine. All Rights Reserved.
 //
+
+// RC: folder named ReSSource.
+// RC: ResourceMan? Should be ResourceMgr / ResourceManager.
 
 #include "Ressources/ressources.hpp"
 #include <sstream>
@@ -34,7 +40,7 @@ void ResourceManager::AddResource(Resource *r)
 {
     if(r == nullptr)
         return;
-    if(r->GetType() == EResourceType::Mesh)
+    if(r->GetType() == EResourceType::Mesh) // RC: Please use ELSE IF or Switch case with default log.
     {
         EnginePtr->renderer->InitMesh((MeshResource*)r);
         MeshList.List.push_back(r);
@@ -60,6 +66,8 @@ Resource * ResourceManager::GetResourceByName(const char* name)
     std::string StrName =name;
     if(EnginePtr == nullptr || !EnginePtr->MultiThreadEnabled())
     {
+        // RC: Bad code.
+        // Use 1 switch case to get list from EResourceType.
         Resource* r = TextureList.Find(name);
         if(r != nullptr)
             return r;
@@ -97,6 +105,7 @@ Resource * ResourceManager::GetResourceByName(const char* name)
         IDWrapper IDS[ResourceTypeNum];
 
         {
+            // RC: TaskMgr
             int i = 0;
             TaskMan.AddTask(Task(Task::MakeID("Find " + std::to_string(i) + name), ETaskType::GENERAL, Lambda, &TextureList, &MtResource[i], name));
             IDS[i] = {"Find "+ std::to_string(i) + name, i};

@@ -72,8 +72,9 @@ namespace Solid
 
     constexpr bool Quat::IsZero() const noexcept
     {
-        return Solid::Maths::Equals0(x) && Solid::Maths::Equals0(y)
-               && Solid::Maths::Equals0(z) && Solid::Maths::Equals0(w);
+        // RC: Already in Solid::.
+        return Maths::Equals0(x) && Maths::Equals0(y)
+               && Maths::Equals0(z) && Maths::Equals0(w);
     }
 
     constexpr float Quat::SqrtLength() const noexcept
@@ -338,7 +339,7 @@ namespace Solid
 
     Quat &Quat::operator/=(const Quat &_quat)
     {
-        return *this = *this * _quat;
+        return *this = *this * _quat; // RC: UNIT TESTING
     }
 
     Quat &Quat::operator+=(const Quat &_quat)
@@ -364,11 +365,13 @@ namespace Solid
 
     constexpr bool Quat::operator==(const Quat &_quat)
     {
+        // RC: USE Equals(_quat);
         return (x == _quat.x && y == _quat.y && z == _quat.z && w == _quat.w);
     }
 
     constexpr bool Quat::operator!=(const Quat &_quat)
     {
+        // RC: USE Equals(_quat);
         return !(x == _quat.x && y == _quat.y && z == _quat.z && w == _quat.w);
 
     }

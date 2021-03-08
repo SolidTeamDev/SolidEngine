@@ -11,10 +11,12 @@ namespace Solid
     struct Quat;
 
 
+    // RC: Only Maths class with template?
     template<typename T = float>
-    struct SOLID_API Mat4
+    struct SOLID_API Mat4               // RC: NO NEED SOLID_API
     {
-        std::array<T, 16> elements;
+        T elems[16]{};
+        std::array<T, 16> elements;     // RC: T elems[16]{}; ?
 
         Mat4();
 
@@ -55,17 +57,18 @@ namespace Solid
         T& At(unsigned int _n, unsigned int _m);
         constexpr T& At(unsigned int _n, unsigned int _m)const;
 
+        // RC: Scale()?
         Mat4& Multiply(T _scale) noexcept;
-        constexpr Mat4 GetMultiply(T _scale) const noexcept;
+        constexpr Mat4 GetMultiply(T _scale) const noexcept; // RC: GetScaled / GetMultiplied()
 
         Mat4& Divide(T _scale) noexcept;
-        constexpr Mat4 GetDivide(T _scale) const noexcept;
+        constexpr Mat4 GetDivide(T _scale) const noexcept;  // RC: GetDivided.
 
         Mat4& Transpose() noexcept;
-        constexpr Mat4 GetTranspose() const noexcept;
+        constexpr Mat4 GetTranspose() const noexcept;       // RC: GetTransposed.
         constexpr Mat4 CoMatrix() noexcept;
         Mat4& Inverse() noexcept;
-        constexpr Mat4 GetInverse() const noexcept;
+        constexpr Mat4 GetInverse() const noexcept;         // RC: GetInversed.
 
         constexpr float Determinant() const noexcept;
 

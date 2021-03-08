@@ -65,6 +65,6 @@ namespace Solid
 
     bool Engine::IsEngineContextInitialized() const
     {
-        return engineContextInit;
+        return engineContextInit; // RC: return window != nullptr && renderer != nullptr
     }
 } //!namespace

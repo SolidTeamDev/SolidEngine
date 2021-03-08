@@ -7,7 +7,8 @@ namespace Solid
 
     Renderer * Renderer::GetInstance()
     {
-        std::lock_guard<std::mutex>lck(mutex);
+        std::lock_guard<std::mutex>lck(mutex); // RC: What is this mutex for?
+
         if(pInstance == nullptr)
         {
             ThrowError("Renderer not initialized", ESolidErrorCode::S_INIT_ERROR);

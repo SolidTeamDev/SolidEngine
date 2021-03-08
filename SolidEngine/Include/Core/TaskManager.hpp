@@ -9,11 +9,13 @@
 namespace Solid
 {
 
+    // RC: INDENTATION ?
     class SOLID_API TaskManager {
         std::mutex taskSystemGuard;
         std::vector<Task> taskPool;
     public:
 
+        // RC: Full code in .hpp?
         TaskManager()
         {
 
