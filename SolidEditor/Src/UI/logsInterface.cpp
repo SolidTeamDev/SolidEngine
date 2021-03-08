@@ -24,7 +24,7 @@ namespace Solid
         {
             auto currLog = Log::GetLogAt(i);
             std::string currMsg = currLog.logMessage;
-            if (currMsg == "")
+            if (currMsg.empty())
                 continue;
             switch (currLog.logSeverity)
             {
@@ -50,7 +50,7 @@ namespace Solid
                     break;
 
             }
-            UI::Text("%s", currMsg.c_str());
+            UI::TextWrapped("%s", currMsg.c_str());
             UI::PopStyleColor(1);
         }
         UI::End();
