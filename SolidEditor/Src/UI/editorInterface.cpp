@@ -5,6 +5,9 @@
 #include <imgui_internal.h>
 #include <string>
 
+
+Solid::GameObject* Solid::EditorInterface::selectedGO = nullptr;
+
 namespace Solid {
     EditorInterface::EditorInterface() :
             editorStyle(UI::GetStyle())
@@ -20,7 +23,7 @@ namespace Solid {
         DarkTheme();
     }
 
-    void EditorInterface::Update()
+    void EditorInterface::Update(Engine* _engine)
     {
         UIContext::BeginFrame();
 
@@ -28,8 +31,8 @@ namespace Solid {
 
         filesInterface.Draw();
         sceneInterface.Draw();
-        inspectorInterface.Draw();
-        hierarchyTreeInterface.Draw();
+        inspectorInterface.Draw(_engine);
+        hierarchyTreeInterface.Draw(_engine);
         playInterface.Draw();
         logsInterface.Draw();
 
