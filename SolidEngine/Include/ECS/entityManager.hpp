@@ -6,70 +6,72 @@
 #include "Build/solidAPI.hpp"
 #include "ECS/types.hpp"
 
-class SOLID_API EntityManager
+namespace Solid
 {
-private:
-    std::queue<Entity> availableEntities {};
-    std::array<Signature, MAX_ENTITIES> signatures {};
-
-    uint32_t livingEntityCount {};
-public:
-    EntityManager()
+    class SOLID_API EntityManager
     {
-        for (Entity entity = 0 ; entity < MAX_ENTITIES ; entity++)
-            availableEntities.push(entity);
-    }
+    private:
+        std::queue<Entity> availableEntities{};
+        std::array<Signature, MAX_ENTITIES> signatures{};
 
-    Entity CreateEntity()
-    {
-        //max entity guard
-        if(livingEntityCount > MAX_ENTITIES)
+        uint32_t livingEntityCount{};
+    public:
+        EntityManager()
         {
-            std::cerr << "Error : Cannot create more entity (Max entities reach) : " << MAX_ENTITIES << std::endl;
-            return 0;
+            for (Entity entity = 0; entity < MAX_ENTITIES; entity++)
+                availableEntities.push(entity);
         }
 
-        Entity id = availableEntities.front();
-        availableEntities.pop();
-        livingEntityCount++;
-
-        return id;
-    }
-
-    void DestroyEntity(Entity _entity)
-    {
-        if(_entity > MAX_ENTITIES)
+        Entity CreateEntity()
         {
-            std::cerr << "Error : Cannot delete entity (Entity out of range) " << std::endl;
-            return;
+            //max entity guard
+            if (livingEntityCount > MAX_ENTITIES)
+            {
+                std::cerr << "Error : Cannot create more entity (Max entities reach) : " << MAX_ENTITIES << std::endl;
+                return 0;
+            }
+
+            Entity id = availableEntities.front();
+            availableEntities.pop();
+            livingEntityCount++;
+
+            return id;
         }
 
-        signatures[_entity].reset();
-
-        availableEntities.push(_entity);
-        livingEntityCount--;
-    }
-
-    void SetSignature(Entity _entity, Signature _signature)
-    {
-        if(_entity > MAX_ENTITIES)
+        void DestroyEntity(Entity _entity)
         {
-            std::cerr << "Error : Cannot set signature (Entity out of range) " << std::endl;
-            return;
+            if (_entity > MAX_ENTITIES)
+            {
+                std::cerr << "Error : Cannot delete entity (Entity out of range) " << std::endl;
+                return;
+            }
+
+            signatures[_entity].reset();
+
+            availableEntities.push(_entity);
+            livingEntityCount--;
         }
 
-        signatures[_entity] = _signature;
-    }
-
-    Signature GetSignature(Entity _entity)
-    {
-        if(_entity > MAX_ENTITIES)
+        void SetSignature(Entity _entity, Signature _signature)
         {
-            std::cerr << "Error : Cannot get signature (Entity out of range) " << std::endl;
-            return 0;
+            if (_entity > MAX_ENTITIES)
+            {
+                std::cerr << "Error : Cannot set signature (Entity out of range) " << std::endl;
+                return;
+            }
+
+            signatures[_entity] = _signature;
         }
 
-        return signatures[_entity];
-    }
-};
+        Signature GetSignature(Entity _entity)
+        {
+            if (_entity > MAX_ENTITIES)
+            {
+                std::cerr << "Error : Cannot get signature (Entity out of range) " << std::endl;
+                return 0;
+            }
 
+            return signatures[_entity];
+        }
+    };
+} //!namespace

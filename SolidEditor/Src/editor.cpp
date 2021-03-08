@@ -72,9 +72,7 @@ namespace Solid
 
         Entity entity = engine.ecsManager.CreateEntity();
         engine.ecsManager.AddComponent(entity,Transform{
-                {0,0,-10},
-                {0,0,0,1},
-                {1,1,1}
+
         });
         engine.ecsManager.AddComponent(entity,MeshRenderer{
                 .mesh   = dynamic_cast<MeshResource*>(engine.resourceManager->GetResourceByName("towerWNorms.obj")),

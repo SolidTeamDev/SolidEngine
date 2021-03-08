@@ -4,13 +4,16 @@
 #include "Build/solidAPI.hpp"
 #include "types.hpp"
 
-class SOLID_API System
+namespace Solid
 {
-public:
-    std::set<Entity> entities;
-    class ECSManager& ecsManager;
+    class SOLID_API System
+    {
+    public:
+        std::set<Entity> entities;
+        class ECSManager& ecsManager;
 
-    System(ECSManager& _ecsManager) : ecsManager(_ecsManager) {};
-};
+        System(ECSManager& _ecsManager) : ecsManager(_ecsManager) {};
+    };
+} //!namespace
 
 #include "ECS/ecsManager.hpp"
