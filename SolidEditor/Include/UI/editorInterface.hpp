@@ -37,10 +37,13 @@ namespace Solid
 
         ~EditorInterface() = default;
 
+        static Solid::GameObject* selectedGO;
+
+
         /**
          * @debrief Updates the whole UI
          */
-        void Update();
+        void Update(Engine* _engine);
 
         /**
          * @debrief Updates the UI style to a dark theme

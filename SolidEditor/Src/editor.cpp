@@ -10,8 +10,20 @@
 
 #include <string>
 
+
+
+
 namespace Solid
 {
+    void add(Engine& e, Entity x)
+    {
+    e.ecsManager.AddComponent(x,Transform{});
+    e.ecsManager.AddComponent(x,MeshRenderer{
+            .mesh   = dynamic_cast<MeshResource*>(e.resourceManager->GetResourceByName("towerWNorms.obj")),
+            .shader = dynamic_cast<ShaderResource*>(e.resourceManager->GetResourceByName("ZShader"))
+    });}
+
+#define ADD(e,x) add(e,x);
     Framebuffer Editor::sceneFramebuffer;
 
     Editor::Editor()
@@ -71,15 +83,21 @@ namespace Solid
              //Resource Manager Have a ResourceList for this type
 
         Entity entity = engine.ecsManager.CreateEntity();
-        engine.ecsManager.AddComponent(entity,Transform{
-                {0,0,-10},
-                {0,0,0,1},
-                {1,1,1}
-        });
-        engine.ecsManager.AddComponent(entity,MeshRenderer{
-                .mesh   = dynamic_cast<MeshResource*>(engine.resourceManager->GetResourceByName("towerWNorms.obj")),
-                .shader = dynamic_cast<ShaderResource*>(engine.resourceManager->GetResourceByName("ZShader"))
-        });
+        Entity  e8=engine.ecsManager.CreateEntity(entity);
+        Entity  e6=engine.ecsManager.CreateEntity(entity);
+        Entity  e5=engine.ecsManager.CreateEntity(entity);
+        Entity  e2 = engine.ecsManager.CreateEntity(entity);
+        Entity  e3 = engine.ecsManager.CreateEntity(e2);
+        Entity  e4 = engine.ecsManager.CreateEntity(e3);
+        Entity  e7= engine.ecsManager.CreateEntity();
+        ADD(engine, entity)
+        ADD(engine, e2)
+        ADD(engine, e3)
+        ADD(engine, e4)
+        ADD(engine, e5)
+        ADD(engine, e6)
+        ADD(engine, e7)
+        ADD(engine, e8)
 
         glfwSwapInterval(0);
 
@@ -98,7 +116,7 @@ namespace Solid
             engine.rendererSystem->Update(renderer,editorCamera);
             renderer->EndFramebuffer();
 
-            editorInterface.Update();
+            editorInterface.Update(&engine);
 
             renderer->UpdateFramebuffer(sceneFramebuffer);
             Time::Update();
@@ -142,9 +160,9 @@ namespace Solid
         float camSpeed = (float)(4 * Time::DeltaTime());
         float forwardVelocity = 0;
 
-        if(editorInputManager->IsPressed(EInputList::UP))
+        if(editorInputManager->IsPressed(EInputList::FORWARD))
             forwardVelocity = camSpeed;
-        if(editorInputManager->IsPressed(EInputList::DOWN))
+        if(editorInputManager->IsPressed(EInputList::BACK))
             forwardVelocity = -camSpeed;
 
         float strafeVelocity = 0;
@@ -153,6 +171,12 @@ namespace Solid
             strafeVelocity = -camSpeed;
         if(editorInputManager->IsPressed(EInputList::RIGHT))
             strafeVelocity = camSpeed;
+
+        if(editorInputManager->IsPressed(EInputList::UP))
+            editorCameraT.Translate(Vec3(0,-camSpeed,0));
+        if(editorInputManager->IsPressed(EInputList::DOWN))
+            editorCameraT.Translate(Vec3(0,camSpeed,0));
+
 
         /*editorCameraT.Translate(Vec3(forwardVelocity,
                                      -forwardVelocity,

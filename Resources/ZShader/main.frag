@@ -6,5 +6,10 @@ in vec3 color;
 
 void main()
 {
-    FragColor = vec4(color,1);
+    float f = color.x/20.0f;
+    if(f < 0.2f)
+    f = 0.2f;
+    if(f > 0.9f)
+    f = 0.9f;
+    FragColor = vec4(1.0f-f,1.0f-f,1.0f-f,1);
 }
