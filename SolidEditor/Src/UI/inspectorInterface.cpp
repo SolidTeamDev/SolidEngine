@@ -1,11 +1,12 @@
 #include "UI/inspectorInterface.hpp"
-
+#include "UI/editorInterface.hpp"
+#include "Core/engine.hpp"
 #include <imgui.h>
 #include <imgui_stdlib.h>
 
 namespace Solid
 {
-    void InspectorInterface::Draw()
+    void InspectorInterface::Draw(Engine* _engine)
     {
         if(!p_open)
             return;
@@ -15,17 +16,21 @@ namespace Solid
         UI::Begin("Inspector", &p_open,
                   ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
 
-        DrawComponent();
+        DrawComponents(_engine);
 
         UI::End();
     }
 
-    void InspectorInterface::DrawComponent()
+    void InspectorInterface::DrawComponents(Engine* _engine)
     {
-        UI::Text("Name:");
-        EditText(fakeName, "##name");
+        GameObject* gameObject = EditorInterface::selectedGO;
+        if (gameObject == nullptr)
+            return;
 
-        EditTransform(fakeTRS);
+        UI::Text("Name: %s", gameObject->name.c_str());
+        EditText(gameObject->name, "##name");
+
+        EditTransform(_engine->ecsManager.GetComponent<Transform>(gameObject->GetEntity()));
     }
 
     void InspectorInterface::EditTransform(Transform& _trs)

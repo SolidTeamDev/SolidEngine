@@ -1,7 +1,7 @@
 #pragma once
 
 #include <deque>
-
+#include <string>
 #include "Build/solidAPI.hpp"
 
 #include "ECS/types.hpp"
@@ -27,6 +27,7 @@ namespace Solid
         {
             parent = _parent;
             entity = _entity;
+            name += " PAR:"+std::to_string(_parent->entity)+" Ent:"+std::to_string(_entity);
         }
 
         ~GameObject()

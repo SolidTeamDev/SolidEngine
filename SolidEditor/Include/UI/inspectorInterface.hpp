@@ -6,6 +6,7 @@
 
 namespace Solid
 {
+    class Engine;
     class InspectorInterface
     {
     private:
@@ -15,8 +16,8 @@ namespace Solid
         InspectorInterface()  = default;
         ~InspectorInterface() = default;
 
-        void Draw();
-        void DrawComponent();
+        void Draw(Engine* _engine);
+        void DrawComponents(Engine* _engine);
 
         void EditTransform(Transform& _trs);
 
