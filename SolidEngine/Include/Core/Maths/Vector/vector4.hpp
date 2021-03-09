@@ -16,10 +16,14 @@ namespace Solid
         float w;
 
         constexpr Vec4() noexcept = default;
-        constexpr Vec4(float _value)noexcept;
-        constexpr Vec4(float _x, float _y, float _z, float _w)noexcept;
-        constexpr Vec4(const Vec3& _copy)noexcept;
-        constexpr Vec4(const Vec4& _copy)noexcept;
+
+        constexpr Vec4(float _value) noexcept;
+
+        constexpr Vec4(float _x, float _y, float _z, float _w) noexcept;
+
+        constexpr Vec4(const Vec3& _copy) noexcept;
+
+        constexpr Vec4(const Vec4& _copy) noexcept;
 
         ~Vec4() = default;
 
@@ -33,15 +37,15 @@ namespace Solid
         static const Vec4 Forward;
         static const Vec4 Back;
 
-        static constexpr float Dot(const Vec4 &_v1,const Vec4 &_v2) noexcept;
+        static constexpr float Dot(const Vec4& _v1, const Vec4& _v2) noexcept;
 
-        static constexpr Vec4 Cross(const Vec4 &_v1,const Vec4 &_v2) noexcept;
+        static constexpr Vec4 Cross(const Vec4& _v1, const Vec4& _v2) noexcept;
 
-        static Vec4 Lerp(const Vec4& _v1,const Vec4& _v2, float _r) noexcept;
+        static Vec4 Lerp(const Vec4& _v1, const Vec4& _v2, float _r) noexcept;
 
-        static Vec4 Nlerp(const Vec4& _v1,const Vec4& _v2, float _r) noexcept;
+        static Vec4 Nlerp(const Vec4& _v1, const Vec4& _v2, float _r) noexcept;
 
-        static Vec4 Slerp(const Vec4& _v1,const Vec4& _v2, float _r) noexcept;
+        static Vec4 Slerp(const Vec4& _v1, const Vec4& _v2, float _r) noexcept;
 
 #pragma endregion
 #pragma region Methods
@@ -50,15 +54,15 @@ namespace Solid
 
         constexpr float Length() const noexcept;
 
-        Vec4 &Scale(float _scale) noexcept;
+        Vec4& Scale(float _scale) noexcept;
 
         constexpr Vec4 GetScaled(float _scale) const noexcept;
 
-        Vec4 &Unscale(float _scale) noexcept;
+        Vec4& Unscale(float _scale) noexcept;
 
         constexpr Vec4 GetUnscaled(float _scale) const noexcept;
 
-        Vec4 &Normalize() noexcept;
+        Vec4& Normalize() noexcept;
 
         constexpr Vec4 GetNormalize() const noexcept;
 
@@ -76,50 +80,52 @@ namespace Solid
 #pragma endregion
 #pragma region Operator
 
-        constexpr Vec4 &operator = (const Vec4& vec) noexcept = default;
+        constexpr Vec4& operator=(const Vec4& vec) noexcept = default;
 
-        constexpr bool operator == (const Vec4 &_vec) const noexcept;
+        constexpr bool operator==(const Vec4& _vec) const noexcept;
 
-        constexpr bool operator != (const Vec4 &_vec) const noexcept;
+        constexpr bool operator!=(const Vec4& _vec) const noexcept;
 
-        constexpr Vec4 operator + (const Vec4 &_vec) const noexcept;
+        constexpr Vec4 operator+(const Vec4& _vec) const noexcept;
 
-        constexpr Vec4 operator - (const Vec4 &_vec) const noexcept;
+        constexpr Vec4 operator-(const Vec4& _vec) const noexcept;
 
-        constexpr Vec4 operator * (const Vec4 &_vec) const noexcept;
+        constexpr Vec4 operator*(const Vec4& _vec) const noexcept;
 
-        constexpr Vec4 operator / (const Vec4 &_vec) const noexcept;
+        constexpr Vec4 operator/(const Vec4& _vec) const noexcept;
 
-        constexpr Vec4 &operator += (const Vec4 &_vec) noexcept;
+        Vec4& operator+=(const Vec4& _vec) noexcept;
 
-        constexpr Vec4 &operator -= (const Vec4 &_vec) noexcept;
+        Vec4& operator-=(const Vec4& _vec) noexcept;
 
-        constexpr Vec4 &operator *= (const Vec4 &_vec) noexcept;
+        Vec4& operator*=(const Vec4& _vec) noexcept;
 
-        constexpr Vec4 &operator /= (const Vec4 &_vec) noexcept;
+        Vec4& operator/=(const Vec4& _vec) noexcept;
 
-        constexpr Vec4 operator + (float _value) const noexcept;
+        constexpr Vec4 operator+(float _value) const noexcept;
 
-        constexpr Vec4 operator - (float _value) const noexcept;
+        constexpr Vec4 operator-(float _value) const noexcept;
 
-        constexpr Vec4 operator * (float _value) const noexcept;
+        constexpr Vec4 operator*(float _value) const noexcept;
 
-        constexpr Vec4 operator / (float _value) const noexcept;
+        constexpr Vec4 operator/(float _value) const noexcept;
 
-        constexpr Vec4 &operator += (float _value) noexcept;
+        Vec4& operator+=(float _value) noexcept;
 
-        constexpr Vec4 &operator -= (float _value) noexcept;
+        Vec4& operator-=(float _value) noexcept;
 
-        constexpr Vec4 &operator *= (float _value) noexcept;
+        Vec4& operator*=(float _value) noexcept;
 
-        constexpr Vec4 &operator /= (float _value) noexcept;
+        Vec4& operator/=(float _value) noexcept;
 
-        constexpr Vec4 operator -() noexcept;
+        constexpr Vec4 operator-() noexcept;
 
 #pragma endregion
 
     };
-    constexpr Vec4 operator * (float _value, const Vec4& vec) noexcept;
-    constexpr Vec4 operator / (float _value, const Vec4& vec) ;
+
+    constexpr Vec4 operator*(float _value, const Vec4& vec) noexcept;
+
+    constexpr Vec4 operator/(float _value, const Vec4& vec);
 
 };

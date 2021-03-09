@@ -144,7 +144,7 @@ namespace Solid
         deltaPos.x *= mouseSensitivity * Time::DeltaTime();
         deltaPos.y *= mouseSensitivity * Time::DeltaTime();
 
-        Vec3 rot = editorCameraT.GetRotation().GetEuler();
+        Vec3 rot = editorCameraT.GetRotation().ToEuler();
 
         /*rot.x += deltaPos.x;
         rot.y += deltaPos.y;

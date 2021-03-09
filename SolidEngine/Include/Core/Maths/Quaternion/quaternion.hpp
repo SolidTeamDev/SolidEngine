@@ -13,7 +13,7 @@ namespace Solid
         constexpr Quat()noexcept:x(0),y(0),z(0),w(1){}
         constexpr Quat(float _value) noexcept;
         constexpr Quat(float _x,float _y = 0, float _z = 0, float _w = 1) noexcept;
-        constexpr Quat(const Vec3& _axis) noexcept;
+        constexpr Quat(const Vec3& _axis) noexcept; //TODO fix
         constexpr Quat(const Quat& _copy) noexcept = default;
 
         ~Quat() = default;
@@ -56,7 +56,7 @@ namespace Solid
 
         Quat &Normalize() noexcept;
 
-        constexpr Quat GetNormalize() const noexcept;
+        constexpr Quat GetNormalized() const noexcept;
 
         constexpr Quat& Inverse();
 
@@ -72,7 +72,7 @@ namespace Solid
         constexpr Vec3 Unrotate(const Vec3& _vec) const;
         constexpr Quat Unrotate(const Quat& _quat) const;
 
-        Vec3 GetEuler() const;
+        Vec3 ToEuler() const;
 
         std::string ToString() noexcept;
 

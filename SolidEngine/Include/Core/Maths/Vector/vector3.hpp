@@ -15,10 +15,14 @@ namespace Solid
         float z;
 
         constexpr Vec3() noexcept = default;
-        constexpr Vec3(float _value)noexcept;
-        constexpr Vec3(float _x, float _y, float _z)noexcept;
-        constexpr Vec3(const Vec4& _copy)noexcept;
-        constexpr Vec3(const Vec3& _copy)noexcept;
+
+        constexpr Vec3(float _value) noexcept;
+
+        constexpr Vec3(float _x, float _y, float _z) noexcept;
+
+        constexpr Vec3(const Vec4& _copy) noexcept;
+
+        constexpr Vec3(const Vec3& _copy) noexcept;
 
         ~Vec3() = default;
 
@@ -33,15 +37,15 @@ namespace Solid
         static const Vec3 Forward;
         static const Vec3 Back;
 
-        static constexpr float Dot(const Vec3 &_v1,const Vec3 &_v2) noexcept;
+        static constexpr float Dot(const Vec3& _v1, const Vec3& _v2) noexcept;
 
-        static constexpr Vec3 Cross(const Vec3 &_v1,const Vec3 &_v2) noexcept;
+        static constexpr Vec3 Cross(const Vec3& _v1, const Vec3& _v2) noexcept;
 
-        static Vec3 Lerp(const Vec3& _v1,const Vec3& _v2, float _r) noexcept;
+        static Vec3 Lerp(const Vec3& _v1, const Vec3& _v2, float _r) noexcept;
 
-        static Vec3 Nlerp(const Vec3& _v1,const Vec3& _v2, float _r) noexcept;
+        static Vec3 Nlerp(const Vec3& _v1, const Vec3& _v2, float _r) noexcept;
 
-        static Vec3 Slerp(const Vec3& _v1,const Vec3& _v2, float _r) noexcept;
+        static Vec3 Slerp(const Vec3& _v1, const Vec3& _v2, float _r) noexcept;
 
 #pragma endregion
 #pragma region Methods
@@ -50,15 +54,15 @@ namespace Solid
 
         constexpr float Length() const noexcept;
 
-        Vec3 &Scale(float _scale) noexcept;
+        Vec3& Scale(float _scale) noexcept;
 
         constexpr Vec3 GetScaled(float _scale) const noexcept;
 
-        Vec3 &Unscale(float _scale) noexcept;
+        Vec3& Unscale(float _scale) noexcept;
 
         constexpr Vec3 GetUnscaled(float _scale) const noexcept;
 
-        Vec3 &Normalize() noexcept;
+        Vec3& Normalize() noexcept;
 
         constexpr Vec3 GetNormalize() const noexcept;
 
@@ -73,49 +77,51 @@ namespace Solid
 #pragma endregion
 #pragma region Operator
 
-        constexpr Vec3 &operator = (const Vec3& vec) noexcept = default;
+        constexpr Vec3& operator=(const Vec3& vec) noexcept = default;
 
-        constexpr bool operator == (const Vec3 &_vec) const noexcept;
+        constexpr bool operator==(const Vec3& _vec) const noexcept;
 
-        constexpr bool operator != (const Vec3 &_vec) const noexcept;
+        constexpr bool operator!=(const Vec3& _vec) const noexcept;
 
-        constexpr Vec3 operator + (const Vec3 &_vec) const noexcept;
+        constexpr Vec3 operator+(const Vec3& _vec) const noexcept;
 
-        constexpr Vec3 operator - (const Vec3 &_vec) const noexcept;
+        constexpr Vec3 operator-(const Vec3& _vec) const noexcept;
 
-        constexpr Vec3 operator * (const Vec3 &_vec) const noexcept;
+        constexpr Vec3 operator*(const Vec3& _vec) const noexcept;
 
-        constexpr Vec3 operator / (const Vec3 &_vec) const noexcept;
+        constexpr Vec3 operator/(const Vec3& _vec) const noexcept;
 
-        constexpr Vec3 &operator += (const Vec3 &_vec) noexcept;
+        Vec3& operator+=(const Vec3& _vec) noexcept;
 
-        constexpr Vec3 &operator -= (const Vec3 &_vec) noexcept;
+        Vec3& operator-=(const Vec3& _vec) noexcept;
 
-        constexpr Vec3 &operator *= (const Vec3 &_vec) noexcept;
+        Vec3& operator*=(const Vec3& _vec) noexcept;
 
-        constexpr Vec3 &operator /= (const Vec3 &_vec) noexcept;
+        Vec3& operator/=(const Vec3& _vec) noexcept;
 
-        constexpr Vec3 operator + (float _value) const noexcept;
+        constexpr Vec3 operator+(float _value) const noexcept;
 
-        constexpr Vec3 operator - (float _value) const noexcept;
+        constexpr Vec3 operator-(float _value) const noexcept;
 
-        constexpr Vec3 operator * (float _value) const noexcept;
+        constexpr Vec3 operator*(float _value) const noexcept;
 
-        constexpr Vec3 operator / (float _value) const noexcept;
+        constexpr Vec3 operator/(float _value) const noexcept;
 
-        constexpr Vec3 &operator += (float _value) noexcept;
+        Vec3& operator+=(float _value) noexcept;
 
-        constexpr Vec3 &operator -= (float _value) noexcept;
+        Vec3& operator-=(float _value) noexcept;
 
-        constexpr Vec3 &operator *= (float _value) noexcept;
+        Vec3& operator*=(float _value) noexcept;
 
-        constexpr Vec3 &operator /= (float _value) noexcept;
+        Vec3& operator/=(float _value) noexcept;
 
-        constexpr Vec3 operator -() noexcept;
+        constexpr Vec3 operator-() noexcept;
 
 #pragma endregion
 
     };
-    constexpr Vec3 operator * (float _value, const Vec3& vec) noexcept;
-    constexpr Vec3 operator / (float _value, const Vec3& vec) ;
+
+    constexpr Vec3 operator*(float _value, const Vec3& vec) noexcept;
+
+    constexpr Vec3 operator/(float _value, const Vec3& vec);
 };

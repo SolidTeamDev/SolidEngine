@@ -91,13 +91,13 @@ namespace Solid
 
         constexpr Vec2 operator / (const Vec2 &_vec) const noexcept;
 
-        constexpr Vec2 &operator += (const Vec2 &_vec) noexcept;
+        Vec2 &operator += (const Vec2 &_vec) noexcept;
 
-        constexpr Vec2 &operator -= (const Vec2 &_vec) noexcept;
+        Vec2 &operator -= (const Vec2 &_vec) noexcept;
 
-        constexpr Vec2 &operator *= (const Vec2 &_vec) noexcept;
+        Vec2 &operator *= (const Vec2 &_vec) noexcept;
 
-        constexpr Vec2 &operator /= (const Vec2 &_vec) noexcept;
+        Vec2 &operator /= (const Vec2 &_vec) noexcept;
 
         constexpr Vec2 operator + (float _value) const noexcept;
 
@@ -107,13 +107,13 @@ namespace Solid
 
         constexpr Vec2 operator / (float _value) const noexcept;
 
-        constexpr Vec2 &operator += (float _value) noexcept;
+        Vec2 &operator += (float _value) noexcept;
 
-        constexpr Vec2 &operator -= (float _value) noexcept;
+        Vec2 &operator -= (float _value) noexcept;
 
-        constexpr Vec2 &operator *= (float _value) noexcept;
+        Vec2 &operator *= (float _value) noexcept;
 
-        constexpr Vec2 &operator /= (float _value) noexcept;
+        Vec2 &operator /= (float _value) noexcept;
 
         constexpr Vec2 operator -() noexcept;
 

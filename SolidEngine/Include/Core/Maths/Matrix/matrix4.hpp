@@ -12,7 +12,7 @@ namespace Solid
 
 
     template<typename T = float>
-    struct SOLID_API Mat4
+    struct Mat4
     {
         std::array<T, 16> elements;
 
@@ -56,16 +56,16 @@ namespace Solid
         constexpr T& At(unsigned int _n, unsigned int _m)const;
 
         Mat4& Multiply(T _scale) noexcept;
-        constexpr Mat4 GetMultiply(T _scale) const noexcept;
+        constexpr Mat4 GetMultiplied(T _scale) const noexcept;
 
         Mat4& Divide(T _scale) noexcept;
-        constexpr Mat4 GetDivide(T _scale) const noexcept;
+        constexpr Mat4 GetDivided(T _scale) const noexcept;
 
         Mat4& Transpose() noexcept;
-        constexpr Mat4 GetTranspose() const noexcept;
+        constexpr Mat4 GetTransposed() const noexcept;
         constexpr Mat4 CoMatrix() noexcept;
         Mat4& Inverse() noexcept;
-        constexpr Mat4 GetInverse() const noexcept;
+        constexpr Mat4 GetInversed() const noexcept;
 
         constexpr float Determinant() const noexcept;
 

@@ -209,7 +209,8 @@ namespace Solid
     {
         return Vec3(x / _vec.x,y / _vec.y, z / _vec.z);
     }
-    constexpr Vec3 &Vec3::operator+=(const Vec3 &_vec) noexcept
+
+    Vec3 &Vec3::operator+=(const Vec3 &_vec) noexcept
     {
         x += _vec.x;
         y += _vec.y;
@@ -217,7 +218,7 @@ namespace Solid
         return *this;
     }
 
-    constexpr Vec3 &Vec3::operator-=(const Vec3 &_vec) noexcept
+    Vec3 &Vec3::operator-=(const Vec3 &_vec) noexcept
     {
         x -= _vec.x;
         y -= _vec.y;
@@ -225,7 +226,7 @@ namespace Solid
         return *this;
     }
 
-    constexpr Vec3 &Vec3::operator*=(const Vec3 &_vec) noexcept
+    Vec3 &Vec3::operator*=(const Vec3 &_vec) noexcept
     {
         x *= _vec.x;
         y *= _vec.y;
@@ -233,7 +234,7 @@ namespace Solid
         return *this;
     }
 
-    constexpr Vec3 &Vec3::operator/=(const Vec3 &_vec) noexcept
+    Vec3 &Vec3::operator/=(const Vec3 &_vec) noexcept
     {
         x /= _vec.x;
         y /= _vec.y;
@@ -262,7 +263,7 @@ namespace Solid
         return Vec3(x / _value,y / _value, z / _value);
     }
 
-    constexpr Vec3 &Vec3::operator+=( float _value) noexcept
+    Vec3 &Vec3::operator+=( float _value) noexcept
     {
         x += _value;
         y += _value;
@@ -270,7 +271,7 @@ namespace Solid
         return *this;
     }
 
-    constexpr Vec3 &Vec3::operator-=(float _value) noexcept
+    Vec3 &Vec3::operator-=(float _value) noexcept
     {
         x -= _value;
         y -= _value;
@@ -278,7 +279,7 @@ namespace Solid
         return *this;
     }
 
-    constexpr Vec3 &Vec3::operator*=(float _value) noexcept
+    Vec3 &Vec3::operator*=(float _value) noexcept
     {
         x *= _value;
         y *= _value;
@@ -286,7 +287,7 @@ namespace Solid
         return *this;
     }
 
-    constexpr Vec3 &Vec3::operator/=(float _value) noexcept
+    Vec3 &Vec3::operator/=(float _value) noexcept
     {
         x /= _value;
         y /= _value;

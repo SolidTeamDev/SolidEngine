@@ -63,7 +63,7 @@ namespace Solid
 
     Quat Quat::Nlerp(const Quat &_q1, const Quat &_q2, float _r) noexcept
     {
-        return Maths::Lerp<Quat>(_q1, _q2, _r).GetNormalize();
+        return Maths::Lerp<Quat>(_q1, _q2, _r).GetNormalized();
     }
 
     Quat Quat::Slerp(const Quat &_q1, const Quat &_q2, float _r) noexcept
@@ -145,7 +145,7 @@ namespace Solid
         return *this;
     }
 
-    constexpr Quat Quat::GetNormalize() const noexcept
+    constexpr Quat Quat::GetNormalized() const noexcept
     {
         float len = Length();
         if (len == 0)
@@ -246,7 +246,7 @@ namespace Solid
         return GetInversed().Rotate(_quat);
     }
 
-    Vec3 Quat::GetEuler() const
+    Vec3 Quat::ToEuler() const
     {
         Vec3 eulerAngle;
 
@@ -368,12 +368,12 @@ namespace Solid
 
     constexpr bool Quat::operator==(const Quat &_quat)
     {
-        return (x == _quat.x && y == _quat.y && z == _quat.z && w == _quat.w);
+        return IsEquals(_quat);
     }
 
     constexpr bool Quat::operator!=(const Quat &_quat)
     {
-        return !(x == _quat.x && y == _quat.y && z == _quat.z && w == _quat.w);
+        return !IsEquals(_quat);
 
     }
 

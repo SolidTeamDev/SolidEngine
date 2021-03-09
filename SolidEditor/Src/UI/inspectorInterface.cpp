@@ -43,7 +43,7 @@ namespace Solid
 
 
         Vec3 tempPos   = _trs.GetPosition();
-        Vec3 tempRot   = _trs.GetRotation().GetEuler();
+        Vec3 tempRot   = _trs.GetRotation().ToEuler();
         Vec3 tempScale = _trs.GetScale();
 
 

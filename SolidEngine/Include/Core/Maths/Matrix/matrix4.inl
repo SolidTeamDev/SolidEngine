@@ -241,7 +241,7 @@ namespace Solid
     }
 
     template<typename T>
-    constexpr Mat4<T> Mat4<T>::GetMultiply(T _scale) const noexcept
+    constexpr Mat4<T> Mat4<T>::GetMultiplied(T _scale) const noexcept
     {
         return Mat4(elements[0] * _scale, elements[1] * _scale, elements[2] * _scale, elements[3] * _scale,
                     elements[4] * _scale, elements[5] * _scale, elements[6] * _scale, elements[7] * _scale,
@@ -259,7 +259,7 @@ namespace Solid
     }
 
     template<typename T>
-    constexpr Mat4<T> Mat4<T>::GetDivide(T _scale) const noexcept
+    constexpr Mat4<T> Mat4<T>::GetDivided(T _scale) const noexcept
     {
         return Mat4(elements[0] / _scale, elements[1] / _scale, elements[2] / _scale, elements[3] / _scale,
                     elements[4] / _scale, elements[5] / _scale, elements[6] / _scale, elements[7] / _scale,
@@ -270,13 +270,13 @@ namespace Solid
     template<typename T>
     Mat4<T> &Mat4<T>::Transpose() noexcept
     {
-        *this->elements = GetTranspose();
+        *this->elements = GetTransposed();
 
         return *this;
     }
 
     template<typename T>
-    constexpr Mat4<T> Mat4<T>::GetTranspose() const noexcept
+    constexpr Mat4<T> Mat4<T>::GetTransposed() const noexcept
     {
         Mat4 Transpose;
         Transpose.elements[0] = elements[0];
@@ -359,7 +359,7 @@ namespace Solid
     }
 
     template<typename T>
-    constexpr Mat4<T> Mat4<T>::GetInverse() const noexcept
+    constexpr Mat4<T> Mat4<T>::GetInversed() const noexcept
     {
         Mat4 inverse;
         Mat4 AdjM = this->CoMatrix().Transpose();
@@ -550,7 +550,7 @@ namespace Solid
     template<typename T>
     constexpr Mat4<T> Mat4<T>::operator/(const Mat4<T> &_mat) const noexcept
     {
-        return GetInverse();
+        return GetInversed();
     }
 
     template<typename T>
