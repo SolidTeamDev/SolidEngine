@@ -98,7 +98,7 @@ namespace Solid
         ADD(engine, e6)
         ADD(engine, e7)
         ADD(engine, e8)
-        
+
         glfwSwapInterval(0);
 
         while (!glfwWindowShouldClose(window->GetHandle()))
