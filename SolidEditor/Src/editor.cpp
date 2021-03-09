@@ -10,20 +10,8 @@
 
 #include <string>
 
-
-
-
 namespace Solid
 {
-    void add(Engine& e, Entity x)
-    {
-    e.ecsManager.AddComponent(x,Transform{});
-    e.ecsManager.AddComponent(x,MeshRenderer{
-            .mesh   = dynamic_cast<MeshResource*>(e.resourceManager->GetResourceByName("towerWNorms.obj")),
-            .shader = dynamic_cast<ShaderResource*>(e.resourceManager->GetResourceByName("ZShader"))
-    });}
-
-#define ADD(e,x) add(e,x);
     Framebuffer Editor::sceneFramebuffer;
 
     Editor::Editor()
@@ -81,23 +69,6 @@ namespace Solid
             //Ressource Manager do not have this type of resourcesList
         //else;
              //Resource Manager Have a ResourceList for this type
-
-        Entity entity = engine.ecsManager.CreateEntity();
-        Entity  e8=engine.ecsManager.CreateEntity(entity);
-        Entity  e6=engine.ecsManager.CreateEntity(entity);
-        Entity  e5=engine.ecsManager.CreateEntity(entity);
-        Entity  e2 = engine.ecsManager.CreateEntity(entity);
-        Entity  e3 = engine.ecsManager.CreateEntity(e2);
-        Entity  e4 = engine.ecsManager.CreateEntity(e3);
-        Entity  e7= engine.ecsManager.CreateEntity();
-        ADD(engine, entity)
-        ADD(engine, e2)
-        ADD(engine, e3)
-        ADD(engine, e4)
-        ADD(engine, e5)
-        ADD(engine, e6)
-        ADD(engine, e7)
-        ADD(engine, e8)
 
         glfwSwapInterval(0);
 

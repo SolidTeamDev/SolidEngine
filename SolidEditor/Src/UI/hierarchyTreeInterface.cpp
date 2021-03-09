@@ -1,7 +1,7 @@
 #include "UI/hierarchyTreeInterface.hpp"
 #include "UI/editorInterface.hpp"
 #include <imgui.h>
-
+#include "ECS/Components/meshRenderer.hpp"
 
 
 namespace Solid
@@ -15,27 +15,37 @@ namespace Solid
 
         UI::Begin("Hierarchy", &p_open,
                   ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
-        UI::TextWrapped("Welcome on the Solid hierarchy tree!");
 
         for(GameObject* g : _engine->ecsManager.GetWorld()->childs)
         {
             DrawEntities(g,0);
         }
-        DrawCreateObject();
+        DrawCreateObject(_engine);
 
         UI::End();
     }
 }
 
-void Solid::HierarchyTreeInterface::DrawCreateObject()
+void Solid::HierarchyTreeInterface::DrawCreateObject(Engine* _engine)
 {
     if(UI::BeginPopupContextWindow("createObject"))
     {
         if(UI::BeginMenu("New"))
         {
+            if(UI::MenuItem("GameObject"))
+            {
+                Entity tmp = _engine->ecsManager.CreateEntity();
+                _engine->ecsManager.AddComponent(tmp,Transform());
+            }
+            UI::Separator();
             if(UI::MenuItem("Cube"))
             {
-
+                Entity tmp = _engine->ecsManager.CreateEntity();
+                _engine->ecsManager.AddComponent(tmp,Transform());
+                _engine->ecsManager.AddComponent(tmp,MeshRenderer{
+                        .mesh   = dynamic_cast<MeshResource*>(_engine->resourceManager->GetResourceByName("cube.obj")),
+                        .shader = dynamic_cast<ShaderResource*>(_engine->resourceManager->GetResourceByName("ZShader"))
+                });
             }
             if(UI::MenuItem("Sphere"))
             {
@@ -43,7 +53,12 @@ void Solid::HierarchyTreeInterface::DrawCreateObject()
             }
             if(UI::MenuItem("Solid"))
             {
-
+                Entity tmp = _engine->ecsManager.CreateEntity();
+                _engine->ecsManager.AddComponent(tmp,Transform());
+                _engine->ecsManager.AddComponent(tmp,MeshRenderer{
+                        .mesh   = dynamic_cast<MeshResource*>(_engine->resourceManager->GetResourceByName("solid.obj")),
+                        .shader = dynamic_cast<ShaderResource*>(_engine->resourceManager->GetResourceByName("ZShader"))
+                });
             }
             UI::EndMenu();
         }
@@ -81,7 +96,7 @@ void Solid::HierarchyTreeInterface::DrawEntity(GameObject* child)
     UI::PushStyleColor(ImGuiCol_Button, colButton);
     UI::PushStyleColor(ImGuiCol_ButtonHovered, colButton);
 
-    if(UI::SmallButton(child->name.c_str()))
+    if(UI::SmallButton((child->name + "##" +std::to_string(child->GetEntity())).c_str()))
         EditorInterface::selectedGO = child;
 
     UI::PopStyleColor(2);
