@@ -12,7 +12,7 @@ namespace Solid
         ~HierarchyTreeInterface() = default;
 
         void Draw(Engine* _engine);
-        void DrawCreateObject();
+        void DrawCreateObject(Engine* _engine);
 
         void DrawEntities(GameObject* child, uint it);
         void DrawEntity(GameObject* child);

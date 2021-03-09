@@ -27,7 +27,7 @@ namespace Solid
         if (gameObject == nullptr)
             return;
 
-        UI::Text("Name: %s", gameObject->name.c_str());
+        UI::Text("Name: ");
         EditText(gameObject->name, "##name");
 
         EditTransform(_engine->ecsManager.GetComponent<Transform>(gameObject->GetEntity()));
