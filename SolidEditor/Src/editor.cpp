@@ -38,6 +38,8 @@ namespace Solid
         InitEditorInputList(editorInputManager);
 
         sceneFramebuffer = engine.renderer->CreateFramebuffer(window->GetWindowSize());
+
+        LoadResources();
     }
 
     Editor::~Editor()
@@ -50,25 +52,6 @@ namespace Solid
         Window* window = engine.window;
         Renderer* renderer = engine.renderer;
         EditorInterface editorInterface(window);
-
-        engine.EnableMultiThread(true);
-
-        ResourcesLoader loader;
-
-        loader.SetManager(engine.resourceManager);
-        fs::path p = fs::current_path().append("Resources");
-
-        auto before = std::chrono::high_resolution_clock::now();
-        loader.LoadResourcesFromFolder(p);
-        auto after = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<double, std::ratio<1,1000>> fp_s = after - before;
-        std::cout << "Loading MT has Taken " << fp_s.count() << " milliseconds\n";
-        engine.EnableMultiThread(false);
-        //std::vector<Resource*>* Meshes= engine.resourceManager->GetResourcesVecByType<MeshResource>();
-        //if(Meshes == nullptr);
-            //Ressource Manager do not have this type of resourcesList
-        //else;
-             //Resource Manager Have a ResourceList for this type
 
         glfwSwapInterval(0);
 
@@ -95,6 +78,23 @@ namespace Solid
             window->SwapBuffers();
         }
 
+    }
+
+    void Editor::LoadResources()
+    {
+        engine.EnableMultiThread(true);
+
+        ResourcesLoader loader;
+
+        loader.SetManager(engine.resourceManager);
+        fs::path p = fs::current_path().append("Resources");
+
+        auto before = std::chrono::high_resolution_clock::now();
+        loader.LoadResourcesFromFolder(p);
+        auto after = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double, std::ratio<1,1000>> fp_s = after - before;
+        std::cout << "Loading MT has Taken " << fp_s.count() << " milliseconds\n";
+        engine.EnableMultiThread(false);
     }
 
     void Editor::UpdateEditorCamera()

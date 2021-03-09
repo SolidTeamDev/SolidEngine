@@ -15,6 +15,7 @@ namespace Solid
         Camera editorCamera;
 
         void UpdateEditorCamera();
+        void LoadResources();
     public:
 
         static Framebuffer sceneFramebuffer;
