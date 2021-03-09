@@ -2,7 +2,7 @@
 // Created by ryan1 on 23/02/2021.
 //
 
-#include "GameCompiler/ameCompiler.hpp"
+#include "GameCompiler/gameCompiler.hpp"
 #include <fstream>
 
 // ifstream = read  / ofstream = write
@@ -10,6 +10,16 @@
 
 namespace Solid
 {
+    GameCompiler* GameCompiler::instance = nullptr;
+    std::mutex GameCompiler::mutex = std::mutex();
+    GameCompiler * GameCompiler::GetInstance()
+    {
+        std::lock_guard<std::mutex> lck(mutex);
+        if(instance == nullptr)
+            instance = new GameCompiler();
+        return instance;
+    }
+
     void GameCompiler::LaunchCompile()
     {
         fs::path log = p;

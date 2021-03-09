@@ -38,6 +38,7 @@ namespace Solid
         InitEditorInputList(editorInputManager);
 
         sceneFramebuffer = engine.renderer->CreateFramebuffer(window->GetWindowSize());
+        Compiler = GameCompiler::GetInstance();
     }
 
     Editor::~Editor()
