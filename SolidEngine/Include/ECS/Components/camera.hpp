@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Types/extendedTypes.hpp"
+#include "Core/Maths/Vector/vector2.hpp"
 #include "Core/Maths/Matrix/matrix4.hpp"
 #include "Core/Maths/Quaternion/quaternion.hpp"
 #include "transform.hpp"
@@ -24,6 +24,6 @@ namespace Solid
         Mat4<float> GetView();
         Mat4<float> GetProjection() const;
 
-        void UpdateCamera(const Int2 _spaceScreen);
+        void UpdateCamera(const Vec2i _spaceScreen);
     };
 } //!namespace

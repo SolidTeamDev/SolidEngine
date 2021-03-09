@@ -10,6 +10,18 @@ namespace Solid
 
     struct Vec4;
 
+    //TODO: SEE TO TEMPLATE VECTOR
+
+    struct SOLID_API Vec2i
+    {
+        int x;
+        int y;
+    };
+    struct SOLID_API Vec2d
+    {
+        double x;
+        double y;
+    };
     struct SOLID_API Vec2
     {
         float x;

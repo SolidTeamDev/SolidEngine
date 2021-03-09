@@ -5,8 +5,7 @@
 #include <GLFW/glfw3.h>
 
 #include "Build/solidAPI.hpp"
-
-#include "Types/extendedTypes.hpp"
+#include "Core/Maths/Vector/vector2.hpp"
 
 namespace Solid
 {
@@ -14,7 +13,7 @@ namespace Solid
     struct SOLID_API WindowParams
     {
         std::string title;
-        Int2 windowSize;
+        Vec2i windowSize;
     };
 
     /**
@@ -25,7 +24,7 @@ namespace Solid
     private:
         GLFWwindow* window = nullptr;
         std::string title = "SolidWindow";
-        Int2 windowSize = {1280,720};
+        Vec2i windowSize = {1280,720};
     public:
 
         Window(const WindowParams& _wParam);
@@ -42,7 +41,7 @@ namespace Solid
         GLFWwindow* GetHandle() const;
 
         [[nodiscard]]
-        Int2 GetWindowSize() const;
+        Vec2i GetWindowSize() const;
 
     };
 

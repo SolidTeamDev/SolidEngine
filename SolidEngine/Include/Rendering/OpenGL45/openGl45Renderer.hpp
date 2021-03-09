@@ -18,10 +18,10 @@ namespace Solid
         static void GLDebugCallback(GLenum _source, GLenum _type, GLuint _id, GLenum _severity, GLsizei _length,
                                     const GLchar* _message, const void* _userParam);
 
-        void Clear(const Int2& _windowSize) const final;
-        void ClearColor(const Float4& _clearColor) const final;
+        void Clear(const Vec2i& _windowSize) const final;
+        void ClearColor(const Vec4& _clearColor) const final;
         [[nodiscard]]
-        Framebuffer CreateFramebuffer(const Int2& _size) const final;
+        Framebuffer CreateFramebuffer(const Vec2i& _size) const final;
 
         void UpdateFramebuffer(const Framebuffer& _framebuffer) const final;
 

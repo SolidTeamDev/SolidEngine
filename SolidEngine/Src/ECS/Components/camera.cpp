@@ -23,7 +23,7 @@ namespace Solid
         return projection;
     }
 
-    void Camera::UpdateCamera(const Int2 _spaceScreen)
+    void Camera::UpdateCamera(const Vec2i _spaceScreen)
     {
         view       = transform.GetMatrix();
         projection = Mat4<>::Perspective(fov,(float)_spaceScreen.x / (float)_spaceScreen.y,near,far);

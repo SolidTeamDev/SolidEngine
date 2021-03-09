@@ -52,7 +52,7 @@ namespace Solid
         return window;
     }
 
-    Int2 Window::GetWindowSize() const
+    Vec2i Window::GetWindowSize() const
     {
         return windowSize;
     }

@@ -105,9 +105,9 @@ namespace Solid
 
         //== Mouse
 
-        Double2 mousePos{};
+        Vec2d mousePos{};
         editorInputManager->GetCursorPos(mousePos.x,mousePos.y);
-        Double2 deltaPos {mousePos.x - sceneFramebuffer.size.x/2,
+        Vec2d deltaPos {mousePos.x - sceneFramebuffer.size.x/2,
                           mousePos.y - sceneFramebuffer.size.y/2};
 
         float mouseSensitivity = 0.1f;

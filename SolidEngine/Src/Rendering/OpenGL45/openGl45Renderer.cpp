@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 
 #include "Core/Debug/debug.hpp"
+#include "Core/Maths/Vector/vector4.hpp"
 
 namespace Solid
 {
@@ -14,7 +15,7 @@ namespace Solid
         std::lock_guard<std::mutex>lck(mutex);
         if(pInstance != nullptr)
         {
-            ThrowError("Renderer Already Initialzed", ESolidErrorCode::S_INIT_ERROR);
+            throw ThrowError("Renderer already initialized", ESolidErrorCode::S_INIT_ERROR);
         }
         pInstance = new OpenGL45Renderer();
         return pInstance;
@@ -54,18 +55,18 @@ namespace Solid
         Log::Send("OpenGL Debug : " + std::string(_message), logSeverity);
     }
 
-    void OpenGL45Renderer::Clear(const Int2& _windowSize) const
+    void OpenGL45Renderer::Clear(const Vec2i& _windowSize) const
     {
         glViewport(0,0,_windowSize.x,_windowSize.y);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    void OpenGL45Renderer::ClearColor(const Float4 &_clearColor) const
+    void OpenGL45Renderer::ClearColor(const Vec4& _clearColor) const
     {
         glClearColor(_clearColor.x,_clearColor.y,_clearColor.z,_clearColor.w);
     }
 
-    Framebuffer OpenGL45Renderer::CreateFramebuffer(const Int2& _size) const
+    Framebuffer OpenGL45Renderer::CreateFramebuffer(const Vec2i& _size) const
     {
         Framebuffer framebuffer;
 

@@ -58,9 +58,9 @@ namespace Solid
             char* b = nullptr;
         };
         //TODO: Wrapping functions
-        virtual void Clear(const Int2& _windowSize) const = 0;
-        virtual void ClearColor(const Float4& _clearColor) const = 0;
-        virtual Framebuffer CreateFramebuffer(const Int2& _size) const = 0;
+        virtual void Clear(const Vec2i& _windowSize) const = 0;
+        virtual void ClearColor(const Vec4& _clearColor) const = 0;
+        virtual Framebuffer CreateFramebuffer(const Vec2i& _size) const = 0;
         virtual void UpdateFramebuffer(const Framebuffer& _framebuffer) const = 0;
         virtual void BeginFramebuffer(const Framebuffer& _framebuffer) const = 0;
         virtual void EndFramebuffer() const = 0;
