@@ -2,7 +2,7 @@
 
 namespace Solid
 {
-
+    // RC: ?
     struct Int2
     {
         int x; int y;

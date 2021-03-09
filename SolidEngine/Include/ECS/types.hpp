@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <bitset>
 
+// RC: Not in Solid:: ?
 using Entity = std::uint32_t;
 const Entity MAX_ENTITIES = 10000;
 

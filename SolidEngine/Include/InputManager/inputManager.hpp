@@ -29,6 +29,7 @@ namespace Solid
     class InputManager
     {
     private:
+        // RC: nested class in template class is BAD! Multiple definition.
         enum class InputType
         {
             KEY,
@@ -42,12 +43,13 @@ namespace Solid
             InputType inputType;
             int key;
             int joystickId;
-            bool isPressed;
-            bool isReleased;
+            bool isPressed;     // RC: Bad name: an input is either pressed or released.
+            bool isReleased;    // RC: Bad name: an input is either pressed or released.
         };
         GLFWwindow* window;
         std::unordered_map<T,Input> inputList;
 
+        // RC: NORM ? 
         static void joystickCallBack(int jid, int event)
         {
             if(event == GLFW_CONNECTED)
@@ -184,6 +186,11 @@ namespace Solid
                 }
                 else
                 {
+                    /**
+                    * RC:
+                    * input.isPressed = inputPressed;
+                    * input.isReleased = !inputPressed;
+                    */
                     if(inputPressed)
                     {
                         input.isPressed = true;

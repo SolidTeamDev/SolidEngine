@@ -5,7 +5,7 @@
 
 namespace Solid
 {
-
+    // RC: Rendering architecture?
     class SOLID_API OpenGL45Renderer : public Renderer
     {
     private:

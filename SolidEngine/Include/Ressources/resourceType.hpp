@@ -34,7 +34,7 @@ namespace Solid {
 
         static int NoNameNum;
     protected:
-        EResourceType type;
+        EResourceType type; // RC: should be public const.
         fs::path path;
     public:
         std::string name;
@@ -65,6 +65,7 @@ namespace Solid {
     };
 
 
+// RC: ??
 /// TEMPORARY STRUCTS
     struct SOLID_API v2
     {
@@ -98,18 +99,19 @@ namespace Solid {
         v2 TexCoords;
     };
 
+
     class SOLID_API MeshResource : public Resource
     {
 
 
     public:
-        uint VAO = 0;
+        //uint VAO = 0;
 
         class SubMesh
         {
         public:
-            uint VBO = 0;
-            uint EBO = 0;
+            //uint VBO = 0; // RC: Part of Mesh renderer.
+            //uint EBO = 0; // RC: Part of Mesh renderer.
             std::vector<Vertex> vertices;
             std::vector<uint> indices;
         };

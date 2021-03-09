@@ -123,13 +123,19 @@ namespace Solid
     template<typename T>
     Mat4<T> Mat4<T>::Perspective(float _fov, float _aspect, float _near, float _far)
     {
-        float ymax = tanf(_fov * 3.14f / 180.f / 2.f);
-        float xmax = ymax * _aspect;
+        T ymax = tanf(_fov * 3.14f / 180.f / 2.f);
+        T xmax = ymax * _aspect;
 
-        Mat4<T> m;
+        return Mat4(
+            T(1) / xmax, T(0), T(0), T(0),
+            T(0), 1 / ymax
+        );
+
+        Mat4 m;
 
         float temp = _far - _near;
 
+        // RC: Value 0.0 is by default, no need to re-write them.
         m.elements[0] = 1 / xmax;
         m.elements[1] = 0.0;
         m.elements[2] = 0.0;
@@ -161,6 +167,8 @@ namespace Solid
     template<typename T>
     constexpr bool Mat4<T>::IsZero() const noexcept
     {
+        // Function can't be constexpr with a loop.
+
         for (unsigned int i = 0; i < 16; i++)
         {
             if (!Maths::Equals0(elements[i]))
@@ -205,7 +213,7 @@ namespace Solid
     }
 
     template<typename T>
-    T &Mat4<T>::At(unsigned int _index)
+    T &Mat4<T>::At(unsigned int _index) // RC: INDENTATION? T &Mat4<T>
     {
         return elements[_index];
     }

@@ -52,6 +52,12 @@ namespace Solid
 
         void operator()() //override
         {
+            /**
+            * RC:
+            *   if(func)
+            *       func();
+            */
+
             if(!func)
                 return ;
             func();

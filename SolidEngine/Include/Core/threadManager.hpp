@@ -26,7 +26,7 @@ namespace Solid
         int ID = 0;
     };
 
-
+    // RC: Code in .hpp / SOLID_API useless.
     void SOLID_API RunThread(struct Thread *_self, T_Internal* _self_Internal, std::mutex& _selfInternalMutex);
     class SOLID_API Thread
     {
@@ -160,6 +160,7 @@ namespace Solid
     public:
         ThreadManager(TaskManager* _Manager);
         ~ThreadManager() = default;
+        // RC: [[maybe_unused]] BAD!
         [[maybe_unused]] ThreadManager& PlayAllThreads();
         [[maybe_unused]] ThreadManager& PauseAllThreads();
         [[maybe_unused]] ThreadManager& joinAllThread();

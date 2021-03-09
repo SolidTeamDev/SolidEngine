@@ -134,6 +134,7 @@ namespace Solid
 
         glGenVertexArrays(1, &_m->VAO);
         for (MeshResource::SubMesh& sub : _m->Meshes) {
+            // RC: SHould be in class Mesh in renderer.
             glGenBuffers(1, &sub.VBO);
             glGenBuffers(1, &sub.EBO);
             glBindVertexArray(_m->VAO);
@@ -215,6 +216,7 @@ namespace Solid
         glGetProgramiv(compute.pID, GL_LINK_STATUS, &linkStatus);
         if (linkStatus == GL_FALSE)
         {
+            // RC: Def macro in function????
 #ifndef ARRAYSIZE
 #define ARRAYSIZE(arr) (sizeof(arr) / sizeof(arr[0]))
 #endif
@@ -277,6 +279,7 @@ namespace Solid
 
             if(ErrorCode == GL_INVALID_ENUM)
             {
+                // RC: Solid::Log?
                 printf("Binary Format = %u is not a value recognized by the implementation.\n", _binary.format);
             }
             if(ErrorCode == GL_INVALID_OPERATION )
