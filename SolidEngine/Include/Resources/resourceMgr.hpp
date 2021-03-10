@@ -10,32 +10,34 @@
 namespace fs = std::filesystem;
 namespace Solid
 {
+
+    template<class T>
+    struct SOLID_API ResourceList
+    {
+        std::unordered_map<std::string,Resource*> List;
+        const char* type_value = typeid(T*).name();
+        ~ResourceList()
+        {
+            for(auto& r : List)
+            {
+                if(r.second != nullptr)
+                    delete r.second;
+            }
+        }
+        T* Find(const char* name)
+        {
+            auto it = List.find(name);
+            if(it == List.end())
+                return nullptr;
+            else
+                return (T*)it->second;
+
+        }
+    };
+
     class SOLID_API ResourceManager
     {
-        template<class T>
-        struct ResourceList
-        {
-            std::unordered_map<std::string,T*> List;
-            const char* type_value = typeid(T*).name();
-            ~ResourceList()
-            {
-                for(auto& r : List)
-                {
-                    if(r.second != nullptr)
-                        delete r.second;
-                }
-            }
-            T* Find(const char* name)
-            {
-                auto it = List.find(name);
-                if(it == List.end())
-                    return nullptr;
-                else
-                    return it->second;
-
-            }
-        };
-
+    private:
 
         ResourceList<ImageResource>          ImageList;
         ResourceList<MeshResource>           MeshList;
@@ -77,7 +79,7 @@ namespace Solid
 	    ComputeShaderResource* GetRawComputeByName(const char* name);
 
         template<typename T>
-        std::unordered_map<std::string,T*> * GetResourcesVecByType()
+        std::unordered_map<std::string,Resource*> * GetResourcesVecByType()
         {
             std::string_view type_value = typeid(T*).name();
             if(type_value == ImageList.type_value)
@@ -104,7 +106,7 @@ namespace Solid
             return nullptr;
         }
 	    template<typename T>
-	    std::unordered_map<std::string,T*> * GetResourcesVecByType(EResourceType _type)
+	    std::unordered_map<std::string,Resource*> * GetResourcesVecByType(EResourceType _type)
 	    {
 		    switch (_type)
 		    {

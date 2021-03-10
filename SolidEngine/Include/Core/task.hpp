@@ -6,7 +6,7 @@
 #define SOLIDENGINE_TASK_HPP
 
 
-
+#include <atomic>
 
 namespace Solid
 {

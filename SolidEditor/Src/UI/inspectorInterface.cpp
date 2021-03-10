@@ -5,7 +5,7 @@
 #include <imgui_stdlib.h>
 namespace Solid
 {
-    void InspectorInterface::Draw(Engine* _engine)
+    void InspectorInterface::Draw()
     {
         if(!p_open)
             return;
@@ -21,30 +21,32 @@ namespace Solid
             return;
         }
 
-        DrawComponents(_engine);
+        DrawComponents();
 
-        AddComponents(_engine);
+        AddComponents();
 
         UI::End();
     }
 
-    void InspectorInterface::DrawComponents(Engine* _engine)
+    void InspectorInterface::DrawComponents()
     {
+        Engine*     engine = Engine::GetInstance();
         GameObject* gameObject = EditorInterface::selectedGO;
 
         UI::Text("Name: ");
         EditText(gameObject->name, "##name");
 
-        EditTransform(_engine->ecsManager.GetComponent<Transform>(gameObject->GetEntity()));
+        EditTransform(engine->ecsManager.GetComponent<Transform>(gameObject->GetEntity()));
 
-        if(_engine->ecsManager.GotComponent<MeshRenderer>(gameObject->GetEntity()))
+        if(engine->ecsManager.GotComponent<MeshRenderer>(gameObject->GetEntity()))
         {
-            EditMeshRenderer(_engine->ecsManager.GetComponent<MeshRenderer>(gameObject->GetEntity()));
+            EditMeshRenderer(engine->ecsManager.GetComponent<MeshRenderer>(gameObject->GetEntity()));
         }
     }
 
-    void InspectorInterface::AddComponents(Engine* _engine)
+    void InspectorInterface::AddComponents()
     {
+        Engine*     engine = Engine::GetInstance();
         GameObject* gameObject = EditorInterface::selectedGO;
 
         if(UI::Button("Add Component",ImVec2(-1, 0)))
@@ -52,11 +54,11 @@ namespace Solid
 
         if(UI::BeginPopup("AddComponent"))
         {
-            if(!_engine->ecsManager.GotComponent<MeshRenderer>(gameObject->GetEntity()))
+            if(!engine->ecsManager.GotComponent<MeshRenderer>(gameObject->GetEntity()))
             {
                 if(UI::Button("Mesh renderer"))
                 {
-                    _engine->ecsManager.AddComponent(gameObject->GetEntity(),MeshRenderer());
+                    engine->ecsManager.AddComponent(gameObject->GetEntity(),MeshRenderer());
                 }
             }
             UI::EndPopup();
@@ -93,19 +95,45 @@ namespace Solid
     {
         if(UI::CollapsingHeader("MeshRenderer",ImGuiTreeNodeFlags_DefaultOpen))
         {
-            const char* meshName = _meshRenderer.mesh == nullptr ? "" : _meshRenderer.mesh->_name.c_str();
+            Engine* engine = Engine::GetInstance();
+            const char* meshName = _meshRenderer.mesh == nullptr ? "" : _meshRenderer.mesh->name.c_str();
 
             UI::Text("Mesh  ");UI::SameLine();
             if(UI::BeginCombo("##Mesh", meshName))
             {
+                auto* meshList = engine->resourceManager->GetResourcesVecByType<MeshResource>();
+
+                for(auto mesh : *meshList)
+                {
+                    bool selected = (meshName == mesh.second->name);
+                    if(UI::Selectable(mesh.second->name.c_str(), selected))
+                    {
+                        _meshRenderer.mesh = engine->graphicsResourceMgr.GetMesh(mesh.second->name.c_str());
+                    }
+                    if(selected)
+                        UI::SetItemDefaultFocus();
+                }
+
                 UI::EndCombo();
             }
 
-            const char* shaderName = _meshRenderer.shader == nullptr ? "" : _meshRenderer.shader->_name.c_str();
+            const char* shaderName = _meshRenderer.shader == nullptr ? "" : _meshRenderer.shader->name.c_str();
 
             UI::Text("Shader");UI::SameLine();
             if(UI::BeginCombo("##Shader", shaderName))
             {
+                auto* shaderList = engine->resourceManager->GetResourcesVecByType<ShaderResource>();
+
+                for(auto shader : *shaderList)
+                {
+                    bool selected = (meshName == shader.second->name);
+                    if(UI::Selectable(shader.second->name.c_str(), selected))
+                    {
+                        _meshRenderer.shader = engine->graphicsResourceMgr.GetShader(shader.second->name.c_str());
+                    }
+                    if(selected)
+                        UI::SetItemDefaultFocus();
+                }
                 UI::EndCombo();
             }
         }

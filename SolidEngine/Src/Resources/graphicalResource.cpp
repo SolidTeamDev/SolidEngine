@@ -10,6 +10,8 @@
 using namespace Solid;
 GL::Mesh::Mesh(MeshResource *_raw)
 {
+    name = _raw->name;
+
 	glGenVertexArrays(1, &VAO);
 	Meshes.resize(_raw->Meshes.size());
 	for (int i = 0; i < _raw->Meshes.size(); ++i) {
@@ -42,7 +44,10 @@ void GL::Mesh::Init(MeshResource *_raw)
 {
 	if(bIsInit)
 		return;
-	glGenVertexArrays(1, &VAO);
+
+    name = _raw->name;
+
+    glGenVertexArrays(1, &VAO);
 	Meshes.resize(_raw->Meshes.size());
 	for (int i = 0; i < _raw->Meshes.size(); ++i)
 	{
@@ -90,7 +95,9 @@ void GL::Mesh::DrawMesh()
 
 GL::Shader::Shader(ShaderResource *_s) :IShader(EResourceType::Shader)
 {
-	std::vector<char*> tab;
+    name = _s->name;
+
+    std::vector<char*> tab;
 	tab.push_back(_s->VertexSource.data());
 	ShaderWrapper vShader = CreateShader(GL_VERTEX_SHADER, 1, tab);
 	tab.clear();
@@ -117,7 +124,9 @@ GL::Shader::Shader(ShaderResource *_s) :IShader(EResourceType::Shader)
 
 GL::ComputeShader::ComputeShader(ComputeShaderResource *_cs) :Shader(EResourceType::Compute)
 {
-	//use binaries if available
+    name = _cs->name;
+
+    //use binaries if available
 	std::vector<char*> tab;
 	tab.push_back(_cs->ComputeSource.data());
 	ShaderWrapper compute = CreateShader(GL_COMPUTE_SHADER, 1, tab);

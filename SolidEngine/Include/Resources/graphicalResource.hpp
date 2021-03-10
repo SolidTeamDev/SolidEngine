@@ -4,7 +4,9 @@
 
 #ifndef SOLIDEDITOR_GRAPHICALRESOURCE_HPP
 #define SOLIDEDITOR_GRAPHICALRESOURCE_HPP
+
 #include "graphicalResourceInterface.hpp"
+
 namespace Solid
 {
 	namespace GL
@@ -54,7 +56,7 @@ namespace Solid
 			Shader():IShader(EResourceType::Shader){}
 			Shader(ShaderResource* _s);
 			Shader(EResourceType _type):IShader(_type){}
-			ShaderWrapper CreateShader(GLenum _type, int _sourceCount, std::vector<char*>& _sources);
+			ShaderWrapper CreateShader(uint _type, int _sourceCount, std::vector<char*>& _sources);
 			virtual void SetFloat(const char *_name, float _value) override;
 
 			virtual void SetMVP(Transform& _model, Camera& _camera) override;

@@ -14,7 +14,7 @@ namespace Solid
 	{
 	public:
 		//public members
-
+        std::string name;
 	protected:
 		//protected members
 
@@ -31,6 +31,7 @@ namespace Solid
 	{
 	public:
 		//public members
+		std::string name;
 		const EResourceType type;
 	protected:
 		//protected members

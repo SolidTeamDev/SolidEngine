@@ -49,22 +49,22 @@ void ResourceManager::AddResource(Resource *r)
 			break;
 		case EResourceType::Shader:
 			ShaderList.List.emplace(r->name, (ShaderResource*)r);
-			break;
+            break;
 		case EResourceType::Material:
 			MaterialList.List.emplace(r->name, (MaterialResource*)r);
-			break;
+            break;
 		case EResourceType::Compute:
 			ComputeList.List.emplace(r->name, (ComputeShaderResource*)r);
-			break;
+            break;
 		case EResourceType::Image:
 			ImageList.List.emplace(r->name, (ImageResource*)r);
-			break;
+            break;
 		case EResourceType::Texture:
 			TextureList.List.emplace(r->name, (TextureResource*)r);
-			break;
+            break;
 		case EResourceType::Anim:
 			AnimList.List.emplace(r->name, (AnimResource*)r);
-			break;
+            break;
 		default:
 			ThrowError("Type Not Stored", ESolidErrorCode::S_INIT_ERROR);
 			break;
@@ -157,7 +157,7 @@ MeshResource* ResourceManager::GetRawMeshByName(const char* _name)
 	auto it = list.find(_name);
 	if(it == list.end())
 		return nullptr;
-	return it->second;
+	return (MeshResource*)it->second;
 }
 
 ShaderResource* ResourceManager::GetRawShaderByName(const char* _name)
@@ -166,7 +166,7 @@ ShaderResource* ResourceManager::GetRawShaderByName(const char* _name)
 	auto it = list.find(_name);
 	if(it == list.end())
 		return nullptr;
-	return it->second;
+	return (ShaderResource*)it->second;
 }
 
 ComputeShaderResource* ResourceManager::GetRawComputeByName(const char* _name)
@@ -175,7 +175,7 @@ ComputeShaderResource* ResourceManager::GetRawComputeByName(const char* _name)
 	auto it = list.find(_name);
 	if(it == list.end())
 		return nullptr;
-	return it->second;
+	return (ComputeShaderResource*)it->second;
 }
 
 ResourceManager * ResourceManager::Initialize(Engine* e)
