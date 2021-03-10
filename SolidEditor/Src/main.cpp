@@ -1,6 +1,6 @@
 #include <iostream>
 #include "Core/engine.hpp"
-#include "Ressources/ressources.hpp"
+#include "Resources/ressources.hpp"
 #include "editor.hpp"
 #include <chrono>
 int main()

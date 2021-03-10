@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Ressources/ressources.hpp"
-
+#include "Resources/ressources.hpp"
+#include "Resources/graphicalResource.hpp"
 namespace Solid
 {
     struct MeshRenderer
     {
-        MeshResource* mesh = nullptr;
-        ShaderResource* shader = nullptr;
+        std::shared_ptr<IMesh> mesh = nullptr;
+	    std::shared_ptr<IShader> shader = nullptr;
     };
 } //!namespace

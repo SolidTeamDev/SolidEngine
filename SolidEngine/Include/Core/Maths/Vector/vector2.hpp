@@ -91,7 +91,7 @@ namespace Solid
 
         constexpr Vec2 operator / (const Vec2 &_vec) const noexcept;
 
-        // RC: constexpr with += ? Not possible.
+
         constexpr Vec2 &operator += (const Vec2 &_vec) noexcept;
 
         constexpr Vec2 &operator -= (const Vec2 &_vec) noexcept;

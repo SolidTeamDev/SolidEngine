@@ -6,7 +6,7 @@
 #include "entityManager.hpp"
 #include "systemManager.hpp"
 
-// RC: Code in .h! use .inl for template.
+
 class SOLID_API ECSManager
 {
 private:

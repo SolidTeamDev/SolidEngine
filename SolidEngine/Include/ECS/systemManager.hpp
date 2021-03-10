@@ -7,7 +7,7 @@
 #include "system.hpp"
 #include "types.hpp"
 
-// RC: namespace Solid:: ?
+
 class SOLID_API SystemManager
 {
 private:
@@ -25,7 +25,7 @@ public:
 
         if(systems.find(typeName) != systems.end())
         {
-            // RC: Use Solid::Log?
+
             std::cerr << "Error : Cannot register system (System already registered)" << std::endl;
             return nullptr;
         }

@@ -14,9 +14,10 @@ namespace Solid
                 continue;
 
             auto transform = ecsManager.GetComponent<Transform>(entity);
-
-            _renderer->SetShaderMVP(meshRenderer.shader,transform,_camera);
-            _renderer->DrawMesh(meshRenderer.mesh);
+			meshRenderer.shader->SetMVP(transform,_camera);
+			meshRenderer.mesh->DrawMesh();
+            //_renderer->SetShaderMVP(meshRenderer.shader,transform,_camera);
+            //_renderer->DrawMesh(meshRenderer.mesh);
         }
     }
 } //!namespace

@@ -16,7 +16,7 @@ namespace Solid
         Quat rotation {};
         Mat4<float> transMat;
 
-        bool hasToUpdateMat = true; // RC: bIsDirty
+        bool hasToUpdateMat = true;
 
         void UpdateTransformMatrix();
 
@@ -35,7 +35,7 @@ namespace Solid
         Quat GetRotation() const;
         Vec3 GetScale() const;
 
-        Mat4<float> GetMatrix(); // RC: return const Mat4<float>&
+        Mat4<float> GetMatrix();
     };
 } //!namespace
 

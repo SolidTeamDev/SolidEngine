@@ -48,19 +48,12 @@ namespace Solid
             func =  std::function<void()>(pair.func);
             return *this;
         }
-        ~TaskPair() /*override*/ = default;
+        ~TaskPair()  = default;
 
-        void operator()() //override
+        void operator()()
         {
-            /**
-            * RC:
-            *   if(func)
-            *       func();
-            */
-
-            if(!func)
-                return ;
-            func();
+        	if(func)
+        		func();
         }
 
     };

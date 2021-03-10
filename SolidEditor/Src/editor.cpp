@@ -3,7 +3,7 @@
 #include "UI/editorInterface.hpp"
 #include "Inputs/editorInputs.hpp"
 
-#include "Ressources/ressources.hpp"
+#include "Resources/ressources.hpp"
 
 #include "ECS/Components/transform.hpp"
 #include "ECS/Components/meshRenderer.hpp"
@@ -78,8 +78,8 @@ namespace Solid
                 {1,1,1}
         });
         engine.ecsManager.AddComponent(entity,MeshRenderer{
-                .mesh   = dynamic_cast<MeshResource*>(engine.resourceManager->GetResourceByName("towerWNorms.obj")),
-                .shader = dynamic_cast<ShaderResource*>(engine.resourceManager->GetResourceByName("ZShader"))
+                .mesh   = engine.graphicsResourceMgr.GetMesh("towerWNorms.obj"),
+                .shader = engine.graphicsResourceMgr.GetShader("ZShader")
         });
 
         glfwSwapInterval(0);

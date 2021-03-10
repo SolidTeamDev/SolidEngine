@@ -2,7 +2,7 @@
 // Created by ryan1 on 26/02/2021.
 //
 
-#include "Ressources/ressources.hpp"
+#include "Resources/ressources.hpp"
 #include <sstream>
 #include "glad/glad.h"
 #include "Core/engine.hpp"
@@ -14,13 +14,16 @@ int Resource::NoNameNum = 0;
 #define SASSET_GEN 1
 
 
+
+
+
 ///
 /// Resources Classes
 ///
 ImageResource::~ImageResource() = default;
 
 
-uint ShaderResource::GetProgram() const {return ProgramID;};
+
 
 
 ///
@@ -184,12 +187,15 @@ void ComputeShaderResource::ToDataBuffer(std::vector<char> &buffer)
     ResourcesLoader::Append(buffer, &(size), sizeof(size));
     ResourcesLoader::Append(buffer, (void *) (this->ComputeSource.c_str()), size * sizeof(std::string::value_type));
     // Write Program Binary
-    Renderer::ShaderBinary binary =Renderer::GetInstance()->GetShaderBinary(this->ProgramID);
-    std::uint32_t PSize = binary.size;
+    GL::ComputeShader TempShader = GL::ComputeShader(this);
+
+    binaries =Renderer::GetInstance()->GetShaderBinary(TempShader.ProgID);
+    std::uint32_t PSize = binaries.size;
     ResourcesLoader::Append(buffer, &PSize, sizeof  (PSize));
-    ResourcesLoader::Append(buffer, &binary.format, sizeof  (binary.format));
-    ResourcesLoader::Append(buffer, binary.b, sizeof  (char) * binary.size);
-    delete[] binary.b;
+    ResourcesLoader::Append(buffer, &binaries.format, sizeof  (binaries.format));
+    ResourcesLoader::Append(buffer, binaries.b, sizeof  (char) * binaries.size);
+
+    delete[] binaries.b;
 }
 void ComputeShaderResource::FromDataBuffer(char *buffer, int bSize)
 {
@@ -224,8 +230,8 @@ void ComputeShaderResource::FromDataBuffer(char *buffer, int bSize)
     ResourcesLoader::ReadFromBuffer(buffer, &(bFormat), sizeof(bFormat), ReadPos);
     char* binary = new char[size];
     ResourcesLoader::ReadFromBuffer(buffer, binary, sizeof(char) * size, ReadPos);
-    Renderer::ShaderBinary b {.size =size ,.format=bFormat,.b=binary};
-    this->ProgramID =Renderer::GetInstance()->CreateShaderFromBinary(b);
+    binaries = {.size =size ,.format=bFormat,.b=binary};
+
     delete[] binary;
 
 }
@@ -253,12 +259,13 @@ void ShaderResource::ToDataBuffer(std::vector<char> &buffer)
     ResourcesLoader::Append(buffer, (void *) (this->FragSource.c_str()), size * sizeof(std::string::value_type));
 
     // Write Program Binary
-    Renderer::ShaderBinary binary =Renderer::GetInstance()->GetShaderBinary(this->ProgramID);
-    std::uint32_t PSize = binary.size;
+	GL::Shader TempShader = GL::Shader(this);
+    binaries =Renderer::GetInstance()->GetShaderBinary(TempShader.ProgID);
+    std::uint32_t PSize = binaries.size;
     ResourcesLoader::Append(buffer, &PSize, sizeof  (PSize));
-    ResourcesLoader::Append(buffer, &binary.format, sizeof  (binary.format));
-    ResourcesLoader::Append(buffer, binary.b, sizeof  (char) * binary.size);
-    delete[] binary.b;
+    ResourcesLoader::Append(buffer, &binaries.format, sizeof  (binaries.format));
+    ResourcesLoader::Append(buffer, binaries.b, sizeof  (char) * binaries.size);
+    delete[] binaries.b;
 }
 void ShaderResource::FromDataBuffer(char *buffer, int bSize)
 {
@@ -299,7 +306,6 @@ void ShaderResource::FromDataBuffer(char *buffer, int bSize)
     ResourcesLoader::ReadFromBuffer(buffer, &(bFormat), sizeof(bFormat), ReadPos);
     char* binary = new char[size];
     ResourcesLoader::ReadFromBuffer(buffer, binary, sizeof(char) * size, ReadPos);
-    Renderer::ShaderBinary b {.size =size ,.format=bFormat,.b=binary};
-    this->ProgramID =Renderer::GetInstance()->CreateShaderFromBinary(b);
+    binaries ={.size =size ,.format=bFormat,.b=binary};
     delete[] binary;
 }

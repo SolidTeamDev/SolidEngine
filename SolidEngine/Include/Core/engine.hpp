@@ -11,6 +11,7 @@
 
 #include "ECS/ecsManager.hpp"
 #include "ECS/System/rendererSystem.hpp"
+#include "Resources/graphicalResourceMgr.hpp"
 
 namespace Solid
 {
@@ -36,6 +37,7 @@ namespace Solid
         class ResourceManager* resourceManager;
         TaskManager taskManager;
         ThreadManager threadPool;
+        GraphicalResourceMgr graphicsResourceMgr;
         bool MultiThreadEnabled()const {return mtEnabled;}
         void EnableMultiThread(bool _b)
         {

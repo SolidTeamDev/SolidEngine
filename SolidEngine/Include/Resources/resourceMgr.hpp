@@ -2,9 +2,11 @@
 // Created by ryan1 on 26/02/2021.
 //
 
-#ifndef SOLIDEDITOR_RESOURCEMAN_HPP
-#define SOLIDEDITOR_RESOURCEMAN_HPP
+#ifndef SOLIDEDITOR_RESOURCEMGR_HPP
+#define SOLIDEDITOR_RESOURCEMGR_HPP
 #include <mutex>
+#include <unordered_map>
+#include "Core/Debug/throwError.hpp"
 namespace fs = std::filesystem;
 namespace Solid
 {
@@ -13,30 +15,28 @@ namespace Solid
         template<class T>
         struct ResourceList
         {
-            std::vector<Resource*> List;
+            std::unordered_map<std::string,T*> List;
             const char* type_value = typeid(T*).name();
             ~ResourceList()
             {
-                for(Resource* r : List)
+                for(auto& r : List)
                 {
-                    if(r != nullptr)
-                        delete r;
+                    if(r.second != nullptr)
+                        delete r.second;
                 }
             }
-            Resource* Find(const char* name)
+            T* Find(const char* name)
             {
-                for(Resource* r : List)
-                {
-                    if(r == nullptr)
-                        continue;
-                    if(r->name == name)
-                        return (r);
-                }
-                return nullptr;
+                auto it = List.find(name);
+                if(it == List.end())
+                    return nullptr;
+                else
+                    return it->second;
+
             }
         };
 
-        // RC: USE UNORDERED MAP.
+
         ResourceList<ImageResource>          ImageList;
         ResourceList<MeshResource>           MeshList;
         ResourceList<AnimResource>           AnimList;
@@ -70,11 +70,14 @@ namespace Solid
 
         void AddResource(Resource* r);
 
-
-        Resource* GetResourceByName(const char* name);
+	    template<class T>
+	    T* GetResourceByName(const char* name);
+	    MeshResource* GetRawMeshByName(const char* name);
+	    ShaderResource* GetRawShaderByName(const char* name);
+	    ComputeShaderResource* GetRawComputeByName(const char* name);
 
         template<typename T>
-        std::vector<Resource*> * GetResourcesVecByType()
+        std::unordered_map<std::string,T*> * GetResourcesVecByType()
         {
             std::string_view type_value = typeid(T*).name();
             if(type_value == ImageList.type_value)
@@ -100,9 +103,41 @@ namespace Solid
 
             return nullptr;
         }
+	    template<typename T>
+	    std::unordered_map<std::string,T*> * GetResourcesVecByType(EResourceType _type)
+	    {
+		    switch (_type)
+		    {
+			    case EResourceType::Mesh:
+				    return &MeshList.List;
+				    break;
+			    case EResourceType::Shader:
+				    return &ShaderList.List;
+				    break;
+			    case EResourceType::Material:
+				    return &MaterialList.List;
+				    break;
+			    case EResourceType::Compute:
+				    return &ComputeList.List;
+				    break;
+			    case EResourceType::Image:
+				    return &ImageList.List;
+				    break;
+			    case EResourceType::Texture:
+				    return &TextureList.List;
+				    break;
+			    case EResourceType::Anim:
+				    return &AnimList.List;
+				    break;
+			    default:
+				    ThrowError("Type Not Stored", ESolidErrorCode::S_INIT_ERROR);
+				    return nullptr;
+				    break;
+		    }
+	    };
 
     };
 }
 
 
-#endif //SOLIDEDITOR_RESOURCEMAN_HPP
+#endif //SOLIDEDITOR_RESOURCEMGR_HPP

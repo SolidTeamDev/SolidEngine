@@ -5,8 +5,19 @@
 #ifndef SOLIDEDITOR_RESOURCETYPE_HPP
 #define SOLIDEDITOR_RESOURCETYPE_HPP
 #include <filesystem>
+
+#include "Core/Maths/solidVector.hpp"
+
+
 namespace fs = std::filesystem;
 namespace Solid {
+
+	struct ShaderBinary
+	{
+		uint size = 0;
+		uint format;
+		char* b = nullptr;
+	};
 
     enum class SOLID_API EResourceType : char
     {
@@ -34,7 +45,7 @@ namespace Solid {
 
         static int NoNameNum;
     protected:
-        EResourceType type; // RC: should be public const.
+        EResourceType type;
         fs::path path;
     public:
         std::string name;
@@ -65,38 +76,12 @@ namespace Solid {
     };
 
 
-// RC: ??
-/// TEMPORARY STRUCTS
-    struct SOLID_API v2
-    {
-        union
-        {
-            struct
-            {
-                float x;
-                float y;
-            };
-            float elt[2];
-        };
-    };
-    struct SOLID_API v3
-    {
-        union
-        {
-            struct
-            {
-                float x;
-                float y;
-                float z;
-            };
-            float elt[3];
-        };
-    };
+
     struct SOLID_API Vertex
     {
-        v3 Pos;
-        v3 Normal;
-        v2 TexCoords;
+        Vec3 Pos;
+	    Vec3 Normal;
+	    Vec2 TexCoords;
     };
 
 
@@ -105,13 +90,12 @@ namespace Solid {
 
 
     public:
-        //uint VAO = 0;
+
 
         class SubMesh
         {
         public:
-            //uint VBO = 0; // RC: Part of Mesh renderer.
-            //uint EBO = 0; // RC: Part of Mesh renderer.
+
             std::vector<Vertex> vertices;
             std::vector<uint> indices;
         };
@@ -152,19 +136,17 @@ namespace Solid {
 
     class SOLID_API ShaderResource : public Resource
     {
-        uint VertShaderID;
-        uint FragShaderID;
-        uint ProgramID;
-        std::string VertexSource;
-        std::string FragSource;
+
+
 //programs ID ?
     public:
-        ShaderResource(uint vid, uint fid, uint pid, const char *vs, const char *fs)
+	    std::string VertexSource;
+	    std::string FragSource;
+	    ShaderBinary binaries = {.b=nullptr};
+        ShaderResource(const char *vs, const char *fs)
         {
             type = EResourceType::Shader;
-            VertShaderID = vid;
-            FragShaderID = fid;
-            ProgramID = pid;
+
             VertexSource = vs;
             FragSource = fs;
         }
@@ -178,7 +160,7 @@ namespace Solid {
         {
 
         }
-        uint GetProgram() const;
+
         void ToDataBuffer(std::vector<char> &buffer);
 
         void FromDataBuffer(char *buffer, int bSize);
@@ -186,17 +168,15 @@ namespace Solid {
 
     class SOLID_API ComputeShaderResource : public Resource
     {
-        uint ShaderID;
-        uint ProgramID;
-        std::string ComputeSource;
-//programs ID ?
-    public:
 
-        ComputeShaderResource(uint sid, uint pid, const char *cSource)
+
+
+    public:
+	    std::string ComputeSource;
+	    ShaderBinary binaries = {.b=nullptr};
+        ComputeShaderResource(const char *cSource)
         {
             type = EResourceType::Compute;
-            ShaderID = sid;
-            ProgramID = pid;
             ComputeSource = cSource;
         }
 

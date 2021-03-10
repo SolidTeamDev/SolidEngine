@@ -3,7 +3,7 @@
 #include <iostream>
 #include "Rendering/OpenGL45/openGl45Renderer.hpp"
 #include "UI/solidUI.hpp"
-#include "Ressources/ressources.hpp"
+#include "Resources/ressources.hpp"
 
 #include "ECS/Components/transform.hpp"
 #include "ECS/Components/meshRenderer.hpp"
@@ -15,6 +15,7 @@ namespace Solid
             threadPool(&taskManager)
     {
         resourceManager = ResourceManager::Initialize(this);
+
         InitEcs();
     }
 
@@ -61,10 +62,14 @@ namespace Solid
 
         if(window != nullptr && renderer != nullptr)
             engineContextInit = true;
+	    graphicsResourceMgr.Init(resourceManager, renderer);
     }
 
     bool Engine::IsEngineContextInitialized() const
     {
-        return engineContextInit; // RC: return window != nullptr && renderer != nullptr
+
+        return engineContextInit;
     }
 } //!namespace
+
+

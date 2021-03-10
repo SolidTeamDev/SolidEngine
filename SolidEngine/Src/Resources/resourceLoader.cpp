@@ -1,8 +1,8 @@
 //
 // Created by ryan1 on 26/02/2021.
 //
-// RC: Folder is reSSources ?
-#include "Ressources/ressources.hpp"
+
+#include "Resources/ressources.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION 1
 #include "stb_image.h"
@@ -63,36 +63,36 @@ void  ResourcesLoader::LoadRessourceNoAdd(const fs::path &Rpath, ResourcePtrWrap
 
     ///Solid Asset Loading
 
-    // RC: USE ELSE IF.
+
     if(extension == ".simage")
         r=LoadSolidImage(Rpath);
-    if(extension == ".stexture")
+    else if(extension == ".stexture")
         ;
-    if(extension == ".smesh")
+    else if(extension == ".smesh")
         r=LoadSolidMesh(Rpath);
-    if(extension == ".scompute")
+    else if(extension == ".scompute")
         r=LoadSolidComputeShader(Rpath);
-    if(extension == ".svertfrag")
+    else if(extension == ".svertfrag")
         r=LoadSolidShader(Rpath);
-    if(extension == ".smaterial")
+    else if(extension == ".smaterial")
         ;
-    if(extension == ".sanim")
+    else if(extension == ".sanim")
         ;
 
     /// Image Loading
-    if(extension == ".bmp")
+    else if(extension == ".bmp")
         r=LoadImage(Rpath);
-    if(extension == ".png")
+    else if(extension == ".png")
         r=LoadImage(Rpath);
-    if(extension == ".jpg")
+    else if(extension == ".jpg")
         r=LoadImage(Rpath);
-    if(extension == ".jpeg")
+    else if(extension == ".jpeg")
         r=LoadImage(Rpath);
 
     ///Mesh Loading
-    if(extension == ".obj")
+    else if(extension == ".obj")
         r=LoadMesh(Rpath);
-    if(extension == ".fbx")
+    else if(extension == ".fbx")
         r=LoadMesh(Rpath);
 
     wrapper.r = r;
@@ -294,7 +294,7 @@ Resource * ResourcesLoader::LoadMesh(const fs::path &Rpath)
             WritePos+= scene->mMeshes[i]->mFaces[j].mNumIndices;
         }
 
-        // RC: opti?
+        
         for (int j = 0; j < scene->mMeshes[i]->mNumVertices; ++j) {
             if(scene->mMeshes[i]->HasPositions())
                 std::memcpy(&(Sub.vertices[j].Pos), &(scene->mMeshes[i]->mVertices[j]), 3 * sizeof(float));
@@ -372,13 +372,8 @@ Resource * ResourcesLoader::LoadShader(const fs::path &Rpath)
         }
         if(!found)
             return nullptr;
-        Renderer::CShader program = r->CreateComputeProgram(ComputeSources);
-        if(program.error)
-        {
-            //CLEAN
-            return nullptr;
-        }
-        ComputeShaderResource* Compute = new ComputeShaderResource(program.sID, program.pID, ComputeSources[0]);
+
+        ComputeShaderResource* Compute = new ComputeShaderResource(ComputeSources[0]);
         Compute->name = Rpath.filename().string();
 
 #if SASSET_GEN
@@ -400,7 +395,7 @@ Resource * ResourcesLoader::LoadShader(const fs::path &Rpath)
 #endif
         delete[] ComputeSources[0];
         return Compute;
-
+		
 
     }
     else
@@ -451,10 +446,8 @@ Resource * ResourcesLoader::LoadShader(const fs::path &Rpath)
         if(!vert || !frag)
             return nullptr;
         //TODO Cleanup at return
-        Renderer::VFShader shader = r->CreateVertFragProgram(VertexSources, fragSources);
-        if(shader.error)
-            return nullptr;
-        ShaderResource* Shader = new ShaderResource(shader.vID,shader.fID, shader.pID, VertexSources[0], fragSources[0]);
+
+        ShaderResource* Shader = new ShaderResource(VertexSources[0], fragSources[0]);
         Shader->name = Rpath.filename().string();
 
 #if SASSET_GEN

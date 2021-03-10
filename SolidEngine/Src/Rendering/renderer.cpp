@@ -3,11 +3,11 @@
 namespace Solid
 {
     Renderer* Renderer::pInstance{nullptr};
-    std::mutex Renderer::mutex;
+
 
     Renderer * Renderer::GetInstance()
     {
-        std::lock_guard<std::mutex>lck(mutex); // RC: What is this mutex for?
+
 
         if(pInstance == nullptr)
         {

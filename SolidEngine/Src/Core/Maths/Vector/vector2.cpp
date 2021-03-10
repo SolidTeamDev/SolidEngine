@@ -154,7 +154,7 @@ namespace Solid
 
     constexpr Vec2 Vec2::GetNormalize() const noexcept
     {
-        // RC: Use macro for release.
+
         float len = Length();
 
         SE_WARN(len != 0, "normalize function: length = 0 impossible to compute");
