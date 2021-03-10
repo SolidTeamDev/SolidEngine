@@ -11,6 +11,7 @@
 
 namespace Solid
 {
+	__declspec(dllexport) Engine* Engine::instance = nullptr;
     Engine::Engine() :
             threadPool(&taskManager)
     {
@@ -70,6 +71,21 @@ namespace Solid
 
         return engineContextInit;
     }
+
+	Engine *Engine::GetInstance()
+	{
+    	if(instance == nullptr)
+    		instance = new Engine();
+
+    	return instance;
+	}
+
+	void Engine::EnableMultiThread(bool _b)
+	{
+		mtEnabled = _b;
+		if(_b){threadPool.PlayAllThreads();}
+		else{threadPool.PauseAllThreads();}
+	}
 } //!namespace
 
 

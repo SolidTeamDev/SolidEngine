@@ -12,7 +12,7 @@ namespace Solid
     {
     private:
         InputManager<int>* editorInputManager = nullptr;
-        Engine engine;
+        Engine* engine = nullptr;
         GameCompiler* Compiler;
         Camera editorCamera;
 

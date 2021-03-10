@@ -3,10 +3,14 @@
 #include "ECS/Components/transform.hpp"
 #include "ECS/Components/meshRenderer.hpp"
 
+
+#include "Core/engine.hpp"
+
 namespace Solid
 {
     void RendererSystem::Update(const Renderer* _renderer, Camera& _camera)
     {
+	    Engine* e =Engine::GetInstance();
         for (auto entity : entities)
         {
             auto& meshRenderer = ecsManager.GetComponent<MeshRenderer>(entity);
@@ -16,6 +20,7 @@ namespace Solid
             auto transform = ecsManager.GetComponent<Transform>(entity);
 			meshRenderer.shader->SetMVP(transform,_camera);
 			meshRenderer.mesh->DrawMesh();
+
             //_renderer->SetShaderMVP(meshRenderer.shader,transform,_camera);
             //_renderer->DrawMesh(meshRenderer.mesh);
         }

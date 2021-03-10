@@ -5,7 +5,7 @@
 
 namespace Solid
 {
-    class SOLID_API HierarchyTreeInterface
+    class HierarchyTreeInterface
     {
     public:
         HierarchyTreeInterface()  = default;

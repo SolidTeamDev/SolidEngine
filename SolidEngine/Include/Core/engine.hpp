@@ -28,8 +28,11 @@ namespace Solid
         bool engineContextInit = false;
 
         void InitEcs();
+	    Engine();
+	    static Engine* instance;
 
     public:
+    	//Engine** test = &instance;
         Window* window;
         Renderer* renderer = nullptr;
         ECSManager ecsManager;
@@ -38,14 +41,9 @@ namespace Solid
         TaskManager taskManager;
         ThreadManager threadPool;
         GraphicalResourceMgr graphicsResourceMgr;
+        static Engine* GetInstance();
         bool MultiThreadEnabled()const {return mtEnabled;}
-        void EnableMultiThread(bool _b)
-        {
-            mtEnabled = _b;
-            if(_b){threadPool.PlayAllThreads();}
-            else{threadPool.PauseAllThreads();}
-        }
-        Engine();
+        void EnableMultiThread(bool _b);
         Engine(const Engine& _copy) = delete;
         Engine(Engine&& _move) = delete;
 

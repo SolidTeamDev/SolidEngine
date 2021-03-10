@@ -12,6 +12,7 @@
 
 namespace Solid
 {
+
     Framebuffer Editor::sceneFramebuffer;
 
     Editor::Editor()
@@ -26,18 +27,18 @@ namespace Solid
         {
             .rendererType = ERendererType::OpenGl45
         };
+		engine = Engine::GetInstance();
+        engine->InitEngineContext(windowParams, rendererParams);
 
-        engine.InitEngineContext(windowParams, rendererParams);
-
-        if(!engine.IsEngineContextInitialized())
+        if(!engine->IsEngineContextInitialized())
             throw ThrowError("Engine not correctly initialized !",ESolidErrorCode::S_INIT_ERROR);
 
-        const Window* window = engine.window;
+        const Window* window = engine->window;
 
         editorInputManager = new InputManager<int>(window->GetHandle());
         InitEditorInputList(editorInputManager);
 
-        sceneFramebuffer = engine.renderer->CreateFramebuffer(window->GetWindowSize());
+        sceneFramebuffer = engine->renderer->CreateFramebuffer(window->GetWindowSize());
         Compiler = GameCompiler::GetInstance();
 
         LoadResources();
@@ -50,8 +51,8 @@ namespace Solid
 
     void Editor::Run()
     {
-        Window* window = engine.window;
-        Renderer* renderer = engine.renderer;
+        Window* window = engine->window;
+        Renderer* renderer = engine->renderer;
         EditorInterface editorInterface(window);
 
         glfwSwapInterval(0);
@@ -68,10 +69,10 @@ namespace Solid
             renderer->BeginFramebuffer(sceneFramebuffer);
             renderer->ClearColor({0.f,0.f,0.f,1});
             renderer->Clear(sceneFramebuffer.size);
-            engine.rendererSystem->Update(renderer,editorCamera);
+            engine->rendererSystem->Update(renderer,editorCamera);
             renderer->EndFramebuffer();
 
-            editorInterface.Update(&engine);
+            editorInterface.Update(engine);
 
             renderer->UpdateFramebuffer(sceneFramebuffer);
             Time::Update();
@@ -83,11 +84,11 @@ namespace Solid
 
     void Editor::LoadResources()
     {
-        engine.EnableMultiThread(true);
+        engine->EnableMultiThread(true);
 
         ResourcesLoader loader;
 
-        loader.SetManager(engine.resourceManager);
+        loader.SetManager(engine->resourceManager);
         fs::path p = fs::current_path().append("Resources");
 
         auto before = std::chrono::high_resolution_clock::now();
@@ -95,7 +96,7 @@ namespace Solid
         auto after = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double, std::ratio<1,1000>> fp_s = after - before;
         std::cout << "Loading MT has Taken " << fp_s.count() << " milliseconds\n";
-        engine.EnableMultiThread(false);
+        engine->EnableMultiThread(false);
     }
 
     void Editor::UpdateEditorCamera()

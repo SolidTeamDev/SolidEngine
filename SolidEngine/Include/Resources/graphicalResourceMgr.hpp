@@ -41,6 +41,7 @@ namespace Solid
 					break;
 				}
 				default:
+					return nullptr;
 					break;
 			}
 		}
@@ -55,6 +56,7 @@ namespace Solid
 					break;
 				}
 				default:
+					return nullptr;
 					break;
 			}
 		}
@@ -69,6 +71,7 @@ namespace Solid
 					break;
 				}
 				default:
+					return nullptr;
 					break;
 			}
 		}

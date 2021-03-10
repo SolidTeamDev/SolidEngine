@@ -20,7 +20,7 @@ namespace Solid
 
 
     template<typename T>
-    class SOLID_API ComponentArray : public IComponentArray
+    class ComponentArray : public IComponentArray
     {
     private:
 
@@ -33,7 +33,7 @@ namespace Solid
 
     public:
 
-        void InsertData(Entity _entity, T _component)
+    	void InsertData(Entity _entity, T _component)
         {
             if(entityToIndexMap.find(_entity) != entityToIndexMap.end())
             {
