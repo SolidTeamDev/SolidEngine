@@ -43,7 +43,7 @@ namespace Solid
         /**
          * @debrief Updates the whole UI
          */
-        void Update(Engine* _engine);
+        void Update();
 
         /**
          * @debrief Updates the UI style to a dark theme

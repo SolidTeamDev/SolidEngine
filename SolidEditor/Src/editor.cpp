@@ -72,7 +72,7 @@ namespace Solid
             engine->rendererSystem->Update(renderer,editorCamera);
             renderer->EndFramebuffer();
 
-            editorInterface.Update(engine);
+            editorInterface.Update();
 
             renderer->UpdateFramebuffer(sceneFramebuffer);
             Time::Update();

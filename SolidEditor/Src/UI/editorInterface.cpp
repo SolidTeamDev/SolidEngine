@@ -23,7 +23,7 @@ namespace Solid {
         DarkTheme();
     }
 
-    void EditorInterface::Update(Engine* _engine)
+    void EditorInterface::Update()
     {
         UIContext::BeginFrame();
 
@@ -31,8 +31,8 @@ namespace Solid {
 
         filesInterface.Draw();
         sceneInterface.Draw();
-        inspectorInterface.Draw(_engine);
-        hierarchyTreeInterface.Draw(_engine);
+        inspectorInterface.Draw();
+        hierarchyTreeInterface.Draw();
         playInterface.Draw();
         logsInterface.Draw();
 

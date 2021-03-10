@@ -14,9 +14,9 @@ namespace Solid
         InspectorInterface()  = default;
         ~InspectorInterface() = default;
 
-        void Draw(Engine* _engine);
-        void DrawComponents(Engine* _engine);
-        void AddComponents(Engine* _engine);
+        void Draw();
+        void DrawComponents();
+        void AddComponents();
 
         void EditTransform(Transform& _trs);
         void EditMeshRenderer(MeshRenderer& _meshRenderer);

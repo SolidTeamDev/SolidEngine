@@ -6,45 +6,49 @@
 
 namespace Solid
 {
-    void HierarchyTreeInterface::Draw(Engine* _engine)
+    void HierarchyTreeInterface::Draw()
     {
         if(!p_open)
             return;
+
+        Engine* engine = Engine::GetInstance();
 
         UI::SetNextWindowSize(ImVec2(250,250));
 
         UI::Begin("Hierarchy", &p_open,
                   ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
 
-        for(GameObject* g : _engine->ecsManager.GetWorld()->childs)
+        for(GameObject* g : engine->ecsManager.GetWorld()->childs)
         {
             DrawEntities(g,0);
         }
-        DrawCreateObject(_engine);
+        DrawCreateObject();
 
         UI::End();
     }
 }
 
-void Solid::HierarchyTreeInterface::DrawCreateObject(Engine* _engine)
+void Solid::HierarchyTreeInterface::DrawCreateObject()
 {
+    Engine* engine = Engine::GetInstance();
+
     if(UI::BeginPopupContextWindow("createObject"))
     {
         if(UI::BeginMenu("New"))
         {
             if(UI::MenuItem("GameObject"))
             {
-                Entity tmp = _engine->ecsManager.CreateEntity();
-                _engine->ecsManager.AddComponent(tmp,Transform());
+                Entity tmp = engine->ecsManager.CreateEntity();
+                engine->ecsManager.AddComponent(tmp,Transform());
             }
             UI::Separator();
             if(UI::MenuItem("Cube"))
             {
-                Entity tmp = _engine->ecsManager.CreateEntity();
-                _engine->ecsManager.AddComponent(tmp,Transform());
-                _engine->ecsManager.AddComponent(tmp,MeshRenderer{
-                        .mesh   = _engine->graphicsResourceMgr.GetMesh("cube.obj"),
-                        .shader = _engine->graphicsResourceMgr.GetShader("ZShader")
+                Entity tmp = engine->ecsManager.CreateEntity();
+                engine->ecsManager.AddComponent(tmp,Transform());
+                engine->ecsManager.AddComponent(tmp,MeshRenderer{
+                        .mesh   = engine->graphicsResourceMgr.GetMesh("cube.obj"),
+                        .shader = engine->graphicsResourceMgr.GetShader("ZShader")
                 });
             }
             if(UI::MenuItem("Sphere"))
@@ -53,11 +57,11 @@ void Solid::HierarchyTreeInterface::DrawCreateObject(Engine* _engine)
             }
             if(UI::MenuItem("Solid"))
             {
-                Entity tmp = _engine->ecsManager.CreateEntity();
-                _engine->ecsManager.AddComponent(tmp,Transform());
-                _engine->ecsManager.AddComponent(tmp,MeshRenderer{
-                        .mesh   = _engine->graphicsResourceMgr.GetMesh("solid.obj"),
-                        .shader = _engine->graphicsResourceMgr.GetShader("ZShader")
+                Entity tmp = engine->ecsManager.CreateEntity();
+                engine->ecsManager.AddComponent(tmp,Transform());
+                engine->ecsManager.AddComponent(tmp,MeshRenderer{
+                        .mesh   = engine->graphicsResourceMgr.GetMesh("solid.obj"),
+                        .shader = engine->graphicsResourceMgr.GetShader("ZShader")
                 });
             }
             UI::EndMenu();

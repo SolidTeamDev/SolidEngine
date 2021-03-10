@@ -116,7 +116,7 @@ namespace Solid
     template<typename T>
     Mat4<T> Mat4<T>::Transform(const Vec3 &_pos, const Quat &_rot, const Vec3 &_scale)
     {
-        Mat4<T> TRS = Translate(_pos)*Rotation(_rot)*Scale(_scale);
+        Mat4<T> TRS = Scale(_scale)*Rotation(_rot)*Translate(_pos);
         return TRS ;
     }
 

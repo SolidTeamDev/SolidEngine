@@ -91,3 +91,10 @@ ADD_CUSTOM_COMMAND (TARGET SolidEditor POST_BUILD
 COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/Resources ${CMAKE_BINARY_DIR}/Resources
 # Output Message
 COMMENT "Copying Resources folder" VERBATIM)
+
+# ========= LAYOUT ==========
+ADD_CUSTOM_COMMAND (TARGET SolidEditor POST_BUILD
+
+COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/imgui.ini ${CMAKE_BINARY_DIR}
+# Output Message
+COMMENT "Copying Default Layout" VERBATIM)
