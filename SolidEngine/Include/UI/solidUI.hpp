@@ -6,7 +6,6 @@
 
 namespace Solid::UIContext
 {
-
         /**
          * @brief Initializes SolidUI
          * @param window required to bind the context to the window

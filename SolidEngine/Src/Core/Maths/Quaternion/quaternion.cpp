@@ -76,8 +76,9 @@ namespace Solid
 
     constexpr bool Quat::IsZero() const noexcept
     {
-        return Solid::Maths::Equals0(x) && Solid::Maths::Equals0(y)
-               && Solid::Maths::Equals0(z) && Solid::Maths::Equals0(w);
+
+        return Maths::Equals0(x) && Maths::Equals0(y)
+               && Maths::Equals0(z) && Maths::Equals0(w);
     }
 
     constexpr float Quat::SqrtLength() const noexcept

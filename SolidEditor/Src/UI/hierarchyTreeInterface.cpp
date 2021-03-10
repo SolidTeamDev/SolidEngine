@@ -43,8 +43,8 @@ void Solid::HierarchyTreeInterface::DrawCreateObject(Engine* _engine)
                 Entity tmp = _engine->ecsManager.CreateEntity();
                 _engine->ecsManager.AddComponent(tmp,Transform());
                 _engine->ecsManager.AddComponent(tmp,MeshRenderer{
-                        .mesh   = dynamic_cast<MeshResource*>(_engine->resourceManager->GetResourceByName("cube.obj")),
-                        .shader = dynamic_cast<ShaderResource*>(_engine->resourceManager->GetResourceByName("ZShader"))
+                        .mesh   = _engine->graphicsResourceMgr.GetMesh("cube.obj"),
+                        .shader = _engine->graphicsResourceMgr.GetShader("ZShader")
                 });
             }
             if(UI::MenuItem("Sphere"))
@@ -56,8 +56,8 @@ void Solid::HierarchyTreeInterface::DrawCreateObject(Engine* _engine)
                 Entity tmp = _engine->ecsManager.CreateEntity();
                 _engine->ecsManager.AddComponent(tmp,Transform());
                 _engine->ecsManager.AddComponent(tmp,MeshRenderer{
-                        .mesh   = dynamic_cast<MeshResource*>(_engine->resourceManager->GetResourceByName("solid.obj")),
-                        .shader = dynamic_cast<ShaderResource*>(_engine->resourceManager->GetResourceByName("ZShader"))
+                        .mesh   = _engine->graphicsResourceMgr.GetMesh("solid.obj"),
+                        .shader = _engine->graphicsResourceMgr.GetShader("ZShader")
                 });
             }
             UI::EndMenu();

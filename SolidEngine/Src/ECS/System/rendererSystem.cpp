@@ -13,10 +13,11 @@ namespace Solid
             if(meshRenderer.shader == nullptr || meshRenderer.mesh == nullptr)
                 continue;
 
-            auto& transform = ecsManager.GetComponent<Transform>(entity);
-
-            _renderer->SetShaderMVP(meshRenderer.shader,transform,_camera);
-            _renderer->DrawMesh(meshRenderer.mesh);
+            auto transform = ecsManager.GetComponent<Transform>(entity);
+			meshRenderer.shader->SetMVP(transform,_camera);
+			meshRenderer.mesh->DrawMesh();
+            //_renderer->SetShaderMVP(meshRenderer.shader,transform,_camera);
+            //_renderer->DrawMesh(meshRenderer.mesh);
         }
     }
 } //!namespace

@@ -29,6 +29,7 @@ namespace Solid
     class InputManager
     {
     private:
+
         enum class InputType
         {
             KEY,
@@ -47,6 +48,7 @@ namespace Solid
         };
         GLFWwindow* window;
         std::unordered_map<T,Input> inputList;
+
 
         static void joystickCallBack(int jid, int event)
         {
@@ -184,6 +186,7 @@ namespace Solid
                 }
                 else
                 {
+
                     if(inputPressed)
                     {
                         input.isPressed = true;

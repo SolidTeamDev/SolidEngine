@@ -3,7 +3,7 @@
 #include "UI/editorInterface.hpp"
 #include "Inputs/editorInputs.hpp"
 
-#include "Ressources/ressources.hpp"
+#include "Resources/ressources.hpp"
 
 #include "ECS/Components/transform.hpp"
 #include "ECS/Components/meshRenderer.hpp"
@@ -38,6 +38,7 @@ namespace Solid
         InitEditorInputList(editorInputManager);
 
         sceneFramebuffer = engine.renderer->CreateFramebuffer(window->GetWindowSize());
+        Compiler = GameCompiler::GetInstance();
 
         LoadResources();
     }

@@ -21,7 +21,7 @@ namespace fs = std::filesystem;
 using uint = unsigned int ;
 
 #include "resourceType.hpp"
-#include "resourceMan.hpp"
+#include "resourceMgr.hpp"
 #include "resourceLoader.hpp"
 
 

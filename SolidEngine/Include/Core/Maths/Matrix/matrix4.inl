@@ -123,10 +123,12 @@ namespace Solid
     template<typename T>
     Mat4<T> Mat4<T>::Perspective(float _fov, float _aspect, float _near, float _far)
     {
-        float ymax = tanf(_fov * 3.14f / 180.f / 2.f);
-        float xmax = ymax * _aspect;
+        T ymax = tanf(_fov * 3.14f / 180.f / 2.f);
+        T xmax = ymax * _aspect;
 
-        Mat4<T> m;
+
+
+        Mat4 m;
 
         float temp = _far - _near;
 
@@ -161,6 +163,8 @@ namespace Solid
     template<typename T>
     constexpr bool Mat4<T>::IsZero() const noexcept
     {
+        // Function can't be constexpr with a loop.
+
         for (unsigned int i = 0; i < 16; i++)
         {
             if (!Maths::Equals0(elements[i]))
@@ -354,7 +358,7 @@ namespace Solid
     template<typename T>
     Mat4<T> &Mat4<T>::Inverse() noexcept
     {
-        elements = GetInverse();
+        elements = GetInversed();
         return *this;
     }
 

@@ -44,7 +44,7 @@ namespace Solid
                 TaskManager* manager = _self_Internal->taskManager;
                 if(manager == nullptr)
                 {
-                    std::this_thread::sleep_for(std::chrono::microseconds (10));
+                    //std::this_thread::sleep_for(std::chrono::microseconds (10));
                     std::this_thread::yield();
                     continue;
                 }
@@ -59,7 +59,7 @@ namespace Solid
                 {
                     if(_self_Internal->bWaitForThread)
                         _self_Internal->bWaitForThread = false;
-                    std::this_thread::sleep_for(std::chrono::microseconds (10));
+                    //std::this_thread::sleep_for(std::chrono::microseconds (10));
                     std::this_thread::yield();
 
                 }
@@ -140,5 +140,121 @@ namespace Solid
             element->join( TerminateAfterJoin{});
         }
     }
-    
+
+	void Thread::Play()
+	{
+		std::lock_guard<std::mutex> Lock(internalDataMutex);
+		internal.bPauseThread = false;
+	}
+
+	void Thread::Pause()
+	{
+		std::lock_guard<std::mutex> Lock(internalDataMutex);
+		internal.bPauseThread = true;
+	}
+
+	bool Thread::IsTerminating()
+	{
+		std::lock_guard<std::mutex> Lock(internalDataMutex);
+		return internal.bTerminateThread;
+	}
+
+	void Thread::Terminate()
+	{
+		std::lock_guard<std::mutex> Lock(internalDataMutex);
+		internal.bTerminateThread = true;
+	}
+
+	void Thread::SetManager(TaskManager *m)
+	{
+		internal.taskManager = m;
+	}
+
+	Thread::~Thread()
+	{
+		thread->join();
+		delete thread;
+		//delete internalDataMutex;
+	}
+
+	Thread::Thread(TaskManager *_m, int *_i)
+	{
+		//internalDataMutex = new std::mutex();
+		internal.taskManager = _m;
+		internal.ID = *_i;
+		thread = new std::thread(RunThread, this, &(this->internal), std::ref(internalDataMutex));
+
+
+		*_i -=1;
+	}
+
+	Thread::Thread(TaskManager *_m)
+	{
+		//internalDataMutex = new std::mutex();
+		internal.taskManager = _m;
+		thread = new std::thread(RunThread, this, &(this->internal), std::ref(internalDataMutex));
+	}
+
+	Thread::Thread()
+	{
+		//internalDataMutex = new std::mutex();
+		thread = new std::thread(RunThread, this, &(this->internal), std::ref(internalDataMutex));
+	}
+
+	bool Thread::IsPaused()
+	{
+		std::lock_guard<std::mutex> Lock(internalDataMutex);
+		return internal.bPauseThread;
+	}
+
+	ETaskType Thread::GetThreadType()
+	{
+		return threadType ;
+	}
+
+	void Thread::SetThreadType(ETaskType t)
+	{
+		threadType = t;
+	}
+
+	void Thread::join()
+	{
+
+		{
+			std::lock_guard<std::mutex> Lock(internalDataMutex);
+			internal.bWaitForThread = true;
+		}
+		bool Wait = true;
+		while (Wait)
+		{
+
+			{
+				std::this_thread::yield();
+			}
+			{
+				std::lock_guard<std::mutex> Lock(internalDataMutex);
+				Wait = internal.bWaitForThread;
+			}
+		}
+	}
+
+	void Thread::join(TerminateAfterJoin _t)
+	{
+		{
+			std::lock_guard<std::mutex> Lock(internalDataMutex);
+			internal.bWaitForThread = true;
+			internal.bTerminateThread = true;
+		}
+		bool Wait = true;
+		while (Wait)
+		{
+			{
+				std::lock_guard<std::mutex> Lock(internalDataMutex);
+				Wait = internal.bWaitForThread;
+			}
+			{
+				std::this_thread::yield();
+			}
+		}
+	}
 }

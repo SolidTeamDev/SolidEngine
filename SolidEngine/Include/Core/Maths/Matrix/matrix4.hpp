@@ -14,6 +14,7 @@ namespace Solid
     template<typename T = float>
     struct Mat4
     {
+
         std::array<T, 16> elements;
 
         Mat4();
@@ -54,6 +55,7 @@ namespace Solid
         constexpr T& At(unsigned int _index)const;
         T& At(unsigned int _n, unsigned int _m);
         constexpr T& At(unsigned int _n, unsigned int _m)const;
+
 
         Mat4& Multiply(T _scale) noexcept;
         constexpr Mat4 GetMultiplied(T _scale) const noexcept;

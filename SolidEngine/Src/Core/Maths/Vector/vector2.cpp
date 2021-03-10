@@ -142,14 +142,28 @@ namespace Solid
 
     }
 
+#if _DEBUG
+
+#define SE_WARN(_pred, str) { if(!_pred) Log::Send(str); }
+
+#else
+
+#define SE_WARN(...) {}
+
+#endif
+
     constexpr Vec2 Vec2::GetNormalize() const noexcept
     {
+
         float len = Length();
-        if(len == 0)
-        {
-            Log::Send("normalize function: length = 0 impossible to compute");
-            return *this;
-        }
+
+        SE_WARN(len != 0, "normalize function: length = 0 impossible to compute");
+
+        //if(len == 0)
+        //{
+        //    Log::Send("normalize function: length = 0 impossible to compute");
+        //    return *this;
+        //}
         return Vec2(x/len, y/len);
     }
 
