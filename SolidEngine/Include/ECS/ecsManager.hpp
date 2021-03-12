@@ -51,7 +51,10 @@ namespace Solid
 
             sceneGraphManager->GetNodeFromEntity(_entity)->RemoveCurrent();
         }
-
+        GameObject* GetGameObjectFromEntity(Entity _e)
+        {
+            return sceneGraphManager->GetNodeFromEntity(_e);
+        }
         GameObject* GetWorld()
         {
             return sceneGraphManager->GetWorld();
