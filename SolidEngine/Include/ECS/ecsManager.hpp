@@ -40,6 +40,20 @@ namespace Solid
             sceneGraphManager->GetNodeFromEntity(_parent)->AddToCurrent(temp);
             return temp;
         }
+	    Entity CreateEntity(std::string _name)
+	    {
+		    Entity temp = entityManager->CreateEntity();
+		    GameObject* obj =sceneGraphManager->GetWorld()->AddToCurrent(temp);
+		    obj->name = _name;
+		    return temp;
+	    }
+	    Entity CreateEntity(std::string _name,Entity _parent)
+	    {
+		    Entity temp = entityManager->CreateEntity();
+		    GameObject* obj = sceneGraphManager->GetNodeFromEntity(_parent)->AddToCurrent(temp);
+		    obj->name = _name;
+		    return temp;
+	    }
 
         void DestroyEntity(Entity _entity)
         {

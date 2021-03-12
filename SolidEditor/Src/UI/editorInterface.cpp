@@ -67,10 +67,67 @@ namespace Solid {
         {
             if (UI::MenuItem("Save Scene"))
             {
-                //SCENE : implement save function here
+	            json j;
+	            j["Scene"].array();
+	            j = j.flatten();
+	            std::string elt = "/Scene";
+	            GameObject* world = Engine::GetInstance()->ecsManager.GetWorld();
+	            std::function<void(json&, GameObject*, std::string&)> Lambda = [&](json& j, GameObject* elt, std::string& path){
+
+		            for(GameObject* sub : elt->childs)
+		            {
+			            std::string subP = path + "/{GameObject_"+ std::to_string(sub->GetEntity()) + "}" ;
+			            j[subP + "/Name"] = sub->name;
+			            Lambda(std::ref(j), sub, std::ref(subP));
+		            }
+
+	            };
+	            Lambda(std::ref(j), world, std::ref(elt));
+	            std::ofstream file("test.json");
+	            j = j.unflatten();
+	            file << std::setw(4) << j << std::endl;
             }
             if (UI::MenuItem("Load Scene"))
             {
+            	json j;
+            	std::ifstream file("test.json");
+            	if(file.is_open())
+	            {
+            		file >> j;
+	            }
+	            Engine* engine = Engine::GetInstance();
+	            GameObject* world = engine->ecsManager.GetWorld();
+	            for (auto it = world->childs.begin() ; it != world->childs.end();)
+	            {
+		            (*it)->RemoveCurrent();
+		            it = world->childs.begin();
+		            if(it == world->childs.end())
+		            {
+			            break;
+		            }
+	            }
+
+	            std::function<void(json&,Entity)> Lambda = [&, engine](json& j,Entity e){
+		            for(auto it = j.begin(); it != j.end(); ++it)
+		            {
+			            std::string key = (it).key();
+			            if(key.find("GameObject") != std::string::npos)
+			            {
+			            	Entity ent = engine->ecsManager.CreateEntity( it.value()["Name"], e);
+			            	Lambda(std::ref(it.value()), ent);
+			            }
+		            }
+	            };
+	            for(auto it = j["Scene"].begin(); it != j["Scene"].end(); ++it)
+	            {
+		            std::string key = (it).key();
+		            if(key.find("GameObject") != std::string::npos)
+		            {
+		            	std::string name = it.value()["Name"];
+			            Entity ent = engine->ecsManager.CreateEntity(name);
+			            Lambda(std::ref(it.value()), ent);
+		            }
+	            }
                 //SCENE : implement load function here
             }
             if (UI::BeginMenu("Build"))
