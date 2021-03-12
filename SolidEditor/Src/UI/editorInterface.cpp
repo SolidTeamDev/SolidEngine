@@ -65,7 +65,14 @@ namespace Solid {
     {
         if (UI::BeginMenu("Files"))
         {
-            UI::MenuItem("Save");
+            if (UI::MenuItem("Save Scene"))
+            {
+                //SCENE : implement save function here
+            }
+            if (UI::MenuItem("Load Scene"))
+            {
+                //SCENE : implement load function here
+            }
             if (UI::BeginMenu("Build"))
             {
                 if (UI::MenuItem("Windows"))

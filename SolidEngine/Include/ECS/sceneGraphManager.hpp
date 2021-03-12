@@ -78,7 +78,10 @@ namespace Solid
             for (GameObject* node : node->childs)
             {
                 if(node->GetEntity() == _entity)
+                {
                     result = node;
+                    break;
+                }
                 else
                 {
                     result = GetNodeFromEntity(_entity,node);

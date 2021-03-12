@@ -18,11 +18,15 @@ namespace Solid
         UI::Begin("Hierarchy", &p_open,
                   ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
 
+        if (UI::IsWindowHovered() && UI::IsAnyMouseDown())
+            EditorInterface::selectedGO = nullptr;
+
         for(GameObject* g : engine->ecsManager.GetWorld()->childs)
         {
             DrawEntities(g,0);
         }
         DrawCreateObject();
+
 
         UI::End();
     }
@@ -38,8 +42,16 @@ void Solid::HierarchyTreeInterface::DrawCreateObject()
         {
             if(UI::MenuItem("GameObject"))
             {
-                Entity tmp = engine->ecsManager.CreateEntity();
+                Entity tmp = -1;
+
+                if (EditorInterface::selectedGO != nullptr)
+                    tmp = engine->ecsManager.CreateEntity(EditorInterface::selectedGO->GetEntity());
+                else
+                    tmp = engine->ecsManager.CreateEntity();
+
                 engine->ecsManager.AddComponent(tmp,Transform());
+                EditorInterface::selectedGO = engine->ecsManager.GetGameObjectFromEntity(tmp);
+
             }
             UI::Separator();
             if(UI::MenuItem("Cube"))
@@ -49,7 +61,10 @@ void Solid::HierarchyTreeInterface::DrawCreateObject()
                 engine->ecsManager.AddComponent(tmp,MeshRenderer{
                         .mesh   = engine->graphicsResourceMgr.GetMesh("cube.obj"),
                         .shader = engine->graphicsResourceMgr.GetShader("ZShader")
+
                 });
+                EditorInterface::selectedGO = engine->ecsManager.GetGameObjectFromEntity(tmp);
+
             }
             if(UI::MenuItem("Sphere"))
             {
@@ -63,6 +78,8 @@ void Solid::HierarchyTreeInterface::DrawCreateObject()
                         .mesh   = engine->graphicsResourceMgr.GetMesh("solid.obj"),
                         .shader = engine->graphicsResourceMgr.GetShader("ZShader")
                 });
+                EditorInterface::selectedGO = engine->ecsManager.GetGameObjectFromEntity(tmp);
+
             }
             UI::EndMenu();
         }
@@ -100,7 +117,8 @@ void Solid::HierarchyTreeInterface::DrawEntity(GameObject* child)
     UI::PushStyleColor(ImGuiCol_Button, colButton);
     UI::PushStyleColor(ImGuiCol_ButtonHovered, colButton);
 
-    if(UI::SmallButton((child->name + "##" +std::to_string(child->GetEntity())).c_str()))
+    if(UI::SmallButton((child->name + "##" +std::to_string(child->GetEntity())).c_str())
+                        || (UI::IsAnyMouseDown() && UI::IsItemHovered()))
         EditorInterface::selectedGO = child;
 
     UI::PopStyleColor(2);
