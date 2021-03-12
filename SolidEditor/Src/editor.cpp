@@ -57,6 +57,8 @@ namespace Solid
 
         glfwSwapInterval(0);
 
+
+
         while (!glfwWindowShouldClose(window->GetHandle()))
         {
             glfwPollEvents();
@@ -79,6 +81,26 @@ namespace Solid
 
             window->SwapBuffers();
         }
+        json j;
+	    j["Scene"].array();
+	    j = j.flatten();
+	    std::string elt = "/Scene";
+	    GameObject* world = engine->ecsManager.GetWorld();
+	    std::function<void(json&, GameObject*, std::string&)> Lambda = [&](json& j, GameObject* elt, std::string& path){
+
+	    	for(GameObject* sub : elt->childs)
+		    {
+	    		std::string subP = path + "/GameObject_"+ std::to_string(sub->GetEntity()) ;
+	    		j[subP + "/Name"] = sub->name;
+
+	    		Lambda(std::ref(j), sub, std::ref(path));
+		    }
+
+	    };
+		Lambda(std::ref(j), world, std::ref(elt));
+	    std::ofstream file("test.json");
+	    j = j.unflatten();
+	    file << std::setw(4) << j << std::endl;
 
     }
 
