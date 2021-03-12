@@ -26,7 +26,7 @@ namespace Solid
             DrawEntities(g,0);
         }
         DrawCreateObject();
-
+        CheckEntityDrag();
 
         UI::End();
     }
@@ -122,4 +122,15 @@ void Solid::HierarchyTreeInterface::DrawEntity(GameObject* child)
         EditorInterface::selectedGO = child;
 
     UI::PopStyleColor(2);
+}
+
+void Solid::HierarchyTreeInterface::CheckEntityDrag()
+{
+    if (UI::IsMouseDragging(ImGuiMouseButton_Left) && UI::IsWindowFocused())
+    {
+        UI::BeginPopup("##dragEntity");
+        UI::TextWrapped("DRAGGG");
+        UI::EndPopup();
+    }
+
 }
