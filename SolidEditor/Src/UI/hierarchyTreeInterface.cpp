@@ -140,11 +140,10 @@ void Solid::HierarchyTreeInterface::DrawEntity(GameObject* child)
         EditorInterface::draggingEnt = false;
         Log::Send("Changed " + EditorInterface::selectedGO->name +
                              "'s parent to " + child->name, Log::ELogSeverity::DEBUG);
-        /* broken
-        child->parent->RemoveCurrent();
-        EditorInterface::selectedGO->parent = child;
-        child->AddToCurrent(EditorInterface::selectedGO->GetEntity());
-        */
+
+		if(child != EditorInterface::selectedGO)
+            EditorInterface::selectedGO->ReParentCurrent(child);
+
     }
 }
 
