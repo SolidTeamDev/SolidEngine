@@ -50,6 +50,7 @@ project(SolidEditor)
 
 include_directories(SolidEditor/Include)
 include_directories(SolidEngine/Include)
+include_directories(SolidEditor/ThirdParty/Include)
 
 ### Editor Sources Files
 
@@ -73,6 +74,17 @@ target_link_libraries(SolidEditor ${EDITOR_LIBS})
 target_compile_definitions(SolidEditor PRIVATE "IMGUI_API=__declspec(dllimport)")
 target_compile_definitions(SolidEditor PUBLIC "SOLID_API=__declspec(dllimport)")
 target_compile_definitions(SolidEditor PRIVATE "SOLID_EDITOR_API=__declspec(dllexport)")
+
+#Refureku
+target_link_directories(SolidEditor PRIVATE SolidEditor/ThirdParty/Lib)
+target_link_libraries(SolidEditor PRIVATE $<IF:$<CONFIG:Debug>,Refurekud,Refureku>)
+
+add_custom_target(RunGenerator
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+        COMMAND SolidEditor/ThirdParty/Bin/RefurekuGenerator
+        )
+
+add_dependencies(SolidEditor RunGenerator)
 
 
 # ========= DLL ==========
