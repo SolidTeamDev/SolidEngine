@@ -12,15 +12,15 @@ GL::Mesh::Mesh(MeshResource *_raw)
 {
     name = _raw->name;
 
-	glGenVertexArrays(1, &VAO);
+
 	Meshes.resize(_raw->Meshes.size());
 	for (int i = 0; i < _raw->Meshes.size(); ++i) {
 		MeshResource::SubMesh& rawSub = _raw->Meshes.at(i);
 		GL::Mesh::SubMesh& sub = Meshes.at(i);
-
+		glGenVertexArrays(1, &sub.VAO);
 		glGenBuffers(1, &sub.VBO);
 		glGenBuffers(1, &sub.EBO);
-		glBindVertexArray(VAO);
+		glBindVertexArray(sub.VAO);
 		glBindBuffer(GL_ARRAY_BUFFER, sub.VBO);
 		glBufferData(GL_ARRAY_BUFFER, rawSub.vertices.size() * 8 *sizeof(GLfloat), rawSub.vertices.data(), GL_STATIC_DRAW);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 *sizeof(GLfloat), (void*)0);
@@ -36,7 +36,10 @@ GL::Mesh::Mesh(MeshResource *_raw)
 
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER,  rawSub.indices.size()*sizeof(unsigned int), rawSub.indices.data(), GL_STATIC_DRAW);
 		sub.numOfIndices = rawSub.indices.size();
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
+	glBindVertexArray(0);
 	bIsInit = true;
 }
 
@@ -47,16 +50,16 @@ void GL::Mesh::Init(MeshResource *_raw)
 
     name = _raw->name;
 
-    glGenVertexArrays(1, &VAO);
+
 	Meshes.resize(_raw->Meshes.size());
 	for (int i = 0; i < _raw->Meshes.size(); ++i)
 	{
 		MeshResource::SubMesh& rawSub = _raw->Meshes.at(i);
 		GL::Mesh::SubMesh& sub = Meshes.at(i);
-
+		glGenVertexArrays(1, &sub.VAO);
 		glGenBuffers(1, &sub.VBO);
 		glGenBuffers(1, &sub.EBO);
-		glBindVertexArray(VAO);
+		glBindVertexArray(sub.VAO);
 		glBindBuffer(GL_ARRAY_BUFFER, sub.VBO);
 		glBufferData(GL_ARRAY_BUFFER, rawSub.vertices.size() * 8 *sizeof(GLfloat), rawSub.vertices.data(), GL_STATIC_DRAW);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 *sizeof(GLfloat), (void*)0);
@@ -80,12 +83,16 @@ void GL::Mesh::Init(MeshResource *_raw)
 void GL::Mesh::DrawMesh()
 {
 	glEnable(GL_DEPTH_TEST);
-	glBindVertexArray(VAO);
+
 	for (auto& subMesh : Meshes)
 	{
+		glBindVertexArray(subMesh.VAO);
+		glBindBuffer(GL_ARRAY_BUFFER, subMesh.VBO);
+
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,subMesh.EBO);
 		glDrawElements(GL_TRIANGLES, subMesh.numOfIndices,GL_UNSIGNED_INT, nullptr);
 	}
+	glBindVertexArray(0);
 }
 
 

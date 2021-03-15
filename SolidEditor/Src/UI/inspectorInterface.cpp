@@ -35,8 +35,11 @@ namespace Solid
 
         UI::Text("Name: ");
         EditText(gameObject->name, "##name");
+	    if(engine->ecsManager.GotComponent<Transform>(gameObject->GetEntity()))
+	    {
+		    EditTransform(engine->ecsManager.GetComponent<Transform>(gameObject->GetEntity()));
+	    }
 
-        EditTransform(engine->ecsManager.GetComponent<Transform>(gameObject->GetEntity()));
 
         if(engine->ecsManager.GotComponent<MeshRenderer>(gameObject->GetEntity()))
         {
@@ -54,6 +57,13 @@ namespace Solid
 
         if(UI::BeginPopup("AddComponent"))
         {
+	        if(!engine->ecsManager.GotComponent<Transform>(gameObject->GetEntity()))
+	        {
+		        if(UI::Button("Transform"))
+		        {
+			        engine->ecsManager.AddComponent(gameObject->GetEntity(),Transform());
+		        }
+	        }
             if(!engine->ecsManager.GotComponent<MeshRenderer>(gameObject->GetEntity()))
             {
                 if(UI::Button("Mesh renderer"))
