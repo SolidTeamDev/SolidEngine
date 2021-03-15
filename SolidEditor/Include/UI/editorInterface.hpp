@@ -38,6 +38,7 @@ namespace Solid
         ~EditorInterface() = default;
 
         static Solid::GameObject* selectedGO;
+        static bool        draggingEnt;
 
 
         /**
