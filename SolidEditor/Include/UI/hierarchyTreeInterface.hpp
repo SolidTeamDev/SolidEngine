@@ -15,7 +15,7 @@ namespace Solid
         void DrawCreateObject();
 
         void DrawEntities();
-        void DrawEntity(GameObject* child);
+        bool DrawEntity(GameObject* child);
 
         void CheckEntities(GameObject* child, uint it);
 
