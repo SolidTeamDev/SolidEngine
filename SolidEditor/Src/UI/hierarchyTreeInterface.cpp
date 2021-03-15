@@ -27,7 +27,6 @@ namespace Solid
         }
         DrawCreateObject();
 
-
         UI::End();
     }
 }
@@ -56,7 +55,13 @@ void Solid::HierarchyTreeInterface::DrawCreateObject()
             UI::Separator();
             if(UI::MenuItem("Cube"))
             {
-                Entity tmp = engine->ecsManager.CreateEntity();
+                Entity tmp = -1;
+
+                if (EditorInterface::selectedGO != nullptr)
+                    tmp = engine->ecsManager.CreateEntity(EditorInterface::selectedGO->GetEntity());
+                else
+                    tmp = engine->ecsManager.CreateEntity();
+
                 engine->ecsManager.AddComponent(tmp,Transform());
                 engine->ecsManager.AddComponent(tmp,MeshRenderer{
                         .mesh   = engine->graphicsResourceMgr.GetMesh("cube.obj"),
@@ -121,5 +126,21 @@ void Solid::HierarchyTreeInterface::DrawEntity(GameObject* child)
                         || (UI::IsAnyMouseDown() && UI::IsItemHovered()))
         EditorInterface::selectedGO = child;
 
+    if(UI::IsItemHovered() && UI::IsMouseDragging(ImGuiMouseButton_Left) && child == EditorInterface::selectedGO)
+        EditorInterface::draggingEnt = true;
+
+    if(UI::IsItemHovered() && EditorInterface::draggingEnt && !UI::IsAnyMouseDown())
+    {
+        EditorInterface::draggingEnt = false;
+        Log::Send("Changed " + EditorInterface::selectedGO->name +
+                             "'s parent to " + child->name, Log::ELogSeverity::DEBUG);
+        /* broken
+        child->parent->RemoveCurrent();
+        EditorInterface::selectedGO->parent = child;
+        child->AddToCurrent(EditorInterface::selectedGO->GetEntity());
+        */
+    }
+
     UI::PopStyleColor(2);
 }
+

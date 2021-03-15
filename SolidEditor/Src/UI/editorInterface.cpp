@@ -7,6 +7,7 @@
 
 
 Solid::GameObject* Solid::EditorInterface::selectedGO = nullptr;
+bool               Solid::EditorInterface::draggingEnt = false;
 
 namespace Solid {
     EditorInterface::EditorInterface() :
