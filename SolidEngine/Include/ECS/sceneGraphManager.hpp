@@ -44,6 +44,21 @@ namespace Solid
             return obj;
         }
 
+        void ReParentCurrent(GameObject* Parent)
+        {
+            GameObject* ParentTemp =this->parent;
+            this->parent = Parent;
+	        for (auto it = ParentTemp->childs.begin(); it != ParentTemp->childs.end(); it++)
+	        {
+	        	if((*it) == this)
+		        {
+	        		ParentTemp->childs.erase(it);
+		            break;
+		        }
+	        }
+	        Parent->childs.push_back(this);
+        }
+
         void RemoveCurrent()
         {
             if(parent != nullptr)
