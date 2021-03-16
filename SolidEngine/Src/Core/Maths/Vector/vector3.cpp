@@ -155,11 +155,16 @@ namespace Solid
         return Vec3(x/len, y/len,z/len);
     }
 
-    constexpr  bool Vec3::IsEquals(const Vec3 &vec) const noexcept
+    constexpr bool Vec3::IsNormalized() const noexcept
     {
-        return  Solid::Maths::Equals(x,vec.x) &&
-                Solid::Maths::Equals(y,vec.y) &&
-                Solid::Maths::Equals(z,vec.z);
+        return Maths::Equals<float>(SqrtLength(), 3.f * S_EPSILON);
+    }
+
+    constexpr bool Vec3::IsEquals(const Vec3& vec) const noexcept
+    {
+        return  Solid::Maths::Equals(x,vec.x, 0.0001f) &&
+                Solid::Maths::Equals(y,vec.y, 0.0001f) &&
+                Solid::Maths::Equals(z,vec.z, 0.0001f);
     }
 
     constexpr float Vec3::Dist(const Vec3 &vec) const noexcept
@@ -172,9 +177,11 @@ namespace Solid
         return (*this - vec).SqrtLength();
     }
 
-    std::string Vec3::ToString() noexcept
+    const std::string Vec3::ToString() const noexcept
     {
-        return "[" + std::to_string(Maths::RadToDeg(x)) + "," + std::to_string(Maths::RadToDeg(y)) + "," + std::to_string(Maths::RadToDeg(z)) + "]";
+        //return "[" + std::to_string(Maths::RadToDeg(x)) + "," + std::to_string(Maths::RadToDeg(y)) + "," + std::to_string(Maths::RadToDeg(z)) + "]";
+        return "[" + std::to_string(x) + "," + std::to_string(y) + "," + std::to_string(z) + "]";
+
     }
 
 #pragma endregion

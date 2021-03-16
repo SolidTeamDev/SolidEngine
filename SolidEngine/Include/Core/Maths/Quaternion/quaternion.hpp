@@ -13,8 +13,9 @@ namespace Solid
         constexpr Quat()noexcept:x(0),y(0),z(0),w(1){}
         constexpr Quat(float _value) noexcept;
         constexpr Quat(float _x,float _y = 0, float _z = 0, float _w = 1) noexcept;
-        constexpr Quat(const Vec3& _axis) noexcept; //TODO fix
+        constexpr Quat(const Vec3& _angles) noexcept; //TODO fix
         constexpr Quat(const Quat& _copy) noexcept = default;
+        Quat(float _angle, const Vec3& _axis) noexcept;
 
         ~Quat() = default;
 
@@ -73,8 +74,10 @@ namespace Solid
         constexpr Quat Unrotate(const Quat& _quat) const;
 
         Vec3 ToEuler() const;
+        Quat FromEuler(const Vec3& _angles) const;
 
-        std::string ToString() noexcept;
+
+        const std::string ToString() const noexcept;
 
 #pragma endregion
 #pragma region Operator

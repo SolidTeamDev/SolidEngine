@@ -1,3 +1,4 @@
+#include <iostream>
 #include "Core/Maths/Quaternion/quaternion.hpp"
 #include "Core/Maths/Vector/vector3.hpp"
 #include "Core/Debug/debug.hpp"
@@ -19,29 +20,49 @@ namespace Solid
             w{_w}
     {}
 
-    constexpr Quat::Quat(const Vec3 &_axis) noexcept :
+    constexpr Quat::Quat(const Vec3 &_angles) noexcept :
     x{0},
     y{0},
     z{0},
     w{0}
     {
-        Vec3 half = _axis * 05;
+        Vec3 half = _angles * 0.5;
 
-        float cosX = Maths::Cos(half.x);
-        float cosY = Maths::Cos(half.y);
-        float cosZ = Maths::Cos(half.z);
-        float sinX = Maths::Sin(half.x);
-        float sinY = Maths::Sin(half.y);
-        float sinZ = Maths::Sin(half.z);
+        float cosPitch = Maths::Cos(half.y);
+        float sinPitch = Maths::Sin(half.y);
 
-        w = cosX * cosY * cosZ - sinX * sinY * sinZ;
-        x = sinX * cosY * cosZ + cosX * sinY * sinZ;
-        y = cosX * sinY * cosZ - sinX * cosY * sinZ;
-        z = cosX * cosY * sinZ + sinX * sinY * cosZ;
+        float cosYaw = Maths::Cos(half.x);
+        float sinYaw = Maths::Sin(half.x);
 
+        float cosRoll = Maths::Cos(half.z);
+        float sinRoll = Maths::Sin(half.z);
+
+        w = cosPitch * cosYaw * cosRoll + sinPitch * sinYaw * sinRoll;
+        x = sinYaw * cosRoll * cosPitch - cosYaw * sinRoll * sinPitch;
+        y = cosYaw * cosRoll * sinPitch + sinYaw * sinRoll * cosPitch;
+        z = cosYaw * sinRoll * cosPitch - sinYaw * cosRoll * sinPitch;
 
     }
 
+    Quat::Quat(float _angle, const Vec3& _axis) noexcept
+    {
+        _angle = Maths::DegToRad(_angle)/2.f;
+
+        w = Maths::Cos(_angle);
+
+        if(!_axis.IsNormalized())
+        {
+            Vec3 vn = _axis.GetNormalize();
+            x = vn.x * Maths::Sin(_angle);
+            y = vn.y * Maths::Sin(_angle);
+            z = vn.z * Maths::Sin(_angle);
+            return;
+        }
+
+        x = _axis.x * Maths::Sin(_angle);
+        y = _axis.y * Maths::Sin(_angle);
+        z = _axis.z * Maths::Sin(_angle);
+    }
 #pragma region Static Methods
 
     Quat Quat::Zero{0, 0, 0, 0};
@@ -188,12 +209,12 @@ namespace Solid
     }
 
 
-    constexpr bool Quat::IsEquals(const Quat &_quat) const noexcept
+    constexpr bool Quat::IsEquals(const Quat& _quat) const noexcept
     {
-        return Solid::Maths::Equals(x, _quat.x) &&
-               Solid::Maths::Equals(y, _quat.y) &&
-               Solid::Maths::Equals(z, _quat.z) &&
-               Solid::Maths::Equals(w, _quat.w);
+        return Solid::Maths::Equals(x, _quat.x, 0.0001f) &&
+               Solid::Maths::Equals(y, _quat.y,  0.0001f) &&
+               Solid::Maths::Equals(z, _quat.z,  0.0001f) &&
+               Solid::Maths::Equals(w, _quat.w,  0.0001f);
     }
 
     constexpr Vec3 Quat::Rotate(const Vec3 &_vec) const
@@ -247,31 +268,73 @@ namespace Solid
         return GetInversed().Rotate(_quat);
     }
 
+
+
     Vec3 Quat::ToEuler() const
     {
         Vec3 eulerAngle;
+        const float SINGULARITY_THRESHOLD = 0.4999995f;
+        const float SingularityTest = ( w * y - z * x );
+        const float YawY = 2.f*(w*z+x*y);
+        const float YawX = (1.f-2.f*(y*y + z*z));
+        //heading = yaw
+        //bank = roll
+        //attitude = pitch
+        //http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/
+        // a check TODO
 
-        // roll (x-axis rotation)
-        double sinr_cosp = 2 * (w * x + y * z);
-        double cosr_cosp = 1 - 2 * (x * x + y * y);
-        eulerAngle.x = std::atan2(sinr_cosp, cosr_cosp);
+        /*
+        // roll (z-axis rotation)
+        eulerAngle.z = Maths::Atan2(YawY, YawX);
+        // pitch (x-axis rotation)
+        // yaw (y-axis rotation)
 
-        // pitch (y-axis rotation)
-        double sinp = 2 * (w * y - z * x);
-        if (std::abs(sinp) >= 1)
-            eulerAngle.y = std::copysign(S_PI / 2, sinp); // use 90 degrees if out of range
+        if (SingularityTest < -SINGULARITY_THRESHOLD)
+        {
+            eulerAngle.x = -eulerAngle.z - (2.f * Maths::Atan2(x, w));
+            eulerAngle.y = Maths::DegToRad(-90.f);
+        }
+        else if(SingularityTest > SINGULARITY_THRESHOLD)
+        {
+            eulerAngle.x =eulerAngle.z - (2.f * Maths::Atan2(x, w));
+            eulerAngle.y = Maths::DegToRad(90.f);
+        }
         else
-            eulerAngle.y = std::asin(sinp);
+        {
+            eulerAngle.x = Maths::Atan2(2.f*(w*x+y*z), (1.f-2.f*(x*x + y*y)));
+            eulerAngle.y = Maths::Asin(2.0 * SingularityTest);
+        }
+*/
 
-        // yaw (z-axis rotation)
-        double siny_cosp = 2 * (w * z + x * y);
-        double cosy_cosp = 1 - 2 * (y * y + z * z);
-        eulerAngle.z = std::atan2(siny_cosp, cosy_cosp);
+
+
+        //float siny_cosp = 2.0 * (w * z + x * y);
+        //float cosy_cosp = 1.0 - 2.0 * (y * y + z * z);
+
 
         return eulerAngle;
     }
 
-    std::string Quat::ToString() noexcept
+    Quat Quat::FromEuler(const Vec3& _angles) const
+    {
+        Vec3 half = _angles * 05;
+
+        float cosPitch = Maths::Cos(half.x);
+        float cosYaw = Maths::Cos(half.y);
+        float cosRoll = Maths::Cos(half.z);
+        float sinPitch = Maths::Sin(half.x);
+        float sinYaw = Maths::Sin(half.y);
+        float sinRoll = Maths::Sin(half.z);
+
+        Quat result;
+        result.w = cosPitch * cosYaw * cosRoll - sinPitch * sinYaw * sinRoll;
+        result.x = sinPitch * cosYaw * cosRoll + cosPitch * sinYaw * sinRoll;
+        result.y = cosPitch * sinYaw * cosRoll - sinPitch * cosYaw * sinRoll;
+        result.z = cosPitch * cosYaw * sinRoll + sinPitch * sinYaw * cosRoll;
+
+        return result;
+    }
+    const std::string Quat::ToString() const noexcept
     {
         return "[" + std::to_string(x) + "," + std::to_string(y) + "," +
                std::to_string(z) + "," + std::to_string(w) + "]";

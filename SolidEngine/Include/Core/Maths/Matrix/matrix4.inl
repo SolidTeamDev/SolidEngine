@@ -412,7 +412,7 @@ namespace Solid
 
 
     template<typename T>
-    std::string Mat4<T>::ToString() noexcept
+    const std::string Mat4<T>::ToString() const noexcept
     {
         std::string str = "\n";
 

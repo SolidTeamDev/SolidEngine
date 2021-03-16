@@ -49,13 +49,13 @@ namespace Solid
         template<typename T>
         constexpr T DegToRad(T _value) noexcept
         {
-            return _value * S_PI/180;
+            return _value * S_PI/180.f;
         }
 
         template<typename T>
         constexpr T RadToDeg(T _value) noexcept
         {
-            return _value * 180/S_PI;
+            return _value * 180.f/S_PI;
         }
 
         template<typename T>
@@ -136,6 +136,12 @@ namespace Solid
         constexpr T Atan(T _value) noexcept
         {
             return std::atan(_value);
+        }
+
+        template<typename T>
+        constexpr T Atan2(T _value1,T _value2) noexcept
+        {
+            return std::atan2(_value1, _value2);
         }
 
         template<typename T>

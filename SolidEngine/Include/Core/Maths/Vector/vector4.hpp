@@ -66,6 +66,7 @@ namespace Solid
 
         constexpr Vec4 GetNormalize() const noexcept;
 
+        constexpr bool IsNormalized() const noexcept;
 
         constexpr bool IsEquals(const Vec4& vec) const noexcept;
 
@@ -75,7 +76,7 @@ namespace Solid
 
         constexpr Vec3 ToVector3() const noexcept;
 
-        std::string ToString() noexcept;
+        const std::string ToString() const noexcept;
 
 #pragma endregion
 #pragma region Operator

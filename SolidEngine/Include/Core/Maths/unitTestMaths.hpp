@@ -3,10 +3,30 @@
 
 namespace Solid
 {
-    void SOLID_API TestVec3();
-    void SOLID_API TestVec4();
-    void SOLID_API TestQuat();
-    void SOLID_API TestMat4();
+    namespace Vec2UnitTest
+    {
+        void SOLID_API Main();
+    }
+
+    namespace Vec3UnitTest
+    {
+        void SOLID_API Main();
+    }
+
+    namespace Vec4UnitTest
+    {
+        void SOLID_API Main();
+    }
+
+    namespace QuatUnitTest
+    {
+        void SOLID_API Main();
+    }
+
+    namespace Mat4UnitTest
+    {
+        void SOLID_API Main();
+    }
     int  SOLID_API AllTestFuncMaths();
 }
 

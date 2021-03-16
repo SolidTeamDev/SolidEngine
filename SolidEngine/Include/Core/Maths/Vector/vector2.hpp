@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Build/SolidAPI.hpp"
+#include <Core/Maths/Utils/constants.hpp>
 #include <iostream>
 #include <string>
 
@@ -24,8 +25,8 @@ namespace Solid
     };
     struct SOLID_API Vec2
     {
-        float x;
-        float y;
+        float x = 0;
+        float y = 0;
 
         constexpr Vec2() noexcept = default;
 
@@ -78,13 +79,15 @@ namespace Solid
 
         constexpr Vec2 GetNormalize() const noexcept;
 
+        constexpr bool IsNormalized() const noexcept;
+
         constexpr bool IsEquals(const Vec2& vec) const noexcept;
 
         constexpr float Dist(const Vec2& vec) const noexcept;
 
         constexpr float SqrtDist(const Vec2& vec) const noexcept;
 
-        std::string ToString() noexcept;
+        const std::string ToString() const noexcept;
 
 #pragma endregion
 #pragma region Operator

@@ -81,12 +81,13 @@ namespace Solid
             UI::Text("Position");UI::SameLine();
             EditVec3(tempPos  , "##trsPos");
             UI::Text("Rotation");UI::SameLine();
-            EditVec3(tempRot  , "##trsRot");
+            bool changed = EditVec3(tempRot  , "##trsRot");
             UI::Text("Scale   ");UI::SameLine();
             EditVec3(tempScale, "##trsScl");
 
             _trs.SetPosition(tempPos);
-            _trs.SetRotation(Quat(tempRot));
+            if (changed)
+                _trs.SetRotation(Quat(tempRot));
             _trs.SetScale(tempScale);
         }
     }
@@ -139,9 +140,15 @@ namespace Solid
         }
     }
 
-    void InspectorInterface::EditVec3(Vec3& _vec, const std::string& _label)
+    bool InspectorInterface::EditVec3(Vec3& _vec, const std::string& _label)
     {
-        UI::DragFloat3(_label.c_str(), &_vec.x, 0.01f);
+        Vec3 temp = _vec;
+        if(UI::DragFloat3(_label.c_str(), &temp.x, 0.01f))
+        {
+            _vec = temp;
+            return true;
+        }
+        return false;
     }
 
     void InspectorInterface::EditVec2(Vec2& _vec, const std::string& _label)

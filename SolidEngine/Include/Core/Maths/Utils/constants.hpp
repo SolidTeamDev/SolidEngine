@@ -14,4 +14,4 @@ static constexpr double S_LN2		= 0.69314718055994530941;	//ln(2)
 static constexpr double S_LN10	    = 2.30258509299404568402; //ln(10)
 static constexpr double S_SQRT2		= 1.41421356237309504880;	//sqrt(2)
 static constexpr double S_SQRT1_2	= 0.707106781186547524401;	//1/sqrt(2)
-static constexpr double S_EPSILON   = 0.00000000002220446;
+static constexpr double S_EPSILON   = 0.0000000002220446;

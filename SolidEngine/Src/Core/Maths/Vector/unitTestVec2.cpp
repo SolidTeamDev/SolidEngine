@@ -1,6 +1,7 @@
 #include <iostream>
 #include <Core/Maths/Vector/vector2.hpp>
-#include <Core/Maths/Vector/unitTestVec2.hpp>
+#include <Core/Maths/unitTestMaths.hpp>
+#define SA_UTH_DFLT_CSL_LOG 1
 #include <SA-UnitTestHelper.hpp>
 
 using namespace Sa;
@@ -40,8 +41,9 @@ namespace Solid::Vec2UnitTest
 
     }
 
-    void AllTest()
+    void Main()
     {
+        //std::cout.precision(7);
         SA_UTH_GP(TestConstructors());
     }
 

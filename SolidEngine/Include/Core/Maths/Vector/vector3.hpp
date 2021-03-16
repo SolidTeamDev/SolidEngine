@@ -66,13 +66,15 @@ namespace Solid
 
         constexpr Vec3 GetNormalize() const noexcept;
 
+        constexpr bool IsNormalized() const noexcept;
+
         constexpr bool IsEquals(const Vec3& vec) const noexcept;
 
         constexpr float Dist(const Vec3& vec) const noexcept;
 
         constexpr float SqrtDist(const Vec3& vec) const noexcept;
 
-        std::string ToString() noexcept;
+        const std::string ToString() const noexcept;
 
 #pragma endregion
 #pragma region Operator

@@ -1033,9 +1033,9 @@ namespace Sa
 		*/
 		#define SA_UTH_EQ(_lhs, _rhs, ...)\
 		{\
-			using namespace Sa::UTH::Internal;\
+			using namespace UTH::Internal;\
 		\
-			bool bRes = UTH::Equals(_lhs, _rhs, __VA_ARGS__);\
+			bool bRes = Sa::UTH::Equals(_lhs, _rhs, __VA_ARGS__);\
 			Sa::UTH::Internal::Update(bRes);\
 		\
 			if(ShouldComputeTest(bRes))\

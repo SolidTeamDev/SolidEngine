@@ -1,36 +1,20 @@
 #include <Core/Maths/unitTestMaths.hpp>
-#include <Core/Maths/Vector/unitTestVec2.hpp>
+#define SA_UTH_DFLT_CSL_LOG 1
 #include <SA-UnitTestHelper.hpp>
 #include <iostream>
 
 
 namespace Solid
 {
-    void TestVec3()
-    {
-        /*TODO*/
-    }
-
-    void TestVec4()
-    {
-        /*TODO*/
-    }
-
-    void TestQuat()
-    {
-        /*TODO*/
-    }
-
-    void TestMat4()
-    {
-        /*TODO*/
-    }
 
     int AllTestFuncMaths()
     {
-        std::cout << "Test vec2" << std::endl;
+
         SA_UTH_INIT();
-        Solid::Vec2UnitTest::AllTest();
+        Sa::UTH::verbosity = Sa::UTH::Verbosity::Default;
+
+        SA_UTH_GP(Solid::Vec2UnitTest::Main());
+        SA_UTH_GP(Solid::QuatUnitTest::Main());
         SA_UTH_EXIT();
     }
 

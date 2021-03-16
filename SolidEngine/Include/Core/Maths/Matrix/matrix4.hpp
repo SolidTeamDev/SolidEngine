@@ -71,7 +71,7 @@ namespace Solid
 
         constexpr float Determinant() const noexcept;
 
-        std::string ToString() noexcept;
+        const std::string ToString() const noexcept;
 
     private:
         constexpr float det_2(unsigned x, unsigned y, unsigned z, unsigned w) noexcept;

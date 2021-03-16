@@ -162,12 +162,17 @@ namespace Solid
         return Vec4(x/len, y/len,z/len,1);
     }
 
-    constexpr  bool Vec4::IsEquals(const Vec4 &vec) const noexcept
+    constexpr bool Vec4::IsNormalized() const noexcept
     {
-        return  Solid::Maths::Equals(x,vec.x) &&
-                Solid::Maths::Equals(y,vec.y) &&
-                Solid::Maths::Equals(z,vec.z) &&
-                Solid::Maths::Equals(w,vec.w) ;
+        return Maths::Equals<float>(SqrtLength(), 3.f * S_EPSILON);
+    }
+
+    constexpr bool Vec4::IsEquals(const Vec4& vec) const noexcept
+    {
+        return  Solid::Maths::Equals(x,vec.x, 0.0001f) &&
+                Solid::Maths::Equals(y,vec.y, 0.0001f) &&
+                Solid::Maths::Equals(z,vec.z, 0.0001f) &&
+                Solid::Maths::Equals(w,vec.w, 0.0001f) ;
     }
 
     constexpr float Vec4::Dist(const Vec4 &vec) const noexcept
@@ -185,7 +190,7 @@ namespace Solid
         return Vec3(x/w,y/w,z/w);
     }
 
-    std::string Vec4::ToString() noexcept
+    const std::string Vec4::ToString() const noexcept
     {
         return  "[" + std::to_string(x) + "," + std::to_string(y) + "," +
                 std::to_string(z) + "," + std::to_string(w) + "]";
