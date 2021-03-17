@@ -19,7 +19,6 @@ namespace Solid
         if (UI::IsWindowHovered() && UI::IsAnyMouseDown())
             EditorInterface::selectedGO = nullptr;
 
-
         DrawEntities();
 
         DrawCreateObject();
@@ -92,27 +91,24 @@ void Solid::HierarchyTreeInterface::DrawCreateObject()
 
 void Solid::HierarchyTreeInterface::DrawEntities()
 {
-    //UI::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.3f, 0.3f, 0.3f, 1.f));
-    //UI::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(0.25f, 0.25f, 0.25f, 1.f);
-    //UI::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(0.35f, 0.35f, 0.35f, 1.f));
-
-    UI::SetNextItemOpen(true, ImGuiCond_Once);
-    if (UI::TreeNode("##EntitiesTree"))
+    Engine *engine = Engine::GetInstance();
+    for (GameObject *g : engine->ecsManager.GetWorld()->childs)
     {
-        Engine *engine = Engine::GetInstance();
-        for (GameObject *g : engine->ecsManager.GetWorld()->childs)
-        {
-            CheckEntities(g, 0);
-        }
-        UI::TreePop();
+        CheckEntities(g, 0);
     }
-    //UI::PopStyleColor(3);
+
+    if (EditorInterface::draggingEnt && !UI::IsAnyMouseDown() && !UI::IsAnyItemHovered() && UI::IsWindowHovered())
+    {
+        EditorInterface::draggingEnt = false;
+        if (EditorInterface::selectedGO->parent == nullptr)
+            return;
+
+        EditorInterface::selectedGO->ReParentCurrent(engine->ecsManager.GetWorld());
+    }
 }
 
 void Solid::HierarchyTreeInterface::CheckEntities(GameObject* child, unsigned int it)
 {
-
-
     ImVec2 pos = UI::GetCursorPos();
     pos.x += 20.f * (float)it;
     UI::SetCursorPos(pos);
@@ -123,14 +119,17 @@ void Solid::HierarchyTreeInterface::CheckEntities(GameObject* child, unsigned in
     for(GameObject* child : child->childs)
     {
         CheckEntities(child, it+1);
-    }
 
+    }
 }
 
 bool Solid::HierarchyTreeInterface::DrawEntity(GameObject* child)
 {
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_None;
 
-    bool result = UI::TreeNode((child->name + "##" +std::to_string(child->GetEntity())).c_str());
+    if (child->childs.empty())
+        flags |= ImGuiTreeNodeFlags_Leaf;
+    bool result = UI::TreeNodeEx((child->name + "##" +std::to_string(child->GetEntity())).c_str(), flags);
     if (UI::IsAnyMouseDown() && UI::IsItemHovered())
         EditorInterface::selectedGO = child;
 
