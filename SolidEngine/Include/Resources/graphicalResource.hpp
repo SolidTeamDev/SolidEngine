@@ -15,11 +15,12 @@ namespace Solid
 		{
 		public:
 			//public members
-			uint VAO;
+
 			bool bIsInit = false;
 			class SubMesh
 			{
 			public:
+				uint VAO;
 				uint VBO;
 				uint EBO;
 				std::size_t numOfIndices;

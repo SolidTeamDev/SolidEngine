@@ -57,6 +57,8 @@ namespace Solid
 
         glfwSwapInterval(0);
 
+
+
         while (!glfwWindowShouldClose(window->GetHandle()))
         {
             glfwPollEvents();
@@ -79,6 +81,7 @@ namespace Solid
 
             window->SwapBuffers();
         }
+
 
     }
 

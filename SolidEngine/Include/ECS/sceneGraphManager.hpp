@@ -37,9 +37,26 @@ namespace Solid
             }
         }
 
-        void AddToCurrent(Entity _entity)
+        GameObject* AddToCurrent(Entity _entity)
         {
-            childs.push_back(new GameObject(this,_entity));
+	        GameObject* obj = new GameObject(this,_entity);
+            childs.push_back(obj);
+            return obj;
+        }
+
+        void ReParentCurrent(GameObject* Parent)
+        {
+            GameObject* ParentTemp =this->parent;
+            this->parent = Parent;
+	        for (auto it = ParentTemp->childs.begin(); it != ParentTemp->childs.end(); it++)
+	        {
+	        	if((*it) == this)
+		        {
+	        		ParentTemp->childs.erase(it);
+		            break;
+		        }
+	        }
+	        Parent->childs.push_back(this);
         }
 
         void RemoveCurrent()

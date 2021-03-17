@@ -17,6 +17,7 @@ namespace Solid
         void DrawEntities(GameObject* child, uint it);
         void DrawEntity(GameObject* child);
 
+
         bool p_open = true;
     };
 }

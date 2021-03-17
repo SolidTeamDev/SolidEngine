@@ -7,10 +7,14 @@
 #include <filesystem>
 
 #include "Core/Maths/solidVector.hpp"
+#include "json.hpp"
+
+
 
 
 namespace fs = std::filesystem;
 namespace Solid {
+	typedef nlohmann::json json;
 
 	struct ShaderBinary
 	{
@@ -28,6 +32,7 @@ namespace Solid {
         Compute,
         Material,
         Texture,
+        Scene,
         NONE,
     };
 
@@ -222,5 +227,20 @@ namespace Solid {
 
         }
     };
+	class SOLID_API SceneResource : public Resource
+	{
+	public:
+		SceneResource()
+		{
+			type = EResourceType::Scene;
+		}
+
+		~SceneResource()
+		{
+
+		}
+	};
 }
+
+
 #endif //SOLIDEDITOR_RESOURCETYPE_HPP
