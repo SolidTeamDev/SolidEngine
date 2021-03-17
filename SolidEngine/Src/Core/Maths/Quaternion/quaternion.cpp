@@ -4,6 +4,7 @@
 #include "Core/Debug/debug.hpp"
 #include "Core/Maths/Utils/numerics.hpp"
 
+
 namespace Solid
 {
     constexpr Quat::Quat(float _value) noexcept:

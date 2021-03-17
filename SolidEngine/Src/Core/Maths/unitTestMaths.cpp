@@ -11,7 +11,7 @@ namespace Solid
     {
 
         SA_UTH_INIT();
-        Sa::UTH::verbosity = Sa::UTH::Verbosity::Default;
+        Sa::UTH::verbosity = Sa::UTH::Verbosity::ParamsFailure;
 
         SA_UTH_GP(Solid::Vec2UnitTest::Main());
         SA_UTH_GP(Solid::QuatUnitTest::Main());

@@ -12,8 +12,8 @@ namespace Solid
     {
         constexpr Quat()noexcept:x(0),y(0),z(0),w(1){}
         constexpr Quat(float _value) noexcept;
-        constexpr Quat(float _x,float _y = 0, float _z = 0, float _w = 1) noexcept;
-        constexpr Quat(const Vec3& _angles) noexcept; //TODO fix
+        constexpr Quat(float _x,float _y, float _z, float _w = 1) noexcept;
+        constexpr Quat(const Vec3& _angles) noexcept;
         constexpr Quat(const Quat& _copy) noexcept = default;
         Quat(float _angle, const Vec3& _axis) noexcept;
 
