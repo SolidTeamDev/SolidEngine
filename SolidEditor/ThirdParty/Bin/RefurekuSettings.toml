@@ -14,7 +14,9 @@ toParseDirectories = [
 ]
 
 # Files to parse which are not included in any directory of toParseDirectories
-toParseFiles = []
+toParseFiles = [
+    #'''SolidEngine/Include/ECS/Components/script.hpp'''
+]
 
 # Files contained in the directories of this list will be ignored
 ignoredDirectories = [
@@ -36,7 +38,9 @@ shouldParseAllEntities = false
 # Include directories of the project
 projectIncludeDirectories = [
 	'''SolidEditor/ThirdParty/Include/Refureku''',
-	'''SolidEditor/Include'''
+	'''SolidEditor/Include''',
+	'''SolidEngine/Include''',
+	'''SolidEditor/ThirdParty/Include'''
 ]
 
 # Must be one of "msvc", "clang++", "g++"
@@ -44,9 +48,11 @@ compilerExeName = "msvc"
 
 [FileParsingSettings.Properties]
 namespaceMacroName = "SLDNamespace"
-classmacroName = "SLDClass"
+classMacroName = "SLDClass"
 structMacroName = "SLDStruct"
 fieldMacroName = "SLDField"
 methodMacroName = "SLDMethod"
 enumMacroName = "SLDEnum"
 enumValueMacroName = "SLDEnumVal"
+variableMacroName = "SLDVariable"
+functionMacroName = "SLDFunction"

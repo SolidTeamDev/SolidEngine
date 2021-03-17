@@ -7,8 +7,7 @@
 
 #include "ECS/Components/transform.hpp"
 #include "ECS/Components/meshRenderer.hpp"
-
-#include <string>
+#include "../../Resources/customScript.hpp"
 
 namespace Solid
 {
