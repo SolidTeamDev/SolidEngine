@@ -119,6 +119,7 @@ namespace Solid
                     if(UI::Selectable(mesh.second->name.c_str(), selected))
                     {
                         _meshRenderer.mesh = engine->graphicsResourceMgr.GetMesh(mesh.second->name.c_str());
+                        _meshRenderer.materials.resize(_meshRenderer.mesh->subMeshCount, nullptr);
                     }
                     if(selected)
                         UI::SetItemDefaultFocus();
@@ -127,7 +128,7 @@ namespace Solid
                 UI::EndCombo();
             }
 
-            const char* shaderName = _meshRenderer.shader == nullptr ? "" : _meshRenderer.shader->name.c_str();
+           /* const char* shaderName = _meshRenderer.shader == nullptr ? "" : _meshRenderer.shader->name.c_str();
 
             UI::Text("Shader");UI::SameLine();
             if(UI::BeginCombo("##Shader", shaderName))
@@ -145,7 +146,7 @@ namespace Solid
                         UI::SetItemDefaultFocus();
                 }
                 UI::EndCombo();
-            }
+            }*/
         }
     }
 

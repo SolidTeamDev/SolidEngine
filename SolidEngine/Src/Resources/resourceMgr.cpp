@@ -59,8 +59,6 @@ void ResourceManager::AddResource(Resource *r)
 		case EResourceType::Image:
 			ImageList.List.emplace(r->name, (ImageResource*)r);
             break;
-		case EResourceType::Texture:
-			TextureList.List.emplace(r->name, (TextureResource*)r);
             break;
 		case EResourceType::Anim:
 			AnimList.List.emplace(r->name, (AnimResource*)r);
@@ -101,9 +99,6 @@ T* ResourceManager::GetResourceByName(const char* _name)
         {
 
             int i = 0;
-            TaskMgr.AddTask(Task(Task::MakeID("Find " + std::to_string(i) + _name), ETaskType::GENERAL, Lambda, &TextureList, &MtResource[i], _name));
-            IDS[i] = {"Find "+ std::to_string(i) + _name, i};
-            ++i;
             TaskMgr.AddTask(Task(Task::MakeID("Find " + std::to_string(i) + _name), ETaskType::GENERAL, Lambda, &MeshList, &MtResource[i], _name));
             IDS[i] = {"Find "+ std::to_string(i) + _name, i};
             ++i;
@@ -193,6 +188,19 @@ ResourceManager * ResourceManager::GetInstance()
     if(instance == nullptr)
         ThrowError("ResourceManager is not Initialized", ESolidErrorCode::S_INIT_ERROR);
     return instance;
+}
+
+void ResourceManager::InitDefaultMat()
+{
+	if(defaultMatInit)
+		return;
+	defaultMat = new MaterialResource();
+	defaultMatInit = true;
+}
+
+const MaterialResource* ResourceManager::GetDefaultMat()
+{
+	return defaultMat;
 }
 
 

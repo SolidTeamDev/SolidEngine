@@ -66,8 +66,6 @@ void  ResourcesLoader::LoadRessourceNoAdd(const fs::path &Rpath, ResourcePtrWrap
 
     if(extension == ".simage")
         r=LoadSolidImage(Rpath);
-    else if(extension == ".stexture")
-        ;
     else if(extension == ".smesh")
         r=LoadSolidMesh(Rpath);
     else if(extension == ".scompute")
@@ -198,7 +196,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
                 }
             }
         }
-
+		Manager->InitDefaultMat();
 
     }
         /// MonoThread Loading
