@@ -26,6 +26,7 @@ namespace Solid
     z{0},
     w{0}
     {
+
         Vec3 half = _angles * 0.5;
 
         float cosPitch = Maths::Cos(half.y);
@@ -269,23 +270,18 @@ namespace Solid
     }
 
 
-
+    /// TO Euler Convention is ZYX
     Vec3 Quat::ToEuler() const
     {
+
         Vec3 eulerAngle;
         const float SINGULARITY_THRESHOLD = 0.4999995f;
         const float SingularityTest = ( w * y - z * x );
         const float YawY = 2.f*(w*z+x*y);
-        const float YawX = (1.f-2.f*(y*y + z*z));
-        //heading = yaw
-        //bank = roll
-        //attitude = pitch
-        //http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/
-        // a check TODO
+        const float Yawx = (1.f-2.f*(y*y + z*z));
 
-        /*
         // roll (z-axis rotation)
-        eulerAngle.z = Maths::Atan2(YawY, YawX);
+        eulerAngle.z = Maths::Atan2(YawY, Yawx);
         // pitch (x-axis rotation)
         // yaw (y-axis rotation)
 
@@ -304,13 +300,6 @@ namespace Solid
             eulerAngle.x = Maths::Atan2(2.f*(w*x+y*z), (1.f-2.f*(x*x + y*y)));
             eulerAngle.y = Maths::Asin(2.0 * SingularityTest);
         }
-*/
-
-
-
-        //float siny_cosp = 2.0 * (w * z + x * y);
-        //float cosy_cosp = 1.0 - 2.0 * (y * y + z * z);
-
 
         return eulerAngle;
     }

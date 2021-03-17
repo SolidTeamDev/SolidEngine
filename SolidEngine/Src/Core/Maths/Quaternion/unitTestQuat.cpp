@@ -104,9 +104,9 @@ namespace Solid::QuatUnitTest
         // Pi/2 angle on random Axis.
         {
             const Quat q1(90.f, Vec3(3.656f, 1.15f, 7.36f).Normalize());
-            const Vec3 result_euler1(Maths::DegToRad(37.84f),
-                                     Maths::DegToRad(-39.26f),
-                                     Maths::DegToRad(127.20f));
+            const Vec3 result_euler1(Maths::DegToRad(35.61f),
+                                     Maths::DegToRad(-14.6f),
+                                     Maths::DegToRad(78.42f));
 
             const Vec3 euler1 = q1.ToEuler();
             SA_UTH_MF(euler1, IsEquals, result_euler1);

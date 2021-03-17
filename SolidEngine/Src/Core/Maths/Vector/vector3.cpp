@@ -162,9 +162,9 @@ namespace Solid
 
     constexpr bool Vec3::IsEquals(const Vec3& vec) const noexcept
     {
-        return  Solid::Maths::Equals(x,vec.x, 0.0001f) &&
-                Solid::Maths::Equals(y,vec.y, 0.0001f) &&
-                Solid::Maths::Equals(z,vec.z, 0.0001f);
+        return  Solid::Maths::Equals(x,vec.x, 0.01f) &&
+                Solid::Maths::Equals(y,vec.y, 0.01f) &&
+                Solid::Maths::Equals(z,vec.z, 0.01f);
     }
 
     constexpr float Vec3::Dist(const Vec3 &vec) const noexcept
