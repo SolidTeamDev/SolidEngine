@@ -24,6 +24,8 @@ namespace Solid
 		std::unordered_map<std::string, std::shared_ptr<IShader>> Shaders;
 		ResourceManager* resourceMgr = nullptr;
 		Renderer* renderer = nullptr;
+		std::shared_ptr<const IShader> defaultShader = nullptr;
+		bool defaultShaderInit = false;
 	public:
 		//public func
 		GraphicalResourceMgr() = default;
@@ -108,6 +110,15 @@ namespace Solid
 				return Shaders.emplace(s->name, std::make_shared<GL::Shader>(s)).first->second;
 			}
 			return it->second;
+		}
+		std::shared_ptr<const IShader> GetDefaultShader()
+		{
+			if(defaultShaderInit)
+				return defaultShader;
+			ShaderResource* s=resourceMgr->GetRawShaderByName("DefaultShader");
+			defaultShader = std::make_shared<const GL::Shader>(s);
+			defaultShaderInit = true;
+			return defaultShader;
 		}
 		ShaderMap GetShaders()
 		{

@@ -8,7 +8,8 @@
 #include <editor.hpp>
 
 using namespace Solid;
-GL::Mesh::Mesh(MeshResource *_raw)
+GL::Mesh::Mesh(MeshResource *_raw):
+IMesh(_raw->Meshes.size())
 {
     name = _raw->name;
 
@@ -86,6 +87,34 @@ void GL::Mesh::DrawMesh()
 
 	for (auto& subMesh : Meshes)
 	{
+		glBindVertexArray(subMesh.VAO);
+		glBindBuffer(GL_ARRAY_BUFFER, subMesh.VBO);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,subMesh.EBO);
+		glDrawElements(GL_TRIANGLES, subMesh.numOfIndices,GL_UNSIGNED_INT, nullptr);
+	}
+	glBindVertexArray(0);
+}
+
+void GL::Mesh::DrawMesh(std::vector<MaterialResource *> _list, Transform& _tr, Camera& _cam)
+{
+	glEnable(GL_DEPTH_TEST);
+
+	for (int i = 0; i < Meshes.size(); ++i)
+	{
+		SubMesh& subMesh = Meshes.at(i);
+		const MaterialResource* mat = _list.at(i);
+
+		if(mat == nullptr)
+		{
+			mat = Engine::GetInstance()->resourceManager->GetDefaultMat();
+			mat->defaultshader->SetMVP(_tr, _cam);
+		}
+		else
+		{
+			mat->shader->SetMVP(_tr, _cam);
+		}
+
 		glBindVertexArray(subMesh.VAO);
 		glBindBuffer(GL_ARRAY_BUFFER, subMesh.VBO);
 
@@ -186,7 +215,7 @@ void GL::Shader::SetFloat(const char *_name, float _value)
 	glUniform1f(glGetUniformLocation(ProgID,_name), _value);
 }
 
-void GL::Shader::SetMVP(Transform& _model, Camera& _camera)
+void GL::Shader::SetMVP(Transform& _model, Camera& _camera)const
 {
 
 	glUseProgram(ProgID);

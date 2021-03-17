@@ -15,6 +15,8 @@
 namespace fs = std::filesystem;
 namespace Solid {
 	typedef nlohmann::json json;
+	class ITexture;
+	class IShader;
 
 	struct ShaderBinary
 	{
@@ -31,7 +33,6 @@ namespace Solid {
         Shader,
         Compute,
         Material,
-        Texture,
         Scene,
         NONE,
     };
@@ -202,31 +203,22 @@ namespace Solid {
 
     class SOLID_API MaterialResource : public Resource
     {
+
     public:
-        MaterialResource()
-        {
-            type = EResourceType::Material;
-        }
+	    std::shared_ptr<IShader> shader;
+	    std::shared_ptr<const IShader> defaultshader;
+	    std::unordered_map<std::string, std::shared_ptr<ITexture>> TexturesProperties;
+	    std::unordered_map<std::string, Vec4> ColorProperties;
+	    std::unordered_map<std::string, float> ValueProperties;
 
-        ~MaterialResource()
-        {
 
-        }
+        MaterialResource();
+
+
+        ~MaterialResource();
+
     };
 
-    class SOLID_API TextureResource : public Resource
-    {
-    public:
-        TextureResource()
-        {
-            type = EResourceType::Texture;
-        }
-
-        ~TextureResource()
-        {
-
-        }
-    };
 	class SOLID_API SceneResource : public Resource
 	{
 	public:

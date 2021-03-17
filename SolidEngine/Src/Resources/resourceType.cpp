@@ -24,7 +24,17 @@ ImageResource::~ImageResource() = default;
 
 
 
+MaterialResource::MaterialResource()
+{
+	type = EResourceType::Material;
+	shader = nullptr;
+	defaultshader = Engine::GetInstance()->graphicsResourceMgr.GetDefaultShader();
+}
 
+MaterialResource::~MaterialResource()
+{
+
+}
 
 ///
 /// Resources Classes Buffer Reader / Writer

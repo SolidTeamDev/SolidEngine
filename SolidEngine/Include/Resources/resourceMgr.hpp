@@ -45,8 +45,9 @@ namespace Solid
         ResourceList<ShaderResource>         ShaderList;
         ResourceList<ComputeShaderResource>  ComputeList;
         ResourceList<MaterialResource>       MaterialList;
-        ResourceList<TextureResource>        TextureList;
+        const MaterialResource* defaultMat = nullptr;
         class Engine* EnginePtr = nullptr;
+        bool defaultMatInit = false;
 
 
     private:
@@ -66,7 +67,8 @@ namespace Solid
 
         static ResourceManager* Initialize(class Engine* e);
         static ResourceManager* GetInstance();
-
+	    void InitDefaultMat();
+	    const MaterialResource* GetDefaultMat();
         class Engine* GetEngine();
 
 
@@ -81,6 +83,7 @@ namespace Solid
         template<typename T>
         std::unordered_map<std::string,Resource*> * GetResourcesVecByType()
         {
+
             std::string_view type_value = typeid(T*).name();
             if(type_value == ImageList.type_value)
                 return &(ImageList.List);
@@ -100,8 +103,6 @@ namespace Solid
             if(type_value == MaterialList.type_value)
                 return &(MaterialList.List);
 
-            if(type_value == TextureList.type_value)
-                return &(TextureList.List);
 
             return nullptr;
         }
@@ -124,9 +125,6 @@ namespace Solid
 				    break;
 			    case EResourceType::Image:
 				    return &ImageList.List;
-				    break;
-			    case EResourceType::Texture:
-				    return &TextureList.List;
 				    break;
 			    case EResourceType::Anim:
 				    return &AnimList.List;

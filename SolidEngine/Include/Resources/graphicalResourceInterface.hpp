@@ -15,6 +15,7 @@ namespace Solid
 	public:
 		//public members
         std::string name;
+		const unsigned int subMeshCount = 0;
 	protected:
 		//protected members
 
@@ -22,8 +23,10 @@ namespace Solid
 	public:
 		//public func
 		IMesh() = default;
+		IMesh(uint _count):subMeshCount(_count){}
 		~IMesh() = default;
 		virtual void DrawMesh() = 0;
+		virtual void DrawMesh(std::vector<MaterialResource *> _list, Transform& _tr, Camera& _cam) = 0;
 
 	};
 
@@ -52,7 +55,7 @@ namespace Solid
 		virtual void SetVec3Array(const char *_name, int size, Vec3* _value) = 0;
 		virtual void SetMatrixArray(const char *_name, int size, Mat4<float>* _value) = 0;
 
-		virtual void SetMVP(Transform& _model, Camera& _camera) = 0;
+		virtual void SetMVP(Transform& _model, Camera& _camera) const = 0;
 		virtual void SetMaterial(const char* _name) = 0;
 
 

@@ -40,6 +40,8 @@ namespace Solid
 
 			virtual void DrawMesh() override;
 
+			virtual void DrawMesh(std::vector<MaterialResource *> _list, Transform &_tr, Camera &_cam) override;
+
 		};
 		class SOLID_API Shader : public IShader
 		{
@@ -60,7 +62,7 @@ namespace Solid
 			ShaderWrapper CreateShader(uint _type, int _sourceCount, std::vector<char*>& _sources);
 			virtual void SetFloat(const char *_name, float _value) override;
 
-			virtual void SetMVP(Transform& _model, Camera& _camera) override;
+			virtual void SetMVP(Transform& _model, Camera& _camera) const override;
 
 			virtual void SetMaterial(const char *_name) override;
 
@@ -98,6 +100,22 @@ namespace Solid
 			ComputeShader(ComputeShaderResource* _cs);
 
 			~ComputeShader() = default;
+
+		};
+
+		class Texture : public ITexture
+		{
+		public:
+		//public members
+
+		protected:
+		//protected members
+
+
+		public:
+		//public func
+		    Texture() = default;
+		    ~Texture() = default;
 
 		};
 
