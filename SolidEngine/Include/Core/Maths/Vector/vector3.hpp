@@ -8,6 +8,8 @@ namespace Solid
 
     struct Vec4;
 
+    struct Quat;
+
     struct SOLID_API Vec3
     {
         float x;
@@ -23,6 +25,11 @@ namespace Solid
         constexpr Vec3(const Vec4& _copy) noexcept;
 
         constexpr Vec3(const Vec3& _copy) noexcept;
+
+        /**
+         * make a euler angle
+        **/
+        Vec3(const Quat& _q) noexcept;
 
         ~Vec3() = default;
 

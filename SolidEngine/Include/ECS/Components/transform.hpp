@@ -14,6 +14,7 @@ namespace Solid
         Vec3 position {0,0,0};
         Vec3 scale {1,1,1};
         Quat rotation {};
+        Vec3 euler{};
         Mat4<float> transMat;
 
         bool hasToUpdateMat = true;
@@ -27,11 +28,13 @@ namespace Solid
         void SetPosition(const Vec3& _vec);
         void SetRotation(const Quat& _quat);
         void SetScale(const Vec3& _vec);
+        void SetEuler(const Vec3& _euler);
         void Translate(const Vec3& _vec);
         void Rotate(const Quat& _quat);
         void Scale(const Vec3& _vec);
 
         Vec3 GetPosition() const;
+        Vec3 GetEuler()const;
         Quat GetRotation() const;
         Vec3 GetScale() const;
 
