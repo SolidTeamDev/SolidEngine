@@ -1,7 +1,7 @@
 #include "Core/Maths/Vector/vector2.hpp"
 #include "Core/Maths/Vector/vector3.hpp"
 #include "Core/Maths/Vector/vector4.hpp"
-
+#include "Core/Maths/Quaternion/quaternion.hpp"
 #include "Core/Maths/Utils/numerics.hpp"
 #include "Core/Debug/log.hpp"
 namespace Solid
@@ -32,6 +32,11 @@ namespace Solid
     y{_copy.y},
     z{_copy.z}
     {}
+
+    Vec3::Vec3(const Quat& _q) noexcept
+    {
+        *this =  _q.ToEuler();
+    }
 
 #pragma endregion
 #pragma region Static Methods

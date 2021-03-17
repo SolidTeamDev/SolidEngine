@@ -85,10 +85,7 @@ namespace Solid
         if(UI::CollapsingHeader("Transform",ImGuiTreeNodeFlags_DefaultOpen))
         {
             Vec3 tempPos   = _trs.GetPosition();
-            static Vec3 tempRot   = _trs.GetRotation().ToEuler();
-            tempRot.x=Maths::RadToDeg(tempRot.x);
-            tempRot.y=Maths::RadToDeg(tempRot.y);
-            tempRot.z=Maths::RadToDeg(tempRot.z);
+            Vec3 tempRot   = _trs.GetEuler();
             Vec3 tempScale = _trs.GetScale();
 
             UI::Text("Position");UI::SameLine();
@@ -99,13 +96,9 @@ namespace Solid
             EditVec3(tempScale, "##trsScl");
 
             _trs.SetPosition(tempPos);
-            tempRot.x=Maths::DegToRad(tempRot.x);
-            tempRot.y=Maths::DegToRad(tempRot.y);
-            tempRot.z=Maths::DegToRad(tempRot.z);
             if (changed)
             {
-
-                _trs.SetRotation(Quat(tempRot));
+                _trs.SetEuler(tempRot);
             }
             _trs.SetScale(tempScale);
         }

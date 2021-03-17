@@ -22,7 +22,19 @@ namespace Solid
     void Transform::SetRotation(const Quat &_quat)
     {
         rotation = _quat;
+        euler = _quat.ToEuler();
+        euler.x=Maths::RadToDeg(euler.x);
+        euler.y=Maths::RadToDeg(euler.y);
+        euler.z=Maths::RadToDeg(euler.z);
+
         hasToUpdateMat = true;
+    }
+
+    void Transform::SetEuler(const Vec3& _euler)
+    {
+        euler=_euler;
+        Vec3 temp {Maths::DegToRad(_euler.x),Maths::DegToRad(_euler.y),Maths::DegToRad(_euler.z)};
+        rotation = Quat(temp);
     }
 
     void Transform::SetScale(const Vec3 &_vec)
@@ -65,6 +77,12 @@ namespace Solid
         return scale;
     }
 
+
+
+    Vec3 Transform::GetEuler() const
+    {
+        return euler;
+    }
 
     Mat4<float> Transform::GetMatrix()
     {
