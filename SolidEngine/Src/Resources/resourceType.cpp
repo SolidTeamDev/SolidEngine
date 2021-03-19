@@ -508,3 +508,12 @@ void MaterialResource::FromDataBuffer(char *buffer, int bSize)
 
 
 }
+
+MaterialResource::MaterialResource(const char *_name, bool _genfile)
+{
+    type = EResourceType::Material;
+    shader = nullptr;
+    defaultshader = Engine::GetInstance()->graphicsResourceMgr.GetDefaultShader();
+    name = _name;
+    shouldGenerateFileAtDestroy = _genfile;
+}
