@@ -64,7 +64,7 @@ namespace Solid
 	{
 	public:
 	//public members
-
+		std::string name;
 	protected:
 	//protected members
 

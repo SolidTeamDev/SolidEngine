@@ -19,8 +19,6 @@ using namespace Solid;
 
 #define SASSET_GEN 1
 
-ResourceManager* ResourceManager::instance = nullptr;
-std::mutex ResourceManager::mutex = std::mutex();
 struct IDWrapper
 {
     std::string Name;
@@ -45,23 +43,23 @@ void ResourceManager::AddResource(Resource *r)
 	switch (r->GetType())
 	{
 		case EResourceType::Mesh:
-			MeshList.List.emplace(r->name, (MeshResource*)r);
+			MeshList.List.emplace(r->name, r);
 			break;
 		case EResourceType::Shader:
-			ShaderList.List.emplace(r->name, (ShaderResource*)r);
+			ShaderList.List.emplace(r->name, r);
             break;
 		case EResourceType::Material:
-			MaterialList.List.emplace(r->name, (MaterialResource*)r);
+			MaterialList.List.emplace(r->name, r);
             break;
 		case EResourceType::Compute:
-			ComputeList.List.emplace(r->name, (ComputeShaderResource*)r);
+			ComputeList.List.emplace(r->name, r);
             break;
 		case EResourceType::Image:
-			ImageList.List.emplace(r->name, (ImageResource*)r);
+			ImageList.List.emplace(r->name, r);
             break;
             break;
 		case EResourceType::Anim:
-			AnimList.List.emplace(r->name, (AnimResource*)r);
+			AnimList.List.emplace(r->name, r);
             break;
 		default:
 			ThrowError("Type Not Stored", ESolidErrorCode::S_INIT_ERROR);
@@ -173,34 +171,50 @@ ComputeShaderResource* ResourceManager::GetRawComputeByName(const char* _name)
 	return (ComputeShaderResource*)it->second;
 }
 
-ResourceManager * ResourceManager::Initialize(Engine* e)
-{
-    std::lock_guard<std::mutex>lck(mutex);
-    if(instance != nullptr)
-        ThrowError("ResourceManager is already Initialized", ESolidErrorCode::S_INIT_ERROR);
 
-    return new ResourceManager(e);
-}
 
-ResourceManager * ResourceManager::GetInstance()
-{
-    std::lock_guard<std::mutex>lck(mutex);
-    if(instance == nullptr)
-        ThrowError("ResourceManager is not Initialized", ESolidErrorCode::S_INIT_ERROR);
-    return instance;
-}
 
 void ResourceManager::InitDefaultMat()
 {
 	if(defaultMatInit)
 		return;
-	defaultMat = new MaterialResource();
+	defaultMat = new MaterialResource("DEFAULT MATERIAL", false);
 	defaultMatInit = true;
 }
 
 const MaterialResource* ResourceManager::GetDefaultMat()
 {
 	return defaultMat;
+}
+
+MaterialResource *ResourceManager::GetRawMaterialByName(const char *_name)
+{
+	auto list = MaterialList.List;
+	auto it = list.find(_name);
+	if(it == list.end())
+		return nullptr;
+	return (MaterialResource*)it->second;
+	return nullptr;
+}
+
+ImageResource *ResourceManager::GetRawImageByName(const char *_name)
+{
+	auto list = ImageList.List;
+	auto it = list.find(_name);
+	if(it == list.end())
+		return nullptr;
+	return (ImageResource*)it->second;
+	return nullptr;
+}
+
+MaterialResource *ResourceManager::CreateMaterial(const char *name)
+{
+	MaterialResource* mat = new MaterialResource();
+	mat->name = name;
+
+	AddResource(mat);
+	Log::Send("Material {" + mat->name + "} Has been Created");
+	return mat;
 }
 
 
