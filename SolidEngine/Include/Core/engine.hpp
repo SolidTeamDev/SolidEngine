@@ -13,6 +13,7 @@
 #include "ECS/System/rendererSystem.hpp"
 #include "Resources/graphicalResourceMgr.hpp"
 
+#include "Physics/physics.hpp"
 
 namespace Solid
 {
@@ -51,6 +52,8 @@ namespace Solid
         TaskManager taskManager;
         ThreadManager threadPool;
         GraphicalResourceMgr graphicsResourceMgr;
+        Physics physics;
+
         static Engine* GetInstance();
         bool MultiThreadEnabled()const {return mtEnabled;}
         void EnableMultiThread(bool _b);

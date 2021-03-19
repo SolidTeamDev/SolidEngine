@@ -16,7 +16,6 @@ namespace Solid
             threadPool(&taskManager),
             resourceManager(this)
     {
-
         InitEcs();
     }
 
