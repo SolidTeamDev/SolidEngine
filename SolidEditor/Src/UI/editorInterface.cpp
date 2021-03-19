@@ -41,7 +41,7 @@ namespace Solid {
         if (colorOpen)
             DrawChangeColors();
         if (perfOpen)
-            DrawPerfOverlay();
+            AddInfoOverlay();
         if (demoOpen)
             UI::ShowDemoWindow();
 
@@ -201,7 +201,7 @@ namespace Solid {
         UI::DockSpaceOverViewport(UI::GetMainViewport(), dockFlags);
     }
 
-    void EditorInterface::DrawPerfOverlay()
+    void EditorInterface::AddInfoOverlay()
     {
         UI::SetNextWindowBgAlpha(0.4);
         UI::SetNextWindowSize(ImVec2(250, 150));
@@ -212,7 +212,7 @@ namespace Solid {
         flags |= ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDocking;
         flags |= ImGuiWindowFlags_NoTitleBar;
 
-        UI::Begin("PerfOverlay", &perfOpen, flags);
+        UI::Begin("Additional Informations", &perfOpen, flags);
 
         std::string fps = std::to_string(Time::Fps()) + " fps";
         UI::Text("%s", fps.c_str());
