@@ -20,6 +20,7 @@ namespace Solid
         bool        demoOpen  = false;
         bool        colorOpen = false;
 
+
         Window*     window;
         ImGuiStyle& editorStyle;
 
@@ -96,5 +97,7 @@ namespace Solid
          * @brief Draws the performances overlay
          */
         void DrawPerfOverlay();
+
+
     };
 }
