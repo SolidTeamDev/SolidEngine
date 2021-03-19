@@ -206,6 +206,8 @@ namespace Solid {
 
     public:
 	    std::shared_ptr<IShader> shader;
+	    bool shouldGenerateFileAtDestroy = true;
+
 	    std::shared_ptr<const IShader> defaultshader;
 	    std::unordered_map<std::string, std::shared_ptr<ITexture>> TexturesProperties;
 	    std::unordered_map<std::string, Vec4> ColorProperties;
@@ -213,9 +215,18 @@ namespace Solid {
 
 
         MaterialResource();
+	    MaterialResource(const char* _name, bool _genfile = true)
+	    {
+	    	name = _name;
+	    	shouldGenerateFileAtDestroy = _genfile;
+	    }
 
 
         ~MaterialResource();
+
+	    void ToDataBuffer(std::vector<char> &buffer);
+
+	    void FromDataBuffer(char *buffer, int bSize);
 
     };
 

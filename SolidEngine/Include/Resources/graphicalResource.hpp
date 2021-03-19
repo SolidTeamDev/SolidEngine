@@ -115,6 +115,7 @@ namespace Solid
 		public:
 		//public func
 		    Texture() = default;
+			Texture(ImageResource* _image);
 		    ~Texture() = default;
 
 		};
