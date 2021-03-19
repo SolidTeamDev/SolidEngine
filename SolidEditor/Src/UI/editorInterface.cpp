@@ -1,6 +1,7 @@
 #include "UI/editorInterface.hpp"
 #include "UI/solidUI.hpp"
 #include "Time/time.hpp"
+#include "editor.hpp"
 
 #include <imgui_internal.h>
 #include <string>
@@ -203,7 +204,7 @@ namespace Solid {
     void EditorInterface::DrawPerfOverlay()
     {
         UI::SetNextWindowBgAlpha(0.4);
-        UI::SetNextWindowSize(ImVec2(150, 150));
+        UI::SetNextWindowSize(ImVec2(250, 150));
         UI::SetNextWindowViewport(UI::GetID(UI::GetMainViewport()));
 
         ImGuiWindowFlags flags = 0;
@@ -215,6 +216,19 @@ namespace Solid {
 
         std::string fps = std::to_string(Time::Fps()) + " fps";
         UI::Text("%s", fps.c_str());
+
+        Vec3 camPos = Editor::editorCamera.transform.GetPosition();
+        std::string posSubText = std::to_string(camPos.x);
+        std::string xCut = posSubText.substr(0, posSubText.find(".")+3);
+
+        posSubText = std::to_string(camPos.y);
+        std::string yCut = posSubText.substr(0, posSubText.find(".")+3);
+
+        posSubText = std::to_string(camPos.z);
+        std::string zCut = posSubText.substr(0, posSubText.find(".")+3);
+
+        std::string camPosStr = "Camera position:\nx: " + xCut + " y: " + yCut + " z: " + zCut;
+        UI::Text("%s", camPosStr.c_str());
 
         UI::End();
 

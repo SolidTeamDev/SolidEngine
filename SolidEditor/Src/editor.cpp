@@ -14,6 +14,8 @@ namespace Solid
 {
 
     Framebuffer Editor::sceneFramebuffer;
+    Camera Editor::editorCamera;
+    float Editor::camSpeed = 2.f;
 
     Editor::Editor()
     {
@@ -133,25 +135,25 @@ namespace Solid
         editorCameraT.SetRotation(Quat(rot));*/
 
         //== Movement
-        float camSpeed = (float)(4 * Time::DeltaTime());
+        float updateCamSpeed = (float)(camSpeed * Time::DeltaTime());
         float forwardVelocity = 0;
 
         if(editorInputManager->IsPressed(EInputList::FORWARD))
-            forwardVelocity = camSpeed;
+            forwardVelocity = updateCamSpeed;
         if(editorInputManager->IsPressed(EInputList::BACK))
-            forwardVelocity = -camSpeed;
+            forwardVelocity = -updateCamSpeed;
 
         float strafeVelocity = 0;
 
         if(editorInputManager->IsPressed(EInputList::LEFT))
-            strafeVelocity = -camSpeed;
+            strafeVelocity = -updateCamSpeed;
         if(editorInputManager->IsPressed(EInputList::RIGHT))
-            strafeVelocity = camSpeed;
+            strafeVelocity = updateCamSpeed;
 
         if(editorInputManager->IsPressed(EInputList::UP))
-            editorCameraT.Translate(Vec3(0,-camSpeed,0));
+            editorCameraT.Translate(Vec3(0,-updateCamSpeed,0));
         if(editorInputManager->IsPressed(EInputList::DOWN))
-            editorCameraT.Translate(Vec3(0,camSpeed,0));
+            editorCameraT.Translate(Vec3(0,updateCamSpeed,0));
 
 
         /*editorCameraT.Translate(Vec3(forwardVelocity,
