@@ -272,10 +272,11 @@ Resource * ResourcesLoader::LoadImage(const fs::path &Rpath)
 {
     ImageResource* Image = new ImageResource();
     Image->name = Rpath.filename().string();
-    unsigned char* img =stbi_load(Rpath.string().c_str(), &Image->x, &Image->y, &Image->ChannelsNum, STBI_rgb_alpha);
+	stbi_set_flip_vertically_on_load(true);
+	unsigned char* img =stbi_load(Rpath.string().c_str(), &Image->x, &Image->y, &Image->ChannelsNum, STBI_rgb_alpha);
     //test convert to const char*
     //or vector<char>
-    Image->image.resize(Image->x * Image->y * Image->ChannelsNum);
+    Image->image.resize(Image->x * Image->y * 4/*Image->ChannelsNum*/);
     std::memcpy(Image->image.data(), img, Image->image.size());
 
 #if SASSET_GEN
@@ -331,9 +332,9 @@ Resource * ResourcesLoader::LoadMesh(const fs::path &Rpath)
                 std::memcpy(&(Sub.vertices[j].Pos), &(scene->mMeshes[i]->mVertices[j]), 3 * sizeof(float));
             if(scene->mMeshes[i]->HasNormals())
                 std::memcpy(&(Sub.vertices[j].Normal), &(scene->mMeshes[i]->mNormals[j]), 3 * sizeof(float));
-            if(scene->mMeshes[i]->HasTextureCoords(j))
-                std::memcpy(&(Sub.vertices[j].TexCoords), &(scene->mMeshes[i]->mTextureCoords[j]), 2 * sizeof(float));
-        }
+            if(scene->mMeshes[i]->mTextureCoords[0] != nullptr)
+                std::memcpy(&(Sub.vertices[j].TexCoords), &(scene->mMeshes[i]->mTextureCoords[0][j].x), 2 * sizeof(float));
+        } /// WARN: TEX COORD MAY HAVE MORE DATA LIKE mTextureCoords[1][j] ETC...
     }
 #if SASSET_GEN
     printf("generate .Smesh\n");

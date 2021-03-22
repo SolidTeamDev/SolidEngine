@@ -96,7 +96,7 @@ void GL::Mesh::DrawMesh()
 	glBindVertexArray(0);
 }
 
-void GL::Mesh::DrawMesh(std::vector<MaterialResource *> _list, Transform& _tr, Camera& _cam)
+void GL::Mesh::DrawMesh(std::vector<MaterialResource *>& _list, Transform& _tr, Camera& _cam)
 {
 	glEnable(GL_DEPTH_TEST);
 
@@ -115,7 +115,27 @@ void GL::Mesh::DrawMesh(std::vector<MaterialResource *> _list, Transform& _tr, C
 			if(mat->shader == nullptr)
 				mat->defaultshader->SetMVP(_tr, _cam);
 			else
+			{
+				for(auto& value : mat->ValueProperties)
+				{
+					mat->shader->SetFloat(value.first.c_str(), value.second);
+				}
+				for(auto& value : mat->ColorProperties)
+				{
+					Vec4 temp = value.second;
+					mat->shader->SetVec4(value.first.c_str(),temp);
+				}
+				for(auto& value : mat->TexturesProperties)
+				{
+					if(value.second == nullptr)
+						continue;
+					int TexUnit = 0;
+					mat->shader->GetInt(value.first.c_str(), &TexUnit);
+					value.second->BindTexture(TexUnit);
+
+				}
 				mat->shader->SetMVP(_tr, _cam);
+			}
 		}
 
 		glBindVertexArray(subMesh.VAO);
@@ -123,6 +143,20 @@ void GL::Mesh::DrawMesh(std::vector<MaterialResource *> _list, Transform& _tr, C
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,subMesh.EBO);
 		glDrawElements(GL_TRIANGLES, subMesh.numOfIndices,GL_UNSIGNED_INT, nullptr);
+
+		if(mat->shader != nullptr)
+		{
+			for(auto& value : mat->TexturesProperties)
+			{
+				if(value.second == nullptr)
+					continue;
+				int TexUnit = 0;
+				mat->shader->GetInt(value.first.c_str(), &TexUnit);
+				value.second->UnBindTexture(TexUnit);
+
+			}
+		}
+
 	}
 	glBindVertexArray(0);
 }
@@ -284,8 +318,60 @@ void GL::Shader::SetVec3(const char *_name, Vec3 _value)
 	glUniform3f(glGetUniformLocation(ProgID,_name), _value.x,_value.y,_value.z);
 }
 
+void GL::Shader::SetVec2(const char *_name, Vec2 _value)
+{
+	glUseProgram(ProgID);
+	glUniform2f(glGetUniformLocation(ProgID,_name), _value.x,_value.y);
+}
+
+void GL::Shader::SetVec4(const char *_name, Vec4 _value)
+{
+	glUseProgram(ProgID);
+	glUniform4f(glGetUniformLocation(ProgID,_name), _value.x,_value.y,_value.z, _value.w);
+}
+
+
+void GL::Shader::GetIntArray(const char *_name, int size, int *_value)
+{
+	glGetnUniformiv(ProgID, glGetUniformLocation(ProgID,_name), size, _value);
+}
+
+void GL::Shader::GetInt(const char *_name, int *_value)
+{
+	int loc = glGetUniformLocation(ProgID,_name);
+	if(loc == -1)
+		return;
+	glGetUniformiv(ProgID, loc, _value);
+}
+
 GL::Texture::Texture(ImageResource *_image)
 {
+	Log::Send("IMAGE CHAN NUM = " + std::to_string(_image->ChannelsNum));
+	name = _image->name;
+	glGenTextures(1, &texId);
+	glBindTexture(GL_TEXTURE_2D, texId);
 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//if(_image->ChannelsNum == 4)
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _image->x, _image->y, 0, GL_RGBA, GL_UNSIGNED_BYTE, _image->image.data());
+	//else if(_image->ChannelsNum == 3)
+	//	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, _image->x, _image->y, 0, GL_RGB, GL_UNSIGNED_BYTE, _image->image.data());
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void GL::Texture::BindTexture(uint _texUnit)
+{
+	glActiveTexture(GL_TEXTURE0+ _texUnit);
+	glBindTexture(GL_TEXTURE_2D, texId);
+}
+
+void GL::Texture::UnBindTexture(uint _texUnit)
+{
+	glActiveTexture(GL_TEXTURE0+ _texUnit);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 

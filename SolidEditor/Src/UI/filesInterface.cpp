@@ -72,26 +72,10 @@ namespace Solid
 			{
 				UI::ShowDemoWindow();
 				Engine* engine = Engine::GetInstance();
-				engine->resourceManager.CreateMaterial(matNamestr.c_str());
-				UI::CloseCurrentPopup();
-			}
-			if(UI::Button("Create new Material ZSHADER"))
-			{
-				UI::ShowDemoWindow();
-				Engine* engine = Engine::GetInstance();
 				MaterialResource* mat =engine->resourceManager.CreateMaterial(matNamestr.c_str());
-				mat->shader = engine->graphicsResourceMgr.GetShader("ZShader");
+				mat->shader = engine->graphicsResourceMgr.GetShader("DefaultShader");
 				UI::CloseCurrentPopup();
 			}
-			if(UI::Button("Create new Material COLORShader"))
-			{
-				UI::ShowDemoWindow();
-				Engine* engine = Engine::GetInstance();
-				MaterialResource* mat =engine->resourceManager.CreateMaterial(matNamestr.c_str());
-				mat->shader = engine->graphicsResourceMgr.GetShader("COLORShader");
-				UI::CloseCurrentPopup();
-			}
-
 			UI::EndPopup();
 		}
 
