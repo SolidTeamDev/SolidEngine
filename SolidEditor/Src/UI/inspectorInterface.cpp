@@ -134,44 +134,45 @@ namespace Solid
             }
             int i = 0;
             const MaterialResource* DefaultMat = engine->resourceManager.GetDefaultMat();
-            auto Lambda = [&](auto elt){
+            UI::Indent();
+            if(UI::CollapsingHeader("Materials"))
+            {
+                for (MaterialResource *elt : _meshRenderer.materials)
+                {
+                    const char *matName = elt == nullptr ? "DEFAULT MATERIAL" : elt->name.c_str();
+                    UI::Text("Material  ");
+                    UI::SameLine();
+                    if (UI::BeginCombo(("##Mat" + std::to_string(i)).c_str(), matName))
+                    {
+                        auto *matList = engine->resourceManager.GetResourcesVecByType<MaterialResource>();
+                        {
+                            bool selected = (matName == "DEFAULT MATERIAL");
+                            if (UI::Selectable("DEFAULT MATERIAL", selected))
+                            {
 
-            };
+                                _meshRenderer.materials.at(i) = nullptr;
+                            }
+                            if (selected)
+                                UI::SetItemDefaultFocus();
+                        }
+                        for (auto mat : *matList)
+                        {
+                            bool selected = (matName == mat.second->name);
+                            if (UI::Selectable(mat.second->name.c_str(), selected))
+                            {
 
+                                _meshRenderer.materials.at(i) = (MaterialResource *) mat.second;
+                            }
+                            if (selected)
+                                UI::SetItemDefaultFocus();
+                        }
 
-			for(MaterialResource* elt : _meshRenderer.materials)
-			{
-				const char* matName = elt == nullptr ? "DEFAULT MATERIAL" :  elt->name.c_str();
-				UI::Text("Material  ");UI::SameLine();
-				if(UI::BeginCombo(("##Mat" + std::to_string(i)).c_str(), matName))
-				{
-					auto* matList = engine->resourceManager.GetResourcesVecByType<MaterialResource>();
-					{
-						bool selected = (matName == "DEFAULT MATERIAL");
-						if(UI::Selectable("DEFAULT MATERIAL", selected))
-						{
-
-							_meshRenderer.materials.at(i) = nullptr;
-						}
-						if(selected)
-							UI::SetItemDefaultFocus();
-					}
-					for(auto mat : *matList)
-					{
-						bool selected = (matName == mat.second->name);
-						if(UI::Selectable(mat.second->name.c_str(), selected))
-						{
-
-							_meshRenderer.materials.at(i) = (MaterialResource*)mat.second;
-						}
-						if(selected)
-							UI::SetItemDefaultFocus();
-					}
-
-					UI::EndCombo();
-				}
-				++i;
-			}
+                        UI::EndCombo();
+                    }
+                    ++i;
+                }
+            }
+            UI::Unindent();
            /* const char* shaderName = _meshRenderer.shader == nullptr ? "" : _meshRenderer.shader->name.c_str();
 
             UI::Text("Shader");UI::SameLine();
