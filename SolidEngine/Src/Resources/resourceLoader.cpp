@@ -12,6 +12,8 @@
 #include "assimp/Importer.hpp"
 #include "assimp\postprocess.h"
 #include <sstream>
+#include <Resources/resourceLoader.hpp>
+
 #include "glad/glad.h"
 #include "Core/engine.hpp"
 using namespace Solid;
@@ -62,6 +64,7 @@ void  ResourcesLoader::LoadRessourceNoAdd(const fs::path &Rpath, ResourcePtrWrap
                    [](unsigned char c){ return std::tolower(c); });
 
     ///Solid Asset Loading
+    ///material loding is not here because it depends on Graphical Resources and so we cannot multithread it
 
 
     if(extension == ".simage")
@@ -72,8 +75,6 @@ void  ResourcesLoader::LoadRessourceNoAdd(const fs::path &Rpath, ResourcePtrWrap
         r=LoadSolidComputeShader(Rpath);
     else if(extension == ".svertfrag")
         r=LoadSolidShader(Rpath);
-    else if(extension == ".smaterial")
-        ;
     else if(extension == ".sanim")
         ;
 
@@ -126,9 +127,18 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
             }
             return false;
         };
+	    auto matFind = [](const fs::path&item)
+	    {
+	    	std::string name = item.extension().string();
+	    	std::transform(name.begin(), name.end(), name.begin(),
+					 [](unsigned char c){ return std::tolower(c); });
+	    	return (name.find(".smaterial") != std::string::npos);
+
+	    };
         const std::size_t numOffiles = std::count_if(fs::directory_iterator(Rpath), fs::directory_iterator{}, (fp)fs::is_regular_file);
         const std::size_t numOfShader = std::count_if(fs::directory_iterator(Rpath), fs::directory_iterator{}, (fp)shaderFind);
-        ResourcePtrWrapper* RessourceArray = new ResourcePtrWrapper[numOffiles + numOfShader] {nullptr};
+	    const std::size_t numOfMat = std::count_if(fs::directory_iterator(Rpath), fs::directory_iterator{}, (fp)matFind);
+        ResourcePtrWrapper* RessourceArray = new ResourcePtrWrapper[numOffiles + numOfShader - numOfMat] {nullptr};
 
         auto Lambda = [this](const fs::path *Rpath, ResourcePtrWrapper *wrapper){LoadRessourceNoAdd(*Rpath,*wrapper); delete Rpath;};
         int i =0;
@@ -136,6 +146,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
         std::vector<IDWrapper> IDS;
         IDS.reserve(10);
         Shaders.reserve(5);
+        std::vector<fs::path> matPaths;
         for (auto& item : fs::directory_iterator(Rpath))
         {
             std::string name = item.path().filename().string();
@@ -161,6 +172,12 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
                     Shaders.push_back({item, i});
                     ++i;
                     continue;
+                }
+                else if(matFind(item))
+                {
+                	matPaths.push_back(item);
+
+                	continue;
                 }
                 TaskMan.AddTask(Task(Task::MakeID("Load " + name), ETaskType::RESOURCES_LOADER, Lambda, newP, &RessourceArray[i]));
                 IDS.push_back( {"Load " + name, i});
@@ -197,6 +214,11 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
             }
         }
 		Manager->InitDefaultMat();
+	    for(auto& elt : matPaths)
+	    {
+	        Resource* mat = LoadSolidMaterial(elt);
+	        Manager->AddResource(mat);
+	    }
 
     }
         /// MonoThread Loading
@@ -223,7 +245,18 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
             }
             else
             {
-                LoadRessource(item);
+
+            	std::string extension = item.path().extension().string();
+	            std::transform(extension.begin(), extension.end(), extension.begin(),
+	                           [](unsigned char c){ return std::tolower(c); });
+
+	            if(extension == ".smaterial")
+	            {
+	            	Resource* mat = LoadSolidMaterial(item);
+		            Manager->AddResource(mat);
+	            }
+	            else
+                    LoadRessource(item);
 
             }
         }
@@ -589,5 +622,47 @@ Resource * ResourcesLoader::LoadSolidShader(const fs::path &Rpath)
         Resource::NoNameNum++;
     }
     return s;
+
+}
+
+void ResourcesLoader::SaveMaterialToFile(MaterialResource *_mat)
+{
+	printf("generate .SMaterial\n");
+	std::vector<char> Data;
+	_mat->ToDataBuffer(Data);
+
+
+
+
+	fs::path cachePath =SolidPath;
+	cachePath.append(_mat->name + ".SMaterial");
+	std::ofstream cacheFile(cachePath, std::fstream::binary | std::fstream::trunc);
+
+
+	if(cacheFile.is_open())
+	{
+		std::cout << "" << "\n";
+		cacheFile.write(Data.data(), Data.size());
+	}
+}
+
+Resource *ResourcesLoader::LoadSolidMaterial(const fs::path &Rpath)
+{
+	MaterialResource* mat = new MaterialResource();
+	std::ifstream ifs(Rpath, std::ios::binary|std::ios::ate);
+	std::ifstream::pos_type pos = ifs.tellg();
+
+	std::vector<char>  buffer(pos);
+
+	ifs.seekg(0, std::ios::beg);
+	ifs.read(&buffer[0], pos);
+
+	mat->FromDataBuffer(buffer.data(), buffer.size());
+	if(mat->name == "")
+	{
+		mat->name = "NoName" + std::to_string(Resource::NoNameNum);
+		Resource::NoNameNum++;
+	}
+	return mat;
 
 }

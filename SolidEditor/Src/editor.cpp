@@ -48,7 +48,8 @@ namespace Solid
 
     Editor::~Editor()
     {
-        delete editorInputManager;
+    	delete editorInputManager;
+        //delete engine;
     }
 
     void Editor::Run()
@@ -93,7 +94,7 @@ namespace Solid
 
         ResourcesLoader loader;
 
-        loader.SetManager(engine->resourceManager);
+        loader.SetManager(&(engine->resourceManager));
         fs::path p = fs::current_path().append("Resources");
 
         auto before = std::chrono::high_resolution_clock::now();

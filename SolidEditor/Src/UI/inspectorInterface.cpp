@@ -114,7 +114,7 @@ namespace Solid
             UI::Text("Mesh  ");UI::SameLine();
             if(UI::BeginCombo("##Mesh", meshName))
             {
-                auto* meshList = engine->resourceManager->GetResourcesVecByType<MeshResource>();
+                auto* meshList = engine->resourceManager.GetResourcesVecByType<MeshResource>();
 
                 for(auto mesh : *meshList)
                 {
@@ -122,7 +122,9 @@ namespace Solid
                     if(UI::Selectable(mesh.second->name.c_str(), selected))
                     {
                         _meshRenderer.mesh = engine->graphicsResourceMgr.GetMesh(mesh.second->name.c_str());
-                        _meshRenderer.materials.resize(_meshRenderer.mesh->subMeshCount, nullptr);
+	                    _meshRenderer.materials.clear();
+
+	                    _meshRenderer.materials.resize(_meshRenderer.mesh->subMeshCount, nullptr);
                     }
                     if(selected)
                         UI::SetItemDefaultFocus();
@@ -130,7 +132,46 @@ namespace Solid
 
                 UI::EndCombo();
             }
+            int i = 0;
+            const MaterialResource* DefaultMat = engine->resourceManager.GetDefaultMat();
+            auto Lambda = [&](auto elt){
 
+            };
+
+
+			for(MaterialResource* elt : _meshRenderer.materials)
+			{
+				const char* matName = elt == nullptr ? "DEFAULT MATERIAL" :  elt->name.c_str();
+				UI::Text("Material  ");UI::SameLine();
+				if(UI::BeginCombo(("##Mat" + std::to_string(i)).c_str(), matName))
+				{
+					auto* matList = engine->resourceManager.GetResourcesVecByType<MaterialResource>();
+					{
+						bool selected = (matName == "DEFAULT MATERIAL");
+						if(UI::Selectable("DEFAULT MATERIAL", selected))
+						{
+
+							_meshRenderer.materials.at(i) = nullptr;
+						}
+						if(selected)
+							UI::SetItemDefaultFocus();
+					}
+					for(auto mat : *matList)
+					{
+						bool selected = (matName == mat.second->name);
+						if(UI::Selectable(mat.second->name.c_str(), selected))
+						{
+
+							_meshRenderer.materials.at(i) = (MaterialResource*)mat.second;
+						}
+						if(selected)
+							UI::SetItemDefaultFocus();
+					}
+
+					UI::EndCombo();
+				}
+				++i;
+			}
            /* const char* shaderName = _meshRenderer.shader == nullptr ? "" : _meshRenderer.shader->name.c_str();
 
             UI::Text("Shader");UI::SameLine();

@@ -4,6 +4,8 @@
 
 #include "Resources/ressources.hpp"
 #include <sstream>
+#include <Resources/resourceType.hpp>
+
 #include "glad/glad.h"
 #include "Core/engine.hpp"
 
@@ -33,9 +35,23 @@ MaterialResource::MaterialResource()
 
 MaterialResource::~MaterialResource()
 {
+	//TODO: save to .SMaterial
+	if(shouldGenerateFileAtDestroy)
+	{
+		ResourcesLoader loader;
+		loader.SaveMaterialToFile(this);
+	}
+
 
 }
 
+
+/*
+
+MaterialResource::~MaterialResource(bool shouldGenerateFile)
+{
+
+}*/
 ///
 /// Resources Classes Buffer Reader / Writer
 ///
@@ -318,4 +334,177 @@ void ShaderResource::FromDataBuffer(char *buffer, int bSize)
     ResourcesLoader::ReadFromBuffer(buffer, binary, sizeof(char) * size, ReadPos);
     binaries ={.size =size ,.format=bFormat,.b=binary};
     delete[] binary;
+}
+
+void MaterialResource::ToDataBuffer(std::vector<char> &buffer)
+{
+	std::string pString = this->path.string();
+	std::uint32_t size = pString.size();
+	ResourcesLoader::Append(buffer, &(this->type), sizeof(this->type));
+
+	ResourcesLoader::Append(buffer, &(size), sizeof(size));
+	ResourcesLoader::Append(buffer, (void *) (pString.c_str()),  size * sizeof( std::string::value_type));
+
+	size = this->name.size();
+	ResourcesLoader::Append(buffer, &(size), sizeof(size));
+	ResourcesLoader::Append(buffer, (void *) (this->name.c_str()), size * sizeof(std::string::value_type));
+
+	///shader saving
+	if(this->shader == nullptr)
+	{
+		int j = 128;
+		ResourcesLoader::Append(buffer, &(j), sizeof(j));
+	}
+	else
+	{
+		int j = 256;
+		ResourcesLoader::Append(buffer, &(j), sizeof(j));
+		size = this->shader->name.size();
+		ResourcesLoader::Append(buffer, &(size), sizeof(size));
+		ResourcesLoader::Append(buffer, (void *) (this->shader->name.c_str()), size * sizeof(std::string::value_type));
+
+	}
+
+
+	size = this->TexturesProperties.size();
+	ResourcesLoader::Append(buffer, &(size), sizeof(size));
+	for (auto& tex : this->TexturesProperties)
+	{
+		//property name
+		size = tex.first.size();
+		ResourcesLoader::Append(buffer, &(size), sizeof(size));
+		ResourcesLoader::Append(buffer, (void *) (tex.first.c_str()), size * sizeof(std::string::value_type));
+
+		//property value
+		size = tex.second->name.size();
+		ResourcesLoader::Append(buffer, &(size), sizeof(size));
+		ResourcesLoader::Append(buffer, (void *) (tex.second->name.c_str()), size * sizeof(std::string::value_type));
+		// append  property name and value (tex name)
+	}
+
+	size = this->ColorProperties.size();
+	ResourcesLoader::Append(buffer, &(size), sizeof(size));
+	for (auto& tex : this->ColorProperties)
+	{
+		//property name
+		size = tex.first.size();
+		ResourcesLoader::Append(buffer, &(size), sizeof(size));
+		ResourcesLoader::Append(buffer, (void *) (tex.first.c_str()), size * sizeof(std::string::value_type));
+		//property value
+
+		ResourcesLoader::Append(buffer, (void *) &(tex.second.x), 4 * sizeof(float));
+		// append  property name and value (color value)
+	}
+
+	size = this->ValueProperties.size();
+	ResourcesLoader::Append(buffer, &(size), sizeof(size));
+	for (auto& tex : this->ValueProperties)
+	{
+		//property name
+		size = tex.first.size();
+		ResourcesLoader::Append(buffer, &(size), sizeof(size));
+		ResourcesLoader::Append(buffer, (void *) (tex.first.c_str()), size * sizeof(std::string::value_type));
+		//property value
+
+		ResourcesLoader::Append(buffer, (void *) &(tex.second),  sizeof(float));
+		// append  property name and value (float value)
+	}
+}
+
+void MaterialResource::FromDataBuffer(char *buffer, int bSize)
+{
+	//WARNING : No test for read overflow
+	std::uint64_t ReadPos = 0;
+
+	ResourcesLoader::ReadFromBuffer(buffer, &(this->type), sizeof(this->type), ReadPos);
+
+	//recup path string
+	std::uint32_t size = 0;
+	std::string pString;
+	ResourcesLoader::ReadFromBuffer(buffer, &size, sizeof(size), ReadPos);
+	pString.resize(size);
+	ResourcesLoader::ReadFromBuffer(buffer, (void *) (pString.data()),  size * sizeof( std::string::value_type), ReadPos);
+	this->path = pString;
+
+	//recup name
+	size = 0;
+	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
+	this->name.resize(size);
+	ResourcesLoader::ReadFromBuffer(buffer, (void *) (this->name.data()), size * sizeof(std::string::value_type), ReadPos);
+
+	///shader loading
+	int j = 0;
+	Engine* engine = Engine::GetInstance();
+	ResourcesLoader::ReadFromBuffer(buffer, &(j), sizeof(j), ReadPos);
+	if(j == 128)
+	{
+		this->shader = nullptr;
+		this->defaultshader = engine->graphicsResourceMgr.GetDefaultShader();
+	}
+	else
+	{
+		std::string pName;
+		size = 0;
+		ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
+		pName.resize(size);
+		ResourcesLoader::ReadFromBuffer(buffer, (void *) (pName.data()), size * sizeof(std::string::value_type), ReadPos);
+		this->shader = engine->graphicsResourceMgr.GetShader(pName.c_str());
+
+	}
+
+	size = 0;
+	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
+	for (int i = 0; i < size; ++i)
+	{
+		std::uint32_t pSize = 0;
+		std::string pName;
+		std::uint32_t vSize = 0;
+		std::string vName;
+		//property name
+		ResourcesLoader::ReadFromBuffer(buffer, &(pSize), sizeof(pSize), ReadPos);
+		pName.resize(pSize);
+		ResourcesLoader::ReadFromBuffer(buffer, (void *) (pName.data()), pSize * sizeof(std::string::value_type), ReadPos);
+		//property value
+		ResourcesLoader::ReadFromBuffer(buffer, &(vSize), sizeof(vSize), ReadPos);
+		vName.resize(vSize);
+		ResourcesLoader::ReadFromBuffer(buffer, (void *) (vName.data()), vSize * sizeof(std::string::value_type), ReadPos);
+		// append  Texture
+		this->TexturesProperties.emplace(pName, engine->graphicsResourceMgr.GetTexture(vName.c_str()));
+	}
+
+	size = 0;
+	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
+	for (int i = 0; i < size; ++i)
+	{
+		std::uint32_t pSize = 0;
+		std::string pName;
+		Vec4 Color;
+		//property name
+		ResourcesLoader::ReadFromBuffer(buffer, &(pSize), sizeof(pSize), ReadPos);
+		pName.resize(pSize);
+		ResourcesLoader::ReadFromBuffer(buffer, (void *) (pName.data()), pSize * sizeof(std::string::value_type), ReadPos);
+		//property value
+		ResourcesLoader::ReadFromBuffer(buffer, (void *) &(Color.x), 4 * sizeof(float), ReadPos);
+		// append  Color value
+		this->ColorProperties.emplace(pName, Color);
+	}
+
+	size = 0;
+	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
+	for (int i = 0; i < size; ++i)
+	{
+		std::uint32_t pSize = 0;
+		std::string pName;
+		float Value;
+		//property name
+		ResourcesLoader::ReadFromBuffer(buffer, &(pSize), sizeof(pSize), ReadPos);
+		pName.resize(pSize);
+		ResourcesLoader::ReadFromBuffer(buffer, (void *) (pName.data()), pSize * sizeof(std::string::value_type), ReadPos);
+		//property value
+		ResourcesLoader::ReadFromBuffer(buffer, (void *) &(Value), sizeof(float), ReadPos);
+		// append  Color value
+		this->ValueProperties.emplace(pName, Value);
+	}
+
+
 }

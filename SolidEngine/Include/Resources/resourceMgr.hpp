@@ -51,22 +51,21 @@ namespace Solid
 
 
     private:
-        static std::mutex mutex;
-        static ResourceManager* instance;
-        explicit ResourceManager(class Engine* _engine)
-        {
-            EnginePtr =_engine;
-        }
-        ~ResourceManager()
-        {
-        }
+
+
 
     public:
+	    explicit ResourceManager(class Engine* _engine)
+	    {
+		    EnginePtr =_engine;
+	    }
+	    ~ResourceManager()
+	    {
+
+	    }
         ResourceManager(ResourceManager&) = delete;
         void operator=(const ResourceManager&) = delete;
 
-        static ResourceManager* Initialize(class Engine* e);
-        static ResourceManager* GetInstance();
 	    void InitDefaultMat();
 	    const MaterialResource* GetDefaultMat();
         class Engine* GetEngine();
@@ -79,6 +78,9 @@ namespace Solid
 	    MeshResource* GetRawMeshByName(const char* name);
 	    ShaderResource* GetRawShaderByName(const char* name);
 	    ComputeShaderResource* GetRawComputeByName(const char* name);
+	    MaterialResource* GetRawMaterialByName(const char* name);
+	    ImageResource* GetRawImageByName(const char* name);
+	    MaterialResource* CreateMaterial(const char* name);
 
         template<typename T>
         std::unordered_map<std::string,Resource*> * GetResourcesVecByType()

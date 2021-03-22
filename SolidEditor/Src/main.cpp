@@ -11,8 +11,9 @@
 
 int main()
 {
-
+#ifndef NDEBUG
     Solid::AllTestFuncMaths();
+#endif
 
     try
     {

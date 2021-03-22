@@ -22,6 +22,7 @@ namespace Solid
 		//protected members
 		std::unordered_map<std::string, std::shared_ptr<IMesh>> Meshes;
 		std::unordered_map<std::string, std::shared_ptr<IShader>> Shaders;
+		std::unordered_map<std::string, std::shared_ptr<ITexture>> textures;
 		ResourceManager* resourceMgr = nullptr;
 		Renderer* renderer = nullptr;
 		std::shared_ptr<const IShader> defaultShader = nullptr;
@@ -77,6 +78,21 @@ namespace Solid
 					break;
 			}
 		}
+		std::shared_ptr<ITexture> StoreTexture(ImageResource* _image)
+		{
+			switch (renderer->GetRenderType())
+			{
+				case ERendererType::OpenGl45:
+				{
+					auto it =textures.emplace(_image->name,std::make_shared<GL::Texture>());
+					return it.first->second;
+					break;
+				}
+				default:
+					return nullptr;
+					break;
+			}
+		}
 		MeshMap GetMeshes()
 		{
 			return Meshes;
@@ -90,6 +106,18 @@ namespace Solid
 				if(mesh == nullptr)
 					return nullptr;
 				return Meshes.emplace(mesh->name, std::make_shared<GL::Mesh>(mesh)).first->second;
+			}
+			return it->second;
+		}
+		std::shared_ptr<ITexture> GetTexture(const char* _name)
+		{
+			auto it = textures.find(_name);
+			if(it == textures.end())
+			{
+				ImageResource* image = resourceMgr->GetRawImageByName(_name);
+				if(image == nullptr)
+					return nullptr;
+				return textures.emplace(image->name, std::make_shared<GL::Texture>(image)).first->second;
 			}
 			return it->second;
 		}

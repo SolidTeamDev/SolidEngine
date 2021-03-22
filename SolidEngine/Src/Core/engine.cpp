@@ -13,9 +13,9 @@ namespace Solid
 {
 	__declspec(dllexport) Engine* Engine::instance = nullptr;
     Engine::Engine() :
-            threadPool(&taskManager)
+            threadPool(&taskManager),
+            resourceManager(this)
     {
-        resourceManager = ResourceManager::Initialize(this);
 
         InitEcs();
     }
@@ -63,7 +63,7 @@ namespace Solid
 
         if(window != nullptr && renderer != nullptr)
             engineContextInit = true;
-	    graphicsResourceMgr.Init(resourceManager, renderer);
+	    graphicsResourceMgr.Init(&resourceManager, renderer);
     }
 
     bool Engine::IsEngineContextInitialized() const

@@ -45,6 +45,7 @@ namespace Solid {
         if (demoOpen)
             UI::ShowDemoWindow();
 
+
         UIContext::RenderFrame();
     }
 
@@ -61,12 +62,14 @@ namespace Solid {
 
             UI::EndMainMenuBar();
         }
+
     }
 
     void EditorInterface::DrawMenuFiles()
     {
         if (UI::BeginMenu("Files"))
         {
+
             if (UI::MenuItem("Save Scene"))
             {
 	            json j;
@@ -189,6 +192,9 @@ namespace Solid {
             UI::EndMenu();
         }
     }
+
+
+
 
 #pragma endregion
 #pragma region Windows

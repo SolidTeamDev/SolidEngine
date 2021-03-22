@@ -13,14 +13,17 @@
 #include "ECS/System/rendererSystem.hpp"
 #include "Resources/graphicalResourceMgr.hpp"
 
+
 namespace Solid
 {
+
+
     /**
      * @brief Base engine class. Running the lifetime of application
      */
     class SOLID_API Engine
     {
-    private:
+    protected:
 
         Log log;
 
@@ -29,15 +32,22 @@ namespace Solid
 
         void InitEcs();
 	    Engine();
+
 	    static Engine* instance;
 
+	    ~Engine();
+	    static void DeleteInstance()
+	    {
+	    	delete instance;
+	    };
+	    friend class EngineCleanerInterface;
     public:
     	//Engine** test = &instance;
         Window* window;
         Renderer* renderer = nullptr;
         ECSManager ecsManager;
         std::shared_ptr<RendererSystem> rendererSystem;
-        class ResourceManager* resourceManager;
+        ResourceManager resourceManager;
         TaskManager taskManager;
         ThreadManager threadPool;
         GraphicalResourceMgr graphicsResourceMgr;
@@ -58,6 +68,10 @@ namespace Solid
          */
         bool IsEngineContextInitialized() const;
 
-        ~Engine();
+
+
+
     };
+
+
 } //!namespace

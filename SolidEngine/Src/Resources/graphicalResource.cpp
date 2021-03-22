@@ -107,12 +107,15 @@ void GL::Mesh::DrawMesh(std::vector<MaterialResource *> _list, Transform& _tr, C
 
 		if(mat == nullptr)
 		{
-			mat = Engine::GetInstance()->resourceManager->GetDefaultMat();
+			mat = Engine::GetInstance()->resourceManager.GetDefaultMat();
 			mat->defaultshader->SetMVP(_tr, _cam);
 		}
 		else
 		{
-			mat->shader->SetMVP(_tr, _cam);
+			if(mat->shader == nullptr)
+				mat->defaultshader->SetMVP(_tr, _cam);
+			else
+				mat->shader->SetMVP(_tr, _cam);
 		}
 
 		glBindVertexArray(subMesh.VAO);
@@ -281,5 +284,8 @@ void GL::Shader::SetVec3(const char *_name, Vec3 _value)
 	glUniform3f(glGetUniformLocation(ProgID,_name), _value.x,_value.y,_value.z);
 }
 
+GL::Texture::Texture(ImageResource *_image)
+{
 
+}
 
