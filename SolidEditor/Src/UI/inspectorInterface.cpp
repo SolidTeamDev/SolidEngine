@@ -24,7 +24,7 @@ namespace Solid
         DrawComponents();
 
         AddComponents();
-
+	    DrawUniformNamePopup();
         UI::End();
     }
 
@@ -122,9 +122,10 @@ namespace Solid
                     if(UI::Selectable(mesh.second->name.c_str(), selected))
                     {
                         _meshRenderer.mesh = engine->graphicsResourceMgr.GetMesh(mesh.second->name.c_str());
-	                    _meshRenderer.materials.clear();
-
+	                    //_meshRenderer.materials.clear();
+						_meshRenderer.materialSet.clear();
 	                    _meshRenderer.materials.resize(_meshRenderer.mesh->subMeshCount, nullptr);
+                        _meshRenderer.materialSet.insert(_meshRenderer.materials.begin(), _meshRenderer.materials.end());
                     }
                     if(selected)
                         UI::SetItemDefaultFocus();
@@ -152,6 +153,8 @@ namespace Solid
 						{
 
 							_meshRenderer.materials.at(i) = nullptr;
+							_meshRenderer.materialSet.clear();
+							_meshRenderer.materialSet.insert(_meshRenderer.materials.begin(), _meshRenderer.materials.end());
 						}
 						if(selected)
 							UI::SetItemDefaultFocus();
@@ -163,6 +166,8 @@ namespace Solid
 						{
 
 							_meshRenderer.materials.at(i) = (MaterialResource*)mat.second;
+							_meshRenderer.materialSet.clear();
+							_meshRenderer.materialSet.insert(_meshRenderer.materials.begin(), _meshRenderer.materials.end());
 						}
 						if(selected)
 							UI::SetItemDefaultFocus();
@@ -172,27 +177,141 @@ namespace Solid
 				}
 				++i;
 			}
-           /* const char* shaderName = _meshRenderer.shader == nullptr ? "" : _meshRenderer.shader->name.c_str();
+			i = 0;
 
-            UI::Text("Shader");UI::SameLine();
-            if(UI::BeginCombo("##Shader", shaderName))
-            {
-                auto* shaderList = engine->resourceManager->GetResourcesVecByType<ShaderResource>();
+			for(MaterialResource* elt : _meshRenderer.materialSet)
+	        {
+		        std::string matName = elt == nullptr ? "DEFAULT Name" :  elt->name;
+	        	if(UI::CollapsingHeader((matName + "##" + std::to_string(i)).c_str()))
+		        {
 
-                for(auto shader : *shaderList)
-                {
-                    bool selected = (meshName == shader.second->name);
-                    if(UI::Selectable(shader.second->name.c_str(), selected))
-                    {
-                        _meshRenderer.shader = engine->graphicsResourceMgr.GetShader(shader.second->name.c_str());
-                    }
-                    if(selected)
-                        UI::SetItemDefaultFocus();
-                }
-                UI::EndCombo();
-            }*/
+	        		if(elt == nullptr)
+			        {
+	        			/// const view / no modifying possible
+			        }
+	        		else
+			        {
+				        {
+				        	///shader modifying
+
+				        	const char* shaderName = elt->shader == nullptr ? "" : elt->shader->name.c_str();
+					        if(UI::BeginCombo(("Used Shader##ChooseShader" +  std::to_string(i)).c_str(),shaderName))
+					        {
+						        auto* shaderList = engine->resourceManager.GetResourcesVecByType<ShaderResource>();
+						        for(auto shader : *shaderList)
+						        {
+							        bool selected = (meshName == shader.second->name);
+							        if(UI::Selectable(shader.second->name.c_str(), selected))
+							        {
+								        elt->shader = engine->graphicsResourceMgr.GetShader(shader.second->name.c_str());
+							        }
+							        if(selected)
+								        UI::SetItemDefaultFocus();
+						        }
+						        UI::EndCombo();
+					        }
+
+
+				        }
+	        			for(auto& value : elt->ValueProperties)
+	        			{
+							EditFloat(value.second, value.first);
+	        			}
+				        for(auto& color : elt->ColorProperties)
+				        {
+					        EditVec4(color.second, color.first);
+				        }
+				        int ii = 0;
+				        for(auto& tex : elt->TexturesProperties)
+				        {
+				        	const char* texName = tex.second == nullptr ? "" : tex.second->name.c_str();
+					        if(UI::BeginCombo((tex.first +"##ChooseTex"+ std::to_string(i)+"_" + std::to_string(ii)).c_str(),texName))
+					        {
+						        auto* ImageList = engine->resourceManager.GetResourcesVecByType<ImageResource>();
+						        for(auto& image : *ImageList)
+						        {
+							        bool selected = (meshName == image.second->name);
+							        if(UI::Selectable(image.second->name.c_str(), selected))
+							        {
+								        tex.second = engine->graphicsResourceMgr.GetTexture(image.second->name.c_str());
+							        }
+							        if(selected)
+								        UI::SetItemDefaultFocus();
+						        }
+						        UI::EndCombo();
+					        }
+							++i;
+				        }
+	        			if(UI::Button(("Add Color##"+std::to_string(i)).c_str()))
+				        {
+	        				colorAdd = true;
+	        				namePopup = true;
+	        				matToModify = elt;
+				        }
+				        if(UI::Button(("Add Texture##"+std::to_string(i)).c_str()))
+				        {
+					        textureAdd = true;
+					        namePopup = true;
+					        matToModify = elt;
+				        }
+				        if(UI::Button(("Add Float##"+std::to_string(i)).c_str()))
+				        {
+					        floatAdd = true;
+					        namePopup = true;
+					        matToModify = elt;
+				        }
+			        }
+		        }
+		        ++i;
+	        }
         }
     }
+
+	void InspectorInterface::DrawUniformNamePopup()
+	{
+		if(namePopup)
+		{
+			UI::OpenPopup("ValueNamePopUp");
+			namePopup = false;
+			nameStr = "";
+		}
+		if(!UI::IsPopupOpen("ValueNamePopUp"))
+		{
+			colorAdd = false;
+			textureAdd = false;
+			floatAdd = false;
+		}
+		if (UI::BeginPopup("ValueNamePopUp"))
+		{
+			UI::Text("Value Name :");
+			UI::SameLine();
+			UI::InputText("##ValueName", &nameStr);
+			if(UI::Button("Add Value"))
+			{
+				if(colorAdd)
+				{
+					matToModify->ColorProperties.emplace(nameStr, Vec4());
+					colorAdd = false;
+					matToModify = nullptr;
+				}
+				else if (textureAdd)
+				{
+					matToModify->TexturesProperties.emplace(nameStr, nullptr);
+					textureAdd = false;
+					matToModify = nullptr;
+				}
+				else if(floatAdd)
+				{
+					matToModify->ValueProperties.emplace(nameStr, 0.0f);
+					floatAdd= false;
+					matToModify = nullptr;
+				}
+				UI::CloseCurrentPopup();
+			}
+			UI::EndPopup();
+		}
+
+	}
 
     bool InspectorInterface::EditVec3(Vec3& _vec, const std::string& _label)
     {
@@ -204,6 +323,16 @@ namespace Solid
         }
         return false;
     }
+	bool InspectorInterface::EditVec4(Vec4& _vec, const std::string& _label)
+	{
+		Vec4 temp = _vec;
+		if(UI::DragFloat4(_label.c_str(), &temp.x, 0.01f))
+		{
+			_vec = temp;
+			return true;
+		}
+		return false;
+	}
 
     void InspectorInterface::EditVec2(Vec2& _vec, const std::string& _label)
     {

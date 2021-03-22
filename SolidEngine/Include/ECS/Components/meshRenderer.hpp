@@ -2,6 +2,7 @@
 
 #include "Resources/ressources.hpp"
 #include "Resources/graphicalResource.hpp"
+#include <set>
 namespace Solid
 {
     struct SOLID_API MeshRenderer
@@ -14,10 +15,13 @@ namespace Solid
 		    {
 		    	materials.resize(0);
 		    	materials.resize(mesh->subMeshCount, nullptr);
+		    	materialSet.clear();
+		    	materialSet.emplace(nullptr);
 		    }
     	}
         std::shared_ptr<IMesh> mesh = nullptr;
 	    //std::shared_ptr<IShader> shader = nullptr;
 	    std::vector<MaterialResource*> materials;
+        std::set<MaterialResource*> materialSet;
     };
 } //!namespace

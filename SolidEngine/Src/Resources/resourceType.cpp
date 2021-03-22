@@ -375,11 +375,22 @@ void MaterialResource::ToDataBuffer(std::vector<char> &buffer)
 		ResourcesLoader::Append(buffer, &(size), sizeof(size));
 		ResourcesLoader::Append(buffer, (void *) (tex.first.c_str()), size * sizeof(std::string::value_type));
 
-		//property value
-		size = tex.second->name.size();
+		//is texture empty
+		size = (tex.second == nullptr) ? 128 : 256;
 		ResourcesLoader::Append(buffer, &(size), sizeof(size));
-		ResourcesLoader::Append(buffer, (void *) (tex.second->name.c_str()), size * sizeof(std::string::value_type));
-		// append  property name and value (tex name)
+		if(size == 128)
+		{
+
+		}
+		else
+		{
+			//property value
+			size = tex.second->name.size();
+			ResourcesLoader::Append(buffer, &(size), sizeof(size));
+			ResourcesLoader::Append(buffer, (void *) (tex.second->name.c_str()), size * sizeof(std::string::value_type));
+			// append  property name and value (tex name)
+		}
+
 	}
 
 	size = this->ColorProperties.size();
@@ -464,12 +475,22 @@ void MaterialResource::FromDataBuffer(char *buffer, int bSize)
 		ResourcesLoader::ReadFromBuffer(buffer, &(pSize), sizeof(pSize), ReadPos);
 		pName.resize(pSize);
 		ResourcesLoader::ReadFromBuffer(buffer, (void *) (pName.data()), pSize * sizeof(std::string::value_type), ReadPos);
-		//property value
-		ResourcesLoader::ReadFromBuffer(buffer, &(vSize), sizeof(vSize), ReadPos);
-		vName.resize(vSize);
-		ResourcesLoader::ReadFromBuffer(buffer, (void *) (vName.data()), vSize * sizeof(std::string::value_type), ReadPos);
-		// append  Texture
-		this->TexturesProperties.emplace(pName, engine->graphicsResourceMgr.GetTexture(vName.c_str()));
+
+		//is texture empty
+		ResourcesLoader::ReadFromBuffer(buffer, &(pSize), sizeof(pSize), ReadPos);
+		if(pSize == 128)
+		{
+			this->TexturesProperties.emplace(pName, nullptr);
+		}
+		else
+		{
+			//property value
+			ResourcesLoader::ReadFromBuffer(buffer, &(vSize), sizeof(vSize), ReadPos);
+			vName.resize(vSize);
+			ResourcesLoader::ReadFromBuffer(buffer, (void *) (vName.data()), vSize * sizeof(std::string::value_type), ReadPos);
+			// append  Texture
+			this->TexturesProperties.emplace(pName, engine->graphicsResourceMgr.GetTexture(vName.c_str()));
+		}
 	}
 
 	size = 0;

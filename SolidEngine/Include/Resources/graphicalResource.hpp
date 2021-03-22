@@ -40,7 +40,7 @@ namespace Solid
 
 			virtual void DrawMesh() override;
 
-			virtual void DrawMesh(std::vector<MaterialResource *> _list, Transform &_tr, Camera &_cam) override;
+			virtual void DrawMesh(std::vector<MaterialResource *>& _list, Transform &_tr, Camera &_cam) override;
 
 		};
 		class SOLID_API Shader : public IShader
@@ -66,7 +66,11 @@ namespace Solid
 
 			virtual void SetMaterial(const char *_name) override;
 
+			virtual void SetVec2(const char *_name, Vec2 _value) override;
+
 			virtual void SetVec3(const char *_name, Vec3 _value) override;
+
+			virtual void SetVec4(const char *_name, Vec4 _value) override;
 
 			virtual void SetInt(const char *_name, int _value) override;
 
@@ -81,6 +85,11 @@ namespace Solid
 			virtual void SetVec3Array(const char *_name, int size, Vec3 *_value) override;
 
 			virtual void SetMatrixArray(const char *_name, int size, Mat4<float> *_value) override;
+
+			virtual void GetIntArray(const char *_name, int size, int *_value) override;
+
+			virtual void GetInt(const char *_name, int *_value) override;
+
 
 			~Shader() = default;
 
@@ -107,7 +116,7 @@ namespace Solid
 		{
 		public:
 		//public members
-
+			uint texId = 0;
 		protected:
 		//protected members
 
@@ -118,6 +127,9 @@ namespace Solid
 			Texture(ImageResource* _image);
 		    ~Texture() = default;
 
+			virtual void BindTexture(uint _texUnit) override;
+
+			virtual void UnBindTexture(uint _texUnit) override;
 		};
 
 	}
