@@ -45,7 +45,6 @@ namespace Solid
 
 
         void UpdateEditorCamera();
-        void LoadResources();
     public:
 
         static float camSpeed;
@@ -54,7 +53,7 @@ namespace Solid
 
         Editor();
         ~Editor();
-        
+	    void LoadResources(bool _solid);
         void Run();
         friend class EngineCleanerInterface;
     };
