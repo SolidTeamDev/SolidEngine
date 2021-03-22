@@ -41,7 +41,7 @@ namespace Solid
         sceneFramebuffer = engine->renderer->CreateFramebuffer(window->GetWindowSize());
         Compiler = GameCompiler::GetInstance();
 
-        LoadResources();
+
     }
 
     Editor::~Editor()
@@ -86,15 +86,18 @@ namespace Solid
 
     }
 
-    void Editor::LoadResources()
+    void Editor::LoadResources(bool _solid)
     {
         engine->EnableMultiThread(true);
 
         ResourcesLoader loader;
 
         loader.SetManager(&(engine->resourceManager));
+
         fs::path p = fs::current_path().append("Resources");
 
+        if(_solid)
+			p = fs::current_path().append("SolidResources");
         auto before = std::chrono::high_resolution_clock::now();
         loader.LoadResourcesFromFolder(p);
         auto after = std::chrono::high_resolution_clock::now();

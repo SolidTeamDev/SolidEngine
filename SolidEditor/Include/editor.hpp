@@ -45,14 +45,13 @@ namespace Solid
         Camera editorCamera;
 
         void UpdateEditorCamera();
-        void LoadResources();
     public:
 
         static Framebuffer sceneFramebuffer;
 
         Editor();
         ~Editor();
-        
+	    void LoadResources(bool _solid);
         void Run();
         friend class EngineCleanerInterface;
     };
