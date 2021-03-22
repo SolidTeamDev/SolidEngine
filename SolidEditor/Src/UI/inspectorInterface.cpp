@@ -89,11 +89,11 @@ namespace Solid
             Vec3 tempScale = _trs.GetScale();
 
             UI::Text("Position");UI::SameLine();
-            EditVec3(tempPos  , "##trsPos");
+            EditVec3(tempPos  , "##trsPos", 0.02f);
             UI::Text("Rotation");UI::SameLine();
-            bool changed = EditVec3(tempRot  , "##trsRot");
+            bool changed = EditVec3(tempRot  , "##trsRot", 1.f);
             UI::Text("Scale   ");UI::SameLine();
-            EditVec3(tempScale, "##trsScl");
+            EditVec3(tempScale, "##trsScl", 0.01f);
 
             _trs.SetPosition(tempPos);
             if (changed)
@@ -134,44 +134,45 @@ namespace Solid
             }
             int i = 0;
             const MaterialResource* DefaultMat = engine->resourceManager.GetDefaultMat();
-            auto Lambda = [&](auto elt){
+            UI::Indent();
+            if(UI::CollapsingHeader("Materials"))
+            {
+                for (MaterialResource *elt : _meshRenderer.materials)
+                {
+                    const char *matName = elt == nullptr ? "DEFAULT MATERIAL" : elt->name.c_str();
+                    UI::Text("Material  ");
+                    UI::SameLine();
+                    if (UI::BeginCombo(("##Mat" + std::to_string(i)).c_str(), matName))
+                    {
+                        auto *matList = engine->resourceManager.GetResourcesVecByType<MaterialResource>();
+                        {
+                            bool selected = (matName == "DEFAULT MATERIAL");
+                            if (UI::Selectable("DEFAULT MATERIAL", selected))
+                            {
 
-            };
+                                _meshRenderer.materials.at(i) = nullptr;
+                            }
+                            if (selected)
+                                UI::SetItemDefaultFocus();
+                        }
+                        for (auto mat : *matList)
+                        {
+                            bool selected = (matName == mat.second->name);
+                            if (UI::Selectable(mat.second->name.c_str(), selected))
+                            {
 
+                                _meshRenderer.materials.at(i) = (MaterialResource *) mat.second;
+                            }
+                            if (selected)
+                                UI::SetItemDefaultFocus();
+                        }
 
-			for(MaterialResource* elt : _meshRenderer.materials)
-			{
-				const char* matName = elt == nullptr ? "DEFAULT MATERIAL" :  elt->name.c_str();
-				UI::Text("Material  ");UI::SameLine();
-				if(UI::BeginCombo(("##Mat" + std::to_string(i)).c_str(), matName))
-				{
-					auto* matList = engine->resourceManager.GetResourcesVecByType<MaterialResource>();
-					{
-						bool selected = (matName == "DEFAULT MATERIAL");
-						if(UI::Selectable("DEFAULT MATERIAL", selected))
-						{
-
-							_meshRenderer.materials.at(i) = nullptr;
-						}
-						if(selected)
-							UI::SetItemDefaultFocus();
-					}
-					for(auto mat : *matList)
-					{
-						bool selected = (matName == mat.second->name);
-						if(UI::Selectable(mat.second->name.c_str(), selected))
-						{
-
-							_meshRenderer.materials.at(i) = (MaterialResource*)mat.second;
-						}
-						if(selected)
-							UI::SetItemDefaultFocus();
-					}
-
-					UI::EndCombo();
-				}
-				++i;
-			}
+                        UI::EndCombo();
+                    }
+                    ++i;
+                }
+            }
+            UI::Unindent();
            /* const char* shaderName = _meshRenderer.shader == nullptr ? "" : _meshRenderer.shader->name.c_str();
 
             UI::Text("Shader");UI::SameLine();
@@ -194,10 +195,10 @@ namespace Solid
         }
     }
 
-    bool InspectorInterface::EditVec3(Vec3& _vec, const std::string& _label)
+    bool InspectorInterface::EditVec3(Vec3& _vec, const std::string& _label, float _step)
     {
         Vec3 temp = _vec;
-        if(UI::DragFloat3(_label.c_str(), &temp.x, 0.01f))
+        if(UI::DragFloat3(_label.c_str(), &temp.x, _step))
         {
             _vec = temp;
             return true;
@@ -205,19 +206,19 @@ namespace Solid
         return false;
     }
 
-    void InspectorInterface::EditVec2(Vec2& _vec, const std::string& _label)
+    void InspectorInterface::EditVec2(Vec2& _vec, const std::string& _label, float _step)
     {
-        UI::DragFloat2(_label.c_str(), &_vec.x, 0.01f);
+        UI::DragFloat2(_label.c_str(), &_vec.x, _step);
     }
 
-    void InspectorInterface::EditInt(int& _num, const std::string& _label)
+    void InspectorInterface::EditInt(int& _num, const std::string& _label, float _step)
     {
-        UI::DragInt(_label.c_str(), &_num);
+        UI::DragInt(_label.c_str(), &_num, _step);
     }
 
-    void InspectorInterface::EditFloat(float &_num, const std::string& _label)
+    void InspectorInterface::EditFloat(float &_num, const std::string& _label, float _step)
     {
-        UI::DragFloat(_label.c_str(), &_num);
+        UI::DragFloat(_label.c_str(), &_num, _step);
     }
 
     void InspectorInterface::EditText(std::string &_str, const std::string& _label)

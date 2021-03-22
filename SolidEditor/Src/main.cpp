@@ -9,7 +9,7 @@
 
 #include <SA-UnitTestHelper.hpp>
 
-int main()
+int main(int argc, char** argv)
 {
 #ifndef NDEBUG
     Solid::AllTestFuncMaths();
@@ -17,7 +17,18 @@ int main()
 
     try
     {
-        Solid::Editor editor;
+	    Solid::Editor editor;
+	    bool b = false;
+    	if(argc > 1)
+	    {
+    		std::string arg = argv[1];
+    		if(arg == "-Solid")
+		    {
+    			b = true;
+		    }
+	    }
+
+        editor.LoadResources(b);
         editor.Run();
     }
     catch(const Solid::ThrowError& e)

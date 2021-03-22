@@ -94,10 +94,8 @@ namespace Solid
         void DrawChangeColors();
 
         /**
-         * @brief Draws the performances overlay
+         * @brief Draws the additional informations overlay
          */
-        void DrawPerfOverlay();
-
-
+        void AddInfoOverlay();
     };
 }

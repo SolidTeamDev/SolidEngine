@@ -9,6 +9,7 @@ namespace Solid
         ~SceneInterface() = default;
 
         void Draw();
+        void DrawMenu();
 
         bool p_open = true;
     };

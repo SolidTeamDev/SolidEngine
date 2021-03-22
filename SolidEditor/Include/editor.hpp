@@ -42,17 +42,18 @@ namespace Solid
         InputManager<int>* editorInputManager = nullptr;
         Engine* engine = nullptr;
         GameCompiler* Compiler;
-        Camera editorCamera;
+
 
         void UpdateEditorCamera();
-        void LoadResources();
     public:
 
+        static float camSpeed;
         static Framebuffer sceneFramebuffer;
+        static Camera editorCamera;
 
         Editor();
         ~Editor();
-        
+	    void LoadResources(bool _solid);
         void Run();
         friend class EngineCleanerInterface;
     };
