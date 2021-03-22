@@ -215,11 +215,7 @@ namespace Solid {
 
 
         MaterialResource();
-	    MaterialResource(const char* _name, bool _genfile = true)
-	    {
-	    	name = _name;
-	    	shouldGenerateFileAtDestroy = _genfile;
-	    }
+	    MaterialResource(const char* _name, bool _genfile = true);
 
 
         ~MaterialResource();
