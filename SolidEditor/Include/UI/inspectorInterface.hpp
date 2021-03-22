@@ -17,6 +17,7 @@ namespace Solid
         void Draw();
         void DrawComponents();
         void AddComponents();
+        void CreateScriptWindow();
 
         void EditTransform(Transform& _trs);
         void EditMeshRenderer(MeshRenderer& _meshRenderer);
@@ -29,6 +30,7 @@ namespace Solid
         void EditFloat(float&      _num, const std::string& _label, float _step);
 
         bool p_open = true;
+        bool openCreateScript = false;
 	    bool colorAdd = false;
 	    bool floatAdd = false;
 	    bool textureAdd = false;

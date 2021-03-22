@@ -24,6 +24,10 @@ namespace Solid
         DrawComponents();
 
         AddComponents();
+
+        if (openCreateScript)
+            CreateScriptWindow();
+
 	    DrawUniformNamePopup();
         UI::End();
     }
@@ -54,9 +58,10 @@ namespace Solid
 
         if(UI::Button("Add Component",ImVec2(-1, 0)))
             UI::OpenPopup("AddComponent");
-
         if(UI::BeginPopup("AddComponent"))
         {
+            if (UI::Button("Create Custom Script"))
+                openCreateScript = true;
 	        if(!engine->ecsManager.GotComponent<Transform>(gameObject->GetEntity()))
 	        {
 		        if(UI::Button("Transform"))
@@ -270,6 +275,54 @@ namespace Solid
         }
     }
 
+    void InspectorInterface::CreateScriptWindow()
+    {
+        UI::SetNextWindowBgAlpha(0.9);
+        UI::SetNextWindowSize(ImVec2(325, 100));
+        UI::SetNextWindowViewport(UI::GetID(UI::GetMainViewport()));
+
+        ImGuiWindowFlags flags = 0;
+        flags |= ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse;
+        flags |= ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDocking;
+
+        static std::string sName = ""; //script name
+        static std::string path  = "";  //path of the new script
+
+        UI::Begin("Create Script", &openCreateScript, flags);
+
+        UI::Text("Script Name:");
+        UI::SameLine();
+        ImVec2 cPos = UI::GetCursorPos();
+        UI::InputText("##InputScriptName:", &sName);
+
+
+        UI::Text("Path:");
+        UI::SameLine();
+        cPos.y = UI::GetCursorPos().y;
+        UI::SetCursorPos(cPos);
+        UI::InputText("##InputPath:", &path);
+
+        UI::Indent(50.f);
+        if(UI::Button("Create"))
+        {
+            openCreateScript = false;
+            //call function to create custom script here
+            path = "";
+            sName = "";
+        }
+        UI::SameLine();
+        UI::Indent(125.f);
+        if (UI::Button("Cancel"))
+        {
+            openCreateScript = false;
+            path = "";
+            sName = "";
+        }
+        UI::End();
+    }
+
+
+    bool InspectorInterface::EditVec3(Vec3& _vec, const std::string& _label, float _step)
 	void InspectorInterface::DrawUniformNamePopup()
 	{
 		if(namePopup)
