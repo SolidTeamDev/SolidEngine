@@ -530,6 +530,16 @@ void MaterialResource::FromDataBuffer(char *buffer, int bSize)
 
 }
 
+void AudioResource::ToDataBuffer(std::vector<char> &buffer)
+{
+	///TODO
+}
+
+void AudioResource::FromDataBuffer(char *buffer, int bSize)
+{
+	///TODO
+}
+
 MaterialResource::MaterialResource(const char *_name, bool _genfile)
 {
 	type = EResourceType::Material;

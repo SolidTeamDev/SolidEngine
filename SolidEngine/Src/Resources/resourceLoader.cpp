@@ -11,6 +11,13 @@
 #include "assimp/mesh.h"
 #include "assimp/Importer.hpp"
 #include "assimp\postprocess.h"
+#include "AL/alc.h"
+#include "AL/al.h"
+#include "AL/alext.h"
+#include <vector>
+#include <inttypes.h>
+#include "sndfile.h"
+#include <time.h>
 #include <sstream>
 #include <Resources/resourceLoader.hpp>
 
@@ -77,7 +84,8 @@ void  ResourcesLoader::LoadRessourceNoAdd(const fs::path &Rpath, ResourcePtrWrap
         r=LoadSolidShader(Rpath);
     else if(extension == ".sanim")
         ;
-
+    else if(extension == ".saudio")
+	    ;
     /// Image Loading
     else if(extension == ".bmp")
         r=LoadImage(Rpath);
@@ -94,6 +102,11 @@ void  ResourcesLoader::LoadRessourceNoAdd(const fs::path &Rpath, ResourcePtrWrap
     else if(extension == ".fbx")
         r=LoadMesh(Rpath);
 
+    ///Audio Loading
+    else if(extension == ".wav")
+	    r=LoadAudio(Rpath);
+    else if(extension == ".ogg")
+	    r=LoadAudio(Rpath);
     wrapper.r = r;
 }
 void ResourcesLoader::LoadRessource(const fs::path &Rpath)
@@ -506,6 +519,80 @@ Resource * ResourcesLoader::LoadShader(const fs::path &Rpath)
         return Shader;
 
     }
+}
+
+Resource *ResourcesLoader::LoadAudio(const fs::path &Rpath)
+{
+	AudioResource* audio = new AudioResource();
+	std::string p = Rpath.string();
+	const char* filename = p.c_str();
+	ALenum err, format;
+	ALuint buff;
+	SNDFILE* sndfile;
+	SF_INFO sfinfo;
+	short* membuf = nullptr;
+	sf_count_t numFrames;
+	ALsizei numBytes;
+	audio->name = Rpath.filename().string();
+	sndfile = sf_open(filename, SFM_READ, &sfinfo);
+	if (!sndfile)
+	{
+		std::cout << "Couldn't open the audio " << filename << std::endl;
+		return 0;
+	}
+
+	format = AL_NONE;
+	if (sfinfo.channels == 1)
+		format = AL_FORMAT_MONO16;
+	else if (sfinfo.channels == 2)
+		format = AL_FORMAT_STEREO16;
+	else if (sfinfo.channels == 3)
+	{
+		if (sf_command(sndfile, SFC_WAVEX_GET_AMBISONIC, NULL, 0) == SF_AMBISONIC_B_FORMAT)
+			format = AL_FORMAT_BFORMAT2D_16;
+	}
+	else if (sfinfo.channels == 4)
+	{
+		if (sf_command(sndfile, SFC_WAVEX_GET_AMBISONIC, NULL, 0) == SF_AMBISONIC_B_FORMAT)
+			format = AL_FORMAT_BFORMAT3D_16;
+	}
+
+	if(!format)
+	{
+		std::cout << "Unsupported channel count of " << filename << std::endl;
+		sf_close(sndfile);
+		return 0;
+	}
+	audio->audioRawBinary.resize((sfinfo.frames * sfinfo.channels));
+
+
+	numFrames = sf_readf_short(sndfile, audio->audioRawBinary.data(), sfinfo.frames);
+	if (numFrames < 1)
+	{
+		sf_close(sndfile);
+		std::cout << "Failed to read samples of " << filename << std::endl;
+		return nullptr;
+	}
+
+	numBytes = (ALsizei)(numFrames * sfinfo.channels) * (ALsizei)sizeof(short);
+
+	buff = 0;
+	alGenBuffers(1, &buff);
+	alBufferData(buff, format, audio->audioRawBinary.data(), numBytes, sfinfo.samplerate);
+	audio->buffer = buff;
+	audio->info = sfinfo;
+	sf_close(sndfile);
+
+	err = alGetError();
+	if (err != AL_NO_ERROR)
+	{
+		std::cout << "OpenAL Error : " << alGetString(err) << std::endl;
+		if (buff && alIsBuffer(buff))
+			alDeleteBuffers(1, &buff);
+		return nullptr;
+	}
+	///TODO
+	return audio;
 }
 
 ///
