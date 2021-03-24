@@ -7,7 +7,7 @@
 #include "AL/alc.h"
 #include "AL/al.h"
 #include "AL/alext.h"
-#include "Core/Maths/Vector/vector3.hpp"
+
 namespace Solid
 {
 	class AudioOutput
@@ -29,7 +29,6 @@ namespace Solid
 	    AudioOutput();
 	    ~AudioOutput() ;
 	    ALuint GetOutputID();
-		bool Play(ALuint _sound);
 		void setVolume(float _vol);
 		void setPitch(float _pitch);
 		void setMusicPos(Vec3 _pos);

@@ -4,6 +4,7 @@
 #include "Rendering/OpenGL45/openGl45Renderer.hpp"
 #include "UI/solidUI.hpp"
 #include "Resources/ressources.hpp"
+#include "Resources/audioManager.hpp"
 
 #include "ECS/Components/transform.hpp"
 #include "ECS/Components/meshRenderer.hpp"
@@ -14,7 +15,9 @@ namespace Solid
 	__declspec(dllexport) Engine* Engine::instance = nullptr;
     Engine::Engine() :
             threadPool(&taskManager),
-            resourceManager(this)
+            resourceManager(this),
+            audioMgr(&resourceManager)
+
     {
 
         InitEcs();

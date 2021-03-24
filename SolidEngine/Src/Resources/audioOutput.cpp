@@ -1,6 +1,8 @@
 //
 // Created by a.galliot on 24/03/2021.
 //
+#include <string>
+#include "Core/Maths/Vector/vector3.hpp"
 #include "Resources/audioOutput.hpp"
 
 Solid::AudioOutput::AudioOutput()
@@ -23,12 +25,6 @@ ALuint Solid::AudioOutput::GetOutputID()
 	return sourceID;
 }
 
-bool Solid::AudioOutput::Play(ALuint _sound)
-{
-
-	alSourcei(sourceID, AL_BUFFER, (ALint)_sound);
-	alSourcePlay(sourceID);
-}
 
 
 void Solid::AudioOutput::setVolume(float _vol)

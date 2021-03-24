@@ -10,7 +10,6 @@
 
 #include "Resources/ressources.hpp"
 #include <sstream>
-#include <Resources/resourceMgr.hpp>
 
 #include "glad/glad.h"
 #include "Core/engine.hpp"

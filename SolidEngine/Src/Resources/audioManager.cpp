@@ -1,11 +1,15 @@
 //
 // Created by a.galliot on 24/03/2021.
 //
+#include "Resources/ressources.hpp"
+#include "Resources/audioOutput.hpp"
+#include "Resources/resourceMgr.hpp"
 #include "Resources/audioManager.hpp"
-#include "Resources/resourceType.hpp"
+
 using namespace Solid;
 
-AudioManager::AudioManager()
+AudioManager::AudioManager(ResourceManager* _mgr):
+manager(_mgr)
 {
 
 }
@@ -21,7 +25,9 @@ bool AudioManager::Play(const char *_name)
 	if(currBuff == audio->buffer)
 		return false;
 	currBuff = audio->buffer;
-	out.Play(currBuff);
+	alSourcei(out.GetOutputID(), AL_BUFFER, (ALint)currBuff);
+	alSourcePlay(out.GetOutputID());
+	return true;
 
 }
 

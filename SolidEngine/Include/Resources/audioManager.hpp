@@ -4,8 +4,7 @@
 
 #ifndef SOLIDEDITOR_AUDIOMANAGER_HPP
 #define SOLIDEDITOR_AUDIOMANAGER_HPP
-#include "audioOutput.hpp"
-#include "resourceMgr.hpp"
+
 namespace Solid
 {
 	class AudioManager
@@ -22,7 +21,7 @@ namespace Solid
 
 	public:
 	//public func
-	    AudioManager() ;
+	    AudioManager(ResourceManager* _mgr) ;
 
 	    ~AudioManager();
 		bool Play(const char* _name);
