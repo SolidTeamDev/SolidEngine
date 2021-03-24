@@ -35,7 +35,7 @@ find_package(OpenGL REQUIRED)
 #Extern Lib
 link_directories(SolidEngine/ThirdParty/Lib)
 
-set(ENGINE_LIBS PUBLIC glfw3dll OpenGL::GL assimp-vc142-mtd IrrXML zlibstaticd)
+set(ENGINE_LIBS PUBLIC glfw3dll OpenGL::GL assimp-vc142-mtd IrrXML zlibstaticd OpenAL32 SndFile)
 
 add_library(SolidEngine SHARED ${ENGINE_SOURCE_FILES} ${THIRD_PARTY_FILES})
 

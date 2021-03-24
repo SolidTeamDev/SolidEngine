@@ -44,7 +44,8 @@ namespace Solid
         ResourceList<AnimResource>           AnimList;
         ResourceList<ShaderResource>         ShaderList;
         ResourceList<ComputeShaderResource>  ComputeList;
-        ResourceList<MaterialResource>       MaterialList;
+	    ResourceList<MaterialResource>       MaterialList;
+	    ResourceList<AudioResource>          AudioList;
         const MaterialResource* defaultMat = nullptr;
         class Engine* EnginePtr = nullptr;
         bool defaultMatInit = false;
@@ -80,6 +81,7 @@ namespace Solid
 	    ComputeShaderResource* GetRawComputeByName(const char* name);
 	    MaterialResource* GetRawMaterialByName(const char* name);
 	    ImageResource* GetRawImageByName(const char* name);
+	    AudioResource* GetRawAudioByName(const char* name);
 	    MaterialResource* CreateMaterial(const char* name);
 
         template<typename T>

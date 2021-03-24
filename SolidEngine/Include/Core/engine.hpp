@@ -12,6 +12,8 @@
 #include "ECS/ecsManager.hpp"
 #include "ECS/System/rendererSystem.hpp"
 #include "Resources/graphicalResourceMgr.hpp"
+#include "Resources/audioOutput.hpp"
+#include "Resources/audioManager.hpp"
 
 
 namespace Solid
@@ -51,6 +53,7 @@ namespace Solid
         TaskManager taskManager;
         ThreadManager threadPool;
         GraphicalResourceMgr graphicsResourceMgr;
+        AudioManager audioMgr;
         static Engine* GetInstance();
         bool MultiThreadEnabled()const {return mtEnabled;}
         void EnableMultiThread(bool _b);

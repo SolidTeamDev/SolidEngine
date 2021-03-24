@@ -5,11 +5,13 @@
 #ifndef SOLIDEDITOR_RESOURCETYPE_HPP
 #define SOLIDEDITOR_RESOURCETYPE_HPP
 #include <filesystem>
+#include <sndfile.h>
 
 #include "Core/Maths/solidVector.hpp"
 #include "json.hpp"
-
-
+#include "AL/alc.h"
+#include "AL/al.h"
+#include "AL/alext.h"
 
 
 namespace fs = std::filesystem;
@@ -34,6 +36,7 @@ namespace Solid {
         Compute,
         Material,
         Scene,
+        Audio,
         NONE,
     };
 
@@ -238,6 +241,26 @@ namespace Solid {
 		{
 
 		}
+	};
+	class SOLID_API AudioResource : public Resource
+	{
+	public:
+		std::vector<short> audioRawBinary;
+		SF_INFO info;
+		ALuint buffer;
+		AudioResource()
+		{
+			type = EResourceType::Scene;
+		}
+
+		~AudioResource()
+		{
+
+		}
+		void ToDataBuffer(std::vector<char> &buffer);
+
+		void FromDataBuffer(char *buffer, int bSize);
+
 	};
 }
 

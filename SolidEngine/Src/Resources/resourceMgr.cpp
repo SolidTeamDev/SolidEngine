@@ -10,7 +10,6 @@
 
 #include "Resources/ressources.hpp"
 #include <sstream>
-#include <Resources/resourceMgr.hpp>
 
 #include "glad/glad.h"
 #include "Core/engine.hpp"
@@ -57,10 +56,12 @@ void ResourceManager::AddResource(Resource *r)
 		case EResourceType::Image:
 			ImageList.List.emplace(r->name, r);
             break;
-            break;
 		case EResourceType::Anim:
 			AnimList.List.emplace(r->name, r);
             break;
+		case EResourceType::Audio:
+			AudioList.List.emplace(r->name, r);
+			break;
 		default:
 			ThrowError("Type Not Stored", ESolidErrorCode::S_INIT_ERROR);
 			break;
@@ -171,7 +172,14 @@ ComputeShaderResource* ResourceManager::GetRawComputeByName(const char* _name)
 	return (ComputeShaderResource*)it->second;
 }
 
-
+AudioResource *ResourceManager::GetRawAudioByName(const char *_name)
+{
+	auto list = AudioList.List;
+	auto it = list.find(_name);
+	if(it == list.end())
+		return nullptr;
+	return (AudioResource*)it->second;
+}
 
 
 void ResourceManager::InitDefaultMat()
