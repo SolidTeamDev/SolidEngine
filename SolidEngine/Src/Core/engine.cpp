@@ -8,6 +8,7 @@
 #include "ECS/Components/transform.hpp"
 #include "ECS/Components/meshRenderer.hpp"
 #include "ECS/Components/camera.hpp"
+#include "ECS/Components/rigidBody.hpp"
 
 namespace Solid
 {
@@ -35,6 +36,7 @@ namespace Solid
         ecsManager.RegisterComponent<Transform>();
         ecsManager.RegisterComponent<MeshRenderer>();
         ecsManager.RegisterComponent<Camera>();
+        ecsManager.RegisterComponent<RigidBody>();
 
         //Register Signature
         rendererSystem = ecsManager.RegisterSystem<RendererSystem>();
