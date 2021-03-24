@@ -11,6 +11,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 include_directories(SolidEngine/Include)
 include_directories(SolidEngine/ThirdParty/Include)
+include_directories(SolidEngine/ThirdParty/Include/Physx)
 
 ### Engine Sources Files
 
@@ -29,17 +30,27 @@ file(GLOB_RECURSE THIRD_PARTY_FILES
 #OPENGL
 find_package(OpenGL REQUIRED)
 
-
-
-
 #Extern Lib
-link_directories(SolidEngine/ThirdParty/Lib)
 
-set(ENGINE_LIBS PUBLIC glfw3dll OpenGL::GL assimp-vc142-mtd IrrXML zlibstaticd OpenAL32 SndFile)
+file(GLOB ENGINE_LIBS_COMMON
+        SolidEngine/ThirdParty/Lib/*.lib)
+file(GLOB ENGINE_LIBS_DEBUG
+        SolidEngine/ThirdParty/Lib/Debug/*.lib)
+file(GLOB ENGINE_LIBS_RELEASE
+        SolidEngine/ThirdParty/Lib/Release/*.lib)
 
 add_library(SolidEngine SHARED ${ENGINE_SOURCE_FILES} ${THIRD_PARTY_FILES})
 
-target_link_libraries(SolidEngine ${ENGINE_LIBS})
+if(CMAKE_BUILD_TYPE MATCHES Debug)#DEBUG
+    target_link_libraries(SolidEngine PUBLIC
+        ${ENGINE_LIBS_COMMON}
+        debug     ${ENGINE_LIBS_DEBUG} )
+else()#Release/Other
+    target_link_libraries(SolidEngine PUBLIC
+            ${ENGINE_LIBS_COMMON}
+            optimized ${ENGINE_LIBS_RELEASE})
+endif()
+
 target_compile_definitions(SolidEngine PRIVATE "IMGUI_API=__declspec(dllexport)")
 target_compile_definitions(SolidEngine PUBLIC "SOLID_API=__declspec(dllexport)")
 
@@ -78,12 +89,30 @@ target_compile_definitions(SolidEditor PRIVATE "SOLID_EDITOR_API=__declspec(dlle
 
 # ========= DLL ==========
 
+#COMMON
 ADD_CUSTOM_COMMAND (TARGET SolidEditor POST_BUILD
 
-COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Bin/glfw3.dll ${CMAKE_BINARY_DIR}/
-COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Bin/assimp-vc142-mtd.dll ${CMAKE_BINARY_DIR}/
-# Output Message
-COMMENT "Copying binaries" VERBATIM)
+        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Bin/glfw3.dll ${CMAKE_BINARY_DIR}/
+        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Bin/OpenAL32.dll ${CMAKE_BINARY_DIR}/
+        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Bin/sndfile.dll ${CMAKE_BINARY_DIR}/
+
+COMMENT "Copying common binaries" VERBATIM)
+
+if(CMAKE_BUILD_TYPE MATCHES Debug)#DEBUG
+    ADD_CUSTOM_COMMAND (TARGET SolidEditor POST_BUILD
+
+            COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Bin/Debug ${CMAKE_BINARY_DIR}/
+
+    COMMENT "Copying debug binaries" VERBATIM)
+else()#RELEASE/OTHER
+
+    ADD_CUSTOM_COMMAND (TARGET SolidEditor POST_BUILD
+
+            COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Bin/Release ${CMAKE_BINARY_DIR}/
+
+    COMMENT "Copying release binaries" VERBATIM)
+endif()
+
 
 # ========= RESOURCES ==========
 

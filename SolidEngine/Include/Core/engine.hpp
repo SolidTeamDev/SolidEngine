@@ -15,6 +15,7 @@
 #include "Resources/audioOutput.hpp"
 #include "Resources/audioManager.hpp"
 
+#include "Physics/physics.hpp"
 
 namespace Solid
 {
@@ -53,7 +54,9 @@ namespace Solid
         TaskManager taskManager;
         ThreadManager threadPool;
         GraphicalResourceMgr graphicsResourceMgr;
+        Physics physics;
         AudioManager audioMgr;
+        
         static Engine* GetInstance();
         bool MultiThreadEnabled()const {return mtEnabled;}
         void EnableMultiThread(bool _b);
