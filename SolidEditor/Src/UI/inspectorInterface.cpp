@@ -94,11 +94,11 @@ namespace Solid
             Vec3 tempScale = _trs.GetScale();
 
             UI::Text("Position");UI::SameLine();
-            EditVec3(tempPos  , "##trsPos", 0.02f);
+	        EditVec3(tempPos, "##trsPos", 0.01f);
             UI::Text("Rotation");UI::SameLine();
-            bool changed = EditVec3(tempRot  , "##trsRot", 1.f);
+            bool changed = EditVec3(tempRot, "##trsRot", 0.01f);
             UI::Text("Scale   ");UI::SameLine();
-            EditVec3(tempScale, "##trsScl", 0.01f);
+	        EditVec3(tempScale, "##trsScl", 0.01f);
 
             _trs.SetPosition(tempPos);
             if (changed)
@@ -222,11 +222,11 @@ namespace Solid
 				        }
 	        			for(auto& value : elt->ValueProperties)
 	        			{
-							EditFloat(value.second, value.first);
+							EditFloat(value.second, value.first, 0.01f);
 	        			}
 				        for(auto& color : elt->ColorProperties)
 				        {
-					        EditVec4(color.second, color.first);
+					        EditVec4(color.second, color.first, 0.01f);
 				        }
 				        int ii = 0;
 				        for(auto& tex : elt->TexturesProperties)
@@ -288,6 +288,7 @@ namespace Solid
         static std::string sName = ""; //script name
         static std::string path  = "";  //path of the new script
 
+        
         UI::Begin("Create Script", &openCreateScript, flags);
 
         UI::Text("Script Name:");
@@ -321,8 +322,6 @@ namespace Solid
         UI::End();
     }
 
-
-    bool InspectorInterface::EditVec3(Vec3& _vec, const std::string& _label, float _step)
 	void InspectorInterface::DrawUniformNamePopup()
 	{
 		if(namePopup)
@@ -369,7 +368,7 @@ namespace Solid
 
 	}
 
-    bool InspectorInterface::EditVec3(Vec3& _vec, const std::string& _label)
+    bool InspectorInterface::EditVec3(Vec3 &_vec, const std::string &_label, float _step)
     {
         Vec3 temp = _vec;
         if(UI::DragFloat3(_label.c_str(), &temp.x, _step))
@@ -379,7 +378,7 @@ namespace Solid
         }
         return false;
     }
-	bool InspectorInterface::EditVec4(Vec4& _vec, const std::string& _label)
+	bool InspectorInterface::EditVec4(Vec4 &_vec, const std::string &_label, float _step)
 	{
 		Vec4 temp = _vec;
 		if(UI::DragFloat4(_label.c_str(), &temp.x, 0.01f))
