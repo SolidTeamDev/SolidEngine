@@ -6,24 +6,40 @@ using namespace physx;
 
 namespace Solid
 {
+    physx::PxDefaultErrorCallback Physics::gDefaultErrorCallback = PxDefaultErrorCallback();
+    physx::PxDefaultAllocator     Physics::gDefaultAllocatorCallback = PxDefaultAllocator();
+    physx::PxCudaContextManager* Physics::gCudaContextManager = nullptr;
 
     Physics::Physics()
     {
-        static physx::PxDefaultErrorCallback gDefaultErrorCallback;
-        static physx::PxDefaultAllocator     gDefaultAllocatorCallback;
-
         pxFoundation = PxCreateFoundation(PX_PHYSICS_VERSION,gDefaultAllocatorCallback,gDefaultErrorCallback);
-        if(pxFoundation == nullptr)
+        if(!pxFoundation)
             throw ThrowError("Physx initialization failed ! (PxCreateFoundation)",ESolidErrorCode::S_INIT_ERROR);
 
-        pxPvd = nullptr;/*PxCreatePvd(*pxFoundation);
-    PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate(PVD_HOST, 5425, 10);
-    pxPvd->connect(*transport, PxPvdInstrumentationFlag::Enum::eALL);*/
-
-        pxPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *pxFoundation, PxTolerancesScale(), true, pxPvd);
-        if(pxPhysics == nullptr)
+        pxPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *pxFoundation, PxTolerancesScale(), true, nullptr);
+        if(!pxPhysics)
             throw ThrowError("Physx initialization failed ! (PxCreatePhysics)",ESolidErrorCode::S_INIT_ERROR);
 
+        /// Create physx scene
+
+        PxCudaContextManagerDesc cudaContextManagerDesc;
+
+        gCudaContextManager = PxCreateCudaContextManager(*pxFoundation, cudaContextManagerDesc, PxGetProfilerCallback());
+
+        PxSceneDesc sceneDesc(pxPhysics->getTolerancesScale());
+
+        sceneDesc.gravity = PxVec3(0,-9.81f,0);
+        sceneDesc.cpuDispatcher = PxDefaultCpuDispatcherCreate(4);
+        sceneDesc.filterShader  = PxDefaultSimulationFilterShader;
+        sceneDesc.cudaContextManager = gCudaContextManager;
+
+        sceneDesc.flags |= PxSceneFlag::eENABLE_GPU_DYNAMICS;
+        sceneDesc.broadPhaseType = PxBroadPhaseType::eGPU;
+
+        pxScene = pxPhysics->createScene(sceneDesc);
+        if(!pxScene)
+            throw ThrowError("Physx create scene failed !",ESolidErrorCode::S_INIT_ERROR);
+        ///
     }
 
     Physics::~Physics()
