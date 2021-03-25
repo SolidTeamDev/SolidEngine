@@ -2,14 +2,16 @@
 
 #include <string>
 
-#include "Build/SolidAPI.hpp"
+#include "Build/solidAPI.hpp"
 #include "../Utils/constants.hpp"
+#include "EngineGenerated/quaternion.sld.hpp"
 
-namespace Solid
+namespace Solid SLDNamespace()
 {
-    struct Vec3;
-    struct SOLID_API Quat
+    class Vec3;
+    class SOLID_API SLDClass() Quat
     {
+    public:
         constexpr Quat()noexcept:x(0),y(0),z(0),w(1){}
         constexpr Quat(float _value) noexcept;
         constexpr Quat(float _x,float _y = 0, float _z = 0, float _w = 1) noexcept;
@@ -126,9 +128,11 @@ namespace Solid
 
         constexpr Quat operator - () const noexcept;
 #pragma endregion
-
+		Quat_GENERATED
     };
 
     constexpr Quat operator * (float _value, const Quat& _quat) noexcept;
     constexpr Quat operator / (float _value, const Quat& _quat) ;
 }
+
+File_GENERATED

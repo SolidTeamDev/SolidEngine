@@ -1,16 +1,19 @@
 #pragma once
 
 #include "Build/SolidAPI.hpp"
+#include "EngineGenerated/vector4.sld.hpp"
 
-namespace Solid
+namespace Solid SLDNamespace()
 {
-    struct Vec4;
+    class Vec2;
 
-    struct Vec4;
+    class Vec3;
 
-    struct SOLID_API Vec4
+    class SOLID_API SLDClass() Vec4
     {
-        float x;
+    public:
+
+	    float x;
         float y;
         float z;
         float w;
@@ -121,7 +124,7 @@ namespace Solid
         constexpr Vec4 operator-() noexcept;
 
 #pragma endregion
-
+		Vec4_GENERATED
     };
 
     constexpr Vec4 operator*(float _value, const Vec4& vec) noexcept;
@@ -129,3 +132,5 @@ namespace Solid
     constexpr Vec4 operator/(float _value, const Vec4& vec);
 
 };
+
+File_GENERATED

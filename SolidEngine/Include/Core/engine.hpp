@@ -27,6 +27,7 @@ namespace Solid
         bool mtEnabled = false;
         bool engineContextInit = false;
 
+
         void InitEcs();
 	    Engine();
 	    static Engine* instance;

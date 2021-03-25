@@ -34,11 +34,13 @@ find_package(OpenGL REQUIRED)
 #Extern Lib
 link_directories(SolidEngine/ThirdParty/Lib)
 
+
 set(ENGINE_LIBS PUBLIC glfw3dll OpenGL::GL assimp-vc142-mtd IrrXML zlibstaticd)
 
 add_library(SolidEngine SHARED ${ENGINE_SOURCE_FILES} ${THIRD_PARTY_FILES})
 
 target_link_libraries(SolidEngine ${ENGINE_LIBS})
+target_link_libraries(SolidEngine PRIVATE $<IF:$<CONFIG:Debug>,Refurekud,Refureku>)
 target_compile_definitions(SolidEngine PRIVATE "IMGUI_API=__declspec(dllexport)")
 target_compile_definitions(SolidEngine PUBLIC "SOLID_API=__declspec(dllexport)")
 
@@ -50,7 +52,6 @@ project(SolidEditor)
 
 include_directories(SolidEditor/Include)
 include_directories(SolidEngine/Include)
-include_directories(SolidEditor/ThirdParty/Include)
 
 ### Editor Sources Files
 
@@ -71,20 +72,19 @@ set(EDITOR_LIBS PUBLIC glfw3dll OpenGL::GL SolidEngine)
 
 add_executable(SolidEditor ${EDITOR_SOURCE_FILES})
 target_link_libraries(SolidEditor ${EDITOR_LIBS})
+target_link_libraries(SolidEditor PRIVATE $<IF:$<CONFIG:Debug>,Refurekud,Refureku>)
 target_compile_definitions(SolidEditor PRIVATE "IMGUI_API=__declspec(dllimport)")
 target_compile_definitions(SolidEditor PUBLIC "SOLID_API=__declspec(dllimport)")
 target_compile_definitions(SolidEditor PRIVATE "SOLID_EDITOR_API=__declspec(dllexport)")
 
-#Refureku
-target_link_directories(SolidEditor PRIVATE SolidEditor/ThirdParty/Lib)
-target_link_libraries(SolidEditor PRIVATE $<IF:$<CONFIG:Debug>,Refurekud,Refureku>)
+
 
 add_custom_target(RunGenerator
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-        COMMAND SolidEditor/ThirdParty/Bin/RefurekuGenerator
+        COMMAND SolidEngine/ThirdParty/Bin/RefurekuGenerator
         )
 
-add_dependencies(SolidEditor RunGenerator)
+add_dependencies(SolidEngine RunGenerator)
 
 
 # ========= DLL ==========
