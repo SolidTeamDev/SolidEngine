@@ -393,31 +393,17 @@ void MaterialResource::ToDataBuffer(std::vector<char> &buffer)
 
 	}
 
-	size = this->ColorProperties.size();
+	////HERE
+	size = this->ValuesProperties.size();
 	ResourcesLoader::Append(buffer, &(size), sizeof(size));
-	for (auto& tex : this->ColorProperties)
+	for (auto& tex : this->ValuesProperties)
 	{
 		//property name
 		size = tex.first.size();
 		ResourcesLoader::Append(buffer, &(size), sizeof(size));
 		ResourcesLoader::Append(buffer, (void *) (tex.first.c_str()), size * sizeof(std::string::value_type));
 		//property value
-
-		ResourcesLoader::Append(buffer, (void *) &(tex.second.x), 4 * sizeof(float));
-		// append  property name and value (color value)
-	}
-
-	size = this->ValueProperties.size();
-	ResourcesLoader::Append(buffer, &(size), sizeof(size));
-	for (auto& tex : this->ValueProperties)
-	{
-		//property name
-		size = tex.first.size();
-		ResourcesLoader::Append(buffer, &(size), sizeof(size));
-		ResourcesLoader::Append(buffer, (void *) (tex.first.c_str()), size * sizeof(std::string::value_type));
-		//property value
-
-		ResourcesLoader::Append(buffer, (void *) &(tex.second),  sizeof(float));
+		ResourcesLoader::Append(buffer, (void *) &(tex.second),  sizeof(FieldValue));
 		// append  property name and value (float value)
 	}
 }
@@ -426,6 +412,7 @@ void MaterialResource::FromDataBuffer(char *buffer, int bSize)
 {
 	//WARNING : No test for read overflow
 	std::uint64_t ReadPos = 0;
+
 
 	ResourcesLoader::ReadFromBuffer(buffer, &(this->type), sizeof(this->type), ReadPos);
 
@@ -493,38 +480,23 @@ void MaterialResource::FromDataBuffer(char *buffer, int bSize)
 		}
 	}
 
-	size = 0;
-	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
-	for (int i = 0; i < size; ++i)
-	{
-		std::uint32_t pSize = 0;
-		std::string pName;
-		Vec4 Color;
-		//property name
-		ResourcesLoader::ReadFromBuffer(buffer, &(pSize), sizeof(pSize), ReadPos);
-		pName.resize(pSize);
-		ResourcesLoader::ReadFromBuffer(buffer, (void *) (pName.data()), pSize * sizeof(std::string::value_type), ReadPos);
-		//property value
-		ResourcesLoader::ReadFromBuffer(buffer, (void *) &(Color.x), 4 * sizeof(float), ReadPos);
-		// append  Color value
-		this->ColorProperties.emplace(pName, Color);
-	}
 
+	////HERE
 	size = 0;
 	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
 	for (int i = 0; i < size; ++i)
 	{
 		std::uint32_t pSize = 0;
 		std::string pName;
-		float Value;
+		FieldValue Value(EFieldType::NONE);
 		//property name
 		ResourcesLoader::ReadFromBuffer(buffer, &(pSize), sizeof(pSize), ReadPos);
 		pName.resize(pSize);
 		ResourcesLoader::ReadFromBuffer(buffer, (void *) (pName.data()), pSize * sizeof(std::string::value_type), ReadPos);
 		//property value
-		ResourcesLoader::ReadFromBuffer(buffer, (void *) &(Value), sizeof(float), ReadPos);
-		// append  Color value
-		this->ValueProperties.emplace(pName, Value);
+		ResourcesLoader::ReadFromBuffer(buffer, (void *) &(Value), sizeof(FieldValue), ReadPos);
+		// append  FieldValue
+		this->ValuesProperties.emplace(pName, Value);
 	}
 
 
@@ -537,4 +509,64 @@ MaterialResource::MaterialResource(const char *_name, bool _genfile)
 	defaultshader = Engine::GetInstance()->graphicsResourceMgr.GetDefaultShader();
 	name = _name;
 	shouldGenerateFileAtDestroy = _genfile;
+}
+
+MaterialResource::FieldValue::FieldValue(MaterialResource::EFieldType _type)
+{
+	type = _type;
+	switch (type)
+	{
+		case EFieldType::BOOL:
+			b = false;
+			break;
+		case EFieldType::INT:
+			i = 0;
+			break;
+		case EFieldType::FLOAT:
+			f = 0.0f;
+			break;
+		case EFieldType::VEC2:
+			v2 = (0,0,0);
+			break;
+		case EFieldType::VEC3:
+			v3 = (0,0,0);
+			break;
+		case EFieldType::VEC4:
+			v4 = (0,0,0);
+			break;
+		default:
+			b = false;
+			type = EFieldType::BOOL;
+			break;
+	}
+}
+
+MaterialResource::FieldValue::FieldValue(const MaterialResource::FieldValue &copy)
+{
+	type = copy.type;
+	switch (type)
+	{
+		case EFieldType::BOOL:
+			b = copy.b;
+			break;
+		case EFieldType::INT:
+			i = copy.i;
+			break;
+		case EFieldType::FLOAT:
+			f = copy.f;
+			break;
+		case EFieldType::VEC2:
+			v2 = copy.v2;
+			break;
+		case EFieldType::VEC3:
+			v3 = copy.v3;
+			break;
+		case EFieldType::VEC4:
+			v4 = copy.v4;
+			break;
+		default:
+			b = copy.b;
+			type = EFieldType::BOOL;
+			break;
+	}
 }

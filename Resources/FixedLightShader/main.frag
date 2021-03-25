@@ -8,6 +8,11 @@ in vec2 texCoord;
 out vec4 FragColor;
 uniform sampler2D Diffuse;
 uniform vec3 CamPos;
+uniform vec3 LightPos;
+uniform vec3 LightComps;
+uniform vec3 LightColor;
+uniform vec3 LightAttenuation;
+uniform bool EnableTex;
 
 
 
@@ -49,7 +54,9 @@ vec3 calcLight(vec3 lightsToCalc[6])
 
 void main()
 {
-    vec3 tex = texture(Diffuse, texCoord).rgb;//vec3(1,1,1);
+    vec3 tex = vec3(1,1,1);
+    if(EnableTex)
+        tex = texture(Diffuse, texCoord).rgb;//vec3(1,1,1);
     vec3 lightOutPut = vec3(0,0,0);
 
 
@@ -77,10 +84,10 @@ void main()
 
     vec3 currentLight[6] =
     {
-    {0,0,0},
-    {0.2,0.5,0.8},
-    {1,1,1},
-    {1,0.08,0.02},
+    LightPos,
+    LightComps,
+    LightColor,
+    LightAttenuation,
     {0,0,0},
     {0,0,0},
     };
