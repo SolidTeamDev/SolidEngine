@@ -10,6 +10,7 @@
 #include "ECS/Components/meshRenderer.hpp"
 #include "ECS/Components/camera.hpp"
 #include "ECS/Components/rigidBody.hpp"
+#include "ECS/Components/script.hpp"
 
 namespace Solid
 {
@@ -38,6 +39,7 @@ namespace Solid
         ecsManager.RegisterComponent<MeshRenderer>();
         ecsManager.RegisterComponent<Camera>();
         ecsManager.RegisterComponent<RigidBody>();
+        ecsManager.RegisterComponent<Script*>();
 
         //Register Signature
         rendererSystem = ecsManager.RegisterSystem<RendererSystem>();

@@ -4,6 +4,8 @@ Build/*
 */cmake-build-debug/*
 */cmake-build-release/*
 
+Generated/*
+
 !*/.gitkeep
 TestMaths/.vs
 TestMaths/Debug
