@@ -230,7 +230,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 			    Resource* sound = LoadAudio(elt);
 			    Manager->AddResource(sound);
 		    }
-		    
+
 	    }
 
         bool b = true;
@@ -657,6 +657,9 @@ Resource *ResourcesLoader::LoadAudio(const fs::path &Rpath)
 		cacheFile.write(Data.data(), Data.size());
 	}
 #endif
+	audio->audioRawBinary.clear();
+	audio->audioRawBinary.reserve(0);
+
 	return audio;
 }
 
@@ -845,5 +848,7 @@ Resource *ResourcesLoader::LoadSolidAudio(const fs::path &Rpath)
 		audio->name = "NoName" + std::to_string(Resource::NoNameNum);
 		Resource::NoNameNum++;
 	}
+	audio->audioRawBinary.clear();
+	audio->audioRawBinary.reserve(0);
 	return audio;
 }

@@ -25,6 +25,7 @@ namespace  Solid
 	    ~AudioManager();
 		AudioSource* CreateSource(const char* _sourceName, const char* _soundName = nullptr);
 		AudioSource* GetSource(const char *_sourceName);
+		void RemoveSource(const char* _sourceName);
 
 
 

@@ -282,10 +282,7 @@ namespace Solid {
 			type = EResourceType::Audio;
 		}
 
-		~AudioResource()
-		{
-
-		}
+		~AudioResource();
 		void ToDataBuffer(std::vector<char> &buffer);
 
 		void FromDataBuffer(char *buffer, int bSize);

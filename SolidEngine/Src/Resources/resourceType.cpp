@@ -45,6 +45,12 @@ MaterialResource::~MaterialResource()
 
 }
 
+AudioResource::~AudioResource()
+{
+	alDeleteBuffers(1, &(this->buffer));
+
+}
+
 
 /*
 
@@ -561,6 +567,7 @@ void AudioResource::FromDataBuffer(char *buffer, int bSize)
 	ResourcesLoader::ReadFromBuffer(buffer, (void *) &(this->numFrames), sizeof(sf_count_t), ReadPos);
 
 }
+
 
 MaterialResource::MaterialResource(const char *_name, bool _genfile)
 {

@@ -25,7 +25,7 @@ Solid::AudioSource::AudioSource(ResourceManager* _mgr)
 
 Solid::AudioSource::~AudioSource()
 {
-
+	alDeleteSources(1, &sourceID);
 }
 
 ALuint Solid::AudioSource::GetOutputID()

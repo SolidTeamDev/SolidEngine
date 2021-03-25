@@ -53,4 +53,11 @@ AudioSource *AudioManager::GetSource(const char *_sourceName)
 	return &(sources.at(_sourceName));
 }
 
+void AudioManager::RemoveSource(const char *_sourceName)
+{
+	if(sources.find(_sourceName) == sources.end())
+		return;
+	sources.erase(sources.find(_sourceName));
+}
+
 
