@@ -16,9 +16,7 @@ namespace Solid
 	__declspec(dllexport) Engine* Engine::instance = nullptr;
     Engine::Engine() :
             threadPool(&taskManager),
-            resourceManager(this),
-            audioMgr(&resourceManager)
-
+            resourceManager(this)
     {
         InitEcs();
     }
