@@ -220,14 +220,6 @@ namespace Solid
 
 
 				        }
-	        			for(auto& value : elt->ValueProperties)
-	        			{
-							EditFloat(value.second, value.first, 0.01f);
-	        			}
-				        for(auto& color : elt->ColorProperties)
-				        {
-					        EditVec4(color.second, color.first, 0.01f);
-				        }
 				        int ii = 0;
 				        for(auto& tex : elt->TexturesProperties)
 				        {
@@ -247,23 +239,46 @@ namespace Solid
 						        }
 						        UI::EndCombo();
 					        }
-							++i;
+							++ii;
 				        }
-	        			if(UI::Button(("Add Color##"+std::to_string(i)).c_str()))
+				        ii = 0;
+				        for(auto& fv : elt->ValuesProperties)
 				        {
-	        				colorAdd = true;
-	        				namePopup = true;
-	        				matToModify = elt;
+					        switch (fv.second.type)
+					        {
+					        	case MaterialResource::EFieldType::BOOL:
+							        EditBool(fv.second.b, fv.first);
+							        break;
+						        case  MaterialResource::EFieldType::INT:
+							        EditInt(fv.second.i, fv.first, 1);
+							        break;
+						        case  MaterialResource::EFieldType::FLOAT:
+							        EditFloat(fv.second.f, fv.first, 0.01f);
+							        break;
+						        case  MaterialResource::EFieldType::VEC2:
+							        EditVec2(fv.second.v2, fv.first,0.01f);
+							        break;
+						        case  MaterialResource::EFieldType::VEC3:
+							        EditVec3(fv.second.v3, fv.first,0.01f);
+							        break;
+						        case  MaterialResource::EFieldType::VEC4:
+							        EditVec4(fv.second.v4, fv.first,0.01f);
+							        break;
+						        default:
+							        break;
+					        }
+							++ii;
 				        }
+
 				        if(UI::Button(("Add Texture##"+std::to_string(i)).c_str()))
 				        {
 					        textureAdd = true;
 					        namePopup = true;
 					        matToModify = elt;
 				        }
-				        if(UI::Button(("Add Float##"+std::to_string(i)).c_str()))
+				        if(UI::Button(("Add FieldValue##"+std::to_string(i)).c_str()))
 				        {
-					        floatAdd = true;
+					        fvAdd = true;
 					        namePopup = true;
 					        matToModify = elt;
 				        }
@@ -288,7 +303,7 @@ namespace Solid
         static std::string sName = ""; //script name
         static std::string path  = "";  //path of the new script
 
-        
+
         UI::Begin("Create Script", &openCreateScript, flags);
 
         UI::Text("Script Name:");
@@ -329,46 +344,82 @@ namespace Solid
 			UI::OpenPopup("ValueNamePopUp");
 			namePopup = false;
 			nameStr = "";
+			beginField = "NONE";
+			chosenType =(int)MaterialResource::EFieldType::NONE;
 		}
 		if(!UI::IsPopupOpen("ValueNamePopUp"))
 		{
-			colorAdd = false;
 			textureAdd = false;
-			floatAdd = false;
+			fvAdd = false;
 		}
 		if (UI::BeginPopup("ValueNamePopUp"))
 		{
 			UI::Text("Value Name :");
 			UI::SameLine();
 			UI::InputText("##ValueName", &nameStr);
-			if(UI::Button("Add Value"))
+			if(textureAdd)
 			{
-				if(colorAdd)
-				{
-					matToModify->ColorProperties.emplace(nameStr, Vec4());
-					colorAdd = false;
-					matToModify = nullptr;
-				}
-				else if (textureAdd)
+
+				if (UI::Button("Add Texture"))
 				{
 					matToModify->TexturesProperties.emplace(nameStr, nullptr);
 					textureAdd = false;
 					matToModify = nullptr;
+					UI::CloseCurrentPopup();
 				}
-				else if(floatAdd)
+
+
+			}
+			else
+			{
+				const char* fieldType[(int)MaterialResource::EFieldType::NONE] = {"Bool", "Int", "Float", "Vec2", "Vec3", "Vec4", "NONE"};
+
+				if(UI::BeginCombo("Wanted Field ##ChooseField",beginField))
 				{
-					matToModify->ValueProperties.emplace(nameStr, 0.0f);
-					floatAdd= false;
-					matToModify = nullptr;
+
+					for(int i = 0; i < (int)MaterialResource::EFieldType::NONE; ++i)
+					{
+						bool selected = (fieldType[i] == beginField);
+						if(UI::Selectable(fieldType[i], selected))
+						{
+							beginField = fieldType[i];
+							chosenType = i+1;
+						}
+						if(selected)
+							UI::SetItemDefaultFocus();
+					}
+					UI::EndCombo();
 				}
-				UI::CloseCurrentPopup();
+
+				if(UI::Button("Add Field"))
+				{
+
+
+						matToModify->ValuesProperties.emplace(nameStr, (MaterialResource::EFieldType)chosenType);
+						fvAdd = false;
+						matToModify = nullptr;
+
+					UI::CloseCurrentPopup();
+
+				}
+
 			}
 			UI::EndPopup();
 		}
 
+
+
 	}
 
-    bool InspectorInterface::EditVec3(Vec3 &_vec, const std::string &_label, float _step)
+	void InspectorInterface::EditBool(bool &_num, const std::string &_label)
+	{
+		if(UI::Checkbox(_label.c_str(), &_num))
+		{
+
+		}
+	}
+
+	bool InspectorInterface::EditVec3(Vec3 &_vec, const std::string &_label, float _step)
     {
         Vec3 temp = _vec;
         if(UI::DragFloat3(_label.c_str(), &temp.x, _step))

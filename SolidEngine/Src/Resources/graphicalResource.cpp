@@ -116,15 +116,33 @@ void GL::Mesh::DrawMesh(std::vector<MaterialResource *>& _list, Transform& _tr, 
 				mat->defaultshader->SetMVP(_tr, _cam);
 			else
 			{
-				for(auto& value : mat->ValueProperties)
+				for(auto& value : mat->ValuesProperties)
 				{
-					mat->shader->SetFloat(value.first.c_str(), value.second);
+					switch (value.second.type)
+					{
+						case MaterialResource::EFieldType::BOOL:
+							mat->shader->SetBool(value.first.c_str(), value.second.b);
+							break;
+						case  MaterialResource::EFieldType::INT:
+							mat->shader->SetInt(value.first.c_str(), value.second.i);
+							break;
+						case  MaterialResource::EFieldType::FLOAT:
+							mat->shader->SetFloat(value.first.c_str(), value.second.f);
+							break;
+						case  MaterialResource::EFieldType::VEC2:
+							mat->shader->SetVec2(value.first.c_str(), value.second.v2);
+							break;
+						case  MaterialResource::EFieldType::VEC3:
+							mat->shader->SetVec3(value.first.c_str(), value.second.v3);
+							break;
+						case  MaterialResource::EFieldType::VEC4:
+							mat->shader->SetVec4(value.first.c_str(), value.second.v4);
+							break;
+						default:
+							break;
+					}
 				}
-				for(auto& value : mat->ColorProperties)
-				{
-					Vec4 temp = value.second;
-					mat->shader->SetVec4(value.first.c_str(),temp);
-				}
+
 				for(auto& value : mat->TexturesProperties)
 				{
 					if(value.second == nullptr)
@@ -132,7 +150,6 @@ void GL::Mesh::DrawMesh(std::vector<MaterialResource *>& _list, Transform& _tr, 
 					int TexUnit = 0;
 					mat->shader->GetInt(value.first.c_str(), &TexUnit);
 					value.second->BindTexture(TexUnit);
-
 				}
 				mat->shader->SetMVP(_tr, _cam);
 			}

@@ -22,6 +22,7 @@ namespace Solid
         void EditTransform(Transform& _trs);
         void EditMeshRenderer(MeshRenderer& _meshRenderer);
 
+        void EditBool(bool &_num, const std::string &_label);
         void EditInt(int &_num, const std::string &_label, float _step);
         bool EditVec3(Vec3 &_vec, const std::string &_label, float _step);
         bool EditVec4(Vec4 &_vec, const std::string &_label, float _step);
@@ -31,12 +32,13 @@ namespace Solid
 
         bool p_open = true;
         bool openCreateScript = false;
-	    bool colorAdd = false;
-	    bool floatAdd = false;
+	    bool fvAdd = false;
 	    bool textureAdd = false;
 	    bool namePopup = false;
 	    std::string nameStr;
 	    MaterialResource* matToModify = nullptr;
+	    const char* beginField = "NONE";
+	    int chosenType =(int)MaterialResource::EFieldType::NONE;
 	    void DrawUniformNamePopup();
 
     };

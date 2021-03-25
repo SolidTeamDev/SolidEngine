@@ -208,13 +208,40 @@ namespace Solid {
     {
 
     public:
-	    std::shared_ptr<IShader> shader;
+	    enum class EFieldType : int
+	    {
+	    	BOOL = 1,
+	    	INT,
+	    	FLOAT,
+	    	VEC2,
+	    	VEC3,
+	    	VEC4,
+	    	NONE
+	    };
+		class SOLID_API FieldValue
+		{
+		public:
+			EFieldType type;
+			union
+			{
+				bool   b;
+				int    i;
+				float  f;
+				Vec2   v2;
+				Vec3   v3;
+				Vec4   v4;
+			};
+
+			FieldValue(EFieldType _type);
+			FieldValue(const FieldValue& copy);
+		};
+
+    	std::shared_ptr<IShader> shader;
 	    bool shouldGenerateFileAtDestroy = true;
 
 	    std::shared_ptr<const IShader> defaultshader;
 	    std::unordered_map<std::string, std::shared_ptr<ITexture>> TexturesProperties;
-	    std::unordered_map<std::string, Vec4> ColorProperties;
-	    std::unordered_map<std::string, float> ValueProperties;
+	    std::unordered_map<std::string, FieldValue> ValuesProperties;
 
 
         MaterialResource();
