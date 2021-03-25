@@ -35,7 +35,7 @@ MaterialResource::MaterialResource()
 
 MaterialResource::~MaterialResource()
 {
-	//TODO: save to .SMaterial
+
 	if(shouldGenerateFileAtDestroy)
 	{
 		ResourcesLoader loader;
@@ -480,8 +480,6 @@ void MaterialResource::FromDataBuffer(char *buffer, int bSize)
 		}
 	}
 
-
-	////HERE
 	size = 0;
 	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
 	for (int i = 0; i < size; ++i)
@@ -504,12 +502,64 @@ void MaterialResource::FromDataBuffer(char *buffer, int bSize)
 
 void AudioResource::ToDataBuffer(std::vector<char> &buffer)
 {
-	///TODO
+	std::string pString = this->path.string();
+	std::uint32_t size = pString.size();
+	ResourcesLoader::Append(buffer, &(this->type), sizeof(this->type));
+
+	ResourcesLoader::Append(buffer, &(size), sizeof(size));
+	ResourcesLoader::Append(buffer, (void *) (pString.c_str()),  size * sizeof( std::string::value_type));
+
+	size = this->name.size();
+	ResourcesLoader::Append(buffer, &(size), sizeof(size));
+	ResourcesLoader::Append(buffer, (void *) (this->name.c_str()), size * sizeof(std::string::value_type));
+
+	//RawAudio save
+	size = this->audioRawBinary.size();
+	ResourcesLoader::Append(buffer, &(size), sizeof(size));
+	ResourcesLoader::Append(buffer, (void *) (this->audioRawBinary.data()), size * sizeof(short));
+
+	//SFINFO Save
+	ResourcesLoader::Append(buffer, (void *) &(this->info), sizeof(SF_INFO));
+
+	//format
+	ResourcesLoader::Append(buffer, (void *) &(this->format), sizeof(ALenum));
+
+	ResourcesLoader::Append(buffer, (void *) &(this->numFrames), sizeof(sf_count_t));
+
+
 }
 
 void AudioResource::FromDataBuffer(char *buffer, int bSize)
 {
-	///TODO
+	std::uint64_t ReadPos = 0;
+
+
+	ResourcesLoader::ReadFromBuffer(buffer, &(this->type), sizeof(this->type), ReadPos);
+
+	//recup path string
+	std::uint32_t size = 0;
+	std::string pString;
+	ResourcesLoader::ReadFromBuffer(buffer, &size, sizeof(size), ReadPos);
+	pString.resize(size);
+	ResourcesLoader::ReadFromBuffer(buffer, (void *) (pString.data()),  size * sizeof( std::string::value_type), ReadPos);
+	this->path = pString;
+
+	//recup name
+	size = 0;
+	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
+	this->name.resize(size);
+	ResourcesLoader::ReadFromBuffer(buffer, (void *) (this->name.data()), size * sizeof(std::string::value_type), ReadPos);
+
+	//recup RawAudio
+	size = 0;
+	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
+	this->audioRawBinary.resize(size);
+	ResourcesLoader::ReadFromBuffer(buffer, (void *) (this->audioRawBinary.data()), size * sizeof(short), ReadPos);
+
+	ResourcesLoader::ReadFromBuffer(buffer, (void *) &(this->info), sizeof(SF_INFO), ReadPos);
+	ResourcesLoader::ReadFromBuffer(buffer, (void *) &(this->format), sizeof(ALenum), ReadPos);
+	ResourcesLoader::ReadFromBuffer(buffer, (void *) &(this->numFrames), sizeof(sf_count_t), ReadPos);
+
 }
 
 MaterialResource::MaterialResource(const char *_name, bool _genfile)

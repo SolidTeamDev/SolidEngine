@@ -275,9 +275,11 @@ namespace Solid {
 		std::vector<short> audioRawBinary;
 		SF_INFO info;
 		ALuint buffer;
+		sf_count_t numFrames;
+		ALenum format;
 		AudioResource()
 		{
-			type = EResourceType::Scene;
+			type = EResourceType::Audio;
 		}
 
 		~AudioResource()
