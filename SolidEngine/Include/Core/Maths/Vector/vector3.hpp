@@ -8,6 +8,8 @@ namespace Solid SLDNamespace()
 
     class Vec4;
 
+    class Quat;
+
     class SOLID_API SLDClass() Vec3
     {
     public:

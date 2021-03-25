@@ -31,14 +31,6 @@ file(GLOB_RECURSE THIRD_PARTY_FILES
 find_package(OpenGL REQUIRED)
 
 #Extern Lib
-
-
-set(ENGINE_LIBS PUBLIC glfw3dll OpenGL::GL assimp-vc142-mtd IrrXML zlibstaticd)
-
-add_library(SolidEngine SHARED ${ENGINE_SOURCE_FILES} ${THIRD_PARTY_FILES})
-
-target_link_libraries(SolidEngine ${ENGINE_LIBS})
-target_link_libraries(SolidEngine PRIVATE $<IF:$<CONFIG:Debug>,Refurekud,Refureku>)
 file(GLOB ENGINE_LIBS_COMMON
         SolidEngine/ThirdParty/Lib/*.lib)
 file(GLOB ENGINE_LIBS_DEBUG
@@ -46,7 +38,14 @@ file(GLOB ENGINE_LIBS_DEBUG
 file(GLOB ENGINE_LIBS_RELEASE
         SolidEngine/ThirdParty/Lib/Release/*.lib)
 
+#set(ENGINE_LIBS PUBLIC glfw3dll OpenGL::GL assimp-vc142-mtd IrrXML zlibstaticd)
+
 add_library(SolidEngine SHARED ${ENGINE_SOURCE_FILES} ${THIRD_PARTY_FILES})
+
+
+
+
+
 
 #Extern Lib
 link_directories(SolidEngine/ThirdParty/Lib)
@@ -91,7 +90,6 @@ set(EDITOR_LIBS PUBLIC glfw3dll OpenGL::GL SolidEngine)
 
 add_executable(SolidEditor ${EDITOR_SOURCE_FILES})
 target_link_libraries(SolidEditor ${EDITOR_LIBS})
-target_link_libraries(SolidEditor PRIVATE $<IF:$<CONFIG:Debug>,Refurekud,Refureku>)
 target_compile_definitions(SolidEditor PRIVATE "IMGUI_API=__declspec(dllimport)")
 target_compile_definitions(SolidEditor PUBLIC "SOLID_API=__declspec(dllimport)")
 target_compile_definitions(SolidEditor PRIVATE "SOLID_EDITOR_API=__declspec(dllexport)")
