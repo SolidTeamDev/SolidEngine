@@ -4,32 +4,29 @@
 
 #ifndef SOLIDEDITOR_AUDIOMANAGER_HPP
 #define SOLIDEDITOR_AUDIOMANAGER_HPP
+#include "Build/solidAPI.hpp"
 
-namespace Solid
+namespace  Solid
 {
-	class AudioManager
+	class SOLID_API AudioManager
 	{
 	public:
 	//public members
 
 	protected:
 	//protected members
-		ResourceManager* manager;
-		AudioOutput out;
-		ALuint currBuff = 0;
-		bool loop = false;
+		std::unordered_map<std::string, AudioSource> sources;
+
 
 	public:
 	//public func
-	    AudioManager(ResourceManager* _mgr) ;
+	    AudioManager() ;
 
 	    ~AudioManager();
-		bool Play(const char* _name);
-		bool Play();
-		bool Pause();
-		bool Stop();
-	    void SetLoop(bool _loop);
-	    AudioOutput GetOutput();
+		AudioSource* CreateSource(const char* _sourceName, const char* _soundName = nullptr);
+		AudioSource* GetSource(const char *_sourceName);
+		void RemoveSource(const char* _sourceName);
+
 
 
 

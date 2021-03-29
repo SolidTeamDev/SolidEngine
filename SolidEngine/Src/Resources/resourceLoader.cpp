@@ -84,8 +84,6 @@ void  ResourcesLoader::LoadRessourceNoAdd(const fs::path &Rpath, ResourcePtrWrap
         r=LoadSolidShader(Rpath);
     else if(extension == ".sanim")
         ;
-    else if(extension == ".saudio")
-	    ;
     /// Image Loading
     else if(extension == ".bmp")
         r=LoadImage(Rpath);
@@ -102,11 +100,7 @@ void  ResourcesLoader::LoadRessourceNoAdd(const fs::path &Rpath, ResourcePtrWrap
     else if(extension == ".fbx")
         r=LoadMesh(Rpath);
 
-    ///Audio Loading
-    else if(extension == ".wav")
-	    r=LoadAudio(Rpath);
-    else if(extension == ".ogg")
-	    r=LoadAudio(Rpath);
+
     wrapper.r = r;
 }
 void ResourcesLoader::LoadRessource(const fs::path &Rpath)
@@ -148,10 +142,21 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 	    	return (name.find(".smaterial") != std::string::npos);
 
 	    };
+	    auto soundFind = [](const fs::path&item)
+	    {
+		    std::string name = item.extension().string();
+		    std::transform(name.begin(), name.end(), name.begin(),
+		                   [](unsigned char c){ return std::tolower(c); });
+		    return (name.find(".saudio") != std::string::npos
+		    || name.find(".wav") != std::string::npos
+		    || name.find(".ogg") != std::string::npos);
+
+	    };
         const std::size_t numOffiles = std::count_if(fs::directory_iterator(Rpath), fs::directory_iterator{}, (fp)fs::is_regular_file);
         const std::size_t numOfShader = std::count_if(fs::directory_iterator(Rpath), fs::directory_iterator{}, (fp)shaderFind);
 	    const std::size_t numOfMat = std::count_if(fs::directory_iterator(Rpath), fs::directory_iterator{}, (fp)matFind);
-        ResourcePtrWrapper* RessourceArray = new ResourcePtrWrapper[numOffiles + numOfShader - numOfMat] {nullptr};
+	    const std::size_t numOfSound = std::count_if(fs::directory_iterator(Rpath), fs::directory_iterator{}, (fp)matFind);
+        ResourcePtrWrapper* RessourceArray = new ResourcePtrWrapper[numOffiles + numOfShader - numOfMat - numOfSound] {nullptr};
 
         auto Lambda = [this](const fs::path *Rpath, ResourcePtrWrapper *wrapper){LoadRessourceNoAdd(*Rpath,*wrapper); delete Rpath;};
         int i =0;
@@ -159,7 +164,8 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
         std::vector<IDWrapper> IDS;
         IDS.reserve(10);
         Shaders.reserve(5);
-        std::vector<fs::path> matPaths;
+	    std::vector<fs::path> matPaths;
+	    std::vector<fs::path> soundPaths;
         for (auto& item : fs::directory_iterator(Rpath))
         {
             std::string name = item.path().filename().string();
@@ -192,6 +198,12 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 
                 	continue;
                 }
+                else if(soundFind(item))
+                {
+	                soundPaths.push_back(item);
+
+	                continue;
+                }
                 TaskMan.AddTask(Task(Task::MakeID("Load " + name), ETaskType::RESOURCES_LOADER, Lambda, newP, &RessourceArray[i]));
                 IDS.push_back( {"Load " + name, i});
 
@@ -203,6 +215,23 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
             LoadRessourceNoAdd(s.p, RessourceArray[s.i]);
             Manager->AddResource(RessourceArray[s.i].r);
         }
+	    for(auto& elt : soundPaths)
+	    {
+		    std::string name = elt.extension().string();
+		    std::transform(name.begin(), name.end(), name.begin(),
+		                   [](unsigned char c){ return std::tolower(c); });
+		    if(name.find(".saudio") != std::string::npos)
+		    {
+			    Resource* sound = LoadSolidAudio(elt);
+			    Manager->AddResource(sound);
+		    }
+		    else
+		    {
+			    Resource* sound = LoadAudio(elt);
+			    Manager->AddResource(sound);
+		    }
+
+	    }
 
         bool b = true;
         while(b)
@@ -232,6 +261,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 	        Resource* mat = LoadSolidMaterial(elt);
 	        Manager->AddResource(mat);
 	    }
+
 
     }
         /// MonoThread Loading
@@ -267,6 +297,21 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 	            {
 	            	Resource* mat = LoadSolidMaterial(item);
 		            Manager->AddResource(mat);
+	            }
+	            else if(extension == ".wav")
+	            {
+	            	Resource *r = LoadAudio(Rpath);
+		            Manager->AddResource(r);
+	            }
+	            else if(extension == ".ogg")
+	            {
+	            	Resource *r = LoadAudio(Rpath);
+		            Manager->AddResource(r);
+	            }
+	            else if(extension == ".saudio")
+	            {
+		            Resource *r = LoadSolidAudio(Rpath);
+		            Manager->AddResource(r);
 	            }
 	            else
                     LoadRessource(item);
@@ -531,7 +576,7 @@ Resource *ResourcesLoader::LoadAudio(const fs::path &Rpath)
 	SNDFILE* sndfile;
 	SF_INFO sfinfo;
 	short* membuf = nullptr;
-	sf_count_t numFrames;
+
 	ALsizei numBytes;
 	audio->name = Rpath.filename().string();
 	sndfile = sf_open(filename, SFM_READ, &sfinfo);
@@ -565,16 +610,16 @@ Resource *ResourcesLoader::LoadAudio(const fs::path &Rpath)
 	}
 	audio->audioRawBinary.resize((sfinfo.frames * sfinfo.channels));
 
-
-	numFrames = sf_readf_short(sndfile, audio->audioRawBinary.data(), sfinfo.frames);
-	if (numFrames < 1)
+	audio->format = format;
+	audio->numFrames = sf_readf_short(sndfile, audio->audioRawBinary.data(), sfinfo.frames);
+	if (audio->numFrames < 1)
 	{
 		sf_close(sndfile);
 		std::cout << "Failed to read samples of " << filename << std::endl;
 		return nullptr;
 	}
 
-	numBytes = (ALsizei)(numFrames * sfinfo.channels) * (ALsizei)sizeof(short);
+	numBytes = (ALsizei)(audio->numFrames * sfinfo.channels) * (ALsizei)sizeof(short);
 
 	buff = 0;
 	alGenBuffers(1, &buff);
@@ -591,7 +636,30 @@ Resource *ResourcesLoader::LoadAudio(const fs::path &Rpath)
 			alDeleteBuffers(1, &buff);
 		return nullptr;
 	}
-	///TODO
+
+
+#if SASSET_GEN
+	printf("generate .SAudio\n");
+	std::vector<char> Data;
+	audio->ToDataBuffer(Data);
+
+
+
+
+	fs::path cachePath =SolidPath;
+	cachePath.append(Rpath.filename().string() + ".SAudio");
+	std::ofstream cacheFile(cachePath, std::fstream::binary | std::fstream::trunc);
+
+
+	if(cacheFile.is_open())
+	{
+		std::cout << "" << "\n";
+		cacheFile.write(Data.data(), Data.size());
+	}
+#endif
+	audio->audioRawBinary.clear();
+	audio->audioRawBinary.reserve(0);
+
 	return audio;
 }
 
@@ -753,4 +821,34 @@ Resource *ResourcesLoader::LoadSolidMaterial(const fs::path &Rpath)
 	}
 	return mat;
 
+}
+
+Resource *ResourcesLoader::LoadSolidAudio(const fs::path &Rpath)
+{
+	AudioResource* audio = new AudioResource();
+	std::ifstream ifs(Rpath, std::ios::binary|std::ios::ate);
+	std::ifstream::pos_type pos = ifs.tellg();
+
+	std::vector<char>  buffer(pos);
+
+	ifs.seekg(0, std::ios::beg);
+	ifs.read(&buffer[0], pos);
+
+
+
+
+
+	ALsizei numBytes = (ALsizei)(audio->numFrames * audio->info.channels) * (ALsizei)sizeof(short);
+
+
+	alGenBuffers(1, &audio->buffer);
+	alBufferData(audio->buffer, audio->format, audio->audioRawBinary.data(), numBytes, audio->info.samplerate);
+	if(audio->name == "")
+	{
+		audio->name = "NoName" + std::to_string(Resource::NoNameNum);
+		Resource::NoNameNum++;
+	}
+	audio->audioRawBinary.clear();
+	audio->audioRawBinary.reserve(0);
+	return audio;
 }

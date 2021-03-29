@@ -1,17 +1,34 @@
 //
 // Created by a.galliot on 24/03/2021.
 //
+#include "Core/engine.hpp"
 #include "Resources/ressources.hpp"
-#include "Resources/audioOutput.hpp"
 #include "Resources/resourceMgr.hpp"
+#include "Resources/audioSource.hpp"
 #include "Resources/audioManager.hpp"
+#include "Core/Debug/log.hpp"
 
 using namespace Solid;
 
-AudioManager::AudioManager(ResourceManager* _mgr):
-manager(_mgr)
+AudioManager::AudioManager()
 {
+	static ALCdevice* cDevice = alcOpenDevice(nullptr);
+	if (!cDevice)
+		ThrowError("Couldn't get the sound device", ESolidErrorCode::S_INIT_ERROR);
 
+	static ALCcontext* cContext = alcCreateContext(cDevice, nullptr);
+	if (!cContext)
+		ThrowError("Couldn't create a context", ESolidErrorCode::S_INIT_ERROR);
+
+	if (!alcMakeContextCurrent(cContext))
+		ThrowError("Couldn't make the context current", ESolidErrorCode::S_INIT_ERROR);
+
+	const ALCchar* name = nullptr;
+	if (alcIsExtensionPresent(cDevice, "ALC_ENUMERATE_ALL_EXT"))
+		name = alcGetString(cDevice, ALC_ALL_DEVICES_SPECIFIER);
+	if (!name || alcGetError(cDevice) != AL_NO_ERROR)
+		name = alcGetString(cDevice, ALC_DEVICE_SPECIFIER);
+	Log::Send(name, Log::ELogSeverity::INFO);
 }
 
 AudioManager::~AudioManager()
@@ -19,38 +36,28 @@ AudioManager::~AudioManager()
 
 }
 
-bool AudioManager::Play(const char *_name)
+AudioSource *AudioManager::CreateSource(const char *_sourceName, const char *_soundName)
 {
-	AudioResource* audio =manager->GetRawAudioByName(_name);
-	if(currBuff == audio->buffer)
-		return false;
-	currBuff = audio->buffer;
-	alSourcei(out.GetOutputID(), AL_BUFFER, (ALint)currBuff);
-	alSourcePlay(out.GetOutputID());
-	return true;
-
+	if(sources.find(_sourceName) != sources.end())
+		return nullptr;
+	auto source =sources.emplace(_sourceName, AudioSource(&Engine::GetInstance()->resourceManager));
+	if(_soundName != nullptr)
+		source.first->second.Play(_soundName);
+	return &source.first->second;
 }
 
-bool AudioManager::Play()
+AudioSource *AudioManager::GetSource(const char *_sourceName)
 {
-	alSourcePlay(out.GetOutputID());
-	return true;
+	if(sources.find(_sourceName) == sources.end())
+		return nullptr;
+	return &(sources.at(_sourceName));
 }
 
-bool AudioManager::Pause()
+void AudioManager::RemoveSource(const char *_sourceName)
 {
-	alSourcePause(out.GetOutputID());
-	return true;
+	if(sources.find(_sourceName) == sources.end())
+		return;
+	sources.erase(sources.find(_sourceName));
 }
 
-bool AudioManager::Stop()
-{
-	alSourceStop(out.GetOutputID());
-	return true;
-}
 
-void AudioManager::SetLoop(bool _loop)
-{
-	loop = _loop;
-	alSourcei(out.GetOutputID(), AL_LOOPING, loop);
-}

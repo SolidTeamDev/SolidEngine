@@ -30,11 +30,17 @@ namespace Solid
 void Solid::HierarchyTreeInterface::DrawCreateObject()
 {
     Engine* engine = Engine::GetInstance();
-
+	bool create = true;
+	if(create)
+	{
+		create = false;
+		engine->audioMgr.CreateSource("EasterEgg");
+	}
     if(UI::BeginPopupContextWindow("createObject"))
     {
         if(UI::BeginMenu("New"))
         {
+        	AudioSource* EasterEggSource = engine->audioMgr.GetSource("EasterEgg");
             if(UI::MenuItem("GameObject"))
             {
                 Entity tmp = -1;
@@ -51,6 +57,9 @@ void Solid::HierarchyTreeInterface::DrawCreateObject()
             UI::Separator();
             if(UI::MenuItem("Cube"))
             {
+            	if(EasterEggSource != nullptr)
+            		if(!EasterEggSource->Play("MainTheme.wav"))
+			            EasterEggSource->Pause();
                 Entity tmp = -1;
 
                 if (EditorInterface::selectedGO != nullptr)
@@ -67,10 +76,16 @@ void Solid::HierarchyTreeInterface::DrawCreateObject()
             }
             if(UI::MenuItem("Sphere"))
             {
-
+	            if(EasterEggSource != nullptr)
+		            if(!EasterEggSource->Play("FightTheme.wav"))
+			            EasterEggSource->Pause();
             }
             if(UI::MenuItem("Solid"))
             {
+	            if(EasterEggSource != nullptr)
+		            if(!EasterEggSource->Play("GameTheme.wav"))
+			            EasterEggSource->Pause();
+
                 Entity tmp = engine->ecsManager.CreateEntity();
                 engine->ecsManager.AddComponent(tmp,Transform());
                 engine->ecsManager.AddComponent(tmp,MeshRenderer(

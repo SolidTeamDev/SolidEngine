@@ -31,7 +31,6 @@ file(GLOB_RECURSE THIRD_PARTY_FILES
 find_package(OpenGL REQUIRED)
 
 #Extern Lib
-
 file(GLOB ENGINE_LIBS_COMMON
         SolidEngine/ThirdParty/Lib/*.lib)
 file(GLOB ENGINE_LIBS_DEBUG
@@ -39,8 +38,17 @@ file(GLOB ENGINE_LIBS_DEBUG
 file(GLOB ENGINE_LIBS_RELEASE
         SolidEngine/ThirdParty/Lib/Release/*.lib)
 
+#set(ENGINE_LIBS PUBLIC glfw3dll OpenGL::GL assimp-vc142-mtd IrrXML zlibstaticd)
+
 add_library(SolidEngine SHARED ${ENGINE_SOURCE_FILES} ${THIRD_PARTY_FILES})
 
+
+
+
+
+
+#Extern Lib
+link_directories(SolidEngine/ThirdParty/Lib)
 if(CMAKE_BUILD_TYPE MATCHES Debug)#DEBUG
     target_link_libraries(SolidEngine PUBLIC
         ${ENGINE_LIBS_COMMON}
@@ -85,6 +93,15 @@ target_link_libraries(SolidEditor ${EDITOR_LIBS})
 target_compile_definitions(SolidEditor PUBLIC "IMGUI_API=__declspec(dllimport)")
 target_compile_definitions(SolidEditor PUBLIC "SOLID_API=__declspec(dllimport)")
 target_compile_definitions(SolidEditor PRIVATE "SOLID_EDITOR_API=__declspec(dllexport)")
+
+
+
+add_custom_target(RunGenerator
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+        COMMAND SolidEngine/ThirdParty/Bin/RefurekuGenerator
+        )
+
+add_dependencies(SolidEngine RunGenerator)
 
 
 # ========= DLL ==========

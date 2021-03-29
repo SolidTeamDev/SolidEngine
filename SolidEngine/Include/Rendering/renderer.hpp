@@ -58,7 +58,7 @@ namespace Solid
             GLenum format;
             char* b = nullptr;
         };*/
-        //TODO: Wrapping functions
+
         virtual void Clear(const Vec2i& _windowSize) const = 0;
         virtual void ClearColor(const Vec4& _clearColor) const = 0;
         virtual Framebuffer CreateFramebuffer(const Vec2i& _size) const = 0;

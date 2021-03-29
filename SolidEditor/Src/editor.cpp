@@ -8,8 +8,6 @@
 #include "ECS/Components/transform.hpp"
 #include "ECS/Components/meshRenderer.hpp"
 
-#include <string>
-
 namespace Solid
 {
 

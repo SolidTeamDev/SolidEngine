@@ -1,32 +1,37 @@
 #pragma once
-
 #include "Build/SolidAPI.hpp"
 #include <Core/Maths/Utils/constants.hpp>
+
+#include "EngineGenerated/vector2.sld.hpp"
 #include <iostream>
 #include <string>
 
-namespace Solid
+namespace Solid SLDNamespace()
 {
-    struct Vec3;
+    class Vec3;
 
-    struct Vec4;
+    class Vec4;
 
     //TODO: SEE TO TEMPLATE VECTOR
 
-    struct SOLID_API Vec2i
+    struct SOLID_API SLDStruct() Vec2i
     {
         int x;
         int y;
+        Vec2i_GENERATED
     };
-    struct SOLID_API Vec2d
+    struct SOLID_API SLDStruct() Vec2d
     {
         double x;
         double y;
+	    Vec2d_GENERATED
     };
-    struct SOLID_API Vec2
+    class SOLID_API SLDClass() Vec2
     {
-        float x = 0;
-        float y = 0;
+    public:
+
+	    float x;
+        float y;
 
         constexpr Vec2() noexcept = default;
 
@@ -133,10 +138,11 @@ namespace Solid
         constexpr Vec2 operator -() noexcept;
 
 #pragma endregion
-
+		Vec2_GENERATED
     };
     constexpr Vec2 operator * (float _value, const Vec2& vec) noexcept;
     constexpr Vec2 operator / (float _value, const Vec2& vec) ;
 
 };
 
+File_GENERATED

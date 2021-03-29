@@ -8,3 +8,4 @@
 #define SOLID_EDITOR_API //__declspec(dllexport)
 #endif
 using uint = unsigned int ;
+#include "EngineGenerated/EntityMacros.h"
