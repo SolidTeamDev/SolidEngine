@@ -51,7 +51,7 @@ else()#Release/Other
             optimized ${ENGINE_LIBS_RELEASE})
 endif()
 
-target_compile_definitions(SolidEngine PRIVATE "IMGUI_API=__declspec(dllexport)")
+target_compile_definitions(SolidEngine PUBLIC "IMGUI_API=__declspec(dllexport)")
 target_compile_definitions(SolidEngine PUBLIC "SOLID_API=__declspec(dllexport)")
 
 # ========= EDITOR ==========
@@ -82,7 +82,7 @@ set(EDITOR_LIBS PUBLIC glfw3dll OpenGL::GL SolidEngine)
 
 add_executable(SolidEditor ${EDITOR_SOURCE_FILES})
 target_link_libraries(SolidEditor ${EDITOR_LIBS})
-target_compile_definitions(SolidEditor PRIVATE "IMGUI_API=__declspec(dllimport)")
+target_compile_definitions(SolidEditor PUBLIC "IMGUI_API=__declspec(dllimport)")
 target_compile_definitions(SolidEditor PUBLIC "SOLID_API=__declspec(dllimport)")
 target_compile_definitions(SolidEditor PRIVATE "SOLID_EDITOR_API=__declspec(dllexport)")
 
