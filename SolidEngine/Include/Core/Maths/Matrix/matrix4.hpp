@@ -42,7 +42,7 @@ namespace Solid
         static Mat4 Scale(const Vec3& _scale);
         static Mat4 Transform(const Vec3& _pos,const Quat& _rot, const Vec3& _scale = Vec3::One);
         static Mat4 Perspective(float _fov = 90.f, float _aspect = 1.f,float _near = 0.25f,float _far = 100.f);
-        static bool DecomposeTransform(const Mat4<T>& transform, Vec3& translation, Vec3& rotation, Vec3& scale);
+        static bool DecomposeTransform(const Mat4<T>& transform, Vec3& translation, Quat& rotation, Vec3& scale);
         //static Mat4 Orthogonal();
 
 #pragma endregion

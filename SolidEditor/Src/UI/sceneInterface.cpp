@@ -12,6 +12,9 @@
 
 namespace Solid
 {
+    //TODO: Replace static
+    static ImGuizmo::OPERATION gizmoMode = ImGuizmo::OPERATION::TRANSLATE;
+    static ImGuizmo::MODE      gizmoReferential = ImGuizmo::MODE::LOCAL;
     void SceneInterface::Draw() {
         if (!p_open)
             return;
@@ -44,13 +47,15 @@ namespace Solid
             Mat4<float> transMat = engine->ecsManager.GetComponent<Transform>(go->GetEntity()).GetMatrix();
 
             ImGuizmo::Manipulate(viewMat.elements.data(), projMat.elements.data(),
-                                 ImGuizmo::OPERATION::ROTATE, ImGuizmo::LOCAL,
+                                 gizmoMode, gizmoReferential,
                                  transMat.elements.data());
             if (ImGuizmo::IsUsing())
             {
                 engine->ecsManager.GetComponent<Transform>(go->GetEntity()).SetTransformMatrix(transMat);
             }
         }
+        //Show grid
+        //::DrawGrid(viewMat.elements.data(),projMat.elements.data(),Mat4<float>::Identity.elements.data(),10);
 
         UI::End();
     }
@@ -66,12 +71,17 @@ void Solid::SceneInterface::DrawMenu()
     UI::SliderFloat("Camera Speed", &Editor::camSpeed, 0.1f, 1000.f);
     Editor::camSpeed = std::clamp(Editor::camSpeed, 0.f, 50000.f);
 
-    /*if(UI::Button("Translation"))
+    if(UI::Button("Local"))
+        gizmoReferential = ImGuizmo::MODE::LOCAL;
+    if(UI::Button("Global"))
+        gizmoReferential =  ImGuizmo::MODE::WORLD;
+
+    if(UI::Button("Translation"))
         gizmoMode = ImGuizmo::OPERATION::TRANSLATE;
     if(UI::Button("Rotation"))
         gizmoMode = ImGuizmo::OPERATION::ROTATE;
     if(UI::Button("Scale"))
-        gizmoMode = ImGuizmo::OPERATION::SCALE;*/
+        gizmoMode = ImGuizmo::OPERATION::SCALE; //TODO: Force Local
 
     UI::EndMenuBar();
 

@@ -105,9 +105,9 @@ namespace Solid
     void Transform::SetTransformMatrix(const Mat4<float> &_mat)
     {
         transMat = _mat;
-        Vec3 rotEuler = rotation.ToEuler();
-        Mat4<float>::DecomposeTransform(_mat,position,rotEuler,scale);
-        rotation.FromEuler(rotEuler);
+        Mat4<float>::DecomposeTransform(_mat,position,rotation,scale);
+        Vec3 eulerRad = rotation.ToEuler();
+        euler = Vec3(Maths::RadToDeg(eulerRad.x),Maths::RadToDeg(eulerRad.y),Maths::RadToDeg(eulerRad.z));
         hasToUpdateMat = false;
     }
 

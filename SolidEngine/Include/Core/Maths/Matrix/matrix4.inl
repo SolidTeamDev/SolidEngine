@@ -165,19 +165,19 @@ namespace Solid
     }
 
     template<typename T>
-    bool Mat4<T>::DecomposeTransform(const Mat4<T> &transform, Vec3 &translation, Vec3 &rotation, Vec3 &scale)
+    bool Mat4<T>::DecomposeTransform(const Mat4<T>& transform, Vec3& translation, Quat& rotation, Vec3& scale)
     {
         Mat4<float> LocalMatrix(transform);
 
         // Normalize the matrix.
-        if (LocalMatrix[15] == 0 /*+ epsilon*/)
+        if (Maths::Equals0(LocalMatrix[15]))
             return false;
 
         // First, isolate perspective.  This is the messiest.
         if (
-                (LocalMatrix[3] != 0) ||
-                (LocalMatrix[7] != 0) ||
-                (LocalMatrix[11] != 0))
+                (!Maths::Equals0(LocalMatrix[3])) ||
+                (!Maths::Equals0(LocalMatrix[7])) ||
+                (!Maths::Equals0(LocalMatrix[11])))
         {
             // Clear the perspective partition
             LocalMatrix[3] = LocalMatrix[7] = LocalMatrix[11] = 0.0f;
@@ -206,16 +206,50 @@ namespace Solid
         scale.z = Row[2].Length();;
         Row[2] = Row[2].GetNormalize();
 
-        rotation.y = Solid::Maths::Asin(-Row[0].z);
-        if (cos(rotation.y) != 0) {
-            rotation.x = Solid::Maths::Atan2(Row[1].z, Row[2].z);
-            rotation.z = Solid::Maths::Atan2(Row[0].y, Row[0].x);
-        }
-        else {
-            rotation.x = Solid::Maths::Atan2(-Row[2].x, Row[1].y);
-            rotation.z = 0;
+        Pdum3 = Vec3::Cross(Row[1], Row[2]); // v3Cross(row[1], row[2], Pdum3);
+        if (Vec3::Dot(Row[0], Pdum3) < 0)
+        {
+            scale *= static_cast<T>(-1);
+            for (size_t i = 0; i < 3; i++)
+            {
+                Row[i] *= static_cast<T>(-1);
+            }
         }
 
+        float tr = Row[0].x + Row[1].y + Row[2].z;
+        if(tr > 0)
+        {
+            float s = Maths::Sqrt(tr + 1) * 2;
+            rotation.w = 0.25f * s;
+            rotation.x = (Row[2].y - Row[1].z) / s;
+            rotation.y = (Row[0].z - Row[2].x) / s;
+            rotation.z = (Row[1].x - Row[0].y) / s;
+
+        }
+        else if((Row[0].x > Row[1].y) && (Row[0].x > Row[2].z))
+        {
+            float s = Maths::Sqrt(1 + Row[0].x - Row[1].y - Row[2].z) * 2;
+            rotation.w = (Row[2].y - Row[1].z) / s;
+            rotation.x = 0.25f * s;
+            rotation.y = (Row[0].y + Row[1].x) / s;
+            rotation.z = (Row[0].z + Row[2].x) / s;
+        }
+        else if((Row[1].y > Row[2].z))
+        {
+            float s = Maths::Sqrt(1 + Row[1].y - Row[0].x - Row[2].z) * 2;
+            rotation.w = (Row[0].z - Row[2].x) / s;
+            rotation.x = (Row[0].y + Row[1].x) / s;
+            rotation.y = 0.25f * s;
+            rotation.z = (Row[1].z + Row[2].y) / s;
+        }
+        else
+        {
+            float s = Maths::Sqrt(1 + Row[2].z - Row[1].y - Row[0].x) * 2;
+            rotation.w = (Row[1].x - Row[0].y) / s;
+            rotation.x = (Row[0].z + Row[2].x) / s;
+            rotation.y = (Row[1].z + Row[2].y) / s;
+            rotation.z = 0.25f * s;
+        }
 
         return true;
     }
