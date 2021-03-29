@@ -123,7 +123,7 @@ namespace Solid
     template<typename T>
     Mat4<T> Mat4<T>::Perspective(float _fov, float _aspect, float _near, float _far)
     {
-        T ymax = tanf(_fov * 3.14f / 180.f / 2.f);
+        /*T ymax = tanf(_fov * 3.14f / 180.f / 2.f);
         T xmax = ymax * _aspect;
 
 
@@ -147,9 +147,77 @@ namespace Solid
         m.elements[12] = 0.0;
         m.elements[13] = 0.0;
         m.elements[14] = -2 * (_far * _near) / temp;
-        m.elements[15] = 0.0;
+        m.elements[15] = 0.0;*/
+
+        Mat4 m;
+
+        T range = _near - _far;
+        T invRange = _far - _near;
+        T halfFov = tanf(_fov * 3.14f / 180.f / 2.f);
+
+        m.elements[0] = 1/(halfFov*_aspect);
+        m.elements[5] = 1/halfFov;
+        m.elements[10] = -(_far+_near) / invRange;
+        m.elements[11] = -1;
+        m.elements[14] = -2*_far * _near / invRange;
 
         return m;
+    }
+
+    template<typename T>
+    bool Mat4<T>::DecomposeTransform(const Mat4<T> &transform, Vec3 &translation, Vec3 &rotation, Vec3 &scale)
+    {
+        Mat4<float> LocalMatrix(transform);
+
+        // Normalize the matrix.
+        if (LocalMatrix[15] == 0 /*+ epsilon*/)
+            return false;
+
+        // First, isolate perspective.  This is the messiest.
+        if (
+                (LocalMatrix[3] != 0) ||
+                (LocalMatrix[7] != 0) ||
+                (LocalMatrix[11] != 0))
+        {
+            // Clear the perspective partition
+            LocalMatrix[3] = LocalMatrix[7] = LocalMatrix[11] = 0.0f;
+            LocalMatrix[15] = 1;
+        }
+
+        // Next take care of translation (easy).
+        translation = Vec3(LocalMatrix[12], LocalMatrix[13], LocalMatrix[14]);
+        LocalMatrix[12] =  LocalMatrix[13] = LocalMatrix[14] = 0.0f;
+
+        Vec3 Row[3], Pdum3;
+
+        // Now get scale and shear.
+        for (size_t i = 0; i < 3; ++i)
+        {
+
+            Row[i].x = LocalMatrix[(4*i)];
+            Row[i].y = LocalMatrix[(4*i)+1];
+            Row[i].z = LocalMatrix[(4*i)+2];
+        }
+        // Compute X scale factor and normalize first row.
+        scale.x = Row[0].Length();
+        Row[0] = Row[0].GetNormalize();//detail::scale(Row[0], static_cast<T>(1));
+        scale.y = Row[1].Length();
+        Row[1] = Row[1].GetNormalize();
+        scale.z = Row[2].Length();;
+        Row[2] = Row[2].GetNormalize();
+
+        rotation.y = Solid::Maths::Asin(-Row[0].z);
+        if (cos(rotation.y) != 0) {
+            rotation.x = Solid::Maths::Atan2(Row[1].z, Row[2].z);
+            rotation.z = Solid::Maths::Atan2(Row[0].y, Row[0].x);
+        }
+        else {
+            rotation.x = Solid::Maths::Atan2(-Row[2].x, Row[1].y);
+            rotation.z = 0;
+        }
+
+
+        return true;
     }
 
     /*template <typename T>

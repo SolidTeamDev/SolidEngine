@@ -1,5 +1,7 @@
 #include "ECS/Components/transform.hpp"
 
+#include "Core/Maths/Utils/numerics.hpp"
+
 namespace Solid
 {
     Transform::Transform():
@@ -98,6 +100,15 @@ namespace Solid
     void Transform::UpdateTransformMatrix()
     {
         transMat = Mat4<float>::Transform(position,rotation,scale);
+    }
+
+    void Transform::SetTransformMatrix(const Mat4<float> &_mat)
+    {
+        transMat = _mat;
+        Vec3 rotEuler = rotation.ToEuler();
+        Mat4<float>::DecomposeTransform(_mat,position,rotEuler,scale);
+        rotation.FromEuler(rotEuler);
+        hasToUpdateMat = false;
     }
 
 } //!namespace

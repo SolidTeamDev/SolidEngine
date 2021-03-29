@@ -23,36 +23,34 @@ namespace Solid
         windowFlags |= ImGuiWindowFlags_MenuBar;
 
         UI::Begin("Scene", &p_open, windowFlags);
+
+        ImVec2 windowSize = UI::GetWindowSize();
+        windowSize.y -= 50.f;
+        Editor::sceneFramebuffer.size = {(int)windowSize.x,(int)windowSize.y};
+        UI::Image((ImTextureID)(size_t)Editor::sceneFramebuffer.texture,windowSize,ImVec2{0,1},ImVec2{1,0});
+        DrawMenu();
+
         ImGuizmo::SetOrthographic(false);
-        ImGuizmo::SetDrawlist();
+        ImGuizmo::SetDrawlist(UI::GetForegroundDrawList());
         float width = UI::GetWindowWidth();
         float height = UI::GetWindowHeight();
-
         ImGuizmo::SetRect(UI::GetWindowPos().x, UI::GetWindowPos().y, width, height);
-        Mat4<float> viewMat = Editor::editorCamera.GetView().GetTransposed();
-        Mat4<float> projMat = Editor::editorCamera.GetProjection().GetTransposed();
-
+        Mat4<float> viewMat = Editor::editorCamera.GetView();
+        Mat4<float> projMat = Editor::editorCamera.GetProjection();
         Engine* engine = Engine::GetInstance();
         GameObject* go = EditorInterface::selectedGO;
         if (go != nullptr)
         {
-            Mat4<float> pos = engine->ecsManager.GetComponent<Transform>(go->GetEntity()).GetMatrix().GetTransposed();
+            Mat4<float> transMat = engine->ecsManager.GetComponent<Transform>(go->GetEntity()).GetMatrix();
+
             ImGuizmo::Manipulate(viewMat.elements.data(), projMat.elements.data(),
-                                 ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::LOCAL,
-                                 pos.elements.data());
+                                 ImGuizmo::OPERATION::ROTATE, ImGuizmo::LOCAL,
+                                 transMat.elements.data());
             if (ImGuizmo::IsUsing())
             {
-                pos = pos.GetTransposed();
-                Vec3 newPos = Vec3(pos.At(12), pos.At(13), pos.At(14));
-                engine->ecsManager.GetComponent<Transform>(go->GetEntity()).SetPosition(newPos);
+                engine->ecsManager.GetComponent<Transform>(go->GetEntity()).SetTransformMatrix(transMat);
             }
         }
-        ImVec2 windowSize = UI::GetWindowSize();
-        windowSize.y -= 50.f;
-        Editor::sceneFramebuffer.size = {(int)windowSize.x,(int)windowSize.y};
-        UI::Image((ImTextureID)(size_t)Editor::sceneFramebuffer.texture,windowSize,ImVec2{1,1},ImVec2{0,0});
-        DrawMenu();
-
 
         UI::End();
     }
@@ -68,6 +66,12 @@ void Solid::SceneInterface::DrawMenu()
     UI::SliderFloat("Camera Speed", &Editor::camSpeed, 0.1f, 1000.f);
     Editor::camSpeed = std::clamp(Editor::camSpeed, 0.f, 50000.f);
 
+    /*if(UI::Button("Translation"))
+        gizmoMode = ImGuizmo::OPERATION::TRANSLATE;
+    if(UI::Button("Rotation"))
+        gizmoMode = ImGuizmo::OPERATION::ROTATE;
+    if(UI::Button("Scale"))
+        gizmoMode = ImGuizmo::OPERATION::SCALE;*/
 
     UI::EndMenuBar();
 

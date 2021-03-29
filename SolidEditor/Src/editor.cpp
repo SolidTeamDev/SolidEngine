@@ -148,9 +148,9 @@ namespace Solid
         float strafeVelocity = 0;
 
         if(editorInputManager->IsPressed(EInputList::LEFT))
-            strafeVelocity = -updateCamSpeed;
-        if(editorInputManager->IsPressed(EInputList::RIGHT))
             strafeVelocity = updateCamSpeed;
+        if(editorInputManager->IsPressed(EInputList::RIGHT))
+            strafeVelocity = -updateCamSpeed;
 
         if(editorInputManager->IsPressed(EInputList::UP))
             editorCameraT.Translate(Vec3(0,-updateCamSpeed,0));

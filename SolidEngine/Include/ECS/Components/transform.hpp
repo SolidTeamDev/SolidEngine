@@ -29,6 +29,7 @@ namespace Solid
         void SetRotation(const Quat& _quat);
         void SetScale(const Vec3& _vec);
         void SetEuler(const Vec3& _euler);
+        void SetTransformMatrix(const Mat4<float>& _mat);
         void Translate(const Vec3& _vec);
         void Rotate(const Quat& _quat);
         void Scale(const Vec3& _vec);

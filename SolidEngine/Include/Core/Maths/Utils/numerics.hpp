@@ -201,7 +201,6 @@ namespace Solid
         template <typename T>
         static constexpr bool Equals0(T _value);
 
-
     }
 }
 
