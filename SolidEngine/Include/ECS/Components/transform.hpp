@@ -5,6 +5,8 @@
 #include "Core/Maths/Quaternion/quaternion.hpp"
 #include "Core/Maths/Vector/vector3.hpp"
 #include "Core/Maths/Matrix/matrix4.hpp"
+#include "EngineGenerated/transform.sld.hpp"
+
 
 namespace Solid
 {

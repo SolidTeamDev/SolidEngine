@@ -14,9 +14,9 @@ namespace Solid SLDNamespace()
     {
     public:
 
-	    float x;
-        float y;
-        float z;
+	    float x = 0;
+        float y = 0;
+        float z = 0;
 
         constexpr Vec3() noexcept = default;
 

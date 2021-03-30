@@ -1,4 +1,5 @@
 #pragma once
+#include "EngineGenerated/script.sld.hpp"
 
 namespace Solid
 {

@@ -4,6 +4,7 @@
 #include "Core/Maths/Matrix/matrix4.hpp"
 #include "Core/Maths/Quaternion/quaternion.hpp"
 #include "transform.hpp"
+#include "EngineGenerated/camera.sld.hpp"
 
 namespace Solid
 {
