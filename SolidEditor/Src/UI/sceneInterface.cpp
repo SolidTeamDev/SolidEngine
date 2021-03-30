@@ -27,17 +27,15 @@ namespace Solid
 
         UI::Begin("Scene", &p_open, windowFlags);
 
-        ImVec2 windowSize = UI::GetWindowSize();
-        windowSize.y -= 50.f;
+        ImVec2 windowSize = UI::GetContentRegionAvail();
         Editor::sceneFramebuffer.size = {(int)windowSize.x,(int)windowSize.y};
         UI::Image((ImTextureID)(size_t)Editor::sceneFramebuffer.texture,windowSize,ImVec2{0,1},ImVec2{1,0});
+        ImVec2 imgPos = UI::GetItemRectMin();
         DrawMenu();
 
         ImGuizmo::SetOrthographic(false);
-        ImGuizmo::SetDrawlist(UI::GetForegroundDrawList());
-        float width = UI::GetWindowWidth();
-        float height = UI::GetWindowHeight();
-        ImGuizmo::SetRect(UI::GetWindowPos().x, UI::GetWindowPos().y, width, height);
+        ImGuizmo::SetDrawlist();
+        ImGuizmo::SetRect(imgPos.x, imgPos.y, windowSize.x, windowSize.y);
         Mat4<float> viewMat = Editor::editorCamera.GetView();
         Mat4<float> projMat = Editor::editorCamera.GetProjection();
         Engine* engine = Engine::GetInstance();
