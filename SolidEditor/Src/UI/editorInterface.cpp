@@ -15,6 +15,7 @@ namespace Solid {
             editorStyle(UI::GetStyle())
     {
         window = nullptr;
+
         DarkTheme();
     }
 
@@ -27,7 +28,6 @@ namespace Solid {
 
     void EditorInterface::Update()
     {
-        UIContext::BeginFrame();
 
         DrawMainFrame();
 

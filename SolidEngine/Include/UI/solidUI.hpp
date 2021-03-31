@@ -3,6 +3,7 @@
 #include "Build/solidAPI.hpp"
 #include <GLFW/glfw3.h>
 #include <imgui.h>
+#include <imgui_internal.h>
 
 namespace Solid::UIContext
 {
@@ -20,7 +21,7 @@ namespace Solid::UIContext
         /**
          * @brief Begins a UI frame
          */
-        void SOLID_API BeginFrame();
+        SOLID_API ImGuiWindow* BeginFrame();
         /**
          * @brief Ends and render a UI frame
          */

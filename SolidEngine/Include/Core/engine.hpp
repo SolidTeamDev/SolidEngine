@@ -57,6 +57,7 @@ namespace Solid
         GraphicalResourceMgr graphicsResourceMgr;
         Physics physics;
         AudioManager audioMgr;
+
         
         static Engine* GetInstance();
         bool MultiThreadEnabled()const {return mtEnabled;}

@@ -1,3 +1,4 @@
+#include <imgui_impl_opengl3.h>
 #include "editor.hpp"
 #include "UI/solidUI.hpp"
 #include "UI/editorInterface.hpp"
@@ -65,17 +66,19 @@ namespace Solid
             glfwPollEvents();
             editorInputManager->Update();
             UpdateEditorCamera();
-
+	        editorInterface.sceneInterface.gizmoWin = UIContext::BeginFrame();
+	        editorInterface.sceneInterface.GridList->_ResetForNewFrame();
             renderer->ClearColor({0,0,0,1});
             renderer->Clear(window->GetWindowSize());
 
-            renderer->BeginFramebuffer(sceneFramebuffer);
+            /*renderer->BeginFramebuffer(sceneFramebuffer);
             renderer->ClearColor({0.f,0.f,0.f,1});
             renderer->Clear(sceneFramebuffer.size);
             engine->rendererSystem->Update(renderer,editorCamera);
-            renderer->EndFramebuffer();
+	        renderer->EndFramebuffer();
+*/
+	        editorInterface.Update();
 
-            editorInterface.Update();
 
             renderer->UpdateFramebuffer(sceneFramebuffer);
             Time::Update();

@@ -117,7 +117,7 @@ namespace ImGuizmo
    IMGUI_API void SetDrawlist(ImDrawList* drawlist = nullptr);
 
    // call BeginFrame right after ImGui_XXXX_NewFrame();
-   IMGUI_API void BeginFrame();
+   IMGUI_API ImGuiWindow* BeginFrame();
 
    // this is necessary because when imguizmo is compiled into a dll, and imgui into another
    // globals are not shared between them.
@@ -156,7 +156,7 @@ namespace ImGuizmo
 
    // Render a cube with face color corresponding to face normal. Usefull for debug/tests
    IMGUI_API void DrawCubes(const float* view, const float* projection, const float* matrices, int matrixCount);
-   IMGUI_API void DrawGrid(const float* view, const float* projection, const float* matrix, const float gridSize);
+   IMGUI_API void DrawGrid(const float* view, const float* projection, const float* matrix, const float gridSize, ImDrawList* ListToDraw = nullptr);
 
    // call it when you want a gizmo
    // Needs view and projection matrices. 

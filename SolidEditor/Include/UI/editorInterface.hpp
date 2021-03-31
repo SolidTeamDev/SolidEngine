@@ -28,7 +28,6 @@ namespace Solid
         LogsInterface           logsInterface;
         PlayInterface           playInterface;
         FilesInterface          filesInterface;
-        SceneInterface          sceneInterface;
         InspectorInterface      inspectorInterface;
         HierarchyTreeInterface  hierarchyTreeInterface;
 
@@ -40,6 +39,7 @@ namespace Solid
 
         static Solid::GameObject* selectedGO;
         static bool        draggingEnt;
+	    SceneInterface          sceneInterface;
 
 
         /**

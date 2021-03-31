@@ -30,6 +30,7 @@ IMGUI_IMPL_API bool     ImGui_ImplOpenGL3_Init(const char* glsl_version = NULL);
 IMGUI_IMPL_API void     ImGui_ImplOpenGL3_Shutdown();
 IMGUI_IMPL_API void     ImGui_ImplOpenGL3_NewFrame();
 IMGUI_IMPL_API void     ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data);
+IMGUI_IMPL_API void     ImGui_ImplOpenGL3_RenderDrawList(ImVec2 pos, ImVec2 size,ImVec2 fbScale, ImDrawList* draw_list);
 
 // (Optional) Called by Init/NewFrame/Shutdown
 IMGUI_IMPL_API bool     ImGui_ImplOpenGL3_CreateFontsTexture();

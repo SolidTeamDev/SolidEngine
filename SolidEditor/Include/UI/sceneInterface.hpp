@@ -1,5 +1,7 @@
 #pragma once
 
+#include <imgui.h>
+
 namespace Solid
 {
     class SceneInterface
@@ -12,5 +14,7 @@ namespace Solid
         void DrawMenu();
 
         bool p_open = true;
+	    ImDrawList* GridList = IM_NEW(ImDrawList)(ImGui::GetDrawListSharedData());
+	    void* gizmoWin = nullptr;
     };
 }

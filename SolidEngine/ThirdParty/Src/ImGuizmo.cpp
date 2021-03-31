@@ -904,7 +904,7 @@ namespace ImGuizmo
         ImGui::SetCurrentContext(ctx);
     }
 
-    void BeginFrame()
+    ImGuiWindow* BeginFrame()
     {
         const ImU32 flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus;
 
@@ -923,9 +923,11 @@ namespace ImGuizmo
 
         ImGui::Begin("gizmo", NULL, flags);
         gContext.mDrawList = ImGui::GetWindowDrawList();
+        ImGuiWindow* winPtr = ImGui::GetCurrentWindow();
         ImGui::End();
         ImGui::PopStyleVar();
         ImGui::PopStyleColor(2);
+        return winPtr;
     }
 
     bool IsUsing()
@@ -2437,7 +2439,7 @@ namespace ImGuizmo
         }
     }
 
-    void DrawGrid(const float* view, const float* projection, const float* matrix, const float gridSize)
+    void DrawGrid(const float* view, const float* projection, const float* matrix, const float gridSize, ImDrawList* ListToDraw)
     {
         matrix_t viewProjection = *(matrix_t*)view * *(matrix_t*)projection;
         vec_t frustum[6];
@@ -2486,8 +2488,10 @@ namespace ImGuizmo
                     float thickness = 1.f;
                     thickness = (fmodf(fabsf(f), 10.f) < FLT_EPSILON) ? 1.5f : thickness;
                     thickness = (fabsf(f) < FLT_EPSILON) ? 2.3f : thickness;
-
-                    gContext.mDrawList->AddLine(worldToPos(ptA, res), worldToPos(ptB, res), col, thickness);
+					if(ListToDraw == nullptr)
+                        gContext.mDrawList->AddLine(worldToPos(ptA, res), worldToPos(ptB, res), col, thickness);
+					else
+						ListToDraw->AddLine(worldToPos(ptA, res), worldToPos(ptB, res), col, thickness);
                 }
             }
         }
