@@ -3,14 +3,10 @@
 #include "ECS/Components/transform.hpp"
 #include "ECS/Components/meshRenderer.hpp"
 
-
-#include "Core/engine.hpp"
-
 namespace Solid
 {
     void RendererSystem::Update(const Renderer* _renderer, Camera& _camera)
     {
-	    Engine* e =Engine::GetInstance();
         for (auto entity : entities)
         {
             auto& meshRenderer = ecsManager.GetComponent<MeshRenderer>(entity);

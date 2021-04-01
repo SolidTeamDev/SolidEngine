@@ -48,7 +48,6 @@ MaterialResource::~MaterialResource()
 AudioResource::~AudioResource()
 {
 	alDeleteBuffers(1, &(this->buffer));
-
 }
 
 

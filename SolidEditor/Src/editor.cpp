@@ -66,6 +66,11 @@ namespace Solid
             editorInputManager->Update();
             UpdateEditorCamera();
 
+            //TODO: Update engine task in engine
+            engine->Update();
+            engine->FixedUpdate();
+            engine->LateUpdate();
+
             renderer->ClearColor({0,0,0,1});
             renderer->Clear(window->GetWindowSize());
 
@@ -74,6 +79,8 @@ namespace Solid
             renderer->Clear(sceneFramebuffer.size);
             engine->rendererSystem->Update(renderer,editorCamera);
             renderer->EndFramebuffer();
+
+            engine->audioSystem->Update(editorCamera);
 
             editorInterface.Update();
 
