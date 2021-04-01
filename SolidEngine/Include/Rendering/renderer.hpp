@@ -71,6 +71,7 @@ namespace Solid
         virtual uint CreateShaderFromBinary(ShaderBinary _binary) const = 0;
         virtual void SetRendererType(ERendererType _type) final{ if(type==ERendererType::NONE) type = _type; }
         virtual ERendererType GetRenderType() final {return type;}
+        virtual void DrawSolidGrid(Camera &_camera, float _gridSize, Vec3 _color, float _thickness) = 0;
     };
 
 } //!namespace
