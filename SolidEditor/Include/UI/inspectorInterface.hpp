@@ -3,6 +3,7 @@
 #include "Core/Maths/solidMaths.hpp"
 #include "ECS/Components/transform.hpp"
 #include "ECS/Components/meshRenderer.hpp"
+#include "ECS/Components/audioSource.hpp"
 #include <string>
 
 namespace Solid
@@ -21,6 +22,7 @@ namespace Solid
 
         void EditTransform(Transform& _trs);
         void EditMeshRenderer(MeshRenderer& _meshRenderer);
+        void EditAudioSource(AudioSource& _audioSource);
 
         void EditBool(bool &_num, const std::string &_label);
         void EditInt(int &_num, const std::string &_label, float _step);

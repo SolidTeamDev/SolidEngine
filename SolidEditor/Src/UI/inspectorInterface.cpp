@@ -49,6 +49,11 @@ namespace Solid
         {
             EditMeshRenderer(engine->ecsManager.GetComponent<MeshRenderer>(gameObject->GetEntity()));
         }
+
+        if(engine->ecsManager.GotComponent<AudioSource>(gameObject->GetEntity()))
+        {
+            EditAudioSource(engine->ecsManager.GetComponent<AudioSource>(gameObject->GetEntity()));
+        }
     }
 
     void InspectorInterface::AddComponents()
@@ -74,6 +79,14 @@ namespace Solid
                 if(UI::Button("Mesh renderer"))
                 {
                     engine->ecsManager.AddComponent(gameObject->GetEntity(),MeshRenderer());
+                }
+            }
+            if(!engine->ecsManager.GotComponent<AudioSource>(gameObject->GetEntity()))
+            {
+                if(UI::Button("Audio source"))
+                {
+                    engine->ecsManager.AddComponent<AudioSource>(gameObject->GetEntity(),AudioSource());
+                    engine->ecsManager.GetComponent<AudioSource>(gameObject->GetEntity()).Init();
                 }
             }
             UI::EndPopup();
@@ -107,6 +120,7 @@ namespace Solid
             }
             _trs.SetScale(tempScale);
         }
+        UI::Separator();
     }
 
     void InspectorInterface::EditMeshRenderer(MeshRenderer& _meshRenderer)
@@ -288,6 +302,71 @@ namespace Solid
 	        }
 	        UI::Unindent();
         }
+        UI::Separator();
+    }
+
+    void InspectorInterface::EditAudioSource(AudioSource &_audioSource)
+    {
+        Engine* engine = Engine::GetInstance();
+        std::string audioName = _audioSource.GetName();
+
+        if(UI::CollapsingHeader("Audio Source",ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            if(UI::BeginCombo("##Audio", audioName.c_str()))
+            {
+                auto* audioList = engine->resourceManager.GetResourcesVecByType<AudioResource>();
+
+                for(auto& audio : *audioList)
+                {
+                    bool selected = (audioName == audio.second->name);
+                    if(UI::Selectable(audio.second->name.c_str(), selected))
+                    {
+                        _audioSource.SetAudio(engine->resourceManager.GetRawAudioByName(audio.second->name.c_str()));
+                    }
+                    if(selected)
+                        UI::SetItemDefaultFocus();
+                }
+
+                UI::EndCombo();
+            }
+            
+            {
+                float volume = _audioSource.GetVolume();
+                UI::SliderFloat("Volume",&volume,0,1);
+                _audioSource.SetVolume(volume);
+            }
+
+            {
+                float pitch = _audioSource.GetPitch();
+                UI::SliderFloat("Pitch",&pitch,0,10,"%.2f");
+                _audioSource.SetPitch(pitch);
+            }
+
+            {
+                bool isLooping = _audioSource.IsLooping();
+                UI::Checkbox("Loop",&isLooping);
+                _audioSource.SetLoop(isLooping);
+            }
+
+            {
+                float maxDist = _audioSource.GetMaxDistance();
+                UI::DragFloat("MaxDist",&maxDist);
+                _audioSource.SetMaxDistance(maxDist);
+            }
+
+            {
+                Vec3 musicVelocity = _audioSource.GetMusicVelocity();
+                UI::DragFloat3("Velocity",&musicVelocity.x);
+                _audioSource.SetMusicVelocity(musicVelocity);
+            }
+
+            if(UI::Button("Play sound"))
+                _audioSource.Play();
+            if(UI::Button("Stop sound"))
+                _audioSource.Stop();
+        }
+
+        UI::Separator();
     }
 
     void InspectorInterface::CreateScriptWindow()

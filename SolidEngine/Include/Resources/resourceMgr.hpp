@@ -107,6 +107,9 @@ namespace Solid
             if(type_value == MaterialList.type_value)
                 return &(MaterialList.List);
 
+            if(type_value == AudioList.type_value)
+                return  &(AudioList.List);
+
 
             return nullptr;
         }
@@ -133,6 +136,9 @@ namespace Solid
 			    case EResourceType::Anim:
 				    return &AnimList.List;
 				    break;
+		        case EResourceType::Audio:
+                    return &AudioList.List;
+                    break;
 			    default:
 				    ThrowError("Type Not Stored", ESolidErrorCode::S_INIT_ERROR);
 				    return nullptr;

@@ -3,6 +3,7 @@
 #include "Build/solidAPI.hpp"
 #include "Rendering/renderer.hpp"
 #include "Window/window.hpp"
+#include "Audio/audio.hpp"
 #include "solidMultiThread.hpp"
 #include "Time/time.hpp"
 #include "InputManager/inputManager.hpp"
@@ -11,22 +12,20 @@
 
 #include "ECS/ecsManager.hpp"
 #include "ECS/System/rendererSystem.hpp"
+#include "ECS/System/audioSystem.hpp"
+
 #include "Resources/graphicalResourceMgr.hpp"
-#include "Resources/audioSource.hpp"
-#include "Resources/audioManager.hpp"
 
 #include "Physics/physics.hpp"
 
 namespace Solid
 {
-
-
     /**
      * @brief Base engine class. Running the lifetime of application
      */
     class SOLID_API Engine
     {
-    protected:
+    private:
 
         Log log;
 
@@ -49,14 +48,15 @@ namespace Solid
     	//Engine** test = &instance;
         Window* window;
         Renderer* renderer = nullptr;
+        Audio audio;
         ECSManager ecsManager;
         std::shared_ptr<RendererSystem> rendererSystem;
+        std::shared_ptr<AudioSystem> audioSystem;
         ResourceManager resourceManager;
         TaskManager taskManager;
         ThreadManager threadPool;
         GraphicalResourceMgr graphicsResourceMgr;
         Physics physics;
-        AudioManager audioMgr;
         
         static Engine* GetInstance();
         bool MultiThreadEnabled()const {return mtEnabled;}
@@ -75,8 +75,11 @@ namespace Solid
          */
         bool IsEngineContextInitialized() const;
 
+        void Update();
 
+        void FixedUpdate();
 
+        void LateUpdate();
 
     };
 

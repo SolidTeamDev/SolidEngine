@@ -4,13 +4,13 @@
 #include "Rendering/OpenGL45/openGl45Renderer.hpp"
 #include "UI/solidUI.hpp"
 #include "Resources/ressources.hpp"
-#include "Resources/audioManager.hpp"
 
 #include "ECS/Components/transform.hpp"
 #include "ECS/Components/meshRenderer.hpp"
 #include "ECS/Components/camera.hpp"
 #include "ECS/Components/rigidBody.hpp"
 #include "ECS/Components/script.hpp"
+#include "ECS/Components/audioSource.hpp"
 
 namespace Solid
 {
@@ -40,6 +40,7 @@ namespace Solid
         ecsManager.RegisterComponent<Camera>();
         ecsManager.RegisterComponent<RigidBody>();
         ecsManager.RegisterComponent<Script*>();
+        ecsManager.RegisterComponent<AudioSource>();
 
         //Register Signature
         rendererSystem = ecsManager.RegisterSystem<RendererSystem>();
@@ -48,6 +49,14 @@ namespace Solid
             signature.set(ecsManager.GetComponentType<Transform>());
             signature.set(ecsManager.GetComponentType<MeshRenderer>());
             ecsManager.SetSystemSignature<RendererSystem>(signature);
+        }
+
+        audioSystem = ecsManager.RegisterSystem<AudioSystem>();
+        {
+            Signature signature;
+            signature.set(ecsManager.GetComponentType<Transform>());
+            signature.set(ecsManager.GetComponentType<AudioSource>());
+            ecsManager.SetSystemSignature<AudioSystem>(signature);
         }
     }
 
@@ -90,6 +99,21 @@ namespace Solid
 		if(_b){threadPool.PlayAllThreads();}
 		else{threadPool.PauseAllThreads();}
 	}
+
+    void Engine::Update()
+    {
+
+    }
+
+    void Engine::FixedUpdate()
+    {
+
+    }
+
+    void Engine::LateUpdate()
+    {
+
+    }
 } //!namespace
 
 
