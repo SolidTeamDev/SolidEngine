@@ -72,6 +72,7 @@ namespace Solid
             renderer->BeginFramebuffer(sceneFramebuffer);
             renderer->ClearColor({0.f,0.f,0.f,1});
             renderer->Clear(sceneFramebuffer.size);
+	        renderer->DrawSolidGrid(Editor::editorCamera, 10, Vec3(.5,.5,.5), 1.8);
             engine->rendererSystem->Update(renderer,editorCamera);
             renderer->EndFramebuffer();
 
