@@ -10,3 +10,4 @@ Generated/*
 TestMaths/.vs
 TestMaths/Debug
 out
+SolidEngine/Include/EngineGenerated
