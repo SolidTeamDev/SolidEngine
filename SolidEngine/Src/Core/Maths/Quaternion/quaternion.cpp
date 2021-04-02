@@ -4,8 +4,11 @@
 #include "Core/Debug/debug.hpp"
 #include "Core/Maths/Utils/numerics.hpp"
 
+
 namespace Solid
 {
+#pragma region Constructors
+
     constexpr Quat::Quat(float _value) noexcept:
             x{_value},
             y{_value},
@@ -53,7 +56,7 @@ namespace Solid
 
         if(!_axis.IsNormalized())
         {
-            Vec3 vn = _axis.GetNormalize();
+            Vec3 vn = _axis.GetNormalized();
             x = vn.x * Maths::Sin(_angle);
             y = vn.y * Maths::Sin(_angle);
             z = vn.z * Maths::Sin(_angle);
@@ -64,11 +67,12 @@ namespace Solid
         y = _axis.y * Maths::Sin(_angle);
         z = _axis.z * Maths::Sin(_angle);
     }
+#pragma endregion
 #pragma region Static Methods
 
     Quat Quat::Zero{0, 0, 0, 0};
 
-    Quat Quat::Identity{1, 0, 0, 0};
+    Quat Quat::Identity{0, 0, 0, 1};
 
     constexpr float Quat::Dot(const Quat &_q1, const Quat &_q2) noexcept
     {
@@ -90,7 +94,7 @@ namespace Solid
 
     Quat Quat::Slerp(const Quat &_q1, const Quat &_q2, float _r) noexcept
     {
-        return Maths::Slerp<Quat>(_q1, _q2, _r);
+        return Maths::Slerp<Quat>(_q1, _q2, _r).GetNormalized();
     }
 
 #pragma endregion
