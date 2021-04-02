@@ -64,7 +64,7 @@ namespace Solid
 
         Vec4& Normalize() noexcept;
 
-        constexpr Vec4 GetNormalize() const noexcept;
+        constexpr Vec4 GetNormalized() const noexcept;
 
         constexpr bool IsNormalized() const noexcept;
 

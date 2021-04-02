@@ -71,7 +71,7 @@ namespace Solid
 
         Vec3& Normalize() noexcept;
 
-        constexpr Vec3 GetNormalize() const noexcept;
+        constexpr Vec3 GetNormalized() const noexcept;
 
         constexpr bool IsNormalized() const noexcept;
 

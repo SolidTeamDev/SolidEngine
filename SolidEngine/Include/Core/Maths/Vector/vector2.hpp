@@ -77,7 +77,7 @@ namespace Solid
 
         Vec2 &Normalize() noexcept;
 
-        constexpr Vec2 GetNormalize() const noexcept;
+        constexpr Vec2 GetNormalized() const noexcept;
 
         constexpr bool IsNormalized() const noexcept;
 

@@ -71,12 +71,12 @@ namespace Solid
 
     Vec4 Vec4::Nlerp(const Vec4 &_v1, const Vec4 &_v2, float _r) noexcept
     {
-        return Maths::Lerp(_v1,_v2,_r).GetNormalize();
+        return Maths::Lerp(_v1,_v2,_r).GetNormalized();
     }
 
     Vec4 Vec4::Slerp(const Vec4 &_v1, const Vec4 &_v2, float _r) noexcept
     {
-        return Maths::Slerp(_v1,_v2, _r);
+        return Maths::Slerp(_v1,_v2, _r).GetNormalized();
     }
 
 #pragma endregion
@@ -151,7 +151,7 @@ namespace Solid
 
     }
 
-    constexpr Vec4 Vec4::GetNormalize() const noexcept
+    constexpr Vec4 Vec4::GetNormalized() const noexcept
     {
         float len = Length();
         if(len == 0)

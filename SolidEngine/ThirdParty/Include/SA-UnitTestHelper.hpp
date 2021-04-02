@@ -948,6 +948,17 @@ namespace Sa
 					TitleCB(_funcDecl, _lineNum, _pred);
 			}
 
+            /// \brief Generate Params from params' names and values.
+            template <typename FirstT, typename... Args>
+            void GenerateParamStr(std::vector<Param>& _result, std::string _paramNames, const FirstT& _first, const Args&... _args)
+            {
+                size_t index = _paramNames.find_first_of(',');
+
+                _result.push_back(Param{ _paramNames.substr(0u, index), ToString(_first) });
+
+                if constexpr (sizeof...(_args) != 0)
+                    GenerateParamStr(_result, _paramNames.substr(index + 2), _args...);
+            }
 
 			/// Compute params.
 			template <typename... Args>
@@ -970,17 +981,7 @@ namespace Sa
 				}
 			}
 
-			/// \brief Generate Params from params' names and values.
-			template <typename FirstT, typename... Args>
-			void GenerateParamStr(std::vector<Param>& _result, std::string _paramNames, const FirstT& _first, const Args&... _args)
-			{
-				size_t index = _paramNames.find_first_of(',');
 
-				_result.push_back(Param{ _paramNames.substr(0u, index), ToString(_first) });
-
-				if constexpr (sizeof...(_args) != 0)
-					GenerateParamStr(_result, _paramNames.substr(index + 2), _args...);
-			}
 
 
 			/// Compute the result using _pred predicate.
