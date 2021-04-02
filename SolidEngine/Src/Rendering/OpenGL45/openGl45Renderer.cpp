@@ -108,8 +108,8 @@ namespace Solid
 		}
 		glGenBuffers(1,&grid_vbo);
 		glGenBuffers(1,&grid_ebo);
-		//glDeleteShader(vs);
-		//glDeleteShader(fs);
+		glDeleteShader(vs);
+		glDeleteShader(fs);
 	}
 
 	void OpenGL45Renderer::GLDebugCallback(GLenum _source, GLenum _type, GLuint _id, GLenum _severity, GLsizei _length,
