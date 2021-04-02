@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Build/solidAPI.hpp"
+#include "EngineGenerated/rigidBody.sld.hpp"
 
 namespace Solid
 {

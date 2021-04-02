@@ -3,6 +3,7 @@
 #include "Resources/ressources.hpp"
 #include "Resources/graphicalResource.hpp"
 #include <set>
+#include "EngineGenerated/meshRenderer.sld.hpp"
 namespace Solid
 {
     struct SOLID_API MeshRenderer

@@ -12,6 +12,7 @@ outputDirectory = '''SolidEngine/Include/EngineGenerated'''
 toParseDirectories = [
     '''SolidEngine/Include/Core/Maths/Vector''',
     '''SolidEngine/Include/Core/Maths/Quaternion''',
+    '''SolidEngine/Include/ECS/Components''',
 ]
 
 # Files to parse which are not included in any directory of toParseDirectories
