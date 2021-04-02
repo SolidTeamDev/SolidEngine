@@ -200,11 +200,11 @@ namespace Solid
         }
         // Compute X scale factor and normalize first row.
         scale.x = Row[0].Length();
-        Row[0] = Row[0].GetNormalize();//detail::scale(Row[0], static_cast<T>(1));
+        Row[0] = Row[0].GetNormalized();//detail::scale(Row[0], static_cast<T>(1));
         scale.y = Row[1].Length();
-        Row[1] = Row[1].GetNormalize();
+        Row[1] = Row[1].GetNormalized();
         scale.z = Row[2].Length();;
-        Row[2] = Row[2].GetNormalize();
+        Row[2] = Row[2].GetNormalized();
 
         Pdum3 = Vec3::Cross(Row[1], Row[2]); // v3Cross(row[1], row[2], Pdum3);
         if (Vec3::Dot(Row[0], Pdum3) < 0)
