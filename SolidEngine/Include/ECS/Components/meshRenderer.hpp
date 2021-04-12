@@ -3,11 +3,16 @@
 #include "Resources/ressources.hpp"
 #include "Resources/graphicalResource.hpp"
 #include <set>
+
+
+#include "Build/solidAPI.hpp"
 #include "EngineGenerated/meshRenderer.sld.hpp"
-namespace Solid
+
+namespace Solid SLDNamespace()
 {
-    struct SOLID_API MeshRenderer
+    class SLDClass() SOLID_API MeshRenderer
     {
+    public:
     	MeshRenderer() = default;
     	MeshRenderer(std::shared_ptr<IMesh> _m)
     	{
@@ -24,5 +29,8 @@ namespace Solid
 	    //std::shared_ptr<IShader> shader = nullptr;
 	    std::vector<MaterialResource*> materials;
         std::set<MaterialResource*> materialSet;
+
+        MeshRenderer_GENERATED
     };
 } //!namespace
+File_GENERATED

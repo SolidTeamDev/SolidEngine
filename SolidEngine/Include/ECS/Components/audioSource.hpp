@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Build/solidAPI.hpp"
+
 #include "Core/Maths/Vector/vector3.hpp"
 #include "Resources/resourceType.hpp"
 
@@ -8,9 +8,12 @@
 #include <AL/al.h>
 #include <AL/alext.h>
 
-namespace Solid
+#include "Build/solidAPI.hpp"
+#include "EngineGenerated/audioSource.sld.hpp"
+
+namespace Solid SLDNamespace()
 {
-    class SOLID_API AudioSource
+    class SOLID_API SLDClass() AudioSource
     {
     private:
         bool isInit = false;
@@ -50,6 +53,8 @@ namespace Solid
         bool IsPlaying();
         bool IsPaused();
         bool IsLooping();
-
+		AudioSource_GENERATED
     };
 } //!namespace
+
+File_GENERATED

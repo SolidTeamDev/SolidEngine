@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Build/SolidAPI.hpp"
+#include "Build/solidAPI.hpp"
 #include "EngineGenerated/vector4.sld.hpp"
 
 namespace Solid SLDNamespace()

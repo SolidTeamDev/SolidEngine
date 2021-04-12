@@ -3,9 +3,9 @@
 #include "Build/solidAPI.hpp"
 #include "EngineGenerated/rigidBody.sld.hpp"
 
-namespace Solid
+namespace Solid SLDNamespace()
 {
-    class SOLID_API RigidBody
+    class SOLID_API SLDClass() RigidBody
     {
     public:
 
@@ -15,5 +15,9 @@ namespace Solid
 
         RigidBody() = default;
         ~RigidBody() = default;
+
+        RigidBody_GENERATED
     };
 } //!namespace
+
+File_GENERATED

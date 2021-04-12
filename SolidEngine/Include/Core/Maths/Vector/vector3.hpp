@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Build/SolidAPI.hpp"
+#include "Build/solidAPI.hpp"
 #include "EngineGenerated/vector3.sld.hpp"
 namespace Solid SLDNamespace()
 {
@@ -135,6 +135,6 @@ namespace Solid SLDNamespace()
     constexpr Vec3 operator*(float _value, const Vec3& vec) noexcept;
 
     constexpr Vec3 operator/(float _value, const Vec3& vec);
-};
+}
 
 File_GENERATED

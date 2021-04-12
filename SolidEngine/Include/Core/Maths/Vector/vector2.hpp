@@ -1,5 +1,5 @@
 #pragma once
-#include "Build/SolidAPI.hpp"
+#include "Build/solidAPI.hpp"
 #include <Core/Maths/Utils/constants.hpp>
 
 #include "EngineGenerated/vector2.sld.hpp"

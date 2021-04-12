@@ -5,12 +5,14 @@
 #include "Core/Maths/Quaternion/quaternion.hpp"
 #include "Core/Maths/Vector/vector3.hpp"
 #include "Core/Maths/Matrix/matrix4.hpp"
+
+#include "Build/solidAPI.hpp"
 #include "EngineGenerated/transform.sld.hpp"
 
 
-namespace Solid
+namespace Solid SLDNamespace()
 {
-    class SOLID_API Transform
+    class SOLID_API SLDClass() Transform
     {
     private:
         Vec3 position {0,0,0};
@@ -42,6 +44,10 @@ namespace Solid
         Vec3 GetScale() const;
 
         Mat4<float> GetMatrix();
+
+        Transform_GENERATED
     };
 } //!namespace
 
+
+File_GENERATED

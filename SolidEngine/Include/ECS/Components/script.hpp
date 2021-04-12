@@ -1,9 +1,12 @@
 #pragma once
+
+
+#include "Build/solidAPI.hpp"
 #include "EngineGenerated/script.sld.hpp"
 
-namespace Solid
+namespace Solid SLDNamespace()
 {
-    class  Script
+    class SOLID_API SLDClass() Script
     {
     protected:
         GameObject* gameobject= nullptr;
@@ -19,5 +22,8 @@ namespace Solid
 
         GameObject* GetGameObject(){return gameobject;}
 
+		Script_GENERATED
     };
 }// !namespace
+
+File_GENERATED
