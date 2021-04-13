@@ -11,13 +11,19 @@ namespace Solid
         static physx::PxDefaultAllocator     gDefaultAllocatorCallback;
 
         static physx::PxCudaContextManager* gCudaContextManager;
-    public:
 
         physx::PxFoundation* pxFoundation = nullptr;
         physx::PxPhysics*    pxPhysics    = nullptr;
-        physx::PxScene*      pxScene        = nullptr;
+        physx::PxScene*      pxScene      = nullptr;
+
+        physx::PxMaterial* pxMaterial = nullptr;
+    public:
 
         Physics();
         ~Physics();
+
+        void Update(float _deltaTime);
+
+        void AddCollider(physx::PxActor& _actor);
     };
 }

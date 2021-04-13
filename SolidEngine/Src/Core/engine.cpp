@@ -102,7 +102,7 @@ namespace Solid
 
     void Engine::Update()
     {
-
+        physics.Update((float)Time::DeltaTime());
     }
 
     void Engine::FixedUpdate()

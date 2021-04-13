@@ -22,30 +22,41 @@ namespace Solid
 
         /// Create physx scene
 
-        PxCudaContextManagerDesc cudaContextManagerDesc;
-
-        gCudaContextManager = PxCreateCudaContextManager(*pxFoundation, cudaContextManagerDesc, PxGetProfilerCallback());
-
         PxSceneDesc sceneDesc(pxPhysics->getTolerancesScale());
 
         sceneDesc.gravity = PxVec3(0,-9.81f,0);
         sceneDesc.cpuDispatcher = PxDefaultCpuDispatcherCreate(4);
         sceneDesc.filterShader  = PxDefaultSimulationFilterShader;
-        sceneDesc.cudaContextManager = gCudaContextManager;
-
-        sceneDesc.flags |= PxSceneFlag::eENABLE_GPU_DYNAMICS;
-        sceneDesc.broadPhaseType = PxBroadPhaseType::eGPU;
 
         pxScene = pxPhysics->createScene(sceneDesc);
         if(!pxScene)
             throw ThrowError("Physx create scene failed !",ESolidErrorCode::S_INIT_ERROR);
         ///
+
+        pxMaterial = pxPhysics->createMaterial(.5f,.5f,.6f);
+
+        PxRigidStatic* groundPlane = PxCreatePlane(*pxPhysics,PxPlane(0,1,0,0), *pxMaterial);
+        AddCollider(*groundPlane);
     }
 
     Physics::~Physics()
     {
         pxPhysics->release();
         pxFoundation->release();
+    }
+
+    void Physics::Update(float _deltaTime)
+    {
+        if(_deltaTime <= 0)
+            return;
+
+        pxScene->simulate(_deltaTime);
+        pxScene->fetchResults(true);
+    }
+
+    void Physics::AddCollider(PxActor& _actor)
+    {
+        pxScene->addActor(_actor);
     }
 
 } //!namespace
