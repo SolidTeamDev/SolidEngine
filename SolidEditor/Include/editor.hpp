@@ -7,6 +7,7 @@
 
 namespace Solid
 {
+    struct Vec2d;
 	class SOLID_API EngineCleanerInterface
 	{
 	protected:
@@ -44,7 +45,8 @@ namespace Solid
         GameCompiler* Compiler;
 
 
-        void UpdateEditorCamera();
+        void UpdateEditorCamera(Vec2d mouse_pos);
+        bool MouseInSceneInterface(const Vec2d& mousePos);
     public:
 
         static float camSpeed;

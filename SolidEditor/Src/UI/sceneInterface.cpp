@@ -28,9 +28,12 @@ namespace Solid
         UI::Begin("Scene", &p_open, windowFlags);
 
         ImVec2 windowSize = UI::GetContentRegionAvail();
-        Editor::sceneFramebuffer.size = {(int)windowSize.x,(int)windowSize.y};
+        Editor::sceneFramebuffer.size = {(int)windowSize.x+5,(int)windowSize.y};
         UI::Image((ImTextureID)(size_t)Editor::sceneFramebuffer.texture,windowSize,ImVec2{0,1},ImVec2{1,0});
         ImVec2 imgPos = UI::GetItemRectMin();
+
+        Editor::sceneFramebuffer.pos = {(int)(UI::GetWindowPos().x - UI::GetMainViewport()->Pos.x) ,
+                                        (int)(UI::GetWindowPos().y -UI::GetMainViewport()->Pos.y + 42)};
         DrawMenu();
 
         ImGuizmo::SetOrthographic(false);

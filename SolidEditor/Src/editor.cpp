@@ -64,7 +64,12 @@ namespace Solid
         {
             glfwPollEvents();
             editorInputManager->Update();
-            UpdateEditorCamera();
+            //editorInterface.
+            Vec2d mouse_pos;
+            editorInputManager->GetCursorPos(mouse_pos.x, mouse_pos.y);
+
+            if(MouseInSceneInterface(mouse_pos))
+                UpdateEditorCamera(mouse_pos);
 
             //TODO: Update engine task in engine
             engine->Update();
@@ -114,7 +119,7 @@ namespace Solid
         engine->EnableMultiThread(false);
     }
 
-    void Editor::UpdateEditorCamera()
+    void Editor::UpdateEditorCamera(Vec2d mouse_pos)
     {
         editorCamera.UpdateCamera(sceneFramebuffer.size);
 
@@ -132,6 +137,8 @@ namespace Solid
         deltaPos.x *= mouseSensitivity * Time::DeltaTime();
         deltaPos.y *= mouseSensitivity * Time::DeltaTime();
 
+        //Rotation camera
+
         Vec3 rot = editorCameraT.GetRotation().ToEuler();
 
         /*rot.x += deltaPos.x;
@@ -143,6 +150,7 @@ namespace Solid
             rot.x = -S_PI_2;
 
         editorCameraT.SetRotation(Quat(rot));*/
+
 
         //== Movement
         float updateCamSpeed = (float)(camSpeed * Time::DeltaTime());
@@ -181,5 +189,22 @@ namespace Solid
         editorCameraT.Translate(Vec3(cos(rot.y)  * strafeVelocity,
                                      0,
                                      sin(rot.y)  * strafeVelocity));
+    }
+
+    bool Editor::MouseInSceneInterface(const Vec2d& mousePos)
+    {
+
+        if(editorInputManager->IsPressed(EInputList::Mouse0)
+            && mousePos.x >= sceneFramebuffer.pos.x
+            && mousePos.x < sceneFramebuffer.pos.x + sceneFramebuffer.size.x
+            && mousePos.y >= sceneFramebuffer.pos.y
+            && mousePos.y < sceneFramebuffer.pos.y + sceneFramebuffer.size.y)
+        {
+            return true;
+        }
+        else
+            return false;
+
+
     }
 } //!namespace

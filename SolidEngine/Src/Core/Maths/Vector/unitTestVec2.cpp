@@ -1,10 +1,12 @@
 #include <iostream>
+#include <Core/Maths/Utils/numerics.hpp>
 #include <Core/Maths/Vector/vector2.hpp>
 #include <Core/Maths/Vector/vector3.hpp>
 #include <Core/Maths/Vector/vector4.hpp>
 #include <Core/Maths/unitTestMaths.hpp>
 #define SA_UTH_DFLT_CSL_LOG 1
 #include <SA-UnitTestHelper.hpp>
+
 
 using namespace Sa;
 
@@ -85,20 +87,29 @@ namespace Solid::Vec2UnitTest
         {
             const Vec2 v1(2.f,2.f);
             const Vec2 v2 (-2.f,4.f);
+            const Vec2 slerp_v1(2.0f, 2.0f);
+            const Vec2 slerp_v2(-2.0f, 2.0f);
 
-            const Vec2 lerp_res =  Vec2(0,0);
-            const Vec2 Nlerp_res =  Vec2(0,0);
-            const Vec2 Slerp_res =  Vec2(0,0);
+            const Vec2 lerp_res =  Vec2(0.0f, 3.0f);
+            const Vec2 Nlerp_res =  lerp_res.GetNormalized();
+            const Vec2 Slerp_res =  Vec2(0.0f, slerp_v1.Length());
 
-            //SA_UTH_RSF(lerp_res, Vec2::Lerp, v1, v2,1.f);
-            //SA_UTH_RSF(Nlerp_res, Vec2::Nlerp, v1, v2,1.f);
-            //SA_UTH_RSF(Slerp_res, Vec2::Slerp, v1, v2,0.5f);
+            SA_UTH_RSF(lerp_res, Vec2::Lerp, v1, v2,0.5f);
+            SA_UTH_RSF(Nlerp_res, Vec2::Nlerp, v1, v2,0.5f);
+            SA_UTH_RSF(Slerp_res, Vec2::Slerp, slerp_v1, slerp_v2,0.5f);
 
         }
     }
 
     void TestMethods()
     {
+        {
+            Vec2 v1 = GenerateRandomVec();
+            const float lenSqrt = v1.x * v1.x + v1.y * v1.y;
+            const float len = Solid::Maths::Sqrt(lenSqrt);
+            SA_UTH_RMF(len, v1, Length);
+            SA_UTH_RMF(lenSqrt, v1, SqrtLength);
+        }
 
     }
 
@@ -109,7 +120,6 @@ namespace Solid::Vec2UnitTest
 
     void Main()
     {
-        //std::cout.precision(7);
         SA_UTH_GP(TestConstructors());
         SA_UTH_GP(TestStatics());
 
