@@ -1,22 +1,25 @@
 #pragma once
 
-#include "Build/solidAPI.hpp"
 
 #include "Core/Maths/Quaternion/quaternion.hpp"
 #include "Core/Maths/Vector/vector3.hpp"
 #include "Core/Maths/Matrix/matrix4.hpp"
 
+#include "ECS/types.hpp"
 #include "Build/solidAPI.hpp"
 #include "EngineGenerated/transform.sld.hpp"
 
 
 namespace Solid SLDNamespace()
 {
-    class SOLID_API SLDClass() Transform
+    class SOLID_API SLDClass() Transform : public Components
     {
     private:
+    	SLDField()
         Vec3 position {0,0,0};
-        Vec3 scale {1,1,1};
+        SLDField()
+    	Vec3 scale {1,1,1};
+	    SLDField()
         Quat rotation {};
         Vec3 euler{};
         Mat4<float> transMat;

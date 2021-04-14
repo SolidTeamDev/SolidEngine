@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 #include "Build/solidAPI.hpp"
 #include <Core/Maths/Utils/constants.hpp>
 
@@ -16,13 +17,17 @@ namespace Solid SLDNamespace()
 
     struct SOLID_API SLDStruct() Vec2i
     {
+    	SLDField()
         int x;
+	    SLDField()
         int y;
         Vec2i_GENERATED
     };
     struct SOLID_API SLDStruct() Vec2d
     {
+	    SLDField()
         double x;
+	    SLDField()
         double y;
 	    Vec2d_GENERATED
     };
@@ -30,19 +35,27 @@ namespace Solid SLDNamespace()
     {
     public:
 
+	    SLDField()
 	    float x = 0;
+	    SLDField()
         float y = 0;
 
+	    SLDMethod()
         constexpr Vec2() noexcept = default;
 
+	    SLDMethod()
         constexpr Vec2(const float &_value) noexcept;
 
+	    SLDMethod()
         constexpr Vec2(float _x, float _y) noexcept;
 
+	    SLDMethod()
         constexpr Vec2(const Vec2 &_copy) noexcept;
 
+	    SLDMethod()
         constexpr Vec2(const Vec3 &_copy) noexcept;
 
+	    SLDMethod()
         constexpr Vec2(const Vec4 &_copy) noexcept;
 
         ~Vec2() = default;
@@ -55,43 +68,61 @@ namespace Solid SLDNamespace()
         static const Vec2 Left;
         static const Vec2 Right;
 
+		SLDMethod()
         static constexpr float Dot(const Vec2 &_v1,const Vec2 &_v2) noexcept;
 
+		SLDMethod()
         static constexpr float Cross(const Vec2 &_v1,const Vec2 &_v2) noexcept;
 
+		SLDMethod()
         static Vec2 Lerp(const Vec2& _v1,const Vec2& _v2, float _r) noexcept;
 
+		SLDMethod()
         static Vec2 Nlerp(const Vec2& _v1,const Vec2& _v2, float _r) noexcept;
 
+		SLDMethod()
         static Vec2 Slerp(const Vec2& _v1,const Vec2& _v2, float _r) noexcept;
 
 #pragma endregion
 #pragma region Methods
 
+		SLDMethod()
         constexpr float SqrtLength() const noexcept;
 
+		SLDMethod()
         constexpr float Length() const noexcept;
 
+		SLDMethod()
         Vec2 &Scale(float _scale) noexcept;
 
+		SLDMethod()
         constexpr Vec2 GetScaled(float _scale) const noexcept;
 
+		SLDMethod()
         Vec2 &Unscale(float _scale) noexcept;
 
+		SLDMethod()
         constexpr Vec2 GetUnscaled(float _scale) const noexcept;
 
+		SLDMethod()
         Vec2 &Normalize() noexcept;
 
+		SLDMethod()
         constexpr Vec2 GetNormalized() const noexcept;
 
+		SLDMethod()
         constexpr bool IsNormalized() const noexcept;
 
+		SLDMethod()
         constexpr bool IsEquals(const Vec2& vec) const noexcept;
 
+		SLDMethod()
         constexpr float Dist(const Vec2& vec) const noexcept;
 
+		SLDMethod()
         constexpr float SqrtDist(const Vec2& vec) const noexcept;
 
+		SLDMethod()
         const std::string ToString() const noexcept;
 
 #pragma endregion

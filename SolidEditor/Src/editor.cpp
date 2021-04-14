@@ -1,3 +1,4 @@
+#include <string>
 #include "editor.hpp"
 #include "UI/solidUI.hpp"
 #include "UI/editorInterface.hpp"
@@ -58,9 +59,10 @@ namespace Solid
 
         glfwSwapInterval(0);
 
+        String t = "hh";
 
 
-        while (!glfwWindowShouldClose(window->GetHandle()))
+	    while (!glfwWindowShouldClose(window->GetHandle()))
         {
             glfwPollEvents();
             editorInputManager->Update();

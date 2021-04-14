@@ -5,11 +5,6 @@
 #ifndef SOLIDEDITOR_RESSOURCES_HPP
 #define SOLIDEDITOR_RESSOURCES_HPP
 
-
-#ifndef SOLID_API
-#define SOLID_API __declspec(dllexport)
-#endif
-
 #include <vector>
 #include <string>
 #include <string_view>

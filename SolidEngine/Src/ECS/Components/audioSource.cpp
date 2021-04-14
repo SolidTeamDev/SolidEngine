@@ -7,7 +7,7 @@
 #include "Core/Maths/Vector/vector3.hpp"
 #include "Core/Maths/solidMaths.hpp"
 #include "Core/Debug/log.hpp"
-
+#include "Core/engine.hpp"
 namespace Solid
 {
     AudioSource::~AudioSource()
@@ -23,9 +23,12 @@ namespace Solid
         alSourcef(sourceID, AL_GAIN, volume);
         alSource3f(sourceID, AL_POSITION, 0, 0, 0);
         alSource3f(sourceID, AL_VELOCITY,velocity.x, velocity.y, velocity.z);
-        alSourcei(sourceID, AL_BUFFER, 0);
+
         alSourcei(sourceID, AL_LOOPING, 0);
         alSourcef(sourceID, AL_MAX_DISTANCE, maxDistance);
+        audioResource = Engine::GetInstance()->resourceManager.GetRawAudioByName(name.c_str());
+        if(audioResource != nullptr)
+	        alSourcei(sourceID, AL_BUFFER, audioResource->buffer);
         ALenum error = alGetError();
         if(error != AL_NO_ERROR)
             Log::Send(alGetString(error), Log::ELogSeverity::ERROR);
@@ -42,6 +45,7 @@ namespace Solid
         ALenum error = alGetError();
         if(error != AL_NO_ERROR)
             Log::Send(alGetString(error), Log::ELogSeverity::ERROR);
+
     }
 
     void AudioSource::SetVolume(float _vol)

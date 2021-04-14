@@ -40,7 +40,7 @@ namespace Solid
 
 			virtual void DrawMesh() override;
 
-			virtual void DrawMesh(std::vector<MaterialResource *>& _list, Transform &_tr, Camera &_cam) override;
+			virtual void DrawMesh(const std::vector<MaterialResource *>& _list, Transform &_tr, Camera &_cam) override;
 
 		};
 		class SOLID_API Shader : public IShader

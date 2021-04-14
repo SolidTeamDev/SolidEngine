@@ -15,11 +15,14 @@ namespace Solid
 
         std::string name = "New GameObject";
 
+        std::vector<Components*> compsList;
+
         GameObject* parent = nullptr;
         std::deque<GameObject*> childs;
 
         GameObject(Entity _entity)
         {
+
             entity = _entity;
         }
 

@@ -96,7 +96,7 @@ void GL::Mesh::DrawMesh()
 	glBindVertexArray(0);
 }
 
-void GL::Mesh::DrawMesh(std::vector<MaterialResource *>& _list, Transform& _tr, Camera& _cam)
+void GL::Mesh::DrawMesh(const std::vector<MaterialResource *>& _list, Transform& _tr, Camera& _cam)
 {
 	glEnable(GL_DEPTH_TEST);
 

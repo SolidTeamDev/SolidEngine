@@ -1,12 +1,12 @@
 #pragma once
 
-
+#include "ECS/types.hpp"
 #include "Build/solidAPI.hpp"
 #include "EngineGenerated/script.sld.hpp"
 
 namespace Solid SLDNamespace()
 {
-    class SOLID_API SLDClass() Script
+    class SOLID_API SLDClass() Script : public Components
     {
     protected:
         GameObject* gameobject= nullptr;

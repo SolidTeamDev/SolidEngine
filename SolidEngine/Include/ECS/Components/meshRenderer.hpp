@@ -4,33 +4,47 @@
 #include "Resources/graphicalResource.hpp"
 #include <set>
 
-
+#include "ECS/types.hpp"
 #include "Build/solidAPI.hpp"
 #include "EngineGenerated/meshRenderer.sld.hpp"
 
 namespace Solid SLDNamespace()
 {
-    class SLDClass() SOLID_API MeshRenderer
+    class SOLID_API SLDClass()  MeshRenderer : public Components
     {
-    public:
-    	MeshRenderer() = default;
-    	MeshRenderer(std::shared_ptr<IMesh> _m)
-    	{
-		    mesh = _m;
-		    if(mesh != nullptr)
-		    {
-		    	materials.resize(0);
-		    	materials.resize(mesh->subMeshCount, nullptr);
-		    	materialSet.clear();
-		    	materialSet.emplace(nullptr);
-		    }
-    	}
-        std::shared_ptr<IMesh> mesh = nullptr;
-	    //std::shared_ptr<IShader> shader = nullptr;
+    private:
+
+	    std::shared_ptr<IMesh> mesh = nullptr;
+
+	    SLDField()
+        vectorStr MatNames;
+	    SLDField()
+	    String MeshName;
 	    std::vector<MaterialResource*> materials;
-        std::set<MaterialResource*> materialSet;
+	    std::set<MaterialResource*> materialSet;
+
+    public:
+	    MeshRenderer();
+	    MeshRenderer(std::shared_ptr<IMesh> _m);
+
+	    std::shared_ptr<IMesh> GetMesh() const;
+
+	    void SetMesh(const std::shared_ptr<IMesh> _mesh);
+
+	    const std::vector<MaterialResource *>& GetMaterials() const ;
+	    void SetMaterials(const std::vector<MaterialResource *>&);
+
+	    std::set<MaterialResource *>& GetMaterialSet() ;
+
+	    void SetMaterialAt(int _index, MaterialResource* _mat);
+
+	    void SetMaterialSet(const std::set<MaterialResource *> &_materialSet);
+
+	    void Init();
 
         MeshRenderer_GENERATED
     };
+
+
 } //!namespace
 File_GENERATED

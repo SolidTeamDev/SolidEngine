@@ -1,5 +1,5 @@
 #pragma once
-
+#include <string>
 #include "Build/solidAPI.hpp"
 #include "EngineGenerated/vector3.sld.hpp"
 namespace Solid SLDNamespace()
@@ -13,27 +13,37 @@ namespace Solid SLDNamespace()
     class SOLID_API SLDClass() Vec3
     {
     public:
-
+		SLDField()
 	    float x = 0;
+	    SLDField()
         float y = 0;
+	    SLDField()
         float z = 0;
 
+		SLDMethod()
         constexpr Vec3() noexcept = default;
 
+
+	    SLDMethod()
         constexpr Vec3(float _value) noexcept;
 
+	    SLDMethod()
         constexpr Vec3(float _x, float _y, float _z) noexcept;
 
-        constexpr Vec3(const Vec4& _copy) noexcept;
+	    SLDMethod()
+	    constexpr Vec3(const Vec4& _copy) noexcept;
 
-        constexpr Vec3(const Vec3& _copy) noexcept;
+	    SLDMethod()
+	    constexpr Vec3(const Vec3& _copy) noexcept;
 
         /**
          * make a euler angle
         **/
-        Vec3(const Quat& _q) noexcept;
+	    SLDMethod()
+	    Vec3(const Quat& _q) noexcept;
 
-        ~Vec3() = default;
+	    SLDMethod()
+	    ~Vec3() = default;
 
 #pragma region Static Methods
 
@@ -46,87 +56,125 @@ namespace Solid SLDNamespace()
         static const Vec3 Forward;
         static const Vec3 Back;
 
-        static constexpr float Dot(const Vec3& _v1, const Vec3& _v2) noexcept;
+		SLDMethod()
+		static constexpr float Dot(const Vec3& _v1, const Vec3& _v2) noexcept;
 
-        static constexpr Vec3 Cross(const Vec3& _v1, const Vec3& _v2) noexcept;
+		SLDMethod()
+		static constexpr Vec3 Cross(const Vec3& _v1, const Vec3& _v2) noexcept;
 
-        static Vec3 Lerp(const Vec3& _v1, const Vec3& _v2, float _r) noexcept;
+		SLDMethod()
+		static Vec3 Lerp(const Vec3& _v1, const Vec3& _v2, float _r) noexcept;
 
-        static Vec3 Nlerp(const Vec3& _v1, const Vec3& _v2, float _r) noexcept;
+		SLDMethod()
+		static Vec3 Nlerp(const Vec3& _v1, const Vec3& _v2, float _r) noexcept;
 
-        static Vec3 Slerp(const Vec3& _v1, const Vec3& _v2, float _r) noexcept;
+		SLDMethod()
+		static Vec3 Slerp(const Vec3& _v1, const Vec3& _v2, float _r) noexcept;
 
 #pragma endregion
 #pragma region Methods
 
-        constexpr float SqrtLength() const noexcept;
+		SLDMethod()
+		constexpr float SqrtLength() const noexcept;
 
-        constexpr float Length() const noexcept;
+		SLDMethod()
+		constexpr float Length() const noexcept;
 
-        Vec3& Scale(float _scale) noexcept;
+		SLDMethod()
+		Vec3& Scale(float _scale) noexcept;
 
-        constexpr Vec3 GetScaled(float _scale) const noexcept;
+		SLDMethod()
+		constexpr Vec3 GetScaled(float _scale) const noexcept;
 
-        Vec3& Unscale(float _scale) noexcept;
+		SLDMethod()
+		Vec3& Unscale(float _scale) noexcept;
 
-        constexpr Vec3 GetUnscaled(float _scale) const noexcept;
+		SLDMethod()
+		constexpr Vec3 GetUnscaled(float _scale) const noexcept;
 
-        Vec3& Normalize() noexcept;
+		SLDMethod()
+		Vec3& Normalize() noexcept;
 
-        constexpr Vec3 GetNormalized() const noexcept;
+		SLDMethod()
+		constexpr Vec3 GetNormalized() const noexcept;
 
-        constexpr bool IsNormalized() const noexcept;
+		SLDMethod()
+		constexpr bool IsNormalized() const noexcept;
 
-        constexpr bool IsEquals(const Vec3& vec) const noexcept;
+		SLDMethod()
+		constexpr bool IsEquals(const Vec3& vec) const noexcept;
 
-        constexpr float Dist(const Vec3& vec) const noexcept;
+		SLDMethod()
+		constexpr float Dist(const Vec3& vec) const noexcept;
 
-        constexpr float SqrtDist(const Vec3& vec) const noexcept;
+		SLDMethod()
+		constexpr float SqrtDist(const Vec3& vec) const noexcept;
 
-        const std::string ToString() const noexcept;
+		SLDMethod()
+		const std::string ToString() const noexcept;
 
 #pragma endregion
 #pragma region Operator
 
-        constexpr Vec3& operator=(const Vec3& vec) noexcept = default;
+		SLDMethod()
+		constexpr Vec3& operator=(const Vec3& vec) noexcept = default;
 
-        constexpr bool operator==(const Vec3& _vec) const noexcept;
+		SLDMethod()
+		constexpr bool operator==(const Vec3& _vec) const noexcept;
 
-        constexpr bool operator!=(const Vec3& _vec) const noexcept;
+		SLDMethod()
+		constexpr bool operator!=(const Vec3& _vec) const noexcept;
 
-        constexpr Vec3 operator+(const Vec3& _vec) const noexcept;
+		SLDMethod()
+		constexpr Vec3 operator+(const Vec3& _vec) const noexcept;
 
-        constexpr Vec3 operator-(const Vec3& _vec) const noexcept;
+		SLDMethod()
+		constexpr Vec3 operator-(const Vec3& _vec) const noexcept;
 
-        constexpr Vec3 operator*(const Vec3& _vec) const noexcept;
+		SLDMethod()
+		constexpr Vec3 operator*(const Vec3& _vec) const noexcept;
 
-        constexpr Vec3 operator/(const Vec3& _vec) const noexcept;
+		SLDMethod()
+		constexpr Vec3 operator/(const Vec3& _vec) const noexcept;
 
-        Vec3& operator+=(const Vec3& _vec) noexcept;
+		SLDMethod()
+		Vec3& operator+=(const Vec3& _vec) noexcept;
 
-        Vec3& operator-=(const Vec3& _vec) noexcept;
+		SLDMethod()
+		Vec3& operator-=(const Vec3& _vec) noexcept;
 
-        Vec3& operator*=(const Vec3& _vec) noexcept;
+		SLDMethod()
+		Vec3& operator*=(const Vec3& _vec) noexcept;
 
-        Vec3& operator/=(const Vec3& _vec) noexcept;
+		SLDMethod()
+		Vec3& operator/=(const Vec3& _vec) noexcept;
 
-        constexpr Vec3 operator+(float _value) const noexcept;
+		SLDMethod()
+		constexpr Vec3 operator+(float _value) const noexcept;
 
-        constexpr Vec3 operator-(float _value) const noexcept;
+		SLDMethod()
+		constexpr Vec3 operator-(float _value) const noexcept;
 
-        constexpr Vec3 operator*(float _value) const noexcept;
+		SLDMethod()
+		constexpr Vec3 operator*(float _value) const noexcept;
 
-        constexpr Vec3 operator/(float _value) const noexcept;
+		SLDMethod()
+		constexpr Vec3 operator/(float _value) const noexcept;
 
-        Vec3& operator+=(float _value) noexcept;
+		SLDMethod()
+		Vec3& operator+=(float _value) noexcept;
 
-        Vec3& operator-=(float _value) noexcept;
+		SLDMethod()
+		Vec3& operator-=(float _value) noexcept;
 
-        Vec3& operator*=(float _value) noexcept;
+		SLDMethod()
+		Vec3& operator*=(float _value) noexcept;
 
-        Vec3& operator/=(float _value) noexcept;
+		SLDMethod()
+		Vec3& operator/=(float _value) noexcept;
 
-        constexpr Vec3 operator-() noexcept;
+		SLDMethod()
+		constexpr Vec3 operator-() noexcept;
 
 #pragma endregion
 		Vec3_GENERATED

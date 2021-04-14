@@ -10,12 +10,13 @@ namespace Solid
         for (auto entity : entities)
         {
             auto& meshRenderer = ecsManager.GetComponent<MeshRenderer>(entity);
-            if(meshRenderer.mesh == nullptr)
+            auto mesh = meshRenderer.GetMesh();
+            if(mesh == nullptr)
                 continue;
 
             auto transform = ecsManager.GetComponent<Transform>(entity);
 			//meshRenderer.shader->SetMVP(transform,_camera);
-			meshRenderer.mesh->DrawMesh(meshRenderer.materials, transform, _camera);
+			mesh->DrawMesh(meshRenderer.GetMaterials(), transform, _camera);
 
             //_renderer->SetShaderMVP(meshRenderer.shader,transform,_camera);
             //_renderer->DrawMesh(meshRenderer.mesh);

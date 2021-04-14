@@ -41,7 +41,7 @@ void Solid::HierarchyTreeInterface::DrawCreateObject()
         {
             if(UI::MenuItem("GameObject"))
             {
-                Entity tmp = -1;
+                GameObject* tmp = nullptr;
 
                 if (EditorInterface::selectedGO != nullptr)
                     tmp = engine->ecsManager.CreateEntity(EditorInterface::selectedGO->GetEntity());
@@ -49,13 +49,13 @@ void Solid::HierarchyTreeInterface::DrawCreateObject()
                     tmp = engine->ecsManager.CreateEntity();
 
                 engine->ecsManager.AddComponent(tmp,Transform());
-                EditorInterface::selectedGO = engine->ecsManager.GetGameObjectFromEntity(tmp);
+                EditorInterface::selectedGO = tmp;
 
             }
             UI::Separator();
             if(UI::MenuItem("Cube"))
             {
-                Entity tmp = -1;
+                GameObject* tmp = nullptr;
 
                 if (EditorInterface::selectedGO != nullptr)
                     tmp = engine->ecsManager.CreateEntity(EditorInterface::selectedGO->GetEntity());
@@ -66,7 +66,7 @@ void Solid::HierarchyTreeInterface::DrawCreateObject()
                 engine->ecsManager.AddComponent(tmp,MeshRenderer(
                 		engine->graphicsResourceMgr.GetMesh("cube.obj"))
                 );
-                EditorInterface::selectedGO = engine->ecsManager.GetGameObjectFromEntity(tmp);
+                EditorInterface::selectedGO = tmp;
 
             }
             if(UI::MenuItem("Sphere"))
@@ -74,12 +74,12 @@ void Solid::HierarchyTreeInterface::DrawCreateObject()
             }
             if(UI::MenuItem("Solid"))
             {
-                Entity tmp = engine->ecsManager.CreateEntity();
+                GameObject* tmp = engine->ecsManager.CreateEntity();
                 engine->ecsManager.AddComponent(tmp,Transform());
                 engine->ecsManager.AddComponent(tmp,MeshRenderer(
 		                engine->graphicsResourceMgr.GetMesh("solid.obj"))
                 );
-                EditorInterface::selectedGO = engine->ecsManager.GetGameObjectFromEntity(tmp);
+                EditorInterface::selectedGO = tmp;
             }
             UI::EndMenu();
         }
