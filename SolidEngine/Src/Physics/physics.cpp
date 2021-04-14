@@ -36,7 +36,7 @@ namespace Solid
         pxMaterial = pxPhysics->createMaterial(.5f,.5f,.6f);
 
         PxRigidStatic* groundPlane = PxCreatePlane(*pxPhysics,PxPlane(0,1,0,0), *pxMaterial);
-        AddCollider(*groundPlane);
+        pxScene->addActor(*groundPlane);
     }
 
     Physics::~Physics()
@@ -53,11 +53,5 @@ namespace Solid
         pxScene->simulate(_deltaTime);
         pxScene->fetchResults(true);
     }
-
-    void Physics::AddCollider(PxActor& _actor)
-    {
-        pxScene->addActor(_actor);
-    }
-
 } //!namespace
 

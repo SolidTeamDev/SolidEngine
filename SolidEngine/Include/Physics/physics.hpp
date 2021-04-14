@@ -23,7 +23,5 @@ namespace Solid
         ~Physics();
 
         void Update(float _deltaTime);
-
-        void AddCollider(physx::PxActor& _actor);
     };
 }

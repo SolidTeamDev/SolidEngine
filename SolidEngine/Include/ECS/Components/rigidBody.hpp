@@ -11,7 +11,9 @@ namespace Solid
 
         bool enableGravity = true;
         bool isKinematic   = false;
-
+        float mass = 1.f;
+        float drag = 0;
+        float angularDrag = 0.05;
 
         RigidBody() = default;
         ~RigidBody() = default;
