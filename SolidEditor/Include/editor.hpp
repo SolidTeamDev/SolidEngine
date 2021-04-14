@@ -3,8 +3,6 @@
 #include "Core/engine.hpp"
 #include "GameCompiler/gameCompiler.hpp"
 
-#include "ECS/Components/camera.hpp"
-
 namespace Solid
 {
     struct Vec2d;
@@ -40,18 +38,12 @@ namespace Solid
 		    }
 	    }Clean;
 
-        InputManager<int>* editorInputManager = nullptr;
+
         Engine* engine = nullptr;
         GameCompiler* Compiler;
 
-
-        void UpdateEditorCamera(Vec2d mouse_pos);
-        bool MouseInSceneInterface(const Vec2d& mousePos);
     public:
-
-        static float camSpeed;
-        static Framebuffer sceneFramebuffer;
-        static Camera editorCamera;
+        static InputManager<int>* editorInputManager;
 
         Editor();
         ~Editor();
