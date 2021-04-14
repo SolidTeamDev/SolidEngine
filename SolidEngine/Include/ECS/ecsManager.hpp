@@ -10,6 +10,7 @@
 
 namespace Solid
 {
+	struct FromSceneGraphMgr{};
     class SOLID_API ECSManager
     {
     private:
@@ -64,6 +65,16 @@ namespace Solid
 
             sceneGraphManager->GetNodeFromEntity(_entity)->RemoveCurrent();
         }
+
+	    void DestroyEntity(Entity _entity, FromSceneGraphMgr _noDel)
+	    {
+		    entityManager->DestroyEntity(_entity);
+
+		    componentManager->EntityDestroyed(_entity);
+
+		    systemManager->EntityDestroyed(_entity);
+
+	    }
         GameObject* GetGameObjectFromEntity(Entity _e)
         {
             return sceneGraphManager->GetNodeFromEntity(_e);
