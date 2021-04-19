@@ -71,21 +71,21 @@ namespace Solid
 	        {
 		        if(UI::Button("Transform"))
 		        {
-			        engine->ecsManager.AddComponent(gameObject->GetEntity(),Transform());
+			        engine->ecsManager.AddComponent(gameObject,Transform());
 		        }
 	        }
             if(!engine->ecsManager.GotComponent<MeshRenderer>(gameObject->GetEntity()))
             {
                 if(UI::Button("Mesh renderer"))
                 {
-                    engine->ecsManager.AddComponent(gameObject->GetEntity(),MeshRenderer());
+                    engine->ecsManager.AddComponent(gameObject,MeshRenderer());
                 }
             }
             if(!engine->ecsManager.GotComponent<AudioSource>(gameObject->GetEntity()))
             {
                 if(UI::Button("Audio source"))
                 {
-                    engine->ecsManager.AddComponent<AudioSource>(gameObject->GetEntity(),AudioSource());
+                    engine->ecsManager.AddComponent<AudioSource>(gameObject,AudioSource());
                     engine->ecsManager.GetComponent<AudioSource>(gameObject->GetEntity()).Init();
                 }
             }
@@ -128,7 +128,8 @@ namespace Solid
         if(UI::CollapsingHeader("MeshRenderer",ImGuiTreeNodeFlags_DefaultOpen))
         {
             Engine* engine = Engine::GetInstance();
-            const char* meshName = _meshRenderer.mesh == nullptr ? "" : _meshRenderer.mesh->name.c_str();
+            auto mesh = _meshRenderer.GetMesh();
+            const char* meshName = mesh == nullptr ? "" : mesh->name.c_str();
 
             UI::Text("Mesh  ");UI::SameLine();
             if(UI::BeginCombo("##Mesh", meshName))
@@ -140,12 +141,9 @@ namespace Solid
                     bool selected = (meshName == mesh.second->name);
                     if(UI::Selectable(mesh.second->name.c_str(), selected))
                     {
-                        _meshRenderer.mesh = engine->graphicsResourceMgr.GetMesh(mesh.second->name.c_str());
-	                    //_meshRenderer.materials.clear();
-						_meshRenderer.materialSet.clear();
-	                    _meshRenderer.materials.resize(_meshRenderer.mesh->subMeshCount, nullptr);
-                        _meshRenderer.materialSet.insert(_meshRenderer.materials.begin(), _meshRenderer.materials.end());
-                    }
+                        _meshRenderer.SetMesh( engine->graphicsResourceMgr.GetMesh(mesh.second->name.c_str()));
+
+					}
                     if(selected)
                         UI::SetItemDefaultFocus();
                 }
@@ -160,7 +158,7 @@ namespace Solid
 			UI::Indent();
  			if(UI::CollapsingHeader("Materials"))
  			{
-			for(MaterialResource* elt : _meshRenderer.materials)
+			for(MaterialResource* elt : _meshRenderer.GetMaterials())
 			{
 				const char* matName = elt == nullptr ? "DEFAULT MATERIAL" :  elt->name.c_str();
 				UI::Text("Material  ");UI::SameLine();
@@ -172,9 +170,7 @@ namespace Solid
 						if(UI::Selectable("DEFAULT MATERIAL", selected))
 						{
 
-							_meshRenderer.materials.at(i) = nullptr;
-							_meshRenderer.materialSet.clear();
-							_meshRenderer.materialSet.insert(_meshRenderer.materials.begin(), _meshRenderer.materials.end());
+							_meshRenderer.SetMaterialAt(i, nullptr);
 						}
 						if(selected)
 							UI::SetItemDefaultFocus();
@@ -184,10 +180,7 @@ namespace Solid
 						bool selected = (matName == mat.second->name);
 						if(UI::Selectable(mat.second->name.c_str(), selected))
 						{
-
-							_meshRenderer.materials.at(i) = (MaterialResource*)mat.second;
-							_meshRenderer.materialSet.clear();
-							_meshRenderer.materialSet.insert(_meshRenderer.materials.begin(), _meshRenderer.materials.end());
+							_meshRenderer.SetMaterialAt(i, (MaterialResource*)mat.second);
 						}
 						if(selected)
 							UI::SetItemDefaultFocus();
@@ -200,7 +193,7 @@ namespace Solid
 			}
 			i = 0;
 
-			for(MaterialResource* elt : _meshRenderer.materialSet)
+			for(MaterialResource* elt : _meshRenderer.GetMaterialSet())
 	        {
 		        std::string matName = elt == nullptr ? "DEFAULT Name" :  elt->name;
 	        	if(UI::CollapsingHeader((matName + "##" + std::to_string(i)).c_str()))

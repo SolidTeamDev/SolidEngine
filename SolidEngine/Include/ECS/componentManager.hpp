@@ -70,15 +70,15 @@ namespace Solid
         }
 
         template<typename T>
-        void AddComponent(Entity _entity, T _component)
+        Components* AddComponent(Entity _entity, T _component)
         {
-            GetComponentArray<T>()->InsertData(_entity, _component);
+           return GetComponentArray<T>()->InsertData(_entity, _component);
         }
 
         template<typename T>
-        void RemoveComponent(Entity _entity)
+        Components* RemoveComponent(Entity _entity)
         {
-            GetComponentArray<T>()->RemoveData(_entity);
+            return GetComponentArray<T>()->RemoveData(_entity);
         }
 
         template<typename T>

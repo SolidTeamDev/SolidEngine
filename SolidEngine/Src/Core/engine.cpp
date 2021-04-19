@@ -11,6 +11,7 @@
 #include "ECS/Components/rigidBody.hpp"
 #include "ECS/Components/script.hpp"
 #include "ECS/Components/audioSource.hpp"
+#include "Refureku/Refureku.h"
 
 namespace Solid
 {
@@ -19,6 +20,7 @@ namespace Solid
             threadPool(&taskManager),
             resourceManager(this)
     {
+
         InitEcs();
     }
 

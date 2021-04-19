@@ -58,7 +58,7 @@ namespace Solid
         Mat4<float> projMat = sceneCam.GetProjection();
 
         GameObject* go = EditorInterface::selectedGO;
-        if (go != nullptr)
+        if (go != nullptr && engine->ecsManager.GotComponent<Transform>(go->GetEntity()))
         {
             Mat4<float> transMat = engine->ecsManager.GetComponent<Transform>(go->GetEntity()).GetMatrix();
 

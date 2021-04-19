@@ -26,7 +26,7 @@ namespace Solid
 		IMesh(uint _count):subMeshCount(_count){}
 		~IMesh() = default;
 		virtual void DrawMesh() = 0;
-		virtual void DrawMesh(std::vector<MaterialResource *>& _list, Transform& _tr, Camera& _cam) = 0;
+		virtual void DrawMesh(const std::vector<MaterialResource *>& _list, Transform& _tr, Camera& _cam) = 0;
 
 	};
 

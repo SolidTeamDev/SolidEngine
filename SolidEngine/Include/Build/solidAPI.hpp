@@ -9,3 +9,4 @@
 #endif
 using uint = unsigned int ;
 #include "EngineGenerated/EntityMacros.h"
+#include "Core/std_wrapper.hpp"

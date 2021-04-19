@@ -17,6 +17,7 @@
 #include "Resources/graphicalResourceMgr.hpp"
 
 #include "Physics/physics.hpp"
+#include "std_wrapper.hpp"
 
 namespace Solid
 {

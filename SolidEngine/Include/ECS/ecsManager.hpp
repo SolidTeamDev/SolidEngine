@@ -10,6 +10,7 @@
 
 namespace Solid
 {
+	struct FromSceneGraphMgr{};
     class SOLID_API ECSManager
     {
     private:
@@ -27,32 +28,31 @@ namespace Solid
             sceneGraphManager = std::make_unique<SceneGraphManager>();
         }
 
-        Entity CreateEntity()
+        GameObject* CreateEntity()
         {
             Entity temp = entityManager->CreateEntity();
-            sceneGraphManager->GetWorld()->AddToCurrent(temp);
-            return temp;
+
+            return sceneGraphManager->GetWorld()->AddToCurrent(temp);
         }
 
-        Entity CreateEntity(Entity _parent)
+	    GameObject* CreateEntity(Entity _parent)
         {
             Entity temp = entityManager->CreateEntity();
-            sceneGraphManager->GetNodeFromEntity(_parent)->AddToCurrent(temp);
-            return temp;
+            return sceneGraphManager->GetNodeFromEntity(_parent)->AddToCurrent(temp);
         }
-	    Entity CreateEntity(std::string _name)
+	    GameObject* CreateEntity(std::string _name)
 	    {
 		    Entity temp = entityManager->CreateEntity();
 		    GameObject* obj =sceneGraphManager->GetWorld()->AddToCurrent(temp);
 		    obj->name = _name;
-		    return temp;
+		    return obj;
 	    }
-	    Entity CreateEntity(std::string _name,Entity _parent)
+	    GameObject* CreateEntity(std::string _name,Entity _parent)
 	    {
 		    Entity temp = entityManager->CreateEntity();
 		    GameObject* obj = sceneGraphManager->GetNodeFromEntity(_parent)->AddToCurrent(temp);
 		    obj->name = _name;
-		    return temp;
+		    return obj;
 	    }
 
         void DestroyEntity(Entity _entity)
@@ -65,6 +65,16 @@ namespace Solid
 
             sceneGraphManager->GetNodeFromEntity(_entity)->RemoveCurrent();
         }
+
+	    void DestroyEntity(Entity _entity, FromSceneGraphMgr _noDel)
+	    {
+		    entityManager->DestroyEntity(_entity);
+
+		    componentManager->EntityDestroyed(_entity);
+
+		    systemManager->EntityDestroyed(_entity);
+
+	    }
         GameObject* GetGameObjectFromEntity(Entity _e)
         {
             return sceneGraphManager->GetNodeFromEntity(_e);
@@ -81,33 +91,44 @@ namespace Solid
         }
 
         template<typename T>
-        void AddComponent(Entity _entity, T _component)
+        T* AddComponent(GameObject* _entity, T _component)
         {
-            componentManager->AddComponent<T>(_entity,_component);
-
-            auto signature = entityManager->GetSignature(_entity);
+        	//HERE
+            Components* c =componentManager->AddComponent<T>(_entity->GetEntity(),_component);
+			_entity->compsList.push_back(c);
+            auto signature = entityManager->GetSignature(_entity->GetEntity());
             signature.set(componentManager->GetComponentType<T>(), true);
-            entityManager->SetSignature(_entity,signature);
+            entityManager->SetSignature(_entity->GetEntity(),signature);
 
-            systemManager->EntitySignatureChanged(_entity,signature);
+            systemManager->EntitySignatureChanged(_entity->GetEntity(),signature);
+            return (T*)c;
         }
 
         template<typename T>
-        void RemoveComponent(Entity _entity)
+        void RemoveComponent(GameObject* _entity)
         {
-            componentManager->RemoveComponent<T>(_entity);
+            Components* c =componentManager->RemoveComponent<T>(_entity);
+	        for (auto it= _entity->compsList.begin(); it != _entity->compsList.end(); ++it)
+	        {
+		        if(*it == c)
+		        {
+		        	_entity->compsList.erase(it);
+		        	break;
+		        }
+	        }
 
-            auto signature = entityManager->GetSignature(_entity);
+            auto signature = entityManager->GetSignature(_entity->GetEntity());
             signature.set(componentManager->GetComponentType<T>(), false);
-            entityManager->SetSignature(_entity,signature);
+            entityManager->SetSignature(_entity->GetEntity(),signature);
 
-            systemManager->EntitySignatureChanged(_entity,signature);
+            systemManager->EntitySignatureChanged(_entity->GetEntity(),signature);
         }
 
         template<typename T>
         T& GetComponent(Entity _entity)
         {
             return componentManager->GetComponent<T>(_entity);
+
         }
 
         template<typename T>

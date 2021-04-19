@@ -17,7 +17,8 @@ toParseDirectories = [
 
 # Files to parse which are not included in any directory of toParseDirectories
 toParseFiles = [
-    #'''SolidEngine/Include/ECS/Components/script.hpp'''
+    '''SolidEngine/Include/ECS/types.hpp''',
+    '''SolidEngine/Include/Core/std_wrapper.hpp''',
 ]
 
 # Files contained in the directories of this list will be ignored
