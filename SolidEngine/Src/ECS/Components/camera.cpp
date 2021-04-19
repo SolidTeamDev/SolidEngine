@@ -28,4 +28,20 @@ namespace Solid
         view       = transform.GetMatrix();
         projection = Mat4<>::Perspective(fov,(float)_spaceScreen.x / (float)_spaceScreen.y,near,far);
     }
+
+    void Camera::RotateCamera(float xoffset, float yoffset)
+    {
+        xoffset *= MouseSensitivity;
+        yoffset *= MouseSensitivity;
+
+        RightAngle += xoffset;
+        UpAngle += yoffset;
+
+        Quat aroundY = Quat(-Maths::DegToRad(RightAngle),Vec3::Up);
+        Quat aroundX = Quat(-Maths::DegToRad(UpAngle),Vec3::Right);
+
+        Quat Orientation = aroundY * aroundX;
+        transform.Rotate(Orientation.Inverse());
+
+    }
 } //!namespace

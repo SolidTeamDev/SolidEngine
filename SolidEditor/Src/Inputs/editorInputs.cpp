@@ -11,6 +11,8 @@ namespace Solid
         _inputManager->AddKeyInput(EInputList::RIGHT,GLFW_KEY_D,ImEnumDetectionType::PRESSED);
         _inputManager->AddKeyInput(EInputList::UP,GLFW_KEY_SPACE,ImEnumDetectionType::PRESSED);
         _inputManager->AddKeyInput(EInputList::DOWN,GLFW_KEY_LEFT_ALT,ImEnumDetectionType::PRESSED);
+        _inputManager->AddKeyInput(EInputList::UpCam,GLFW_KEY_U,ImEnumDetectionType::PRESSED);
+
         _inputManager->AddMouseInput(EInputList::Mouse0,GLFW_MOUSE_BUTTON_1,ImEnumDetectionType::PRESSED);
 
     }

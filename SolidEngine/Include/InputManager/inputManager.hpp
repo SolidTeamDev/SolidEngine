@@ -253,7 +253,11 @@ namespace Solid
             return pos;
         }
         #endif
-        
+
+        void SetCursorPos(double _posx, double _posy)
+        {
+            glfwSetCursorPos(window,_posx,_posy);
+        }
         /**
          * @brief Set the specified axis value of the specified joystick id in _pos
          * 
@@ -331,6 +335,8 @@ namespace Solid
             
             return hats[_hatId];
         }
+
+
     };
 
 } //!namespace

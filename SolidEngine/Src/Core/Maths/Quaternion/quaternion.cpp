@@ -50,22 +50,18 @@ namespace Solid
 
     Quat::Quat(float _angle, const Vec3& _axis) noexcept
     {
-        _angle = Maths::DegToRad(_angle)/2.f;
+        float _angleRad = Maths::DegToRad(_angle)*0.5f;
 
-        w = Maths::Cos(_angle);
+        Vec3 vn = _axis;
+        float sinAngle = sin(_angleRad);
 
         if(!_axis.IsNormalized())
-        {
-            Vec3 vn = _axis.GetNormalized();
-            x = vn.x * Maths::Sin(_angle);
-            y = vn.y * Maths::Sin(_angle);
-            z = vn.z * Maths::Sin(_angle);
-            return;
-        }
+            vn = _axis.GetNormalized();
 
-        x = _axis.x * Maths::Sin(_angle);
-        y = _axis.y * Maths::Sin(_angle);
-        z = _axis.z * Maths::Sin(_angle);
+        w = Maths::Cos(_angleRad);
+        x = vn.x * sinAngle;
+        y = vn.y * sinAngle;
+        z = vn.z * sinAngle;
     }
 #pragma endregion
 #pragma region Static Methods
@@ -76,10 +72,10 @@ namespace Solid
 
     constexpr float Quat::Dot(const Quat &_q1, const Quat &_q2) noexcept
     {
-        return _q1.w * _q1.w +
-               _q1.x * _q1.x +
-               _q1.y * _q1.y +
-               _q1.z * _q1.z;
+        return (_q1.w * _q2.w) +
+               (_q1.x * _q2.x) +
+               (_q1.y * _q2.y) +
+               (_q1.z * _q2.z);
     }
 
     Quat Quat::Lerp(const Quat &_q1, const Quat &_q2, float _r) noexcept

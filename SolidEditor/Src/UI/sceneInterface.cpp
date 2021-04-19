@@ -81,8 +81,20 @@ namespace Solid
         Vec2d mousePos{};
         Editor::editorInputManager->GetCursorPos(mousePos.x,mousePos.y);
 
+        if(prevMousePos.IsEquals(Vec2::Zero))
+            prevMousePos = Vec2(mousePos.x,mousePos.y);
+
+
         if(UI::IsWindowFocused() && MouseInSceneInterface(mousePos))
-            MovementAndRotationCam(mousePos);
+        {
+            sceneCam.UpdateCamera(sceneFramebuffer.size);
+            std::cout << "xoffset:" << mousePos.x-prevMousePos.x << std::endl;
+            std::cout << "yoffset:" << mousePos.y-prevMousePos.y << std::endl;
+            sceneCam.RotateCamera((mousePos.x - engine->window->GetWindowSize().x*0.5)* Time::DeltaTime()
+                                  ,(mousePos.y - engine->window->GetWindowSize().y*0.5)* Time::DeltaTime());
+
+        }
+        prevMousePos = Vec2(mousePos.x,mousePos.y);
 
         engine->renderer->BeginFramebuffer(sceneFramebuffer);
         engine->renderer->ClearColor({0.f,0.f,0.f,1});
@@ -127,6 +139,8 @@ namespace Solid
             && mousePos.y >= sceneFramebuffer.pos.y
             && mousePos.y < sceneFramebuffer.pos.y + sceneFramebuffer.size.y)
         {
+            Editor::editorInputManager->SetCursorPos(engine->window->GetWindowSize().x*0.5,
+                                                     engine->window->GetWindowSize().y*0.5);
             return true;
         }
         else
@@ -153,6 +167,9 @@ namespace Solid
         //Rotation camera
 
         Vec3 rot = sceneCamT.GetRotation().ToEuler();
+        //sceneCam.RotateCamera(mousePos.x-prevMousePos.x, mousePos.y-prevMousePos.x);
+        if(Editor::editorInputManager->IsPressed(EInputList::UpCam))
+            sceneCam.transform.Rotate(Quat(0.3571776, 0.0714355, 0.2143066, 0.9063078));
 
 
         //Movement camera
@@ -184,6 +201,7 @@ namespace Solid
         sceneCamT.Translate(Vec3(cos(rot.y)  * strafeVelocity,
                                  0,
                                  sin(rot.y)  * strafeVelocity));
+
     }
 
 

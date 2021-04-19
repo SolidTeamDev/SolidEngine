@@ -17,6 +17,7 @@ namespace Solid
         bool p_open = true;
         inline const Framebuffer& getSceneFrameBuffer() {return sceneFramebuffer;};
 
+        Vec2 prevMousePos = Vec2::Zero;
     private:
 
 
