@@ -3,10 +3,9 @@
 #include "Core/engine.hpp"
 #include "GameCompiler/gameCompiler.hpp"
 
-#include "ECS/Components/camera.hpp"
-
 namespace Solid
 {
+    struct Vec2d;
 	class SOLID_API EngineCleanerInterface
 	{
 	protected:
@@ -39,17 +38,12 @@ namespace Solid
 		    }
 	    }Clean;
 
-        InputManager<int>* editorInputManager = nullptr;
+
         Engine* engine = nullptr;
         GameCompiler* Compiler;
 
-
-        void UpdateEditorCamera();
     public:
-
-        static float camSpeed;
-        static Framebuffer sceneFramebuffer;
-        static Camera editorCamera;
+        static InputManager<int>* editorInputManager;
 
         Editor();
         ~Editor();

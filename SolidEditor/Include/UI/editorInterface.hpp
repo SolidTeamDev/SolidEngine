@@ -1,8 +1,10 @@
 #pragma once
 
+
 #include "Window/window.hpp"
 #include <imgui.h>
 
+#include "Core/engine.hpp"
 #include "UI/playInterface.hpp"
 #include "UI/filesInterface.hpp"
 #include "UI/sceneInterface.hpp"
@@ -22,6 +24,7 @@ namespace Solid
 
 
         Window*     window;
+        Renderer*   renderer;
         ImGuiStyle& editorStyle;
 
         //All interfaces
@@ -34,7 +37,7 @@ namespace Solid
 
     public:
         EditorInterface();
-        explicit EditorInterface(Window* window);
+        explicit EditorInterface(Window* window, Renderer* renderer);
 
         ~EditorInterface() = default;
 

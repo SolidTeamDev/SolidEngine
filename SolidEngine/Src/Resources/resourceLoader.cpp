@@ -631,7 +631,8 @@ Resource *ResourcesLoader::LoadAudio(const fs::path &Rpath)
 	err = alGetError();
 	if (err != AL_NO_ERROR)
 	{
-		std::cout << "OpenAL Error : " << alGetString(err) << std::endl;
+	    if(alGetString(err))
+		    std::cout << "OpenAL Error : " << alGetString(err) << std::endl;
 		if (buff && alIsBuffer(buff))
 			alDeleteBuffers(1, &buff);
 		return nullptr;
