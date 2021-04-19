@@ -89,6 +89,14 @@ namespace Solid
                     engine->ecsManager.GetComponent<AudioSource>(gameObject->GetEntity()).Init();
                 }
             }
+            if(!engine->ecsManager.GotComponent<RigidBody>(gameObject->GetEntity()))
+            {
+                if(UI::Button("RigidBody"))
+                {
+                    engine->ecsManager.AddComponent<RigidBody>(gameObject,RigidBody());
+                    gameObject->physicsActor = engine->physics.CreateDynamic(Transform(Vec3(0,10,0),Quat(),0));
+                }
+            }
             UI::EndPopup();
         }
 

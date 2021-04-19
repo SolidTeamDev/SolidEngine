@@ -12,6 +12,7 @@ namespace Solid
     transMat(Mat4<>::Identity),
     position(_position),
     rotation(_rotation),
+    euler(Maths::RadToDeg(rotation.ToEuler())),
     scale(_scale)
     {}
 

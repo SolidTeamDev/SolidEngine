@@ -14,8 +14,11 @@ namespace Solid SLDNamespace()
         bool enableGravity = true;
         SLDField()
     	bool isKinematic   = false;
+        SLDField()
         float mass = 1.f;
+        SLDField()
         float drag = 0;
+        SLDField()
         float angularDrag = 0.05;
 
         RigidBody() = default;

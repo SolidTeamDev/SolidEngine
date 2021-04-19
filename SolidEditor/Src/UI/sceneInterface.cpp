@@ -44,6 +44,7 @@ namespace Solid
         sceneFramebuffer.pos = {(int)(UI::GetWindowPos().x - UI::GetMainViewport()->Pos.x) ,
                                 (int)(UI::GetWindowPos().y -UI::GetMainViewport()->Pos.y + 42)};
 
+
         DrawScene();
         UI::Image((ImTextureID)(size_t)sceneFramebuffer.texture,windowSize,ImVec2{0,1},ImVec2{1,0});
 

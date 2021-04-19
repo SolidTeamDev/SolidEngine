@@ -4,6 +4,7 @@
 #include "ECS/Components/transform.hpp"
 #include "ECS/Components/meshRenderer.hpp"
 #include "ECS/Components/audioSource.hpp"
+#include "ECS/Components/rigidBody.hpp"
 #include <string>
 
 namespace Solid

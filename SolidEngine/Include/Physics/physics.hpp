@@ -1,10 +1,19 @@
 #pragma once
 
+#include "Build/solidAPI.hpp"
+
+#include "ECS/Components/transform.hpp"
 #include <PxPhysicsAPI.h>
 
 namespace Solid
 {
-    class Physics
+    enum class PhysicsActorType
+    {
+        STATIC,
+        DYNAMIC
+    };
+
+    class SOLID_API Physics
     {
     private:
         static physx::PxDefaultErrorCallback gDefaultErrorCallback;
@@ -22,6 +31,14 @@ namespace Solid
         Physics();
         ~Physics();
 
-        void Update(float _deltaTime);
+        Transform GetTransform(physx::PxActor* _actor) const;
+        void SetTransform(physx::PxActor* _actor, const Transform& _transform) const;
+
+        void Update(float _deltaTime) const;
+
+        physx::PxRigidDynamic* CreateDynamic(const Transform& _transform);
+        physx::PxRigidStatic* CreateStatic();
+        void ConvertActor(physx::PxActor* _actor, const PhysicsActorType& _actorType);
     };
+
 }
