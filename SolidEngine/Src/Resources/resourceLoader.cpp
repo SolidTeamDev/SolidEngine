@@ -98,7 +98,10 @@ void  ResourcesLoader::LoadRessourceNoAdd(const fs::path &Rpath, ResourcePtrWrap
     else if(extension == ".obj")
         r=LoadMesh(Rpath);
     else if(extension == ".fbx")
-        r=LoadMesh(Rpath);
+    {
+	    LoadFBX(Rpath, &wrapper.fbx);
+	    wrapper.isFBX = true;
+    }
 
 
     wrapper.r = r;
@@ -109,6 +112,11 @@ void ResourcesLoader::LoadRessource(const fs::path &Rpath)
     LoadRessourceNoAdd(Rpath, RWrapper);
     if(RWrapper.r != nullptr)
         Manager->AddResource(RWrapper.r);
+    if(RWrapper.isFBX)
+    {
+    	Manager->AddResource(RWrapper.fbx.mesh);
+
+    }
 }
 
 
@@ -252,6 +260,9 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
                     if(RessourceArray[k].r!= nullptr) {
                         Manager->AddResource(RessourceArray[k].r);
                     }
+	                else if(RessourceArray[k].isFBX) {
+	                	Manager->AddResource(RessourceArray[k].fbx.mesh);
+	                }
                 }
             }
         }
@@ -325,6 +336,127 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 ///
 /// Base Asset Loader
 ///
+
+void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
+{
+	MeshResource *Mesh = new MeshResource;
+	bool hasFoundSkeleton = false;
+	SkeletonResource* Skeleton = new SkeletonResource;
+	Assimp::Importer importer;
+	std::string str = Rpath.string();
+	Mesh->name = Rpath.filename().string();
+	importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_ANIMATIONS, true);
+
+
+	const aiScene *scene = importer.ReadFile(str, aiProcess_JoinIdenticalVertices | aiProcess_OptimizeMeshes |
+	                                              aiProcess_SplitLargeMeshes | aiProcess_Triangulate |
+	                                              aiProcess_SortByPType | aiProcess_LimitBoneWeights   );
+
+	if (!scene)
+	{
+		printf("Unable to load FBX: %s\n", importer.GetErrorString());
+		delete Mesh;
+		return;
+	}
+	for (int i = 0; i < scene->mNumAnimations; ++i)
+	{
+		AnimResource* anim = new AnimResource;
+		fbx->anims.push_back(anim);
+		;
+	}
+	for (int i = 0; i < scene->mNumMeshes; ++i)
+	{
+		if(!hasFoundSkeleton)
+		{
+			if(scene->mMeshes[i]->HasBones())
+			{
+				hasFoundSkeleton=true;
+
+				auto skelRoot = scene->mRootNode->FindNode(scene->mMeshes[i]->mBones[0]->mName);
+
+
+				std::function<void(SkeletonResource::Bone*, aiNode*)> lambda = [&](SkeletonResource::Bone* _bone, aiNode* _aiNode){
+
+					_bone->name = _aiNode->mName.C_Str();
+
+					_bone->Childrens.reserve(_aiNode->mNumChildren);
+					for (int j = 0; j < _aiNode->mNumChildren; ++j)
+					{
+						SkeletonResource::Bone* cBone = new SkeletonResource::Bone;
+						_bone->Childrens.push_back(cBone);
+						cBone->Parent = _bone;
+						lambda(cBone, _aiNode->mChildren[j]);
+
+					}
+				};
+				std::function<bool(SkeletonResource::Bone*, aiBone*)> setWeights = [&](SkeletonResource::Bone* _bone, aiBone* _aiBone)-> bool{
+
+					if(_bone->name == _aiBone->mName.C_Str())
+					{
+						_bone->Weights.reserve(_aiBone->mNumWeights);
+						_bone->transfo =
+								Mat4<float>(_aiBone->mOffsetMatrix.a1, _aiBone->mOffsetMatrix.a2, _aiBone->mOffsetMatrix.a3, _aiBone->mOffsetMatrix.a4,
+								            _aiBone->mOffsetMatrix.b1, _aiBone->mOffsetMatrix.b2, _aiBone->mOffsetMatrix.b3, _aiBone->mOffsetMatrix.b4,
+								            _aiBone->mOffsetMatrix.c1, _aiBone->mOffsetMatrix.c2, _aiBone->mOffsetMatrix.c3, _aiBone->mOffsetMatrix.c4,
+								            _aiBone->mOffsetMatrix.d1, _aiBone->mOffsetMatrix.d2, _aiBone->mOffsetMatrix.d3, _aiBone->mOffsetMatrix.d4);
+						///WARN : trasfo matrix of aiBone and ai node *=-1 ?
+						for (int j = 0; j < _aiBone->mNumWeights; ++j)
+						{
+							_bone->Weights.push_back(_aiBone->mWeights[j].mWeight);
+						}
+						return true;
+					}
+
+					for (auto & Children : _bone->Childrens)
+					{
+
+						if(setWeights(Children, _aiBone))
+						{
+							return true;
+						}
+					}
+					return false;
+				};
+				lambda(&Skeleton->rootBone, skelRoot);
+
+
+
+				for (int l = 0; l < scene->mMeshes[i]->mNumBones; ++l)
+				{
+					aiBone* bone = scene->mMeshes[i]->mBones[l];
+					setWeights(&Skeleton->rootBone, bone);
+				}
+				///load bones
+			}
+		}
+		int numIndices = 3 * scene->mMeshes[i]->mNumFaces;
+		MeshResource::SubMesh &Sub = Mesh->Meshes.emplace_back();
+		Sub.indices.resize(numIndices);
+		Sub.vertices.resize(scene->mMeshes[i]->mNumVertices);
+
+		std::uint32_t WritePos = 0;
+		for (int j = 0; j < scene->mMeshes[i]->mNumFaces; ++j)
+		{
+			std::uint32_t size = scene->mMeshes[i]->mFaces[j].mNumIndices * sizeof(unsigned int);
+			std::memcpy(&(Sub.indices[WritePos]), scene->mMeshes[i]->mFaces[j].mIndices, size);
+			WritePos += scene->mMeshes[i]->mFaces[j].mNumIndices;
+		}
+
+
+		for (int j = 0; j < scene->mMeshes[i]->mNumVertices; ++j)
+		{
+			if (scene->mMeshes[i]->HasPositions())
+				std::memcpy(&(Sub.vertices[j].Pos), &(scene->mMeshes[i]->mVertices[j]), 3 * sizeof(float));
+			if (scene->mMeshes[i]->HasNormals())
+				std::memcpy(&(Sub.vertices[j].Normal), &(scene->mMeshes[i]->mNormals[j]), 3 * sizeof(float));
+			if (scene->mMeshes[i]->mTextureCoords[0] != nullptr)
+				std::memcpy(&(Sub.vertices[j].TexCoords), &(scene->mMeshes[i]->mTextureCoords[0][j].x),
+				            2 * sizeof(float));
+		}
+		fbx->mesh = Mesh;
+		fbx->Skeleton = Skeleton;
+	}
+}
 
 Resource * ResourcesLoader::LoadImage(const fs::path &Rpath)
 {
@@ -852,3 +984,5 @@ Resource *ResourcesLoader::LoadSolidAudio(const fs::path &Rpath)
 	audio->audioRawBinary.reserve(0);
 	return audio;
 }
+
+

@@ -8,6 +8,7 @@
 #include <sndfile.h>
 
 #include "Core/Maths/solidVector.hpp"
+#include "Core/Maths/Matrix/matrix4.hpp"
 #include "json.hpp"
 #include "AL/alc.h"
 #include "AL/al.h"
@@ -37,6 +38,7 @@ namespace Solid {
         Material,
         Scene,
         Audio,
+        Skeleton,
         NONE,
     };
 
@@ -142,6 +144,29 @@ namespace Solid {
 
         }
     };
+
+	class SOLID_API SkeletonResource : public Resource
+	{
+	public:
+		struct Bone
+		{
+			std::string name;
+			Bone* Parent;
+			std::vector<Bone*> Childrens;
+			std::vector<float> Weights;
+			Mat4<float> transfo;
+
+		}rootBone;
+		SkeletonResource()
+		{
+			type = EResourceType::Anim;
+		}
+
+		~SkeletonResource()
+		{
+
+		}
+	};
 
     class SOLID_API ShaderResource : public Resource
     {

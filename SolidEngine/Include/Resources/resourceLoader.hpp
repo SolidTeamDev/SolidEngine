@@ -7,10 +7,18 @@
 namespace fs = std::filesystem;
 namespace Solid
 {
+	struct SOLID_API FBXWrapper
+	{
+		MeshResource* mesh;
+		SkeletonResource* Skeleton;
+		std::vector<AnimResource*> anims;
 
+	};
     struct SOLID_API ResourcePtrWrapper
     {
         Resource* r;
+        bool isFBX = false;
+	    FBXWrapper fbx;
     };
 
     class SOLID_API ResourcesLoader
@@ -32,6 +40,8 @@ namespace Solid
         Resource * LoadSolidMaterial(const fs::path& Rpath);
 	    Resource * LoadSolidAnim(const fs::path& Rpath);
 	    Resource * LoadSolidAudio(const fs::path& Rpath);
+	    void LoadFBX(const fs::path& Rpath, FBXWrapper* fbx);
+
 
 
 

@@ -38,7 +38,7 @@ file(GLOB ENGINE_LIBS_DEBUG
 file(GLOB ENGINE_LIBS_RELEASE
         SolidEngine/ThirdParty/Lib/Release/*.lib)
 
-#set(ENGINE_LIBS PUBLIC glfw3dll OpenGL::GL assimp-vc142-mtd IrrXML zlibstaticd)
+#set(ENGINE_LIBS PUBLIC glfw3dll OpenGL::GL assimp-vc140-mtd IrrXML zlibstaticd)
 
 add_library(SolidEngine SHARED ${ENGINE_SOURCE_FILES} ${THIRD_PARTY_FILES})
 

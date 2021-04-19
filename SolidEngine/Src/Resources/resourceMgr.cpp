@@ -62,6 +62,9 @@ void ResourceManager::AddResource(Resource *r)
 		case EResourceType::Audio:
 			AudioList.List.emplace(r->name, r);
 			break;
+		case EResourceType::Skeleton:
+			SkeletonList.List.emplace(r->name, r);
+			break;
 		default:
 			ThrowError("Type Not Stored", ESolidErrorCode::S_INIT_ERROR);
 			break;

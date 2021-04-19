@@ -41,7 +41,8 @@ namespace Solid
 
         ResourceList<ImageResource>          ImageList;
         ResourceList<MeshResource>           MeshList;
-        ResourceList<AnimResource>           AnimList;
+	    ResourceList<AnimResource>           AnimList;
+	    ResourceList<SkeletonResource>       SkeletonList;
         ResourceList<ShaderResource>         ShaderList;
         ResourceList<ComputeShaderResource>  ComputeList;
 	    ResourceList<MaterialResource>       MaterialList;
@@ -139,6 +140,9 @@ namespace Solid
 		        case EResourceType::Audio:
                     return &AudioList.List;
                     break;
+			    case EResourceType::Skeleton:
+				    return &SkeletonList.List;
+				    break;
 			    default:
 				    ThrowError("Type Not Stored", ESolidErrorCode::S_INIT_ERROR);
 				    return nullptr;
