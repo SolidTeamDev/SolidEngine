@@ -89,21 +89,26 @@ namespace Solid
         pxScene->fetchResults(true);
     }
 
-    physx::PxRigidDynamic *Physics::CreateDynamic(const Transform& _transform)
+    physx::PxRigidDynamic* Physics::CreateDynamic(const Transform& _transform)
     {
         Vec3 pos = _transform.GetPosition();
         Quat rot = _transform.GetRotation();
         PxTransform pxT = PxTransform(PxVec3(pos.x,pos.y,pos.z),PxQuat(rot.x,rot.y,rot.z,rot.w));
-        PxRigidDynamic* dynamicActor = PxCreateDynamic(*pxPhysics,pxT,PxBoxGeometry(1,1,1),*pxMaterial, 10.0f);
-
+        PxRigidDynamic* dynamicActor = pxPhysics->createRigidDynamic(pxT);
         pxScene->addActor(*dynamicActor);
 
         return dynamicActor;
     }
 
-    physx::PxRigidStatic *Physics::CreateStatic()
+    physx::PxRigidStatic* Physics::CreateStatic(const Transform& _transform)
     {
-        return nullptr;
+        Vec3 pos = _transform.GetPosition();
+        Quat rot = _transform.GetRotation();
+        PxTransform pxT = PxTransform(PxVec3(pos.x,pos.y,pos.z),PxQuat(rot.x,rot.y,rot.z,rot.w));
+        PxRigidStatic* staticActor = pxPhysics->createRigidStatic(pxT);
+        pxScene->addActor(*staticActor);
+
+        return staticActor;
     }
 
     //TODO: TEST THIS
@@ -135,10 +140,12 @@ namespace Solid
                     pxScene->removeActor(*staticActor);
                     staticActor->release();
                     // Create
-                    dynamicActor = PxCreateDynamic(*pxPhysics, pxT, *shapeList[0], 10.0f);
+                    dynamicActor = pxPhysics->createRigidDynamic(pxT);
                     // Restore
                     for (size_t i = 1; i < nbShape; ++i)
                         dynamicActor->attachShape(*shapeList[i]);
+
+                    staticActor->release();
 
                     _actor = dynamicActor;
 
@@ -162,12 +169,11 @@ namespace Solid
 
                     pxScene->removeActor(*dynamicActor);
 
-                    staticActor = PxCreateStatic(*pxPhysics, pxT, *shapeList[0]);
+                    staticActor = pxPhysics->createRigidStatic(pxT);
 
                     for (size_t i = 1; i < nbShape; ++i)
-                    {
                         staticActor->attachShape(*shapeList[i]);
-                    }
+
                     dynamicActor->release(); ///WARN; maybe Pointer Data Lost For Shape
 
                     _actor = staticActor;

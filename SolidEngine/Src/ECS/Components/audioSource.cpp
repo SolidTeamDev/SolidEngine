@@ -31,7 +31,12 @@ namespace Solid
 	        alSourcei(sourceID, AL_BUFFER, audioResource->buffer);
         ALenum error = alGetError();
         if(error != AL_NO_ERROR)
-            Log::Send(alGetString(error), Log::ELogSeverity::ERROR);
+        {
+            const char * str =alGetString(error);
+            if(str != nullptr)
+                Log::Send(str, Log::ELogSeverity::ERROR);
+        }
+
 
         isInit = true;
     }

@@ -24,6 +24,7 @@ namespace Solid
             Transform& transform = ecsManager.GetComponent<Transform>(entity);
             RigidBody& rigidbody = ecsManager.GetComponent<RigidBody>(entity);
             GameObject* go = ecsManager.GetGameObjectFromEntity(entity);
+
             Vec3 scale = transform.GetScale();
             transform = _physics.GetTransform(go->physicsActor);
             transform.SetScale(scale);

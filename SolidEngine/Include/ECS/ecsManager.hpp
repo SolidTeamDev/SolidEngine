@@ -101,6 +101,7 @@ namespace Solid
             entityManager->SetSignature(_entity->GetEntity(),signature);
 
             systemManager->EntitySignatureChanged(_entity->GetEntity(),signature);
+            c->Init();
             return (T*)c;
         }
 

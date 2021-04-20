@@ -37,7 +37,7 @@ namespace Solid
         void Update(float _deltaTime) const;
 
         physx::PxRigidDynamic* CreateDynamic(const Transform& _transform);
-        physx::PxRigidStatic* CreateStatic();
+        physx::PxRigidStatic* CreateStatic(const Transform& _transform);
         void ConvertActor(physx::PxActor* _actor, const PhysicsActorType& _actorType);
     };
 

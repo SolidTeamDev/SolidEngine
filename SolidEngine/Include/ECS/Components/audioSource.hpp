@@ -43,7 +43,7 @@ namespace Solid SLDNamespace()
         AudioSource() = default;
         ~AudioSource();
         SLDMethod()
-        void Init();
+        void Init() override;
 	    SLDMethod()
         void SetAudio(AudioResource* _audioResource);
 	    SLDMethod()

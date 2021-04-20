@@ -86,7 +86,6 @@ namespace Solid
                 if(UI::Button("Audio source"))
                 {
                     engine->ecsManager.AddComponent<AudioSource>(gameObject,AudioSource());
-                    engine->ecsManager.GetComponent<AudioSource>(gameObject->GetEntity()).Init();
                 }
             }
             if(!engine->ecsManager.GotComponent<RigidBody>(gameObject->GetEntity()))

@@ -17,6 +17,7 @@ namespace Solid SLDNamespace()
     	Components() = default;
     	~Components() = default;
     	Components(const Components& ) = default;
+    	virtual void Init() {};
     	Components& operator=(const Components&)
 	    {
     		return *this;
