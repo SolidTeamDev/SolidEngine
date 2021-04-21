@@ -72,6 +72,7 @@ namespace Solid
 		        if(UI::Button("Transform"))
 		        {
 			        engine->ecsManager.AddComponent(gameObject,Transform());
+                    UI::CloseCurrentPopup();
 		        }
 	        }
             if(!engine->ecsManager.GotComponent<MeshRenderer>(gameObject->GetEntity()))
@@ -79,6 +80,7 @@ namespace Solid
                 if(UI::Button("Mesh renderer"))
                 {
                     engine->ecsManager.AddComponent(gameObject,MeshRenderer());
+                    UI::CloseCurrentPopup();
                 }
             }
             if(!engine->ecsManager.GotComponent<AudioSource>(gameObject->GetEntity()))
@@ -86,6 +88,7 @@ namespace Solid
                 if(UI::Button("Audio source"))
                 {
                     engine->ecsManager.AddComponent<AudioSource>(gameObject,AudioSource());
+                    UI::CloseCurrentPopup();
                 }
             }
             if(!engine->ecsManager.GotComponent<RigidBody>(gameObject->GetEntity()))
@@ -93,7 +96,15 @@ namespace Solid
                 if(UI::Button("RigidBody"))
                 {
                     engine->ecsManager.AddComponent<RigidBody>(gameObject,RigidBody());
-                    gameObject->physicsActor = engine->physics.CreateDynamic(Transform(Vec3(0,10,0),Quat(),0));
+                    UI::CloseCurrentPopup();
+                }
+            }
+            if(!engine->ecsManager.GotComponent<BoxCollider>(gameObject->GetEntity()))
+            {
+                if(UI::Button("Box collider"))
+                {
+                    engine->ecsManager.AddComponent<BoxCollider>(gameObject,BoxCollider());
+                    UI::CloseCurrentPopup();
                 }
             }
             UI::EndPopup();

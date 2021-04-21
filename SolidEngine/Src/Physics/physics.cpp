@@ -112,12 +112,20 @@ namespace Solid
     }
 
     //TODO: TEST THIS
-    void Physics::ConvertActor(PxActor* _actor, const PhysicsActorType& _actorType)
+    void Physics::ConvertActor(PxActor*& _actor, PhysicsActorType _actorType)
     {
         //Check if actor exist
         if(!_actor)
         {
-            Log::Send("Cannot convert actor : Actor not created !",Log::ELogSeverity::WARNING);
+            switch (_actorType)
+            {
+                case PhysicsActorType::STATIC:
+                    _actor = CreateStatic();
+                    break;
+                case PhysicsActorType::DYNAMIC:
+                    _actor = CreateDynamic();
+                    break;
+            }
             return;
         }
 
@@ -130,22 +138,19 @@ namespace Solid
                     PxTransform pxT;
                     PxRigidStatic* staticActor = (PxRigidStatic*) _actor;
                     PxRigidDynamic* dynamicActor = nullptr;
-                    PxShape** shapeList;
-                    size_t nbShape = 0;
+                    size_t nbShape = staticActor->getNbShapes();
+                    std::vector<PxShape*> shapeList(nbShape);
                     // Save data
                     pxT = staticActor->getGlobalPose();
-                    staticActor->getShapes(shapeList,sizeof(PxShape));
-                    nbShape = staticActor->getNbShapes();
+                    staticActor->getShapes(shapeList.data(),sizeof(PxShape));
                     // Remove
                     pxScene->removeActor(*staticActor);
                     staticActor->release();
                     // Create
                     dynamicActor = pxPhysics->createRigidDynamic(pxT);
                     // Restore
-                    for (size_t i = 1; i < nbShape; ++i)
+                    for (size_t i = 0; i < nbShape; ++i)
                         dynamicActor->attachShape(*shapeList[i]);
-
-                    staticActor->release();
 
                     _actor = dynamicActor;
 
@@ -160,21 +165,19 @@ namespace Solid
                     PxTransform pxT;
                     PxRigidStatic* staticActor = nullptr;
                     PxRigidDynamic* dynamicActor = (PxRigidDynamic*) _actor;
-                    PxShape** shapeList;
-                    size_t nbShape = 0;
+                    size_t nbShape = staticActor->getNbShapes();
+                    std::vector<PxShape*> shapeList(nbShape);
 
                     pxT = dynamicActor->getGlobalPose();
-                    dynamicActor->getShapes(shapeList,sizeof(PxShape));
-                    nbShape = dynamicActor->getNbShapes();
+                    dynamicActor->getShapes(shapeList.data(),sizeof(PxShape));
 
                     pxScene->removeActor(*dynamicActor);
 
                     staticActor = pxPhysics->createRigidStatic(pxT);
+                    dynamicActor->release();
 
-                    for (size_t i = 1; i < nbShape; ++i)
+                    for (size_t i = 0; i < nbShape; ++i)
                         staticActor->attachShape(*shapeList[i]);
-
-                    dynamicActor->release(); ///WARN; maybe Pointer Data Lost For Shape
 
                     _actor = staticActor;
 
@@ -186,6 +189,18 @@ namespace Solid
 
         // Add switched actor
         pxScene->addActor(*_actor);
+    }
+
+    physx::PxShape *Physics::CreateShape(physx::PxActor*& _actor, const PxGeometry& _geometry)
+    {
+        if(_actor == nullptr)
+            _actor = CreateStatic(Transform());
+
+        PxShape* shape = pxPhysics->createShape(_geometry,*pxMaterial);
+
+        ((PxRigidActor*) _actor)->attachShape(*shape);
+
+        return shape;
     }
 
 } //!namespace

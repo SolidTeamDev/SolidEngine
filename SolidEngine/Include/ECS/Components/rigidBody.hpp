@@ -22,7 +22,9 @@ namespace Solid SLDNamespace()
         float angularDrag = 0.05;
 
         RigidBody() = default;
-        ~RigidBody() = default;
+        ~RigidBody() override = default ;
+
+        void Init() override;
 
         RigidBody_GENERATED
     };

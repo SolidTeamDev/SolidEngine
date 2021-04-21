@@ -95,6 +95,7 @@ namespace Solid
         {
         	//HERE
             Components* c =componentManager->AddComponent<T>(_entity->GetEntity(),_component);
+            c->gameObject = _entity;
 			_entity->compsList.push_back(c);
             auto signature = entityManager->GetSignature(_entity->GetEntity());
             signature.set(componentManager->GetComponentType<T>(), true);

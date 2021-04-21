@@ -5,6 +5,8 @@
 #include "ECS/Components/meshRenderer.hpp"
 #include "ECS/Components/audioSource.hpp"
 #include "ECS/Components/rigidBody.hpp"
+#include "ECS/Components/boxCollider.hpp"
+
 #include <string>
 
 namespace Solid

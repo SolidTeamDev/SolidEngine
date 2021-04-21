@@ -19,7 +19,7 @@ namespace Solid
         static physx::PxDefaultErrorCallback gDefaultErrorCallback;
         static physx::PxDefaultAllocator     gDefaultAllocatorCallback;
 
-        static physx::PxCudaContextManager* gCudaContextManager;
+        static physx::PxCudaContextManager*  gCudaContextManager;
 
         physx::PxFoundation* pxFoundation = nullptr;
         physx::PxPhysics*    pxPhysics    = nullptr;
@@ -36,9 +36,10 @@ namespace Solid
 
         void Update(float _deltaTime) const;
 
-        physx::PxRigidDynamic* CreateDynamic(const Transform& _transform);
-        physx::PxRigidStatic* CreateStatic(const Transform& _transform);
-        void ConvertActor(physx::PxActor* _actor, const PhysicsActorType& _actorType);
+        physx::PxRigidDynamic* CreateDynamic(const Transform& _transform = Transform());
+        physx::PxRigidStatic* CreateStatic(const Transform& _transform   = Transform());
+        void ConvertActor(physx::PxActor*& _actor, PhysicsActorType _actorType);
+        physx::PxShape* CreateShape(physx::PxActor*& _actor, const physx::PxGeometry& _geometry);
     };
 
 }

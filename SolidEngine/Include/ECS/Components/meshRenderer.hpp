@@ -40,7 +40,7 @@ namespace Solid SLDNamespace()
 
 	    void SetMaterialSet(const std::set<MaterialResource *> &_materialSet);
 
-	    void Init();
+	    void Init() override;
 
         MeshRenderer_GENERATED
     };

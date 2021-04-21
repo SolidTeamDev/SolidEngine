@@ -9,15 +9,17 @@
 namespace Solid SLDNamespace()
 {
     using Entity = std::uint32_t;
+    class GameObject;
     class SOLID_API SLDClass() Components : public rfk::Object
     {
 
     public:
 
     	Components() = default;
-    	~Components() = default;
+    	~Components() override = default;
     	Components(const Components& ) = default;
     	virtual void Init() {};
+    	GameObject* gameObject = nullptr;
     	Components& operator=(const Components&)
 	    {
     		return *this;

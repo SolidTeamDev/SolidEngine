@@ -17,11 +17,13 @@ namespace Solid SLDNamespace()
         Vec3 center;
         SLDField()
         Vec3 size {1.f,1.f,1.f};
-        physx::PxBoxGeometry* boxCollider = nullptr;
+        physx::PxShape* boxCollider = nullptr;
     public:
 
-        BoxCollider();
-        ~BoxCollider() = default;
+        BoxCollider() = default;
+        ~BoxCollider() override = default;
+
+        void Init() override;
 
         BoxCollider_GENERATED
     };
