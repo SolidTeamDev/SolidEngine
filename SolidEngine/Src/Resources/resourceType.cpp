@@ -636,3 +636,193 @@ MaterialResource::FieldValue::FieldValue(const MaterialResource::FieldValue &cop
 			break;
 	}
 }
+
+SkeletonResource::Bone::~Bone()
+{
+	for(Bone* child : Childrens)
+	{
+	    delete child;
+	}
+}
+
+SkeletonResource::Bone &SkeletonResource::Bone::operator=(const SkeletonResource::Bone &b)
+{
+	{
+		for(Bone* child : Childrens)
+		{
+			delete child;
+		}
+		Childrens.clear();
+		Childrens.reserve(b.Childrens.size());
+		name = b.name;
+		Parent = nullptr;
+		Weights = b.Weights;
+		transfo = b.transfo;
+		offset =b.offset;
+		FinalTrans= b.FinalTrans;
+		std::function<void(Bone*, Bone*,Bone*)> lambda = [&](Bone* child,Bone* Parent, Bone* childToCopy){
+			child->Childrens.reserve(childToCopy->Childrens.size());
+			child->name = childToCopy->name;
+			child->Parent = Parent;
+			child->Weights = childToCopy->Weights;
+			child->transfo = childToCopy->transfo;
+			child->offset =childToCopy->offset;
+			child->FinalTrans= childToCopy->FinalTrans;
+
+			for (int i = 0; i < childToCopy->Childrens.size(); ++i)
+			{
+				Bone* childc = new Bone();
+				Bone* childToCopyc =childToCopy->Childrens[i];
+				lambda(childc, child, childToCopyc);
+			}
+		};
+		for (int i = 0; i < b.Childrens.size(); ++i)
+		{
+			Bone* child = new Bone();
+			Bone* childToCopy =b.Childrens[i];
+			lambda(child, this, childToCopy);
+		}
+	}
+	if(b.Parent != nullptr)
+	{
+
+
+		Bone* BoneRoot = b.Parent;
+		while (BoneRoot->Parent != nullptr)
+		{
+			BoneRoot = BoneRoot->Parent;
+		}
+		new Bone(*BoneRoot, this);
+		return *this;
+	}
+
+	return *this;
+}
+
+SkeletonResource::Bone::Bone(const SkeletonResource::Bone &b)
+{
+	{
+		Childrens.reserve(b.Childrens.size());
+		name = b.name;
+		Parent = nullptr;
+		Weights = b.Weights;
+		transfo = b.transfo;
+		offset =b.offset;
+		FinalTrans= b.FinalTrans;
+		std::function<void(Bone*, Bone*,Bone*)> lambda = [&](Bone* child,Bone* Parent, Bone* childToCopy){
+			Parent->Childrens.push_back(child);
+			child->Childrens.reserve(childToCopy->Childrens.size());
+			child->name = childToCopy->name;
+			child->Parent = Parent;
+			child->Weights = childToCopy->Weights;
+			child->transfo = childToCopy->transfo;
+			child->offset =childToCopy->offset;
+			child->FinalTrans= childToCopy->FinalTrans;
+
+			for (int i = 0; i < childToCopy->Childrens.size(); ++i)
+			{
+				Bone* childc = new Bone();
+				Bone* childToCopyc =childToCopy->Childrens[i];
+				lambda(childc, child, childToCopyc);
+			}
+		};
+		for (int i = 0; i < b.Childrens.size(); ++i)
+		{
+			Bone* child = new Bone();
+			Bone* childToCopy =b.Childrens[i];
+			lambda(child, this, childToCopy);
+		}
+	}
+	if(b.Parent != nullptr)
+	{
+		Bone* BoneRoot = b.Parent;
+		while (BoneRoot->Parent != nullptr)
+		{
+			BoneRoot = BoneRoot->Parent;
+		}
+		new Bone(*BoneRoot, this);
+		return;
+	}
+}
+
+SkeletonResource::Bone::Bone(const SkeletonResource::Bone &b, SkeletonResource::Bone *toSet)
+{
+	if(!toSet->isPtr)
+	{
+		return;
+	}
+	/// b is root
+	Childrens.reserve(b.Childrens.size());
+	name = b.name;
+	Parent = nullptr;
+	Weights = b.Weights;
+	transfo = b.transfo;
+	offset =b.offset;
+	FinalTrans= b.FinalTrans;
+	std::function<void(Bone*, Bone*,Bone*)> lambda = [&](Bone* child,Bone* Parent, Bone* childToCopy){
+		child->Childrens.reserve(childToCopy->Childrens.size());
+		child->name = childToCopy->name;
+		child->Parent = Parent;
+		child->Weights = childToCopy->Weights;
+		child->transfo = childToCopy->transfo;
+		child->offset =childToCopy->offset;
+		child->FinalTrans= childToCopy->FinalTrans;
+
+		for (int i = 0; i < childToCopy->Childrens.size(); ++i)
+		{
+			Bone* childToCopyc =childToCopy->Childrens[i];
+			if(childToCopy->name == toSet->name)
+			{
+				child->Childrens.push_back(toSet);
+				break;
+			}
+			Bone* childc = new Bone();
+			lambda(childc, child, childToCopyc);
+		}
+	};
+	for (int i = 0; i < b.Childrens.size(); ++i)
+	{
+		Bone* childToCopy =b.Childrens[i];
+		if(childToCopy->name == toSet->name)
+		{
+			this->Childrens.push_back(toSet);
+			break;
+		}
+		Bone* child = new Bone();
+
+		lambda(child, this, childToCopy);
+	}
+}
+
+void *SkeletonResource::Bone::operator new(std::size_t size)
+{
+	void * p = ::operator new(size);
+	Bone* b = (Bone*)p;
+	b->isPtr = true;
+	return p;
+}
+
+void SkeletonResource::Bone::operator delete(void* p)
+{
+	free(p);
+}
+
+SkeletonResource::Bone *SkeletonResource::Bone::FindBoneByName(const char *_name)
+{
+	if(name == _name)
+	{
+		return this;
+	}
+	for(Bone* child : Childrens)
+	{
+	    if(child->name == _name)
+	    {
+		    return child;
+	    }
+	    Bone* Search =child->FindBoneByName(_name);
+	    if(Search != nullptr)
+		    return Search;
+	}
+
+	return nullptr;
+}

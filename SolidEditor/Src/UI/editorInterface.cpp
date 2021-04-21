@@ -90,8 +90,8 @@ namespace Solid {
 	            };
 	            Lambda(std::ref(j), world, std::ref(elt));
 	            j = j.unflatten();
-
-	            std::ofstream file("test.SolidScene", std::ifstream::binary);
+				std::string name = "test.SolidScene";
+	            std::ofstream file(name, std::ifstream::binary);
 	            std::vector<char> buffer;
 	            std::stringstream sstr;
 	            sstr << std::setw(4) << j << std::endl;
@@ -185,7 +185,10 @@ namespace Solid {
 	            };
 	            LambdaCmp(world);
 				file.write(buffer.data(), buffer.size());
-
+				SceneResource* scene = new SceneResource();
+				scene->rawScene = buffer;
+				scene->name = name;
+				Engine::GetInstance()->resourceManager.AddResource(scene);
 
 
             }

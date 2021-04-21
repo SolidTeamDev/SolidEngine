@@ -28,11 +28,9 @@ int main(int argc, char** argv)
 		    }
 	    }
 
-        //editor.LoadResources(b);
-        //editor.Run();
-        Solid::ResourcesLoader loader;
-    	Solid::ResourcePtrWrapper w;
-    	loader.LoadRessourceNoAdd(fs::current_path().append("Resources").append("Test2.fbx"), w);
+        editor.LoadResources(b);
+        editor.Run();
+
     }
     catch(const Solid::ThrowError& e)
     {

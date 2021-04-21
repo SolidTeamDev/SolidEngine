@@ -58,6 +58,7 @@ namespace Solid {
     protected:
         EResourceType type;
         fs::path path;
+        fs::path assetProjectPath;
     public:
         std::string name;
 
@@ -131,31 +132,30 @@ namespace Solid {
         void FromDataBuffer(char *buffer, int bSize);
     };
 
-    class SOLID_API AnimResource : public Resource
-    {
-    public:
-        AnimResource()
-        {
-            type = EResourceType::Anim;
-        }
-
-        ~AnimResource()
-        {
-
-        }
-    };
-
 	class SOLID_API SkeletonResource : public Resource
 	{
 	public:
-		struct Bone
+		class Bone
 		{
+			bool isPtr = false;
+		public:
 			std::string name;
-			Bone* Parent;
+			Bone* Parent = nullptr;
 			std::vector<Bone*> Childrens;
 			std::vector<float> Weights;
+			bool WeightInit = false;
 			Mat4<float> transfo;
-
+			Mat4<float> offset;
+			Mat4<float> FinalTrans;
+			Bone() = default;
+			~Bone();
+			Bone& operator=(const Bone& b);
+			Bone(const Bone& b);
+			Bone(const Bone& b, Bone* toSet);
+			void* operator new(std::size_t size);
+			void operator delete(void*);
+			//find Bone Anywhere on the tree below used node
+			Bone* FindBoneByName(const char* name);
 		}rootBone;
 		SkeletonResource()
 		{
@@ -167,6 +167,43 @@ namespace Solid {
 
 		}
 	};
+
+    class SOLID_API AnimResource : public Resource
+    {
+    public:
+	    struct KeyFrame
+	    {
+
+			double time;
+			bool usePos= false;
+	    	Vec3 pos;
+		    bool useRot= false;
+	    	Quat Rot;
+		    bool useScale = false;
+	    	Vec3 Scale;
+	    };
+	    struct BoneChannel
+	    {
+	    	SkeletonResource::Bone* BoneToMod = nullptr;
+	    	std::vector<KeyFrame> Frames;
+	    	std::size_t currentFrame = 0;
+	    };
+	    std::vector<BoneChannel> Channels;
+	    SkeletonResource::Bone* Root = nullptr;
+    	double numTicks;
+	    double ticksPerSeconds;
+
+
+    	AnimResource()
+        {
+            type = EResourceType::Anim;
+        }
+
+        ~AnimResource()
+        {
+
+        }
+    };
 
     class SOLID_API ShaderResource : public Resource
     {
@@ -284,6 +321,7 @@ namespace Solid {
 	class SOLID_API SceneResource : public Resource
 	{
 	public:
+		std::vector<char> rawScene;
 		SceneResource()
 		{
 			type = EResourceType::Scene;
