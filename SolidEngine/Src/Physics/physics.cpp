@@ -203,5 +203,11 @@ namespace Solid
         return shape;
     }
 
+    void Physics::DeleteShape(physx::PxActor* _actor, physx::PxShape* _shape)
+    {
+        ((PxRigidActor*) _actor)->detachShape(*_shape);
+        _shape->release();
+    }
+
 } //!namespace
 

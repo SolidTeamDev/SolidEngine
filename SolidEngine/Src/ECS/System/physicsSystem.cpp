@@ -9,8 +9,11 @@ namespace Solid
         //Update physics pos
         for (Entity entity : entities)
         {
-            const Transform& transform = ecsManager.GetComponent<Transform>(entity);
             GameObject* go = ecsManager.GetGameObjectFromEntity(entity);
+            if(go->physicsActor == nullptr)
+                continue;
+
+            const Transform& transform = ecsManager.GetComponent<Transform>(entity);
 
              _physics.SetTransform(go->physicsActor,transform);
         }
@@ -21,9 +24,11 @@ namespace Solid
         //Update engine pos
         for (Entity entity : entities)
         {
-            Transform& transform = ecsManager.GetComponent<Transform>(entity);
-            RigidBody& rigidbody = ecsManager.GetComponent<RigidBody>(entity);
             GameObject* go = ecsManager.GetGameObjectFromEntity(entity);
+            if(go->physicsActor == nullptr)
+                continue;
+
+            Transform& transform = ecsManager.GetComponent<Transform>(entity);
 
             Vec3 scale = transform.GetScale();
             transform = _physics.GetTransform(go->physicsActor);

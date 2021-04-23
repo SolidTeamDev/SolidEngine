@@ -5,29 +5,31 @@
 
 #include "ECS/types.hpp"
 #include "Build/solidAPI.hpp"
-#include "EngineGenerated/boxCollider.sld.hpp"
+#include "EngineGenerated/capsuleCollider.sld.hpp"
 
 namespace Solid SLDNamespace()
 {
-    class SOLID_API SLDClass() BoxCollider : public Components
+    class SOLID_API SLDClass() CapsuleCollider : public Components
     {
         SLDField()
         bool isTrigger = false;
         SLDField()
         Vec3 center;
         SLDField()
-        Vec3 size {1.f,1.f,1.f};
+        float radius = 0.5f;
+        SLDField()
+        float height = 1;
 
-        physx::PxShape* boxCollider = nullptr;
+        physx::PxShape* capsuleCollider = nullptr;
     public:
 
-        BoxCollider() = default;
-        ~BoxCollider() override = default;
+        CapsuleCollider() = default;
+        ~CapsuleCollider() override = default;
 
         void Init() override;
         void Release() override;
 
-        BoxCollider_GENERATED
+        CapsuleCollider_GENERATED
     };
 } //!namespace
 

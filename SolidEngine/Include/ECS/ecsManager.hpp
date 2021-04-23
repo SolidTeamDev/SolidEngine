@@ -109,7 +109,8 @@ namespace Solid
         template<typename T>
         void RemoveComponent(GameObject* _entity)
         {
-            Components* c =componentManager->RemoveComponent<T>(_entity);
+            Components* c = componentManager->RemoveComponent<T>(_entity);
+            c->Release();
 	        for (auto it= _entity->compsList.begin(); it != _entity->compsList.end(); ++it)
 	        {
 		        if(*it == c)

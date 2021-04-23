@@ -3,6 +3,7 @@
 #include "Core/engine.hpp"
 #include <imgui.h>
 #include <imgui_stdlib.h>
+
 namespace Solid
 {
     void InspectorInterface::Draw()
@@ -104,6 +105,22 @@ namespace Solid
                 if(UI::Button("Box collider"))
                 {
                     engine->ecsManager.AddComponent<BoxCollider>(gameObject,BoxCollider());
+                    UI::CloseCurrentPopup();
+                }
+            }
+            if(!engine->ecsManager.GotComponent<SphereCollider>(gameObject->GetEntity()))
+            {
+                if(UI::Button("Sphere collider"))
+                {
+                    engine->ecsManager.AddComponent<SphereCollider>(gameObject,SphereCollider());
+                    UI::CloseCurrentPopup();
+                }
+            }
+            if(!engine->ecsManager.GotComponent<CapsuleCollider>(gameObject->GetEntity()))
+            {
+                if(UI::Button("Capsule collider"))
+                {
+                    engine->ecsManager.AddComponent<CapsuleCollider>(gameObject,CapsuleCollider());
                     UI::CloseCurrentPopup();
                 }
             }

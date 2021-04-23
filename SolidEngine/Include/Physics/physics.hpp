@@ -40,6 +40,8 @@ namespace Solid
         physx::PxRigidStatic* CreateStatic(const Transform& _transform   = Transform());
         void ConvertActor(physx::PxActor*& _actor, PhysicsActorType _actorType);
         physx::PxShape* CreateShape(physx::PxActor*& _actor, const physx::PxGeometry& _geometry);
+
+        void DeleteShape(physx::PxActor* _actor, physx::PxShape* _shape);
     };
 
 }

@@ -6,6 +6,8 @@
 #include "ECS/Components/audioSource.hpp"
 #include "ECS/Components/rigidBody.hpp"
 #include "ECS/Components/boxCollider.hpp"
+#include "ECS/Components/sphereCollider.hpp"
+#include "ECS/Components/capsuleCollider.hpp"
 
 #include <string>
 
