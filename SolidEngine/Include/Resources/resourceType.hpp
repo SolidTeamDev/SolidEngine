@@ -145,7 +145,7 @@ namespace Solid {
 			std::vector<float> Weights;
 			bool WeightInit = false;
 			Mat4<float> transfo;
-			Mat4<float> offset;
+			Mat4<float> offset; // inverse bind pose
 			Mat4<float> FinalTrans;
 			Bone() = default;
 			~Bone();

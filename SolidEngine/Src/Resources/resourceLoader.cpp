@@ -168,7 +168,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
         const std::size_t numOfShader = std::count_if(fs::directory_iterator(Rpath), fs::directory_iterator{}, (fp)shaderFind);
 	    const std::size_t numOfMat = std::count_if(fs::directory_iterator(Rpath), fs::directory_iterator{}, (fp)matFind);
 	    const std::size_t numOfSound = std::count_if(fs::directory_iterator(Rpath), fs::directory_iterator{}, (fp)matFind);
-        ResourcePtrWrapper* RessourceArray = new ResourcePtrWrapper[numOffiles + numOfShader - numOfMat - numOfSound] {nullptr};
+        ResourcePtrWrapper* RessourceArray = new ResourcePtrWrapper[numOffiles + numOfShader - numOfMat - numOfSound]() ;
 
         auto Lambda = [this](const fs::path *Rpath, ResourcePtrWrapper *wrapper){LoadRessourceNoAdd(*Rpath,*wrapper); delete Rpath;};
         int i =0;
@@ -920,7 +920,8 @@ Resource *ResourcesLoader::LoadAudio(const fs::path &Rpath)
 	err = alGetError();
 	if (err != AL_NO_ERROR)
 	{
-		std::cout << "OpenAL Error : " << alGetString(err) << std::endl;
+	    if(err != AL_INVALID_OPERATION)
+		    std::cout << "OpenAL Error : " << alGetString(err) << std::endl;
 		if (buff && alIsBuffer(buff))
 			alDeleteBuffers(1, &buff);
 		return nullptr;
