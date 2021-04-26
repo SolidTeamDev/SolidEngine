@@ -18,9 +18,9 @@ namespace Solid SLDNamespace()
     	SLDField()
         Vec3 position {0,0,0};
         SLDField()
-    	Vec3 scale {1,1,1};
-	    SLDField()
         Quat rotation {};
+        SLDField()
+    	Vec3 scale {1,1,1};
         Vec3 euler{};
         Mat4<float> transMat;
 
