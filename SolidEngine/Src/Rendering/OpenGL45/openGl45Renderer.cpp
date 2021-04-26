@@ -276,7 +276,7 @@ namespace Solid
         return ID;
     }
 
-	void OpenGL45Renderer::DrawSolidGrid(Camera &_camera, float _gridSize, Vec3 _color, float _thickness)
+	void OpenGL45Renderer::DrawSolidGrid(const Camera &_camera, float _gridSize, Vec3 _color, float _thickness) const
 	{
 		//draw GL_LINES
 		uint temp_vao = 0;
@@ -386,4 +386,10 @@ namespace Solid
 		glLineWidth(1);
 
 	}
+
+    void OpenGL45Renderer::DrawSkybox(const Camera& _camera) const
+    {
+        
+    }
+
 } //!namespace

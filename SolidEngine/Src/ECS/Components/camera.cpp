@@ -13,7 +13,7 @@ namespace Solid
         far  = 100.f;
     }
 
-    Mat4<float> Camera::GetView()
+    Mat4<float> Camera::GetView() const
     {
         return view;
     }

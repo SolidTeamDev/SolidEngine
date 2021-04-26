@@ -30,7 +30,7 @@ namespace Solid SLDNamespace()
 
         Camera();
 
-        Mat4<float> GetView();
+        Mat4<float> GetView() const;
         Mat4<float> GetProjection() const;
 
         void UpdateCamera(const Vec2i _spaceScreen);
