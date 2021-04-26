@@ -1,30 +1,57 @@
 #pragma once
 
 #include "Core/engine.hpp"
-
-#include "ECS/Components/camera.hpp"
+#include "GameCompiler/gameCompiler.hpp"
 
 namespace Solid
 {
+    struct Vec2d;
+	class SOLID_API EngineCleanerInterface
+	{
+	protected:
+		EngineCleanerInterface()
+		{
+
+		}
+
+		~EngineCleanerInterface()
+		{
+			Engine::DeleteInstance();
+		}
+
+	};
 
     class Editor
     {
     private:
-        InputManager<int>* editorInputManager = nullptr;
-        Engine engine;
-        Camera editorCamera;
+	    class SOLID_API Engine_Cleaner : public EngineCleanerInterface
+	    {
+	    public:
+		    Engine_Cleaner()
+		    {
 
-        void UpdateEditorCamera();
-        void LoadResources();
+		    }
+
+		    ~Engine_Cleaner()
+		    {
+
+		    }
+	    }Clean;
+
+
+        Engine* engine = nullptr;
+        GameCompiler* Compiler;
+
     public:
-
-        static Framebuffer sceneFramebuffer;
+        static InputManager<int>* editorInputManager;
 
         Editor();
         ~Editor();
-        
+	    void LoadResources(bool _solid);
         void Run();
+        friend class EngineCleanerInterface;
     };
+
 
 } //!namespace
 

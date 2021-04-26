@@ -5,12 +5,17 @@
 
 namespace Solid
 {
-
+    // RC: Rendering architecture?
     class SOLID_API OpenGL45Renderer : public Renderer
     {
     private:
         OpenGL45Renderer();
         ~OpenGL45Renderer() override = default;
+        uint gridProgram;
+        uint grid_vbo;
+        uint grid_ebo;
+        void InitGridGL();
+
     public:
         static Renderer* InitRenderer();
 
@@ -27,17 +32,10 @@ namespace Solid
 
         void BeginFramebuffer(const Framebuffer& _framebuffer) const final;
         void EndFramebuffer() const final;
-        void InitMesh(class MeshResource* _m)const final;
-        void DrawMesh(const class MeshResource* _mesh)const final;
-        void SetShaderMVP(class ShaderResource* _shader, Transform& _model, Camera& _camera)const final;
-
-        VFShader CreateVertFragProgram(std::vector<char *> &_VertexSources, std::vector<char *> &_fragSources)const final;
-
-        CShader CreateComputeProgram(std::vector<char *> &_sources)const final;
-
-        CShader CreateShader(GLenum _type, int _sourceCount, std::vector<char *> &_sources)const final;
         ShaderBinary GetShaderBinary(uint _PID) const final;
         uint CreateShaderFromBinary(ShaderBinary _binary) const final;
+
+	    virtual void DrawSolidGrid(Camera &_camera, float _gridSize, Vec3 _color, float _thickness) override;
     };
 
 } //!namespace

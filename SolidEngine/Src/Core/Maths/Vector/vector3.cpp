@@ -1,7 +1,7 @@
 #include "Core/Maths/Vector/vector2.hpp"
 #include "Core/Maths/Vector/vector3.hpp"
 #include "Core/Maths/Vector/vector4.hpp"
-
+#include "Core/Maths/Quaternion/quaternion.hpp"
 #include "Core/Maths/Utils/numerics.hpp"
 #include "Core/Debug/log.hpp"
 namespace Solid
@@ -32,6 +32,11 @@ namespace Solid
     y{_copy.y},
     z{_copy.z}
     {}
+
+    Vec3::Vec3(const Quat& _q) noexcept
+    {
+        *this =  _q.ToEuler();
+    }
 
 #pragma endregion
 #pragma region Static Methods
@@ -67,7 +72,7 @@ namespace Solid
 
     Vec3 Vec3::Nlerp(const Vec3 &_v1, const Vec3 &_v2, float _r) noexcept
     {
-        return Maths::Lerp(_v1,_v2,_r).GetNormalize();
+        return Maths::Lerp(_v1,_v2,_r).GetNormalized();
     }
 
     Vec3 Vec3::Slerp(const Vec3 &_v1, const Vec3 &_v2, float _r) noexcept
@@ -144,7 +149,7 @@ namespace Solid
 
     }
 
-    constexpr Vec3 Vec3::GetNormalize() const noexcept
+    constexpr Vec3 Vec3::GetNormalized() const noexcept
     {
         float len = Length();
         if(len == 0)
@@ -155,11 +160,16 @@ namespace Solid
         return Vec3(x/len, y/len,z/len);
     }
 
-    constexpr  bool Vec3::IsEquals(const Vec3 &vec) const noexcept
+    constexpr bool Vec3::IsNormalized() const noexcept
     {
-        return  Solid::Maths::Equals(x,vec.x) &&
-                Solid::Maths::Equals(y,vec.y) &&
-                Solid::Maths::Equals(z,vec.z);
+        return Maths::Equals<float>(SqrtLength(), 3.f * S_EPSILON);
+    }
+
+    constexpr bool Vec3::IsEquals(const Vec3& vec) const noexcept
+    {
+        return  Solid::Maths::Equals(x,vec.x, 0.01f) &&
+                Solid::Maths::Equals(y,vec.y, 0.01f) &&
+                Solid::Maths::Equals(z,vec.z, 0.01f);
     }
 
     constexpr float Vec3::Dist(const Vec3 &vec) const noexcept
@@ -172,9 +182,11 @@ namespace Solid
         return (*this - vec).SqrtLength();
     }
 
-    std::string Vec3::ToString() noexcept
+    const std::string Vec3::ToString() const noexcept
     {
-        return "[" + std::to_string(Maths::RadToDeg(x)) + "," + std::to_string(Maths::RadToDeg(y)) + "," + std::to_string(Maths::RadToDeg(z)) + "]";
+        //return "[" + std::to_string(Maths::RadToDeg(x)) + "," + std::to_string(Maths::RadToDeg(y)) + "," + std::to_string(Maths::RadToDeg(z)) + "]";
+        return "[" + std::to_string(x) + "," + std::to_string(y) + "," + std::to_string(z) + "]";
+
     }
 
 #pragma endregion

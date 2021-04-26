@@ -1,8 +1,10 @@
 #pragma once
 
+
 #include "Window/window.hpp"
 #include <imgui.h>
 
+#include "Core/engine.hpp"
 #include "UI/playInterface.hpp"
 #include "UI/filesInterface.hpp"
 #include "UI/sceneInterface.hpp"
@@ -20,7 +22,9 @@ namespace Solid
         bool        demoOpen  = false;
         bool        colorOpen = false;
 
+
         Window*     window;
+        Renderer*   renderer;
         ImGuiStyle& editorStyle;
 
         //All interfaces
@@ -33,17 +37,18 @@ namespace Solid
 
     public:
         EditorInterface();
-        explicit EditorInterface(Window* window);
+        explicit EditorInterface(Window* window, Renderer* renderer);
 
         ~EditorInterface() = default;
 
         static Solid::GameObject* selectedGO;
+        static bool        draggingEnt;
 
 
         /**
          * @debrief Updates the whole UI
          */
-        void Update(Engine* _engine);
+        void Update();
 
         /**
          * @debrief Updates the UI style to a dark theme
@@ -92,8 +97,8 @@ namespace Solid
         void DrawChangeColors();
 
         /**
-         * @brief Draws the performances overlay
+         * @brief Draws the additional informations overlay
          */
-        void DrawPerfOverlay();
+        void AddInfoOverlay();
     };
 }

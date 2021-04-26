@@ -20,7 +20,7 @@ namespace Solid
 
 
     template<typename T>
-    class SOLID_API ComponentArray : public IComponentArray
+    class ComponentArray : public IComponentArray
     {
     private:
 
@@ -33,12 +33,12 @@ namespace Solid
 
     public:
 
-        void InsertData(Entity _entity, T _component)
+    	Components* InsertData(Entity _entity, T _component)
         {
             if(entityToIndexMap.find(_entity) != entityToIndexMap.end())
             {
                 Log::Send("Cannot add component (Component already exist)",Log::ELogSeverity::ERROR);
-                return;
+                return nullptr;
             }
 
             size_t newIndex             = size;
@@ -47,18 +47,20 @@ namespace Solid
             componentArray[newIndex]    = _component;
 
             size++;
+            return &(componentArray[newIndex]);
         }
 
-        void RemoveData(Entity _entity)
+        Components* RemoveData(Entity _entity)
         {
             if(entityToIndexMap.find(_entity) == entityToIndexMap.end())
             {
                 Log::Send("Error : Cannot remove component (Component doesn't exist)",Log::ELogSeverity::ERROR);
-                return;
+                return nullptr;
             }
 
             size_t indexOfRemovedEntity             = entityToIndexMap[_entity];
             size_t indexOfLastElement               = size-1;
+            Components* c = (Components*)&(componentArray[indexOfRemovedEntity]);
             componentArray[indexOfRemovedEntity]    = componentArray[indexOfLastElement];
 
             Entity entityOfLastElement              = indexToEntityMap[indexOfLastElement];
@@ -69,6 +71,7 @@ namespace Solid
             indexToEntityMap.erase(indexOfLastElement);
 
             size--;
+            return c;
         }
 
         T& GetData(Entity _entity)

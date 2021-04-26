@@ -6,6 +6,8 @@
 
 #include "ECS/types.hpp"
 
+#include <PxActor.h>
+
 namespace Solid
 {
     class SOLID_API GameObject
@@ -14,95 +16,39 @@ namespace Solid
     public:
 
         std::string name = "New GameObject";
+        physx::PxActor* physicsActor = nullptr;
+
+        std::vector<Components*> compsList;
 
         GameObject* parent = nullptr;
         std::deque<GameObject*> childs;
 
-        GameObject(Entity _entity)
-        {
-            entity = _entity;
-        }
+        GameObject(Entity _entity);
 
-        GameObject(GameObject* _parent, Entity _entity)
-        {
-            parent = _parent;
-            entity = _entity;
-        }
+        GameObject(GameObject* _parent, Entity _entity);
 
-        ~GameObject()
-        {
-            for (GameObject* child : childs)
-            {
-                delete child;
-            }
-        }
+        ~GameObject();
 
-        void AddToCurrent(Entity _entity)
-        {
-            childs.push_back(new GameObject(this,_entity));
-        }
+        GameObject* AddToCurrent(Entity _entity);
 
-        void RemoveCurrent()
-        {
-            if(parent != nullptr)
-            {
-                for (size_t i = 0 ; i < parent->childs.size() ; ++i)
-                {
-                    if (parent->childs.at(i) == this)
-                    {
-                        parent->childs.erase(parent->childs.begin() + i);
-                        delete this;
-                        break;
-                    }
-                }
-            }
-        }
+        void ReParentCurrent(GameObject* Parent);
 
-        Entity GetEntity() const
-        {
-            return entity;
-        }
+        void RemoveCurrent();
+
+        Entity GetEntity() const;
     };
 
     class SOLID_API SceneGraphManager
     {
         GameObject world;
 
-        GameObject* GetNodeFromEntity(Entity _entity, GameObject* node)
-        {
-            if(node == nullptr)
-                return nullptr;
-
-            GameObject* result = nullptr;
-
-            for (GameObject* node : node->childs)
-            {
-                if(node->GetEntity() == _entity)
-                    result = node;
-                else
-                {
-                    result = GetNodeFromEntity(_entity,node);
-                    if(result != nullptr)
-                        break;
-                }
-            }
-
-            return result;
-        }
+        GameObject* GetNodeFromEntity(Entity _entity, GameObject* node);
     public:
 
-        SceneGraphManager():
-        world(-1)
-        {}
+        SceneGraphManager();
 
-        GameObject* GetWorld()
-        {
-            return &world;
-        }
+        GameObject* GetWorld();
 
-        GameObject* GetNodeFromEntity(Entity _entity)
-        {
-            return GetNodeFromEntity(_entity,&world);
-        }
+        GameObject* GetNodeFromEntity(Entity _entity);
     };
 } //!namespace

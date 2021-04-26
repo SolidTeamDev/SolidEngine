@@ -1694,7 +1694,7 @@ static void ShowDemoWindowWidgets()
         }
         if (ImGui::BeginPopup("mypicker"))
         {
-            ImGui::Text("MY CUSTOM COLOR PICKER WITH AN AMAZING PALETTE!");
+            ImGui::Text("MY CUSTOM COLORShader PICKER WITH AN AMAZING PALETTE!");
             ImGui::Separator();
             ImGui::ColorPicker4("##picker", (float*)&color, misc_flags | ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoSmallPreview);
             ImGui::SameLine();

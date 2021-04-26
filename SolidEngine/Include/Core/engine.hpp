@@ -3,6 +3,7 @@
 #include "Build/solidAPI.hpp"
 #include "Rendering/renderer.hpp"
 #include "Window/window.hpp"
+#include "Audio/audio.hpp"
 #include "solidMultiThread.hpp"
 #include "Time/time.hpp"
 #include "InputManager/inputManager.hpp"
@@ -11,6 +12,13 @@
 
 #include "ECS/ecsManager.hpp"
 #include "ECS/System/rendererSystem.hpp"
+#include "ECS/System/audioSystem.hpp"
+#include "ECS/System/physicsSystem.hpp"
+
+#include "Resources/graphicalResourceMgr.hpp"
+
+#include "Physics/physics.hpp"
+#include "std_wrapper.hpp"
 
 namespace Solid
 {
@@ -26,24 +34,36 @@ namespace Solid
         bool mtEnabled = false;
         bool engineContextInit = false;
 
-        void InitEcs();
 
+        void InitEcs();
+	    Engine();
+
+	    static Engine* instance;
+
+	    ~Engine();
+	    static void DeleteInstance()
+	    {
+	    	delete instance;
+	    };
+	    friend class EngineCleanerInterface;
     public:
+    	//Engine** test = &instance;
         Window* window;
         Renderer* renderer = nullptr;
+        Audio audio;
         ECSManager ecsManager;
         std::shared_ptr<RendererSystem> rendererSystem;
-        class ResourceManager* resourceManager;
+        std::shared_ptr<AudioSystem> audioSystem;
+        std::shared_ptr<PhysicsSystem> physicsSystem;
+        ResourceManager resourceManager;
         TaskManager taskManager;
         ThreadManager threadPool;
+        GraphicalResourceMgr graphicsResourceMgr;
+        Physics physics;
+        
+        static Engine* GetInstance();
         bool MultiThreadEnabled()const {return mtEnabled;}
-        void EnableMultiThread(bool _b)
-        {
-            mtEnabled = _b;
-            if(_b){threadPool.PlayAllThreads();}
-            else{threadPool.PauseAllThreads();}
-        }
-        Engine();
+        void EnableMultiThread(bool _b);
         Engine(const Engine& _copy) = delete;
         Engine(Engine&& _move) = delete;
 
@@ -58,6 +78,13 @@ namespace Solid
          */
         bool IsEngineContextInitialized() const;
 
-        ~Engine();
+        void Update();
+
+        void FixedUpdate();
+
+        void LateUpdate();
+
     };
+
+
 } //!namespace

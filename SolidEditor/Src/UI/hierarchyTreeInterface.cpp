@@ -6,7 +6,7 @@
 
 namespace Solid
 {
-    void HierarchyTreeInterface::Draw(Engine* _engine)
+    void HierarchyTreeInterface::Draw()
     {
         if(!p_open)
             return;
@@ -16,49 +16,70 @@ namespace Solid
         UI::Begin("Hierarchy", &p_open,
                   ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
 
-        for(GameObject* g : _engine->ecsManager.GetWorld()->childs)
-        {
-            DrawEntities(g,0);
-        }
-        DrawCreateObject(_engine);
+        if (UI::IsWindowHovered() && UI::IsAnyMouseDown())
+            EditorInterface::selectedGO = nullptr;
+
+        DrawEntities();
+
+        DrawCreateObject();
 
         UI::End();
     }
 }
 
-void Solid::HierarchyTreeInterface::DrawCreateObject(Engine* _engine)
+void Solid::HierarchyTreeInterface::DrawCreateObject()
 {
+    Engine* engine = Engine::GetInstance();
+	bool create = true;
+	if(create)
+	{
+		create = false;
+	}
     if(UI::BeginPopupContextWindow("createObject"))
     {
         if(UI::BeginMenu("New"))
         {
             if(UI::MenuItem("GameObject"))
             {
-                Entity tmp = _engine->ecsManager.CreateEntity();
-                _engine->ecsManager.AddComponent(tmp,Transform());
+                GameObject* tmp = nullptr;
+
+                if (EditorInterface::selectedGO != nullptr)
+                    tmp = engine->ecsManager.CreateEntity(EditorInterface::selectedGO->GetEntity());
+                else
+                    tmp = engine->ecsManager.CreateEntity();
+
+                engine->ecsManager.AddComponent(tmp,Transform());
+                EditorInterface::selectedGO = tmp;
+
             }
             UI::Separator();
             if(UI::MenuItem("Cube"))
             {
-                Entity tmp = _engine->ecsManager.CreateEntity();
-                _engine->ecsManager.AddComponent(tmp,Transform());
-                _engine->ecsManager.AddComponent(tmp,MeshRenderer{
-                        .mesh   = dynamic_cast<MeshResource*>(_engine->resourceManager->GetResourceByName("cube.obj")),
-                        .shader = dynamic_cast<ShaderResource*>(_engine->resourceManager->GetResourceByName("ZShader"))
-                });
+                GameObject* tmp = nullptr;
+
+                if (EditorInterface::selectedGO != nullptr)
+                    tmp = engine->ecsManager.CreateEntity(EditorInterface::selectedGO->GetEntity());
+                else
+                    tmp = engine->ecsManager.CreateEntity();
+
+                engine->ecsManager.AddComponent(tmp,Transform());
+                engine->ecsManager.AddComponent(tmp,MeshRenderer(
+                		engine->graphicsResourceMgr.GetMesh("cube.obj"))
+                );
+                EditorInterface::selectedGO = tmp;
+
             }
             if(UI::MenuItem("Sphere"))
             {
-
             }
             if(UI::MenuItem("Solid"))
             {
-                Entity tmp = _engine->ecsManager.CreateEntity();
-                _engine->ecsManager.AddComponent(tmp,Transform());
-                _engine->ecsManager.AddComponent(tmp,MeshRenderer{
-                        .mesh   = dynamic_cast<MeshResource*>(_engine->resourceManager->GetResourceByName("solid.obj")),
-                        .shader = dynamic_cast<ShaderResource*>(_engine->resourceManager->GetResourceByName("ZShader"))
-                });
+                GameObject* tmp = engine->ecsManager.CreateEntity();
+                engine->ecsManager.AddComponent(tmp,Transform());
+                engine->ecsManager.AddComponent(tmp,MeshRenderer(
+		                engine->graphicsResourceMgr.GetMesh("solid.obj"))
+                );
+                EditorInterface::selectedGO = tmp;
             }
             UI::EndMenu();
         }
@@ -67,37 +88,65 @@ void Solid::HierarchyTreeInterface::DrawCreateObject(Engine* _engine)
     }
 }
 
-void Solid::HierarchyTreeInterface::DrawEntities(GameObject* child, unsigned int it)
+void Solid::HierarchyTreeInterface::DrawEntities()
 {
+    Engine *engine = Engine::GetInstance();
+    for (GameObject *g : engine->ecsManager.GetWorld()->childs)
+    {
+        CheckEntities(g, 0);
+    }
 
+    if (EditorInterface::draggingEnt && !UI::IsAnyMouseDown() && !UI::IsAnyItemHovered() && UI::IsWindowHovered())
+    {
+        EditorInterface::draggingEnt = false;
+        if (EditorInterface::selectedGO->parent == nullptr)
+            return;
 
+        EditorInterface::selectedGO->ReParentCurrent(engine->ecsManager.GetWorld());
+    }
+}
+
+void Solid::HierarchyTreeInterface::CheckEntities(GameObject* child, unsigned int it)
+{
     ImVec2 pos = UI::GetCursorPos();
     pos.x += 20.f * (float)it;
     UI::SetCursorPos(pos);
 
-    DrawEntity(child);
-
+    if (DrawEntity(child))
+        UI::TreePop();
 
     for(GameObject* child : child->childs)
     {
-        DrawEntities(child, it+1);
-    }
+        CheckEntities(child, it+1);
 
+    }
 }
 
-void Solid::HierarchyTreeInterface::DrawEntity(GameObject* child)
+bool Solid::HierarchyTreeInterface::DrawEntity(GameObject* child)
 {
-    ImVec4 colButton = UI::GetStyleColorVec4(ImGuiCol_Button);
-    if (child == EditorInterface::selectedGO)
-        colButton.w = 0.5f;
-    else
-        colButton.w = 0.0f;
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_None;
 
-    UI::PushStyleColor(ImGuiCol_Button, colButton);
-    UI::PushStyleColor(ImGuiCol_ButtonHovered, colButton);
-
-    if(UI::SmallButton((child->name + "##" +std::to_string(child->GetEntity())).c_str()))
+    if (child->childs.empty())
+        flags |= ImGuiTreeNodeFlags_Leaf;
+    bool result = UI::TreeNodeEx((child->name + "##" +std::to_string(child->GetEntity())).c_str(), flags);
+    if (UI::IsAnyMouseDown() && UI::IsItemHovered())
         EditorInterface::selectedGO = child;
 
-    UI::PopStyleColor(2);
+    if(UI::IsMouseHoveringRect(UI::GetItemRectMin(), UI::GetItemRectMax()) &&
+            UI::IsMouseDragging(ImGuiMouseButton_Left) && child == EditorInterface::selectedGO)
+        EditorInterface::draggingEnt = true;
+
+    if(UI::IsMouseHoveringRect(UI::GetItemRectMin(), UI::GetItemRectMax()) &&
+            EditorInterface::draggingEnt && !UI::IsAnyMouseDown())
+    {
+        EditorInterface::draggingEnt = false;
+        Log::Send("Changed " + EditorInterface::selectedGO->name +
+                             "'s parent to " + child->name, Log::ELogSeverity::DEBUG);
+
+		if(child != EditorInterface::selectedGO)
+            EditorInterface::selectedGO->ReParentCurrent(child);
+
+    }
+    return result;
 }
+

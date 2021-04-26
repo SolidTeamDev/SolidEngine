@@ -15,7 +15,7 @@ namespace Solid
         * @return Clamped value
         */
         template<typename T>
-        constexpr T Clamp(T _value, T _min, T _max) noexcept;
+        static constexpr T Clamp(T _value, T _min, T _max) noexcept;
 
         /**
         * @brief lerp from _start to _end at time.
@@ -26,7 +26,7 @@ namespace Solid
         * @return interpolation between _start and _end
         */
         template<typename T>
-        T Lerp(const T& _start, const T& _end, float _ratio) noexcept;
+        static T Lerp(const T& _start, const T& _end, float _ratio) noexcept;
 
         /**
          * @brief  slerp from _start to _end at time.
@@ -37,7 +37,7 @@ namespace Solid
          * @return interpolation between _start and _end
          */
         template<typename T>
-        T Slerp(const T& _start, T _end, float _ratio) noexcept;
+        static T Slerp(const T& _start, T _end, float _ratio) noexcept;
 
         /**
          * @brief Convert degrees value into radiant
@@ -46,7 +46,7 @@ namespace Solid
          * @return value converted in radiant
          */
         template<typename T>
-        constexpr T DegToRad(T _value) noexcept;
+        static constexpr T DegToRad(T _value) noexcept;
 
         /**
          * @brief Convert radiant value into degrees
@@ -55,7 +55,7 @@ namespace Solid
          * @return value  converted in degrees
          */
         template<typename T>
-        constexpr T RadToDeg(T _value) noexcept;
+        static constexpr T RadToDeg(T _value) noexcept;
 
         /**
          * @brief compute the absolute value
@@ -64,7 +64,7 @@ namespace Solid
          * @return absolute of the number
          */
         template<typename T>
-        constexpr T Abs(T _value) noexcept;
+        static constexpr T Abs(T _value) noexcept;
 
         /**
          * @brief getter of the minimum value
@@ -74,7 +74,7 @@ namespace Solid
          * @return Minimum value of _a and _b
          */
         template<typename T>
-        constexpr T Min(T _a, T _b) noexcept;
+        static constexpr T Min(T _a, T _b) noexcept;
 
         /**
          * @brief getter of the maximum value
@@ -84,7 +84,7 @@ namespace Solid
          * @return Maximum value of _a and _b
          */
         template<typename T>
-        constexpr T Max(T _a, T _b) noexcept;
+        static constexpr T Max(T _a, T _b) noexcept;
 
         /**
          * @brief Compute pow of base with exponent
@@ -94,7 +94,7 @@ namespace Solid
          * @return Base raised to exponent
          */
         template<typename T>
-        constexpr T Pow(T _base, T _exp) noexcept;
+        static constexpr T Pow(T _base, T _exp) noexcept;
 
         /**
         * @brief Compute pow of base with exponent
@@ -104,7 +104,7 @@ namespace Solid
         * @return Base raised to exponent
         */
         template<typename T>
-        constexpr T Pow(T _base, int _exp) noexcept;
+        static constexpr T Pow(T _base, int _exp) noexcept;
 
 
         /**
@@ -114,7 +114,7 @@ namespace Solid
          * @return Square root of the number
          */
         template<typename T>
-        constexpr T Sqrt(T _value) noexcept;
+        static constexpr T Sqrt(T _value) noexcept;
 
         /**
          * @brief Compute the cosine
@@ -123,7 +123,7 @@ namespace Solid
          * @return Cosine of the number
          */
         template<typename T>
-        constexpr T Cos(T _rad) noexcept;
+        static constexpr T Cos(T _rad) noexcept;
 
         /**
          * @brief Compute the arc-cosine
@@ -132,7 +132,7 @@ namespace Solid
          * @return Arc-cosine in radian
          */
         template<typename T>
-        constexpr T Acos(T _value) noexcept;
+        static constexpr T Acos(T _value) noexcept;
 
         /**
         * @brief Compute the sinus
@@ -141,7 +141,7 @@ namespace Solid
         * @return Sinus of the number
         */
         template<typename T>
-        constexpr T Sin(T _rad) noexcept;
+        static constexpr T Sin(T _rad) noexcept;
 
         /**
         * @brief Compute the arc-sinus
@@ -150,7 +150,7 @@ namespace Solid
         * @return Arc-sinus in radian
         */
         template<typename T>
-        constexpr T Asin(T _value) noexcept;
+        static constexpr T Asin(T _value) noexcept;
 
 
         /**
@@ -160,7 +160,7 @@ namespace Solid
         * @return Tangent of the number
         */
         template<typename T>
-        constexpr T Tan(T _rad) noexcept;
+        static constexpr T Tan(T _rad) noexcept;
 
         /**
         * @brief Compute the arc-tangent
@@ -169,8 +169,17 @@ namespace Solid
         * @return Arc-tangent in radian
         */
         template<typename T>
-        constexpr T Atan(T _value) noexcept;
+        static constexpr T Atan(T _value) noexcept;
 
+        /**
+        * @brief Compute the arc-tangent
+        * @tparam T Type of value
+        * @param _value1 Input number to compute
+        * @param _value2 Input number to compute
+        * @return Arc-tangent 2 in radian
+        */
+        template<typename T>
+        static constexpr T Atan2(T _value1, T _value2) noexcept;
 
         /**
          * @brief test the equality of 2 values
@@ -181,7 +190,7 @@ namespace Solid
          * @return if a and b are equal
          */
         template <typename T>
-        constexpr bool Equals(T _a, T _b, float _epsilon = S_EPSILON);
+        static constexpr bool Equals(T _a, T _b, float _epsilon = S_EPSILON);
 
         /**
          * @brief test if the number is equal to 0
@@ -190,8 +199,7 @@ namespace Solid
          * @return if value is equal to 0
          */
         template <typename T>
-        constexpr bool Equals0(T _value);
-
+        static constexpr bool Equals0(T _value);
 
     }
 }

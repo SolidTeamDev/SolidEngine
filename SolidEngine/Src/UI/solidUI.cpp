@@ -2,6 +2,9 @@
 
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
+
+#include "ImGuizmo.h"
+
 namespace Solid::UIContext
 {
     void InitializeSolidUI(GLFWwindow* window)
@@ -33,11 +36,11 @@ namespace Solid::UIContext
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         UI::NewFrame();
+        ImGuizmo::BeginFrame();
 
         UI::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(5.f, 3.f));
         UI::PushStyleVar(ImGuiStyleVar_WindowTitleAlign, ImVec2(0.5f, 0.5f));
 
-        //UI::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
         UI::PushStyleVar(ImGuiStyleVar_TabRounding, 2.f);
         UI::PushStyleVar(ImGuiStyleVar_FrameRounding, 3);
         UI::PushStyleVar(ImGuiStyleVar_WindowRounding, 3);

@@ -68,7 +68,7 @@ namespace Solid
 
     Vec2 Vec2::Nlerp(const Vec2 &_v1, const Vec2 &_v2, float _r) noexcept
     {
-        return Maths::Lerp(_v1,_v2,_r).GetNormalize();
+        return Maths::Lerp(_v1,_v2,_r).GetNormalized();
     }
 
     Vec2 Vec2::Slerp(const Vec2 &_v1, const Vec2 &_v2, float _r) noexcept
@@ -142,20 +142,40 @@ namespace Solid
 
     }
 
-    constexpr Vec2 Vec2::GetNormalize() const noexcept
+#if _DEBUG
+
+#define SE_WARN(_pred, str) { if(!_pred) Log::Send(str); }
+
+#else
+
+#define SE_WARN(...) {}
+
+#endif
+
+    constexpr Vec2 Vec2::GetNormalized() const noexcept
     {
+
         float len = Length();
-        if(len == 0)
-        {
-            Log::Send("normalize function: length = 0 impossible to compute");
-            return *this;
-        }
+
+        SE_WARN(len != 0, "normalize function: length = 0 impossible to compute");
+
+        //if(len == 0)
+        //{
+        //    Log::Send("normalize function: length = 0 impossible to compute");
+        //    return *this;
+        //}
         return Vec2(x/len, y/len);
     }
 
-    constexpr  bool Vec2::IsEquals(const Vec2 &vec) const noexcept
+    constexpr bool Vec2::IsNormalized() const noexcept
     {
-        return Solid::Maths::Equals(x,vec.x) && Solid::Maths::Equals(y,vec.y);
+        return Maths::Equals<float>(SqrtLength(), 3.f * S_EPSILON);
+    }
+
+    constexpr bool Vec2::IsEquals(const Vec2& vec) const noexcept
+    {
+        return Solid::Maths::Equals(x,vec.x, 0.0001f) &&
+               Solid::Maths::Equals(y,vec.y, 0.0001f);
     }
 
     constexpr float Vec2::Dist(const Vec2 &vec) const noexcept
@@ -168,7 +188,7 @@ namespace Solid
         return (*this - vec).SqrtLength();
     }
 
-    std::string Vec2::ToString() noexcept
+    const std::string Vec2::ToString() const noexcept
     {
         return "[" + std::to_string(x) + "," + std::to_string(y) + "]";
     }

@@ -3,18 +3,28 @@
 #include <iostream>
 #include "Rendering/OpenGL45/openGl45Renderer.hpp"
 #include "UI/solidUI.hpp"
-#include "Ressources/ressources.hpp"
+#include "Resources/ressources.hpp"
 
 #include "ECS/Components/transform.hpp"
 #include "ECS/Components/meshRenderer.hpp"
 #include "ECS/Components/camera.hpp"
+#include "ECS/Components/rigidBody.hpp"
+#include "ECS/Components/script.hpp"
+#include "ECS/Components/audioSource.hpp"
+#include "ECS/Components/rigidBody.hpp"
+#include "ECS/Components/boxCollider.hpp"
+#include "ECS/Components/sphereCollider.hpp"
+#include "ECS/Components/capsuleCollider.hpp"
+#include "Refureku/Refureku.h"
 
 namespace Solid
 {
+	__declspec(dllexport) Engine* Engine::instance = nullptr;
     Engine::Engine() :
-            threadPool(&taskManager)
+            threadPool(&taskManager),
+            resourceManager(this)
     {
-        resourceManager = ResourceManager::Initialize(this);
+
         InitEcs();
     }
 
@@ -34,6 +44,12 @@ namespace Solid
         ecsManager.RegisterComponent<Transform>();
         ecsManager.RegisterComponent<MeshRenderer>();
         ecsManager.RegisterComponent<Camera>();
+        ecsManager.RegisterComponent<Script*>();
+        ecsManager.RegisterComponent<AudioSource>();
+        ecsManager.RegisterComponent<RigidBody>();
+        ecsManager.RegisterComponent<BoxCollider>();
+        ecsManager.RegisterComponent<SphereCollider>();
+        ecsManager.RegisterComponent<CapsuleCollider>();
 
         //Register Signature
         rendererSystem = ecsManager.RegisterSystem<RendererSystem>();
@@ -42,6 +58,21 @@ namespace Solid
             signature.set(ecsManager.GetComponentType<Transform>());
             signature.set(ecsManager.GetComponentType<MeshRenderer>());
             ecsManager.SetSystemSignature<RendererSystem>(signature);
+        }
+
+        audioSystem = ecsManager.RegisterSystem<AudioSystem>();
+        {
+            Signature signature;
+            signature.set(ecsManager.GetComponentType<Transform>());
+            signature.set(ecsManager.GetComponentType<AudioSource>());
+            ecsManager.SetSystemSignature<AudioSystem>(signature);
+        }
+
+        physicsSystem = ecsManager.RegisterSystem<PhysicsSystem>();
+        {
+            Signature signature;
+            signature.set(ecsManager.GetComponentType<Transform>());
+            ecsManager.SetSystemSignature<PhysicsSystem>(signature);
         }
     }
 
@@ -61,10 +92,44 @@ namespace Solid
 
         if(window != nullptr && renderer != nullptr)
             engineContextInit = true;
+	    graphicsResourceMgr.Init(&resourceManager, renderer);
     }
 
     bool Engine::IsEngineContextInitialized() const
     {
+
         return engineContextInit;
     }
+
+	Engine *Engine::GetInstance()
+	{
+    	if(instance == nullptr)
+    		instance = new Engine();
+
+    	return instance;
+	}
+
+	void Engine::EnableMultiThread(bool _b)
+	{
+		mtEnabled = _b;
+		if(_b){threadPool.PlayAllThreads();}
+		else{threadPool.PauseAllThreads();}
+	}
+
+    void Engine::Update()
+    {
+
+    }
+
+    void Engine::FixedUpdate()
+    {
+        physicsSystem->Update(physics, (float)Time::DeltaTime());
+    }
+
+    void Engine::LateUpdate()
+    {
+
+    }
 } //!namespace
+
+

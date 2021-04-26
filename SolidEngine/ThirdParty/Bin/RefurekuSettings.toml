@@ -1,0 +1,61 @@
+[FileGenerationSettings]
+# Generated files will use this extension
+generatedFilesExtension = ".sld.hpp"
+
+# List of supported extensions
+supportedExtensions = [".h", ".hpp"]
+
+# Generated files will be located here
+outputDirectory = '''SolidEngine/Include/EngineGenerated'''
+
+# Files contained in the directories of this list will be parsed
+toParseDirectories = [
+    '''SolidEngine/Include/Core/Maths/Vector''',
+    '''SolidEngine/Include/Core/Maths/Quaternion''',
+    '''SolidEngine/Include/ECS/Components''',
+]
+
+# Files to parse which are not included in any directory of toParseDirectories
+toParseFiles = [
+    '''SolidEngine/Include/ECS/types.hpp''',
+    '''SolidEngine/Include/Core/std_wrapper.hpp''',
+]
+
+# Files contained in the directories of this list will be ignored
+ignoredDirectories = [
+#	'''Path/To/Output/Dir''',
+#	'''Path/To/Directory/To/Ignore'''
+]
+
+# Files not to parse which are not included in any directory of ignoredDirectories
+ignoredFiles = []
+
+
+[FileParsingSettings]
+# Abort parsing on first encountered error
+shouldAbortParsingOnFirstError = true
+
+# Should all entities be parsed whether they are tagged with the macro or not
+shouldParseAllEntities = false
+
+# Include directories of the project
+projectIncludeDirectories = [
+	'''SolidEngine/ThirdParty/Include/Refureku''',
+	'''SolidEngine/Include''',
+	'''SolidEngine/Include''',
+	'''SolidEngine/ThirdParty/Include'''
+]
+
+# Must be one of "msvc", "clang++", "g++"
+compilerExeName = "msvc"
+
+[FileParsingSettings.Properties]
+namespaceMacroName = "SLDNamespace"
+classMacroName = "SLDClass"
+structMacroName = "SLDStruct"
+fieldMacroName = "SLDField"
+methodMacroName = "SLDMethod"
+enumMacroName = "SLDEnum"
+enumValueMacroName = "SLDEnumVal"
+variableMacroName = "SLDVariable"
+functionMacroName = "SLDFunction"

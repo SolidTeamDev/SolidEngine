@@ -116,17 +116,19 @@ namespace Solid
     template<typename T>
     Mat4<T> Mat4<T>::Transform(const Vec3 &_pos, const Quat &_rot, const Vec3 &_scale)
     {
-        Mat4<T> TRS = Translate(_pos)*Rotation(_rot)*Scale(_scale);
+        Mat4<T> TRS = Scale(_scale)*Rotation(_rot)*Translate(_pos);
         return TRS ;
     }
 
     template<typename T>
     Mat4<T> Mat4<T>::Perspective(float _fov, float _aspect, float _near, float _far)
     {
-        float ymax = tanf(_fov * 3.14f / 180.f / 2.f);
-        float xmax = ymax * _aspect;
+        /*T ymax = tanf(_fov * 3.14f / 180.f / 2.f);
+        T xmax = ymax * _aspect;
 
-        Mat4<T> m;
+
+
+        Mat4 m;
 
         float temp = _far - _near;
 
@@ -145,9 +147,111 @@ namespace Solid
         m.elements[12] = 0.0;
         m.elements[13] = 0.0;
         m.elements[14] = -2 * (_far * _near) / temp;
-        m.elements[15] = 0.0;
+        m.elements[15] = 0.0;*/
+
+        Mat4 m;
+
+        T range = _near - _far;
+        T invRange = _far - _near;
+        T halfFov = tanf(_fov * 3.14f / 180.f / 2.f);
+
+        m.elements[0] = 1/(halfFov*_aspect);
+        m.elements[5] = 1/halfFov;
+        m.elements[10] = -(_far+_near) / invRange;
+        m.elements[11] = -1;
+        m.elements[14] = -2*_far * _near / invRange;
 
         return m;
+    }
+
+    template<typename T>
+    bool Mat4<T>::DecomposeTransform(const Mat4<T>& transform, Vec3& translation, Quat& rotation, Vec3& scale)
+    {
+        Mat4<float> LocalMatrix(transform);
+
+        // Normalize the matrix.
+        if (Maths::Equals0(LocalMatrix[15]))
+            return false;
+
+        // First, isolate perspective.  This is the messiest.
+        if (
+                (!Maths::Equals0(LocalMatrix[3])) ||
+                (!Maths::Equals0(LocalMatrix[7])) ||
+                (!Maths::Equals0(LocalMatrix[11])))
+        {
+            // Clear the perspective partition
+            LocalMatrix[3] = LocalMatrix[7] = LocalMatrix[11] = 0.0f;
+            LocalMatrix[15] = 1;
+        }
+
+        // Next take care of translation (easy).
+        translation = Vec3(LocalMatrix[12], LocalMatrix[13], LocalMatrix[14]);
+        LocalMatrix[12] =  LocalMatrix[13] = LocalMatrix[14] = 0.0f;
+
+        Vec3 Row[3], Pdum3;
+
+        // Now get scale and shear.
+        for (size_t i = 0; i < 3; ++i)
+        {
+
+            Row[i].x = LocalMatrix[(4*i)];
+            Row[i].y = LocalMatrix[(4*i)+1];
+            Row[i].z = LocalMatrix[(4*i)+2];
+        }
+        // Compute X scale factor and normalize first row.
+        scale.x = Row[0].Length();
+        Row[0] = Row[0].GetNormalized();//detail::scale(Row[0], static_cast<T>(1));
+        scale.y = Row[1].Length();
+        Row[1] = Row[1].GetNormalized();
+        scale.z = Row[2].Length();;
+        Row[2] = Row[2].GetNormalized();
+
+        Pdum3 = Vec3::Cross(Row[1], Row[2]); // v3Cross(row[1], row[2], Pdum3);
+        if (Vec3::Dot(Row[0], Pdum3) < 0)
+        {
+            scale *= static_cast<T>(-1);
+            for (size_t i = 0; i < 3; i++)
+            {
+                Row[i] *= static_cast<T>(-1);
+            }
+        }
+
+        float tr = Row[0].x + Row[1].y + Row[2].z;
+        if(tr > 0)
+        {
+            float s = Maths::Sqrt(tr + 1) * 2;
+            rotation.w = 0.25f * s;
+            rotation.x = (Row[2].y - Row[1].z) / s;
+            rotation.y = (Row[0].z - Row[2].x) / s;
+            rotation.z = (Row[1].x - Row[0].y) / s;
+
+        }
+        else if((Row[0].x > Row[1].y) && (Row[0].x > Row[2].z))
+        {
+            float s = Maths::Sqrt(1 + Row[0].x - Row[1].y - Row[2].z) * 2;
+            rotation.w = (Row[2].y - Row[1].z) / s;
+            rotation.x = 0.25f * s;
+            rotation.y = (Row[0].y + Row[1].x) / s;
+            rotation.z = (Row[0].z + Row[2].x) / s;
+        }
+        else if((Row[1].y > Row[2].z))
+        {
+            float s = Maths::Sqrt(1 + Row[1].y - Row[0].x - Row[2].z) * 2;
+            rotation.w = (Row[0].z - Row[2].x) / s;
+            rotation.x = (Row[0].y + Row[1].x) / s;
+            rotation.y = 0.25f * s;
+            rotation.z = (Row[1].z + Row[2].y) / s;
+        }
+        else
+        {
+            float s = Maths::Sqrt(1 + Row[2].z - Row[1].y - Row[0].x) * 2;
+            rotation.w = (Row[1].x - Row[0].y) / s;
+            rotation.x = (Row[0].z + Row[2].x) / s;
+            rotation.y = (Row[1].z + Row[2].y) / s;
+            rotation.z = 0.25f * s;
+        }
+
+        return true;
     }
 
     /*template <typename T>
@@ -161,6 +265,8 @@ namespace Solid
     template<typename T>
     constexpr bool Mat4<T>::IsZero() const noexcept
     {
+        // Function can't be constexpr with a loop.
+
         for (unsigned int i = 0; i < 16; i++)
         {
             if (!Maths::Equals0(elements[i]))
@@ -354,7 +460,7 @@ namespace Solid
     template<typename T>
     Mat4<T> &Mat4<T>::Inverse() noexcept
     {
-        elements = GetInverse();
+        elements = GetInversed();
         return *this;
     }
 
@@ -408,7 +514,7 @@ namespace Solid
 
 
     template<typename T>
-    std::string Mat4<T>::ToString() noexcept
+    const std::string Mat4<T>::ToString() const noexcept
     {
         std::string str = "\n";
 

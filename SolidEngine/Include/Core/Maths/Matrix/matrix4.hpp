@@ -14,6 +14,7 @@ namespace Solid
     template<typename T = float>
     struct Mat4
     {
+
         std::array<T, 16> elements;
 
         Mat4();
@@ -41,6 +42,7 @@ namespace Solid
         static Mat4 Scale(const Vec3& _scale);
         static Mat4 Transform(const Vec3& _pos,const Quat& _rot, const Vec3& _scale = Vec3::One);
         static Mat4 Perspective(float _fov = 90.f, float _aspect = 1.f,float _near = 0.25f,float _far = 100.f);
+        static bool DecomposeTransform(const Mat4<T>& transform, Vec3& translation, Quat& rotation, Vec3& scale);
         //static Mat4 Orthogonal();
 
 #pragma endregion
@@ -54,6 +56,7 @@ namespace Solid
         constexpr T& At(unsigned int _index)const;
         T& At(unsigned int _n, unsigned int _m);
         constexpr T& At(unsigned int _n, unsigned int _m)const;
+
 
         Mat4& Multiply(T _scale) noexcept;
         constexpr Mat4 GetMultiplied(T _scale) const noexcept;
@@ -69,7 +72,7 @@ namespace Solid
 
         constexpr float Determinant() const noexcept;
 
-        std::string ToString() noexcept;
+        const std::string ToString() const noexcept;
 
     private:
         constexpr float det_2(unsigned x, unsigned y, unsigned z, unsigned w) noexcept;
@@ -81,7 +84,7 @@ namespace Solid
     public:
 
         Mat4& operator = (Mat4&& _move) = default;
-        Mat4& operator = (Mat4& _copy)  = default;
+        Mat4& operator = (const Mat4& _copy)  = default;
 
         constexpr Mat4 operator * (T _scale) const noexcept;
         constexpr Mat4 operator / (T _scale) const noexcept;

@@ -1,5 +1,7 @@
 #include "ECS/Components/transform.hpp"
 
+#include "Core/Maths/Utils/numerics.hpp"
+
 namespace Solid
 {
     Transform::Transform():
@@ -10,6 +12,7 @@ namespace Solid
     transMat(Mat4<>::Identity),
     position(_position),
     rotation(_rotation),
+    euler(Maths::RadToDeg(rotation.ToEuler())),
     scale(_scale)
     {}
 
@@ -22,7 +25,19 @@ namespace Solid
     void Transform::SetRotation(const Quat &_quat)
     {
         rotation = _quat;
+        euler = _quat.ToEuler();
+        euler.x=Maths::RadToDeg(euler.x);
+        euler.y=Maths::RadToDeg(euler.y);
+        euler.z=Maths::RadToDeg(euler.z);
+
         hasToUpdateMat = true;
+    }
+
+    void Transform::SetEuler(const Vec3& _euler)
+    {
+        euler=_euler;
+        Vec3 temp {Maths::DegToRad(_euler.x),Maths::DegToRad(_euler.y),Maths::DegToRad(_euler.z)};
+        rotation = Quat(temp);
     }
 
     void Transform::SetScale(const Vec3 &_vec)
@@ -66,6 +81,12 @@ namespace Solid
     }
 
 
+
+    Vec3 Transform::GetEuler() const
+    {
+        return euler;
+    }
+
     Mat4<float> Transform::GetMatrix()
     {
         if(hasToUpdateMat)
@@ -80,6 +101,15 @@ namespace Solid
     void Transform::UpdateTransformMatrix()
     {
         transMat = Mat4<float>::Transform(position,rotation,scale);
+    }
+
+    void Transform::SetTransformMatrix(const Mat4<float> &_mat)
+    {
+        transMat = _mat;
+        Mat4<float>::DecomposeTransform(_mat,position,rotation,scale);
+        Vec3 eulerRad = rotation.ToEuler();
+        euler = Vec3(Maths::RadToDeg(eulerRad.x),Maths::RadToDeg(eulerRad.y),Maths::RadToDeg(eulerRad.z));
+        hasToUpdateMat = false;
     }
 
 } //!namespace

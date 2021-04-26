@@ -1,7 +1,10 @@
+#include <string>
 #include "UI/filesInterface.hpp"
 
 #include <imgui.h>
 #include <imgui_internal.h>
+#include "Core/engine.hpp"
+#include "imgui_stdlib.h"
 
 namespace Solid
 {
@@ -16,7 +19,10 @@ namespace Solid
                   ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
         UI::TextWrapped("Welcome on the Solid files explorer!");
         DrawCreateFile();
-        UI::End();
+	    DrawMatNamePopup();
+	    UI::End();
+
+
 
     }
 
@@ -34,10 +40,44 @@ namespace Solid
                 {
 
                 }
+	            if (UI::MenuItem("Create Material"))
+	            {
+
+	            	matNamePopup = true;
+	            	matNamestr = "";
+
+
+	            }
                 UI::EndMenu();
             }
 
             UI::EndPopup();
         }
     }
+
+	void FilesInterface::DrawMatNamePopup()
+	{
+    	if(matNamePopup)
+	    {
+    		UI::OpenPopup("MatNamePopUp");
+	        matNamePopup = false;
+	    }
+
+		if (UI::BeginPopup("MatNamePopUp"))
+		{
+			UI::Text("Material Name :");
+			UI::SameLine();
+			UI::InputText("##MatName", &matNamestr);
+			if(UI::Button("Create new Material"))
+			{
+				UI::ShowDemoWindow();
+				Engine* engine = Engine::GetInstance();
+				MaterialResource* mat =engine->resourceManager.CreateMaterial(matNamestr.c_str());
+				mat->shader = engine->graphicsResourceMgr.GetShader("DefaultShader");
+				UI::CloseCurrentPopup();
+			}
+			UI::EndPopup();
+		}
+
+	}
 }

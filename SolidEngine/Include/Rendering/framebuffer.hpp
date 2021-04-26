@@ -13,6 +13,7 @@ namespace Solid
         GLuint texture      = 0;
         GLuint depthBuffer  = 0;
 
+        Vec2i pos = {0,0};
         Vec2i size = {0,0};
     };
 
