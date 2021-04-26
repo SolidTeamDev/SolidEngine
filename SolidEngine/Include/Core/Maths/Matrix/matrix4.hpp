@@ -66,16 +66,16 @@ namespace Solid
 
         Mat4& Transpose() noexcept;
         constexpr Mat4 GetTransposed() const noexcept;
-        constexpr Mat4 CoMatrix() noexcept;
+        Mat4 CoMatrix() const ;
         Mat4& Inverse() noexcept;
-        constexpr Mat4 GetInversed() const noexcept;
+        constexpr Mat4 GetInversed() const;
 
         constexpr float Determinant() const noexcept;
 
         const std::string ToString() const noexcept;
 
     private:
-        constexpr float det_2(unsigned x, unsigned y, unsigned z, unsigned w) noexcept;
+        constexpr float det_2(unsigned x, unsigned y, unsigned z, unsigned w) const noexcept;
 
 
 
