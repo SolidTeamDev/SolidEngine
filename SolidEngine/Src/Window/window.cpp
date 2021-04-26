@@ -20,6 +20,7 @@ namespace Solid
         glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+
         window = glfwCreateWindow(_wParam.windowSize.x,_wParam.windowSize.y,_wParam.title.c_str(), nullptr, nullptr);
 
         if(window == nullptr)

@@ -7,20 +7,7 @@
 
 namespace Solid
 {
-	class SOLID_API EngineCleanerInterface
-	{
-	protected:
-		EngineCleanerInterface()
-		{
 
-		}
-
-		~EngineCleanerInterface()
-		{
-			Engine::DeleteInstance();
-		}
-
-	};
 
     class Editor
     {
@@ -50,10 +37,12 @@ namespace Solid
         static float camSpeed;
         static Framebuffer sceneFramebuffer;
         static Camera editorCamera;
+        json CurrentProjectJson;
 
         Editor();
         ~Editor();
-	    void LoadResources(bool _solid);
+        void InitFromProject();
+	    void LoadResources(fs::path& p);
         void Run();
         friend class EngineCleanerInterface;
     };

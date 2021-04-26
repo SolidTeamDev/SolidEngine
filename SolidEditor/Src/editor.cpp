@@ -96,18 +96,15 @@ namespace Solid
 
     }
 
-    void Editor::LoadResources(bool _solid)
+    void Editor::LoadResources( fs::path& p)
     {
         engine->EnableMultiThread(true);
-
+		ResourcesLoader::SolidPath = p;
         ResourcesLoader loader;
+
 
         loader.SetManager(&(engine->resourceManager));
 
-        fs::path p = fs::current_path().append("Resources");
-
-        if(_solid)
-			p = fs::current_path().append("SolidResources");
         auto before = std::chrono::high_resolution_clock::now();
         loader.LoadResourcesFromFolder(p);
         auto after = std::chrono::high_resolution_clock::now();
@@ -184,4 +181,29 @@ namespace Solid
                                      0,
                                      sin(rot.y)  * strafeVelocity));
     }
+
+	void Editor::InitFromProject()
+	{
+		std::string ProjectName =CurrentProjectJson["Project"]["Name"] ;
+		fs::path ProjectPath =std::string(CurrentProjectJson["Project"]["Path"]) ;
+		fs::path AssetPath =ProjectPath.string() + "/" +(std::string(CurrentProjectJson["Project"]["AssetFolder"])) ;
+		fs::path CodePath =ProjectPath.string() +"/" +(std::string(CurrentProjectJson["Project"]["SourcesFolder"])) ;
+		fs::path EngineIncPath =ProjectPath.string() +"/" +(std::string(CurrentProjectJson["Project"]["EngineIncludeFolder"])) ;
+
+		LoadResources(AssetPath);
+		bool b = (!fs::is_empty(EngineIncPath) && fs::exists(EngineIncPath.append("INIT")));
+		if(!b)
+		{
+			auto editP =fs::current_path();
+			auto EngineInc = editP.append("Include");
+			if(fs::exists(EngineInc))
+			{
+				const auto opt = fs::copy_options::recursive | fs::copy_options::update_existing;
+				fs::copy(EngineInc, EngineIncPath, opt);
+			}
+
+			fs::create_directory(EngineIncPath.string() + "/INIT");
+
+		}
+	}
 } //!namespace
