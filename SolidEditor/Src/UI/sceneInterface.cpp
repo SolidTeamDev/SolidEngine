@@ -85,7 +85,7 @@ namespace Solid
 
         sceneCam.UpdateCamera(sceneFramebuffer.size);
 
-        if(UI::IsWindowFocused() && !ImGuizmo::IsOver() && MouseInSceneInterface(mousePos))
+        if(UI::IsWindowFocused() && MouseInSceneInterface(mousePos))
         {
             MovementAndRotationCam(Time::DeltaTime()  * float((int)(engine->window->GetWindowSize().x/2) - mousePos.x ),
                                   Time::DeltaTime()  * float((int)(engine->window->GetWindowSize().y/2) - mousePos.y ));

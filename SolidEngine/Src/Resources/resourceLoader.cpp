@@ -259,7 +259,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
         const std::size_t numOfShader = std::count_if(ToLoad.begin(), ToLoad.end(), (fp)shaderFind);
 	    const std::size_t numOfMat = std::count_if(ToLoad.begin(), ToLoad.end(), (fp)matFind);
 	    const std::size_t numOfSound = std::count_if(ToLoad.begin(), ToLoad.end(), (fp)matFind);
-        ResourcePtrWrapper* RessourceArray = new ResourcePtrWrapper[numOffiles + numOfShader - numOfMat - numOfSound] {nullptr};
+        ResourcePtrWrapper* RessourceArray = new ResourcePtrWrapper[numOffiles + numOfShader - numOfMat - numOfSound]();
 
 
         auto Lambda = [this](const fs::path *Rpath, ResourcePtrWrapper *wrapper){LoadRessourceNoAdd(*Rpath,*wrapper); delete Rpath;};
