@@ -38,7 +38,7 @@ file(GLOB ENGINE_LIBS_DEBUG
 file(GLOB ENGINE_LIBS_RELEASE
         SolidEngine/ThirdParty/Lib/Release/*.lib)
 
-#set(ENGINE_LIBS PUBLIC glfw3dll OpenGL::GL assimp-vc142-mtd IrrXML zlibstaticd)
+#set(ENGINE_LIBS PUBLIC glfw3dll OpenGL::GL assimp-vc140-mtd IrrXML zlibstaticd)
 
 add_library(SolidEngine SHARED ${ENGINE_SOURCE_FILES} ${THIRD_PARTY_FILES})
 
@@ -103,6 +103,44 @@ add_custom_target(RunGenerator
 
 add_dependencies(SolidEngine RunGenerator)
 
+# ========= LAUNCHER ==========
+
+project(SolidLauncher)
+
+### Include dirs
+
+include_directories(SolidLauncher/Include)
+include_directories(SolidEngine/Include)
+
+### Editor Sources Files
+
+file(GLOB_RECURSE LAUNCHER_SOURCE_FILES
+        SolidLauncher/Src/*.c
+        SolidLauncher/Src/*.cpp
+        $<TARGET_OBJECTS:SolidEngine>)
+
+#### Lib
+
+#OPENGL
+find_package(OpenGL REQUIRED)
+
+#Extern Lib
+link_directories(SolidEngine/ThirdParty/Lib Build/${CMAKE_BUILD_TYPE})
+
+set(LAUNCHER_LIBS PUBLIC glfw3dll OpenGL::GL SolidEngine)
+
+add_executable(SolidLauncher ${LAUNCHER_SOURCE_FILES})
+target_link_libraries(SolidLauncher ${LAUNCHER_LIBS})
+target_compile_definitions(SolidLauncher PUBLIC "IMGUI_API=__declspec(dllimport)")
+target_compile_definitions(SolidLauncher PUBLIC "SOLID_API=__declspec(dllimport)")
+target_compile_definitions(SolidLauncher PRIVATE "SOLID_EDITOR_API=__declspec(dllexport)")
+
+
+
+
+add_dependencies(SolidEditor SolidEngine)
+
+
 
 # ========= DLL ==========
 
@@ -119,14 +157,16 @@ if(CMAKE_BUILD_TYPE MATCHES Debug)#DEBUG
     ADD_CUSTOM_COMMAND (TARGET SolidEditor POST_BUILD
 
             COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Bin/Debug ${CMAKE_BINARY_DIR}/
-
+            COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/SolidEngined.dll ${CMAKE_BINARY_DIR}/Dlls/Debug
+            COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/SolidEngined.lib ${CMAKE_BINARY_DIR}/Dlls/Debug
     COMMENT "Copying debug binaries" VERBATIM)
 else()#RELEASE/OTHER
 
     ADD_CUSTOM_COMMAND (TARGET SolidEditor POST_BUILD
 
             COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Bin/Release ${CMAKE_BINARY_DIR}/
-
+            COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/SolidEngine.dll ${CMAKE_BINARY_DIR}/Dlls/Release
+            COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/SolidEngine.lib ${CMAKE_BINARY_DIR}/Dlls/Release
     COMMENT "Copying release binaries" VERBATIM)
 endif()
 
@@ -139,7 +179,23 @@ COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/Resources ${CMA
 # Output Message
 COMMENT "Copying Resources folder" VERBATIM)
 
+# ========= INCLUDES ==========
+ADD_CUSTOM_COMMAND (TARGET SolidEditor POST_BUILD
+
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/SolidEngine/Include ${CMAKE_BINARY_DIR}/Include
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Include ${CMAKE_BINARY_DIR}/Include
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Lib ${CMAKE_BINARY_DIR}/Dlls
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Bin ${CMAKE_BINARY_DIR}/Dlls
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Include ${CMAKE_BINARY_DIR}/Include
+        # Output Message
+        COMMENT "Copying Includes folder" VERBATIM
+        )
+
+
+
 # ========= LAYOUT ==========
+
+
 ADD_CUSTOM_COMMAND (TARGET SolidEditor POST_BUILD
 
 COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/imgui.ini ${CMAKE_BINARY_DIR}

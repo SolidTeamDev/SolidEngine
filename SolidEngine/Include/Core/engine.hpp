@@ -86,5 +86,20 @@ namespace Solid
 
     };
 
+	class SOLID_API EngineCleanerInterface
+	{
+	protected:
+		EngineCleanerInterface()
+		{
+
+		}
+
+		~EngineCleanerInterface()
+		{
+			Engine::DeleteInstance();
+		}
+
+	};
+
 
 } //!namespace

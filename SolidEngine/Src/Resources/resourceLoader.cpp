@@ -25,6 +25,8 @@
 #include "Core/engine.hpp"
 using namespace Solid;
 
+__declspec(dllexport) fs::path ResourcesLoader::SolidPath ="";
+
 #define SASSET_GEN 1
 struct ShaderLoaderWrapper
 {
@@ -84,6 +86,8 @@ void  ResourcesLoader::LoadRessourceNoAdd(const fs::path &Rpath, ResourcePtrWrap
         r=LoadSolidShader(Rpath);
     else if(extension == ".sanim")
         ;
+    else if(extension == ".sskel")
+	    ;
     /// Image Loading
     else if(extension == ".bmp")
         r=LoadImage(Rpath);
@@ -98,7 +102,10 @@ void  ResourcesLoader::LoadRessourceNoAdd(const fs::path &Rpath, ResourcePtrWrap
     else if(extension == ".obj")
         r=LoadMesh(Rpath);
     else if(extension == ".fbx")
-        r=LoadMesh(Rpath);
+    {
+	    LoadFBX(Rpath, &wrapper.fbx);
+	    wrapper.isFBX = true;
+    }
 
 
     wrapper.r = r;
@@ -109,19 +116,115 @@ void ResourcesLoader::LoadRessource(const fs::path &Rpath)
     LoadRessourceNoAdd(Rpath, RWrapper);
     if(RWrapper.r != nullptr)
         Manager->AddResource(RWrapper.r);
+    if(RWrapper.isFBX)
+    {
+    	Manager->AddResource(RWrapper.fbx.mesh);
+	    Manager->AddResource(RWrapper.fbx.Skeleton);
+	    for(AnimResource* elt : RWrapper.fbx.anims)
+	    {
+		    Manager->AddResource(elt);
+	    }
+    }
 }
 
 
 
 void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 {
-    if(!fs::exists(Rpath))
+    if(!fs::exists(Rpath) || fs::is_empty(Rpath))
         return;
     ///MultiThread Loading
     if(Manager->GetEngine()->MultiThreadEnabled())
     {
         TaskManager& TaskMan = Manager->GetEngine()->taskManager;
         using fp = bool (*)( const fs::path&);
+
+        /////////////////////////////
+	    auto SolidFind = [](const fs::path&item)
+	    {
+		    if(!fs::is_directory(item))
+		    {
+			    std::string name = item.extension().string();
+			    std::transform(name.begin(), name.end(), name.begin(),
+			                   [](unsigned char c){ return std::tolower(c); });
+
+			    return (name.find(".simage") != std::string::npos
+			        || name.find(".smesh") != std::string::npos
+			        || name.find(".scompute") != std::string::npos
+			        || name.find(".svertfrag") != std::string::npos
+			        || name.find(".sanim") != std::string::npos
+			        || name.find(".sskel") != std::string::npos
+			        || name.find(".smaterial") != std::string::npos
+			        || name.find(".saudio") != std::string::npos);
+
+		    }
+		    return false;
+	    };
+	    auto NormalFind = [](const fs::path&item)
+	    {
+		    if(fs::is_directory(item))
+		    {
+			    std::string name = item.filename().string();
+			    std::transform(name.begin(), name.end(), name.begin(),
+			                   [](unsigned char c){ return std::tolower(c); });
+			    return (name.find("shader") != std::string::npos || name.find("compute") != std::string::npos);
+
+		    }
+		    else
+		    {
+			    std::string name = item.filename().string();
+			    std::transform(name.begin(), name.end(), name.begin(),
+			                   [](unsigned char c){ return std::tolower(c); });
+			    return (name.find(".bmp") != std::string::npos
+			    || name.find(".png") != std::string::npos
+			    || name.find(".jpg") != std::string::npos
+			    || name.find(".jpeg") != std::string::npos
+			    || name.find(".obj") != std::string::npos
+			    || name.find(".fbx") != std::string::npos
+			    || name.find(".wav") != std::string::npos
+			    || name.find(".ogg") != std::string::npos);
+
+		    }
+		    return false;
+	    };
+	    std::vector<fs::path> normal;
+	    std::vector<fs::path> Solid;
+	    std::vector<fs::path> ToLoad;
+
+        for(auto& item : fs::directory_iterator(Rpath))
+        {
+			if(NormalFind(item))
+			{
+				normal.push_back(item);
+			}
+			else if(SolidFind(item))
+			{
+				Solid.push_back(item);
+			}
+        }
+		for(auto& elt : normal)
+		{
+			bool found = false;
+			for(auto& elt2 : Solid)
+		    {
+		        if(elt2.filename().string().find(elt.filename().string()) != std::string::npos)
+		        {
+		        	ToLoad.push_back(elt2);
+		        	found = true;
+			        break;
+		        }
+		    }
+			if(!found)
+			{
+				ToLoad.push_back(elt);
+			}
+		}
+
+
+
+        //////////////////////////////
+
+
         auto shaderFind = [](const fs::path&item)
         {
             if(fs::is_directory(item))
@@ -152,11 +255,12 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 		    || name.find(".ogg") != std::string::npos);
 
 	    };
-        const std::size_t numOffiles = std::count_if(fs::directory_iterator(Rpath), fs::directory_iterator{}, (fp)fs::is_regular_file);
-        const std::size_t numOfShader = std::count_if(fs::directory_iterator(Rpath), fs::directory_iterator{}, (fp)shaderFind);
-	    const std::size_t numOfMat = std::count_if(fs::directory_iterator(Rpath), fs::directory_iterator{}, (fp)matFind);
-	    const std::size_t numOfSound = std::count_if(fs::directory_iterator(Rpath), fs::directory_iterator{}, (fp)matFind);
+        const std::size_t numOffiles = std::count_if(ToLoad.begin(), ToLoad.end(), (fp)fs::is_regular_file);
+        const std::size_t numOfShader = std::count_if(ToLoad.begin(), ToLoad.end(), (fp)shaderFind);
+	    const std::size_t numOfMat = std::count_if(ToLoad.begin(), ToLoad.end(), (fp)matFind);
+	    const std::size_t numOfSound = std::count_if(ToLoad.begin(), ToLoad.end(), (fp)matFind);
         ResourcePtrWrapper* RessourceArray = new ResourcePtrWrapper[numOffiles + numOfShader - numOfMat - numOfSound] {nullptr};
+
 
         auto Lambda = [this](const fs::path *Rpath, ResourcePtrWrapper *wrapper){LoadRessourceNoAdd(*Rpath,*wrapper); delete Rpath;};
         int i =0;
@@ -166,10 +270,10 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
         Shaders.reserve(5);
 	    std::vector<fs::path> matPaths;
 	    std::vector<fs::path> soundPaths;
-        for (auto& item : fs::directory_iterator(Rpath))
+        for (auto& item : ToLoad)
         {
-            std::string name = item.path().filename().string();
-            fs::path* newP = new fs::path(item.path());
+            std::string name = item.filename().string();
+            fs::path* newP = new fs::path(item);
             if(fs::is_directory(item))
             {
                 std::transform(name.begin(), name.end(), name.begin(),
@@ -183,7 +287,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
             }
             else
             {
-                std::string extension = item.path().extension().string();
+                std::string extension = item.extension().string();
                 std::transform(extension.begin(), extension.end(), extension.begin(),
                                [](unsigned char c){ return std::tolower(c); });
                 if(extension == ".scompute" || extension == ".svertfrag")
@@ -252,6 +356,15 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
                     if(RessourceArray[k].r!= nullptr) {
                         Manager->AddResource(RessourceArray[k].r);
                     }
+	                else if(RessourceArray[k].isFBX) {
+	                	Manager->AddResource(RessourceArray[k].fbx.mesh);
+	                    Manager->AddResource(RessourceArray[k].fbx.Skeleton);
+	                    for(AnimResource* elt : RessourceArray[k].fbx.anims)
+	                    {
+		                    Manager->AddResource(elt);
+	                    }
+
+	                }
                 }
             }
         }
@@ -326,6 +439,274 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 /// Base Asset Loader
 ///
 
+void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
+{
+	MeshResource *Mesh = new MeshResource;
+	bool hasFoundSkeleton = false;
+	SkeletonResource* Skeleton = new SkeletonResource;
+	Assimp::Importer importer;
+	std::string str = Rpath.string();
+	Mesh->name = Rpath.filename().string();
+	importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_ANIMATIONS, true);
+	importer.SetPropertyBool(AI_CONFIG_IMPORT_REMOVE_EMPTY_BONES, false);
+
+
+	const aiScene *scene = importer.ReadFile(str, aiProcess_JoinIdenticalVertices | aiProcess_OptimizeMeshes |
+	                                              aiProcess_SplitLargeMeshes | aiProcess_Triangulate |
+	                                              aiProcess_SortByPType | aiProcess_LimitBoneWeights   );
+
+
+
+	aiBone* b;
+
+
+	if (!scene)
+	{
+		printf("Unable to load FBX: %s\n", importer.GetErrorString());
+		delete Mesh;
+		return;
+	}
+	if(!hasFoundSkeleton)
+	{
+		aiNode* boneNode = nullptr;
+		if(scene->HasAnimations())
+		{
+			aiString randomBoneName =scene->mAnimations[0]->mChannels[0]->mNodeName;
+			boneNode = scene->mRootNode->FindNode(randomBoneName);
+			aiNode* root = scene->mRootNode;
+			while (boneNode->mParent != root)
+			{
+				boneNode = boneNode->mParent;
+			}
+
+		}
+		if(boneNode != nullptr)
+		{
+			hasFoundSkeleton=true;
+
+			auto skelRoot = boneNode;
+
+
+			std::function<void(SkeletonResource::Bone*, aiNode*)> lambda = [&](SkeletonResource::Bone* _bone, aiNode* _aiNode){
+
+				_bone->name = _aiNode->mName.C_Str();
+
+				_bone->Childrens.reserve(_aiNode->mNumChildren);
+				for (int j = 0; j < _aiNode->mNumChildren; ++j)
+				{
+					SkeletonResource::Bone* cBone = new SkeletonResource::Bone;
+					_bone->Childrens.push_back(cBone);
+					_bone->transfo =
+							Mat4<float>(_aiNode->mTransformation.a1, _aiNode->mTransformation.a2, _aiNode->mTransformation.a3, _aiNode->mTransformation.a4,
+							            _aiNode->mTransformation.b1, _aiNode->mTransformation.b2, _aiNode->mTransformation.b3, _aiNode->mTransformation.b4,
+							            _aiNode->mTransformation.c1, _aiNode->mTransformation.c2, _aiNode->mTransformation.c3, _aiNode->mTransformation.c4,
+							            _aiNode->mTransformation.d1, _aiNode->mTransformation.d2, _aiNode->mTransformation.d3, _aiNode->mTransformation.d4);
+					cBone->Parent = _bone;
+					lambda(cBone, _aiNode->mChildren[j]);
+
+				}
+			};
+			std::function<bool(SkeletonResource::Bone*, aiBone*)> setWeights = [&](SkeletonResource::Bone* _bone, aiBone* _aiBone)-> bool{
+
+				if(_bone->name == _aiBone->mName.C_Str())
+				{
+					_bone->Weights.reserve(_aiBone->mNumWeights);
+					Mat4<float> offset =
+							Mat4<float>(_aiBone->mOffsetMatrix.a1, _aiBone->mOffsetMatrix.a2, _aiBone->mOffsetMatrix.a3, _aiBone->mOffsetMatrix.a4,
+							            _aiBone->mOffsetMatrix.b1, _aiBone->mOffsetMatrix.b2, _aiBone->mOffsetMatrix.b3, _aiBone->mOffsetMatrix.b4,
+							            _aiBone->mOffsetMatrix.c1, _aiBone->mOffsetMatrix.c2, _aiBone->mOffsetMatrix.c3, _aiBone->mOffsetMatrix.c4,
+							            _aiBone->mOffsetMatrix.d1, _aiBone->mOffsetMatrix.d2, _aiBone->mOffsetMatrix.d3, _aiBone->mOffsetMatrix.d4);
+					_bone->offset = offset;
+					_bone->WeightInit = true;
+					_bone->FinalTrans = offset * _bone->transfo;
+					///WARN : trasfo matrix of aiBone and ai node *=-1 ?
+					for (int j = 0; j < _aiBone->mNumWeights; ++j)
+					{
+						_bone->Weights.push_back(_aiBone->mWeights[j].mWeight);
+					}
+					return true;
+				}
+
+				for (auto & Children : _bone->Childrens)
+				{
+
+					if(setWeights(Children, _aiBone))
+					{
+						return true;
+					}
+				}
+				return false;
+			};
+			lambda(&Skeleton->rootBone, skelRoot);
+
+
+			if(scene->HasMeshes())
+			{
+				for (int l = 0; l < scene->mMeshes[0]->mNumBones; ++l)
+				{
+					aiBone* bone = scene->mMeshes[0]->mBones[l];
+					setWeights(&Skeleton->rootBone, bone);
+				}
+			}
+			///load bones
+		}
+	}
+
+
+	for (int i = 0; i < scene->mNumAnimations; ++i)
+	{
+		AnimResource* anim = new AnimResource;
+		anim->numTicks = scene->mAnimations[i]->mDuration;
+		anim->ticksPerSeconds = scene->mAnimations[i]->mTicksPerSecond;
+		if(hasFoundSkeleton)
+			anim->Root = new SkeletonResource::Bone(Skeleton->rootBone);
+		fbx->anims.push_back(anim);
+		anim->Channels.resize(scene->mAnimations[i]->mNumChannels);
+		for(int j = 0; j < anim->Channels.size(); ++j)
+		{
+			AnimResource::BoneChannel& channel = anim->Channels[j];
+		    channel.BoneToMod = anim->Root->FindBoneByName(scene->mAnimations[i]->mChannels[j]->mNodeName.C_Str());
+		    std::size_t maxNumFrames =scene->mAnimations[i]->mChannels[j]->mNumPositionKeys ;
+
+		    if(maxNumFrames < scene->mAnimations[i]->mChannels[j]->mNumRotationKeys)
+		    	maxNumFrames = scene->mAnimations[i]->mChannels[j]->mNumRotationKeys;
+
+		    if(maxNumFrames < scene->mAnimations[i]->mChannels[j]->mNumScalingKeys)
+			    maxNumFrames = scene->mAnimations[i]->mChannels[j]->mNumScalingKeys;
+
+		    channel.Frames.reserve(maxNumFrames);
+
+		    aiVectorKey* vecKeys =scene->mAnimations[i]->mChannels[j]->mPositionKeys;
+			int vecKeysNum =scene->mAnimations[i]->mChannels[j]->mNumPositionKeys;
+			aiQuatKey* rotKeys =scene->mAnimations[i]->mChannels[j]->mRotationKeys;
+			int rotKeysNum =scene->mAnimations[i]->mChannels[j]->mNumRotationKeys;
+			aiVectorKey* scaleKeys =scene->mAnimations[i]->mChannels[j]->mScalingKeys;
+			int scaleKeysNum =scene->mAnimations[i]->mChannels[j]->mNumScalingKeys;
+			int k = 0;
+			int l = 0;
+			int m = 0;
+			for (; k < vecKeysNum && l < rotKeysNum && m < scaleKeysNum;)
+			{
+				bool timeInit = false;
+				bool hasPos = false;
+				bool hasRot = false;
+				bool hasScale = false;
+				double time = 0.0;
+				if(k < vecKeysNum)
+				{
+					if(!timeInit)
+					{
+						time = vecKeys[k].mTime;
+						timeInit = true;
+						hasPos = true;
+					}
+				}
+				if(l < rotKeysNum)
+				{
+					if(!timeInit)
+					{
+						timeInit= true;
+						time = rotKeys[l].mTime;
+						hasRot = true;
+					}
+					else if(rotKeys[l].mTime < time - 0.01)
+					{
+						time = rotKeys[l].mTime;
+						hasRot = true;
+						hasPos = false;
+					}
+					else if(rotKeys[l].mTime >= time - 0.01 && rotKeys[l].mTime <= time + 0.01)
+					{
+						hasRot = true;
+					}
+				}
+				if(m < scaleKeysNum)
+				{
+					if(!timeInit)
+					{
+						timeInit= true;
+						time = scaleKeys[m].mTime;
+						hasScale = true;
+					}
+					else if(scaleKeys[m].mTime < time - 0.01)
+					{
+						time = scaleKeys[m].mTime;
+						hasScale = true;
+						hasPos = false;
+						hasRot = false;
+					}
+					else if(scaleKeys[m].mTime >= time - 0.01 && scaleKeys[m].mTime <= time + 0.01)
+					{
+						hasScale = true;
+					}
+				}
+				auto frame =AnimResource::KeyFrame();
+				if(channel.Frames.size() != 0)
+				{
+					frame = AnimResource::KeyFrame(channel.Frames.back());
+					frame.time = time;
+				}
+
+				if(hasPos)
+				{
+					frame.usePos = true;
+					frame.pos = Vec3(vecKeys[k].mValue.x,vecKeys[k].mValue.y,vecKeys[k].mValue.z);
+					k++;
+				}
+				if (hasRot)
+				{
+					frame.useRot = true;
+					frame.Rot = Quat(rotKeys[k].mValue.x,rotKeys[k].mValue.y,rotKeys[k].mValue.z,rotKeys[k].mValue.w);
+					l++;
+				}
+				if (hasScale)
+				{
+					frame.useScale = true;
+					frame.Scale = Vec3(scaleKeys[k].mValue.x,scaleKeys[k].mValue.y,scaleKeys[k].mValue.z);
+					m++;
+				}
+
+				channel.Frames.push_back(frame);
+			}
+		}
+
+		float f = 0;
+		float g = f;
+
+	}
+	for (int i = 0; i < scene->mNumMeshes; ++i)
+	{
+
+		int numIndices = 3 * scene->mMeshes[i]->mNumFaces;
+		MeshResource::SubMesh &Sub = Mesh->Meshes.emplace_back();
+		Sub.indices.resize(numIndices);
+		Sub.vertices.resize(scene->mMeshes[i]->mNumVertices);
+
+		std::uint32_t WritePos = 0;
+		for (int j = 0; j < scene->mMeshes[i]->mNumFaces; ++j)
+		{
+			std::uint32_t size = scene->mMeshes[i]->mFaces[j].mNumIndices * sizeof(unsigned int);
+			std::memcpy(&(Sub.indices[WritePos]), scene->mMeshes[i]->mFaces[j].mIndices, size);
+			WritePos += scene->mMeshes[i]->mFaces[j].mNumIndices;
+		}
+
+
+		for (int j = 0; j < scene->mMeshes[i]->mNumVertices; ++j)
+		{
+			if (scene->mMeshes[i]->HasPositions())
+				std::memcpy(&(Sub.vertices[j].Pos), &(scene->mMeshes[i]->mVertices[j]), 3 * sizeof(float));
+			if (scene->mMeshes[i]->HasNormals())
+				std::memcpy(&(Sub.vertices[j].Normal), &(scene->mMeshes[i]->mNormals[j]), 3 * sizeof(float));
+			if (scene->mMeshes[i]->mTextureCoords[0] != nullptr)
+				std::memcpy(&(Sub.vertices[j].TexCoords), &(scene->mMeshes[i]->mTextureCoords[0][j].x),
+				            2 * sizeof(float));
+		}
+		fbx->mesh = Mesh;
+		fbx->Skeleton = Skeleton;
+
+	}
+}
+
 Resource * ResourcesLoader::LoadImage(const fs::path &Rpath)
 {
     ImageResource* Image = new ImageResource();
@@ -341,7 +722,7 @@ Resource * ResourcesLoader::LoadImage(const fs::path &Rpath)
     //printf("Generate .SImage\n");
     std::vector<char> Data;
     Image->ToDataBuffer(Data);
-    fs::path cachePath = SolidPath;
+    fs::path cachePath = Rpath.parent_path();
     cachePath.append(Rpath.filename().string() + ".SImage");
     std::ofstream cacheFile(cachePath, std::fstream::binary | std::fstream::trunc);
     if(cacheFile.is_open())
@@ -402,7 +783,7 @@ Resource * ResourcesLoader::LoadMesh(const fs::path &Rpath)
 
 
 
-    fs::path cachePath = SolidPath;
+    fs::path cachePath = Rpath.parent_path();
     cachePath.append(Rpath.filename().string() + ".SMesh");
     std::ofstream cacheFile(cachePath, std::fstream::binary | std::fstream::trunc);
 
@@ -472,7 +853,7 @@ Resource * ResourcesLoader::LoadShader(const fs::path &Rpath)
         Compute->ToDataBuffer(Data);
 
 
-        fs::path cachePath = SolidPath;
+        fs::path cachePath = Rpath.parent_path();
         cachePath.append(Rpath.filename().string() + ".SCompute");
         std::ofstream cacheFile(cachePath, std::fstream::binary | std::fstream::trunc);
 
@@ -548,7 +929,7 @@ Resource * ResourcesLoader::LoadShader(const fs::path &Rpath)
 
 
 
-        fs::path cachePath =SolidPath;
+        fs::path cachePath =Rpath.parent_path();
         cachePath.append(Rpath.filename().string() + ".SVertFrag");
         std::ofstream cacheFile(cachePath, std::fstream::binary | std::fstream::trunc);
 
@@ -647,7 +1028,7 @@ Resource *ResourcesLoader::LoadAudio(const fs::path &Rpath)
 
 
 
-	fs::path cachePath =SolidPath;
+	fs::path cachePath =Rpath.parent_path();
 	cachePath.append(Rpath.filename().string() + ".SAudio");
 	std::ofstream cacheFile(cachePath, std::fstream::binary | std::fstream::trunc);
 
@@ -853,3 +1234,5 @@ Resource *ResourcesLoader::LoadSolidAudio(const fs::path &Rpath)
 	audio->audioRawBinary.reserve(0);
 	return audio;
 }
+
+
