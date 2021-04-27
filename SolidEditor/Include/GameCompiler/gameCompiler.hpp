@@ -18,8 +18,9 @@ namespace Solid
         static GameCompiler* instance;
     public:
         std::string ProjectName;
+	    fs::path srcPath = "";
+	    fs::path IncludePath = "";
     private:
-        fs::path p = fs::current_path().append("SolidGameSrc");
         GameCompiler()=default;
         ~GameCompiler() =default;
     public:
@@ -28,6 +29,7 @@ namespace Solid
         static GameCompiler* GetInstance();
         void LaunchCompile();
         void CreateCmake();
+        void AddLib();
     };
 
 }

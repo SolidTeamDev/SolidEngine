@@ -463,6 +463,16 @@ namespace Solid {
             {
                 if (UI::MenuItem("Windows"))
                     Log::Send("Building for Windows", Log::ELogSeverity::ERROR);
+	            if (UI::MenuItem("Create Cmake"))
+	            {
+	            	GameCompiler::GetInstance()->CreateCmake();
+	            	Log::Send("Cmake Create", Log::ELogSeverity::ERROR);
+	            }
+	            if (UI::MenuItem("Compile"))
+	            {
+		            GameCompiler::GetInstance()->LaunchCompile();
+		            Log::Send("Compiling", Log::ELogSeverity::ERROR);
+	            }
                 UI::MenuItem("Linux");
                 UI::EndMenu();
             }

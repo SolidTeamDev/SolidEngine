@@ -147,6 +147,10 @@ void Solid::Launcher::UpdateInterface()
 						p = p2;
 						p.append("Code");
 						std::filesystem::create_directory(p);
+						p.append("Src");
+						std::filesystem::create_directory(p);
+						p.append("Include");
+						std::filesystem::create_directory(p);
 						p = p2;
 						p.append("EngineInclude");
 						std::filesystem::create_directory(p);

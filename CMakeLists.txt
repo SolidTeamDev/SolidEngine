@@ -157,14 +157,16 @@ if(CMAKE_BUILD_TYPE MATCHES Debug)#DEBUG
     ADD_CUSTOM_COMMAND (TARGET SolidEditor POST_BUILD
 
             COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Bin/Debug ${CMAKE_BINARY_DIR}/
-
+            COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/SolidEngined.dll ${CMAKE_BINARY_DIR}/Dlls/Debug
+            COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/SolidEngined.lib ${CMAKE_BINARY_DIR}/Dlls/Debug
     COMMENT "Copying debug binaries" VERBATIM)
 else()#RELEASE/OTHER
 
     ADD_CUSTOM_COMMAND (TARGET SolidEditor POST_BUILD
 
             COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Bin/Release ${CMAKE_BINARY_DIR}/
-
+            COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/SolidEngine.dll ${CMAKE_BINARY_DIR}/Dlls/Release
+            COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/SolidEngine.lib ${CMAKE_BINARY_DIR}/Dlls/Release
     COMMENT "Copying release binaries" VERBATIM)
 endif()
 
@@ -181,6 +183,9 @@ COMMENT "Copying Resources folder" VERBATIM)
 ADD_CUSTOM_COMMAND (TARGET SolidEditor POST_BUILD
 
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/SolidEngine/Include ${CMAKE_BINARY_DIR}/Include
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Include ${CMAKE_BINARY_DIR}/Include
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Lib ${CMAKE_BINARY_DIR}/Dlls
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Bin ${CMAKE_BINARY_DIR}/Dlls
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Include ${CMAKE_BINARY_DIR}/Include
         # Output Message
         COMMENT "Copying Includes folder" VERBATIM

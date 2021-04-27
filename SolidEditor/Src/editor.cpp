@@ -196,14 +196,35 @@ namespace Solid
 		{
 			auto editP =fs::current_path();
 			auto EngineInc = editP.append("Include");
+
 			if(fs::exists(EngineInc))
 			{
 				const auto opt = fs::copy_options::recursive | fs::copy_options::update_existing;
 				fs::copy(EngineInc, EngineIncPath, opt);
 			}
 
+
 			fs::create_directory(EngineIncPath.string() + "/INIT");
 
+
 		}
+		auto editP =fs::current_path();
+		editP.append("Dlls");
+		auto t = CodePath;
+		t = t.append("Dlls");
+		if(!fs::exists(t))
+		{
+			fs::create_directory(t);
+			if(fs::exists(editP))
+			{
+				const auto opt = fs::copy_options::recursive | fs::copy_options::update_existing;
+				fs::copy(editP, t, opt);
+			}
+		}
+
+		Compiler->srcPath = CodePath;
+		Compiler->IncludePath = EngineIncPath;
+		Compiler->ProjectName = ProjectName;
+		Compiler->CreateCmake();
 	}
 } //!namespace
