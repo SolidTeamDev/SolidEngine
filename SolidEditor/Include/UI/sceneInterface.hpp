@@ -27,6 +27,6 @@ namespace Solid
 
         void DrawScene();
         bool MouseInSceneInterface(const Vec2d& mousePos);
-        void MovementAndRotationCam(const Vec2d& mousePos);
+        void MovementAndRotationCam(float xpos, float ypos);
     };
 }

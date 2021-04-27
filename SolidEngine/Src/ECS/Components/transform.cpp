@@ -54,7 +54,7 @@ namespace Solid
 
     void Transform::Rotate(const Quat &_quat)
     {
-        rotation.Rotate(_quat);
+        rotation = rotation.Rotate(_quat);
 
         hasToUpdateMat = true;
     }

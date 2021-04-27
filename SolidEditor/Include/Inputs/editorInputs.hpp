@@ -14,7 +14,8 @@ namespace Solid
             RIGHT,
             UP,
             DOWN,
-            Mouse0
+            Mouse1,
+            UpCam
         };
 
     } // !namespace

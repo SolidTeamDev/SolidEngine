@@ -82,8 +82,14 @@ namespace Solid
         Vec2d mousePos{};
         Editor::editorInputManager->GetCursorPos(mousePos.x,mousePos.y);
 
-        if(UI::IsWindowFocused() && MouseInSceneInterface(mousePos))
-            MovementAndRotationCam(mousePos);
+
+        sceneCam.UpdateCamera(sceneFramebuffer.size);
+
+        if(UI::IsWindowFocused() && !ImGuizmo::IsOver() && MouseInSceneInterface(mousePos))
+        {
+            MovementAndRotationCam(Time::DeltaTime()  * float((int)(engine->window->GetWindowSize().x/2) - mousePos.x ),
+                                  Time::DeltaTime()  * float((int)(engine->window->GetWindowSize().y/2) - mousePos.y ));
+        }
 
         engine->renderer->BeginFramebuffer(sceneFramebuffer);
         engine->renderer->ClearColor({0.f,0.f,0.f,1});
@@ -122,72 +128,79 @@ namespace Solid
 
     bool SceneInterface::MouseInSceneInterface(const Vec2d& mousePos)
     {
-        if(Editor::editorInputManager->IsPressed(EInputList::Mouse0)
+        if(Editor::editorInputManager->IsPressed(EInputList::Mouse1)
             && mousePos.x >= sceneFramebuffer.pos.x
             && mousePos.x < sceneFramebuffer.pos.x + sceneFramebuffer.size.x
             && mousePos.y >= sceneFramebuffer.pos.y
             && mousePos.y < sceneFramebuffer.pos.y + sceneFramebuffer.size.y)
         {
+            Editor::editorInputManager->ShowCursor(engine->window->GetHandle(), false);
+
+            Editor::editorInputManager->SetCursorPos(engine->window->GetWindowSize().x*0.5,
+                                                     engine->window->GetWindowSize().y*0.5);
+
             return true;
         }
         else
+        {
+            Editor::editorInputManager->ShowCursor(engine->window->GetHandle(), true);
+            sceneCam.MouseInCenterScreen = false;
             return false;
+
+        }
     }
 
-    void SceneInterface::MovementAndRotationCam(const Vec2d& mousePos)
+    void SceneInterface::MovementAndRotationCam(float xpos, float ypos)
     {
-        sceneCam.UpdateCamera(sceneFramebuffer.size);
+        if (!sceneCam.MouseInCenterScreen)
+        {
+            sceneCam.MouseInCenterScreen = true;
+            return;
+        }
 
-        Transform& sceneCamT = sceneCam.transform;
+        //movement cam
+        float updateCamSpeed = (float) (camSpeed * Time::DeltaTime());
 
-        //== Mouse
+        if (Editor::editorInputManager->IsPressed(EInputList::FORWARD))
+            sceneCam.position += sceneCam.Front * updateCamSpeed;
+        if (Editor::editorInputManager->IsPressed(EInputList::BACK))
+            sceneCam.position -= sceneCam.Front * updateCamSpeed;
 
+        if (Editor::editorInputManager->IsPressed(EInputList::LEFT))
+            sceneCam.position -= sceneCam.Right * updateCamSpeed;
+        if (Editor::editorInputManager->IsPressed(EInputList::RIGHT))
+            sceneCam.position += sceneCam.Right * updateCamSpeed;
 
-        Vec2d deltaPos {mousePos.x - sceneFramebuffer.size.x/2,
-                        mousePos.y - sceneFramebuffer.size.y/2};
+        if (Editor::editorInputManager->IsPressed(EInputList::UP))
+            sceneCam.position += Vec3::Up * updateCamSpeed;
+        if (Editor::editorInputManager->IsPressed(EInputList::DOWN))
+            sceneCam.position -= Vec3::Up * updateCamSpeed;
 
-        float mouseSensitivity = 0.1f;
-
-        deltaPos.x *= mouseSensitivity * Time::DeltaTime();
-        deltaPos.y *= mouseSensitivity * Time::DeltaTime();
-
-        //Rotation camera
-
-        Vec3 rot = sceneCamT.GetRotation().ToEuler();
-
-
-        //Movement camera
-        float updateCamSpeed = (float)(camSpeed * Time::DeltaTime());
-        float forwardVelocity = 0;
-
-        if(Editor::editorInputManager->IsPressed(EInputList::FORWARD))
-            forwardVelocity = updateCamSpeed;
-        if(Editor::editorInputManager->IsPressed(EInputList::BACK))
-            forwardVelocity = -updateCamSpeed;
-
-        float strafeVelocity = 0;
-
-        if(Editor::editorInputManager->IsPressed(EInputList::LEFT))
-            strafeVelocity = updateCamSpeed;
-        if(Editor::editorInputManager->IsPressed(EInputList::RIGHT))
-            strafeVelocity = -updateCamSpeed;
-
-        if(Editor::editorInputManager->IsPressed(EInputList::UP))
-            sceneCamT.Translate(Vec3(0,-updateCamSpeed,0));
-        if(Editor::editorInputManager->IsPressed(EInputList::DOWN))
-            sceneCamT.Translate(Vec3(0,updateCamSpeed,0));
+        //rotation camera
 
 
-        sceneCamT.Translate(Vec3(sin(-rot.y) * cos(-rot.x) * forwardVelocity,
-                                 -(sin(rot.x) * forwardVelocity),
-                                 cos(rot.y) * cos(rot.x) * forwardVelocity));
+            sceneCam.Euler.x += xpos * sceneCam.MouseSensitivity;
+            sceneCam.Euler.y += ypos * sceneCam.MouseSensitivity;;
 
-        sceneCamT.Translate(Vec3(cos(rot.y)  * strafeVelocity,
-                                 0,
-                                 sin(rot.y)  * strafeVelocity));
+            if (sceneCam.Euler.y > 89.0f)
+                sceneCam.Euler.y = 89.0f;
+            if (sceneCam.Euler.y < -89.0f)
+                sceneCam.Euler.y = -89.0f;
+
+            Vec3 _front;
+            _front.z = Maths::Cos(Maths::DegToRad(sceneCam.Euler.x)) *
+                       Maths::Cos(Maths::DegToRad(sceneCam.Euler.y));
+
+            _front.y = Maths::Sin(Maths::DegToRad(sceneCam.Euler.y));
+
+            _front.x = Maths::Sin(Maths::DegToRad(sceneCam.Euler.x)) *
+                       Maths::Cos(Maths::DegToRad(sceneCam.Euler.y));
+
+            sceneCam.Front = _front.GetNormalized();
+            sceneCam.Right = Vec3::Cross(sceneCam.Front, Vec3::Up).GetNormalized();
+            sceneCam.Up = Vec3::Cross(sceneCam.Right, sceneCam.Front).GetNormalized();
+
     }
-
-
 }
 
 

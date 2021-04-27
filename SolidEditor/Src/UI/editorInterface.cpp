@@ -35,6 +35,7 @@ namespace Solid {
 
         DrawMainFrame();
 
+
         filesInterface.Draw();
         sceneInterface.Draw();
         inspectorInterface.Draw();

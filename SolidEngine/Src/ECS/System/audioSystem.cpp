@@ -7,7 +7,7 @@ namespace Solid
     void AudioSystem::Update(Camera& _camera)
     {
         //TODO: Update with audio system -> find better solution
-        const Vec3 cameraPos = _camera.transform.GetPosition();
+        const Vec3 cameraPos = _camera.position;
         alListener3f(AL_POSITION,cameraPos.x,cameraPos.y,cameraPos.z);
         for (auto entity : entities)
         {

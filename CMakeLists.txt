@@ -150,23 +150,22 @@ ADD_CUSTOM_COMMAND (TARGET SolidEditor POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Bin/glfw3.dll ${CMAKE_BINARY_DIR}/
         COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Bin/OpenAL32.dll ${CMAKE_BINARY_DIR}/
         COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Bin/sndfile.dll ${CMAKE_BINARY_DIR}/
-
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/SolidEngine.dll ${CMAKE_BINARY_DIR}/Dlls/SolidEngine.dll
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/SolidEngine.lib ${CMAKE_BINARY_DIR}/Dlls/SolidEngine.lib
 COMMENT "Copying common binaries" VERBATIM)
 
 if(CMAKE_BUILD_TYPE MATCHES Debug)#DEBUG
     ADD_CUSTOM_COMMAND (TARGET SolidEditor POST_BUILD
 
             COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Bin/Debug ${CMAKE_BINARY_DIR}/
-            COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/SolidEngined.dll ${CMAKE_BINARY_DIR}/Dlls/Debug
-            COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/SolidEngined.lib ${CMAKE_BINARY_DIR}/Dlls/Debug
+
     COMMENT "Copying debug binaries" VERBATIM)
 else()#RELEASE/OTHER
 
     ADD_CUSTOM_COMMAND (TARGET SolidEditor POST_BUILD
 
             COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Bin/Release ${CMAKE_BINARY_DIR}/
-            COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/SolidEngine.dll ${CMAKE_BINARY_DIR}/Dlls/Release
-            COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/SolidEngine.lib ${CMAKE_BINARY_DIR}/Dlls/Release
+
     COMMENT "Copying release binaries" VERBATIM)
 endif()
 

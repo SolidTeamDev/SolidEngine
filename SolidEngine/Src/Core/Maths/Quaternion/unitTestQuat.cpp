@@ -54,19 +54,19 @@ namespace Solid::QuatUnitTest
 
         //constructor angle Axis
         {
-            //const float deg = UTH::Rand(-180,180);
-            const float deg = 45;
-            const float rad = deg/2.f;
+            const float deg = UTH::Rand(-180.0f, 180.0f);
+            //float deg = 90;
+            const float rad = Maths::DegToRad(deg)*0.5;
+            //const Vec3 v1 = Vec3(1.f,5.f,3.f).GetNormalized();
+            const Vec3 v1 = Vec3(UTH::Rand(-100.0f, 100.0f), UTH::Rand(-100.0f, 100.0f), UTH::Rand(-100.0f, 100.0f)).Normalize();
+            const Vec3 res_v1 = v1 * std::sin(rad);
+            const Quat q1(deg, v1);
 
-            const Vec3 v1 = Vec3(5.f,1.f,3.f).Normalize();
-            //const Vec3 v1 = Vec3(UTH::Rand(-100.0f, 100.0f), UTH::Rand(-100.0f, 100.0f), UTH::Rand(-100.0f, 100.0f)).Normalize();
-            const Vec3 res_v1 = v1 * std::sin(static_cast<float>(rad));
-            const Quat q1(rad, v1);
-
-            SA_UTH_EQ(q1.w, std::cos(static_cast<float>(rad)));
+            SA_UTH_EQ(q1.w, std::cos(rad));
             SA_UTH_EQ(q1.x, res_v1.x);
             SA_UTH_EQ(q1.y, res_v1.y);
             SA_UTH_EQ(q1.z, res_v1.z);
+
         }
 
         //Constructor with Vec3
@@ -188,7 +188,7 @@ namespace Solid::QuatUnitTest
             const Quat q1 = GenerateRandomQuat();
             const Quat q2 = GenerateRandomQuat();
 
-            float dot_res = q1.w * q2.w + q1.x * q2.x + q1.y * q2.y + q1.z * q2.z;
+            float dot_res = (q1.w * q2.w) + (q1.x * q2.x) + (q1.y * q2.y) + (q1.z * q2.z);
             float dot = Quat::Dot(q1,q2);
             SA_UTH_EQ(dot,dot_res);
         }
