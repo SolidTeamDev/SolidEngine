@@ -17,7 +17,6 @@ namespace Solid
         bool p_open = true;
         inline const Framebuffer& getSceneFrameBuffer() {return sceneFramebuffer;};
 
-        Vec2 prevMousePos = Vec2::Zero;
     private:
 
 
@@ -28,6 +27,6 @@ namespace Solid
 
         void DrawScene();
         bool MouseInSceneInterface(const Vec2d& mousePos);
-        void MovementAndRotationCam(const Vec2d& mousePos);
+        void MovementAndRotationCam(float xpos, float ypos);
     };
 }

@@ -28,70 +28,9 @@ namespace Solid
     void Camera::UpdateCamera(const Vec2i _spaceScreen)
     {
 
-        transform.SetTransformMatrix(lookAt(position, position + Front, Up).GetInversed());
+        transform.SetTransformMatrix(lookAt(position, position + Front, Up));
         view       = transform.GetMatrix();
         projection = Mat4<>::Perspective(fov,(float)_spaceScreen.x / (float)_spaceScreen.y,near,far);
-    }
-
-    void Camera::MoveCamera(EDIRECTION dir, float cameraSpeed)
-    {
-        if (dir == EDIRECTION::LEFT)
-            position -= Right * cameraSpeed;
-
-        if (dir == EDIRECTION::RIGHT)
-            position += Right * cameraSpeed;
-
-        if (dir == EDIRECTION::FOWARD)
-            position += cameraSpeed * Front;
-
-        if (dir == EDIRECTION::BACK)
-            position -= cameraSpeed * Front;
-
-        if(dir == EDIRECTION::UP)
-            position -= cameraSpeed * Vec3::Up;
-
-        if(dir == EDIRECTION::DOWN)
-            position += cameraSpeed * Vec3::Up;
-    }
-    void Camera::RotateCamera(float xpos, float ypos)
-    {
-
-        if(MouseInCenterScreen)
-        {
-            lastMousePos.x = xpos;
-            lastMousePos.y = ypos;
-            MouseInCenterScreen = true;
-        }
-
-        float xoffset = xpos ;
-        float yoffset = ypos ;
-
-
-        lastMousePos.x = xpos;
-        lastMousePos.y = ypos;
-
-        float sensitivity = 10.f;
-        xoffset *= sensitivity;
-        yoffset *= sensitivity;
-
-
-
-        Euler.x   += xoffset;
-        Euler.y += yoffset;
-
-        if(Euler.y > 89.0f)
-            Euler.y = 89.0f;
-        if(Euler.y < -89.0f)
-            Euler.y = -89.0f;
-
-        Vec3 _front;
-        _front.z = Maths::Cos(Maths::DegToRad(Euler.x)) * Maths::Cos(Maths::DegToRad(Euler.y));
-        _front.y = Maths::Sin(Maths::DegToRad(Euler.y));
-        _front.x = Maths::Sin(Maths::DegToRad(Euler.x)) * Maths::Cos(Maths::DegToRad(Euler.y));
-        Front = _front.GetNormalized();
-        Right = Vec3::Cross(Front, Vec3::Up).GetNormalized();
-        Up = Vec3::Cross(Right,Front).GetNormalized();
-
     }
 
      Mat4<float> Camera::lookAt(const Vec3& eye, const Vec3& center, const Vec3& up)

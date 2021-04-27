@@ -336,6 +336,13 @@ namespace Solid
             return hats[_hatId];
         }
 
+        void ShowCursor(GLFWwindow* win, bool bShowCursor)
+        {
+            if(!bShowCursor)
+                glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            else
+                glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        }
 
     };
 
