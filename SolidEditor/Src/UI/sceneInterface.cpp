@@ -24,6 +24,7 @@ namespace Solid
     {
         engine = Engine::GetInstance();
         sceneFramebuffer = engine->renderer->CreateFramebuffer(engine->window->GetWindowSize());
+        sceneCam.MouseSensitivity = 35.f;
     }
 
     void SceneInterface::Draw()
@@ -38,6 +39,10 @@ namespace Solid
         windowFlags |= ImGuiWindowFlags_MenuBar;
 
         UI::Begin("Scene", &p_open, windowFlags);
+
+        // Focus window if not focused but clicked and hovered
+        if(UI::IsMouseDown(1) && UI::IsWindowHovered() && !UI::IsWindowFocused())
+            UI::FocusWindow(UI::GetCurrentWindow());
 
         ImVec2 windowSize = UI::GetContentRegionAvail();
         sceneFramebuffer.size = {(int)windowSize.x+5,(int)windowSize.y};
@@ -87,8 +92,8 @@ namespace Solid
 
         if(UI::IsWindowFocused() && MouseInSceneInterface(mousePos))
         {
-            MovementAndRotationCam(Time::DeltaTime()  * float((int)(engine->window->GetWindowSize().x/2) - mousePos.x ),
-                                  Time::DeltaTime()  * float((int)(engine->window->GetWindowSize().y/2) - mousePos.y ));
+            MovementAndRotationCam(Time::DeltaTime()  * ((int)(engine->window->GetWindowSize().x/2) - (int)mousePos.x ),
+                                  Time::DeltaTime()  * ((int)(engine->window->GetWindowSize().y/2) - (int)mousePos.y ));
         }
 
         engine->renderer->BeginFramebuffer(sceneFramebuffer);

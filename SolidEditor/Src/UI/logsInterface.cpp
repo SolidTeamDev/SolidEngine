@@ -13,12 +13,6 @@ namespace Solid
         UI::SetNextWindowSize(ImVec2(250, 250));
         UI::Begin("Logs", &p_open,
                   ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
-        if (!UI::IsWindowFocused())
-        {
-            UI::PopStyleColor();
-            UI::End();
-            return;
-        }
 
         for (unsigned int i = maxLogMessage-1; i > 0; i--)
         {
