@@ -1,4 +1,5 @@
 #include "UI/editorInterface.hpp"
+
 #include "UI/solidUI.hpp"
 #include "Time/time.hpp"
 #include "editor.hpp"
@@ -16,13 +17,15 @@ namespace Solid {
             editorStyle(UI::GetStyle())
     {
         window = nullptr;
+        renderer = nullptr;
         DarkTheme();
     }
 
-    EditorInterface::EditorInterface(Window *_window) :
+    EditorInterface::EditorInterface(Window *_window, Renderer* _renderer) :
             editorStyle(UI::GetStyle())
     {
         window = _window;
+        renderer = _renderer;
         DarkTheme();
     }
 
@@ -31,6 +34,7 @@ namespace Solid {
         UIContext::BeginFrame();
 
         DrawMainFrame();
+
 
         filesInterface.Draw();
         sceneInterface.Draw();
@@ -48,6 +52,7 @@ namespace Solid {
 
 
         UIContext::RenderFrame();
+        renderer->UpdateFramebuffer(sceneInterface.getSceneFrameBuffer());
     }
 
 #pragma region MainMenuBar
@@ -463,6 +468,16 @@ namespace Solid {
             {
                 if (UI::MenuItem("Windows"))
                     Log::Send("Building for Windows", Log::ELogSeverity::ERROR);
+	            if (UI::MenuItem("Create Cmake"))
+	            {
+	            	GameCompiler::GetInstance()->CreateCmake();
+	            	Log::Send("Cmake Create", Log::ELogSeverity::ERROR);
+	            }
+	            if (UI::MenuItem("Compile"))
+	            {
+		            GameCompiler::GetInstance()->LaunchCompile();
+		            Log::Send("Compiling", Log::ELogSeverity::ERROR);
+	            }
                 UI::MenuItem("Linux");
                 UI::EndMenu();
             }
@@ -547,7 +562,7 @@ namespace Solid {
         std::string fps = std::to_string(Time::Fps()) + " fps";
         UI::Text("%s", fps.c_str());
 
-        Vec3 camPos = Editor::editorCamera.transform.GetPosition();
+        /*Vec3 camPos = Editor::editorCamera.transform.GetPosition();
         std::string posSubText = std::to_string(camPos.x);
         std::string xCut = posSubText.substr(0, posSubText.find(".")+3);
 
@@ -558,7 +573,7 @@ namespace Solid {
         std::string zCut = posSubText.substr(0, posSubText.find(".")+3);
 
         std::string camPosStr = "Camera position:\nx: " + xCut + " y: " + yCut + " z: " + zCut;
-        UI::Text("%s", camPosStr.c_str());
+        UI::Text("%s", camPosStr.c_str());*/
 
         UI::End();
 

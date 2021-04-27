@@ -13,6 +13,7 @@
 #include "ECS/ecsManager.hpp"
 #include "ECS/System/rendererSystem.hpp"
 #include "ECS/System/audioSystem.hpp"
+#include "ECS/System/physicsSystem.hpp"
 
 #include "Resources/graphicalResourceMgr.hpp"
 
@@ -53,6 +54,7 @@ namespace Solid
         ECSManager ecsManager;
         std::shared_ptr<RendererSystem> rendererSystem;
         std::shared_ptr<AudioSystem> audioSystem;
+        std::shared_ptr<PhysicsSystem> physicsSystem;
         ResourceManager resourceManager;
         TaskManager taskManager;
         ThreadManager threadPool;
@@ -83,6 +85,21 @@ namespace Solid
         void LateUpdate();
 
     };
+
+	class SOLID_API EngineCleanerInterface
+	{
+	protected:
+		EngineCleanerInterface()
+		{
+
+		}
+
+		~EngineCleanerInterface()
+		{
+			Engine::DeleteInstance();
+		}
+
+	};
 
 
 } //!namespace

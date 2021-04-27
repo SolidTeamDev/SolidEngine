@@ -409,7 +409,7 @@ namespace Solid
     }
 
     template<typename T>
-    constexpr Mat4<T> Mat4<T>::CoMatrix() noexcept
+    Mat4<T> Mat4<T>::CoMatrix() const
     {
         Mat4 coM;
         float temp1 = det_2(10, 15, 14, 11);
@@ -465,10 +465,10 @@ namespace Solid
     }
 
     template<typename T>
-    constexpr Mat4<T> Mat4<T>::GetInversed() const noexcept
+    constexpr Mat4<T> Mat4<T>::GetInversed() const
     {
         Mat4 inverse;
-        Mat4 AdjM = this->CoMatrix().Transpose();
+        const Mat4 AdjM = CoMatrix().GetTransposed();
 
         inverse.elements[0] = AdjM.elements[0] / Determinant();
         inverse.elements[1] = AdjM.elements[1] / Determinant();
@@ -494,7 +494,7 @@ namespace Solid
     }
 
     template<typename T>
-    constexpr float Mat4<T>::det_2(unsigned x, unsigned y, unsigned z, unsigned w) noexcept
+    constexpr float Mat4<T>::det_2(unsigned x, unsigned y, unsigned z, unsigned w) const noexcept
     {
         return (elements[x] * elements[y] - elements[z] * elements[w]);
     }

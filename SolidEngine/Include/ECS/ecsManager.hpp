@@ -95,19 +95,22 @@ namespace Solid
         {
         	//HERE
             Components* c =componentManager->AddComponent<T>(_entity->GetEntity(),_component);
+            c->gameObject = _entity;
 			_entity->compsList.push_back(c);
             auto signature = entityManager->GetSignature(_entity->GetEntity());
             signature.set(componentManager->GetComponentType<T>(), true);
             entityManager->SetSignature(_entity->GetEntity(),signature);
 
             systemManager->EntitySignatureChanged(_entity->GetEntity(),signature);
+            c->Init();
             return (T*)c;
         }
 
         template<typename T>
         void RemoveComponent(GameObject* _entity)
         {
-            Components* c =componentManager->RemoveComponent<T>(_entity);
+            Components* c = componentManager->RemoveComponent<T>(_entity);
+            c->Release();
 	        for (auto it= _entity->compsList.begin(); it != _entity->compsList.end(); ++it)
 	        {
 		        if(*it == c)

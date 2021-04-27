@@ -3,7 +3,6 @@
 #include "UI/solidUI.hpp"
 #include "UI/editorInterface.hpp"
 #include "Inputs/editorInputs.hpp"
-
 #include "Resources/ressources.hpp"
 
 #include "ECS/Components/transform.hpp"
@@ -11,10 +10,7 @@
 
 namespace Solid
 {
-
-    Framebuffer Editor::sceneFramebuffer;
-    Camera Editor::editorCamera;
-    float Editor::camSpeed = 2.f;
+    InputManager<int>* Editor::editorInputManager = nullptr;
 
     Editor::Editor()
     {
@@ -39,7 +35,6 @@ namespace Solid
         editorInputManager = new InputManager<int>(window->GetHandle());
         InitEditorInputList(editorInputManager);
 
-        sceneFramebuffer = engine->renderer->CreateFramebuffer(window->GetWindowSize());
         Compiler = GameCompiler::GetInstance();
 
 
@@ -55,7 +50,7 @@ namespace Solid
     {
         Window* window = engine->window;
         Renderer* renderer = engine->renderer;
-        EditorInterface editorInterface(window);
+        EditorInterface editorInterface(window, renderer);
 
         glfwSwapInterval(0);
 
@@ -66,7 +61,6 @@ namespace Solid
         {
             glfwPollEvents();
             editorInputManager->Update();
-            UpdateEditorCamera();
 
             //TODO: Update engine task in engine
             engine->Update();
@@ -76,18 +70,8 @@ namespace Solid
             renderer->ClearColor({0,0,0,1});
             renderer->Clear(window->GetWindowSize());
 
-            renderer->BeginFramebuffer(sceneFramebuffer);
-            renderer->ClearColor({0.f,0.f,0.f,1});
-            renderer->Clear(sceneFramebuffer.size);
-	        renderer->DrawSolidGrid(Editor::editorCamera, 50, Vec3(.3,.3,.3), 1);
-            engine->rendererSystem->Update(renderer,editorCamera);
-            renderer->EndFramebuffer();
-
-            engine->audioSystem->Update(editorCamera);
-
             editorInterface.Update();
 
-            renderer->UpdateFramebuffer(sceneFramebuffer);
             Time::Update();
 
             window->SwapBuffers();
@@ -96,18 +80,15 @@ namespace Solid
 
     }
 
-    void Editor::LoadResources(bool _solid)
+    void Editor::LoadResources( fs::path& p)
     {
         engine->EnableMultiThread(true);
-
+		ResourcesLoader::SolidPath = p;
         ResourcesLoader loader;
+
 
         loader.SetManager(&(engine->resourceManager));
 
-        fs::path p = fs::current_path().append("Resources");
-
-        if(_solid)
-			p = fs::current_path().append("SolidResources");
         auto before = std::chrono::high_resolution_clock::now();
         loader.LoadResourcesFromFolder(p);
         auto after = std::chrono::high_resolution_clock::now();
@@ -116,72 +97,50 @@ namespace Solid
         engine->EnableMultiThread(false);
     }
 
-    void Editor::UpdateEditorCamera()
-    {
-        editorCamera.UpdateCamera(sceneFramebuffer.size);
 
-        Transform& editorCameraT = editorCamera.transform;
+	void Editor::InitFromProject()
+	{
+		std::string ProjectName =CurrentProjectJson["Project"]["Name"] ;
+		fs::path ProjectPath =std::string(CurrentProjectJson["Project"]["Path"]) ;
+		fs::path AssetPath =ProjectPath.string() + "/" +(std::string(CurrentProjectJson["Project"]["AssetFolder"])) ;
+		fs::path CodePath =ProjectPath.string() +"/" +(std::string(CurrentProjectJson["Project"]["SourcesFolder"])) ;
+		fs::path EngineIncPath =ProjectPath.string() +"/" +(std::string(CurrentProjectJson["Project"]["EngineIncludeFolder"])) ;
 
-        //== Mouse
+		LoadResources(AssetPath);
+		bool b = (!fs::is_empty(EngineIncPath) && fs::exists(EngineIncPath.append("INIT")));
+		if(!b)
+		{
+			auto editP =fs::current_path();
+			auto EngineInc = editP.append("Include");
 
-        Vec2d mousePos{};
-        editorInputManager->GetCursorPos(mousePos.x,mousePos.y);
-        Vec2d deltaPos {mousePos.x - sceneFramebuffer.size.x/2,
-                          mousePos.y - sceneFramebuffer.size.y/2};
-
-        float mouseSensitivity = 0.1f;
-
-        deltaPos.x *= mouseSensitivity * Time::DeltaTime();
-        deltaPos.y *= mouseSensitivity * Time::DeltaTime();
-
-        Vec3 rot = editorCameraT.GetRotation().ToEuler();
-
-        /*rot.x += deltaPos.x;
-        rot.y += deltaPos.y;
-
-        if(rot.x >= S_PI_2)
-            rot.x = S_PI_2;
-        else if (rot.x <= -S_PI_2)
-            rot.x = -S_PI_2;
-
-        editorCameraT.SetRotation(Quat(rot));*/
-
-        //== Movement
-        float updateCamSpeed = (float)(camSpeed * Time::DeltaTime());
-        float forwardVelocity = 0;
-
-        if(editorInputManager->IsPressed(EInputList::FORWARD))
-            forwardVelocity = updateCamSpeed;
-        if(editorInputManager->IsPressed(EInputList::BACK))
-            forwardVelocity = -updateCamSpeed;
-
-        float strafeVelocity = 0;
-
-        if(editorInputManager->IsPressed(EInputList::LEFT))
-            strafeVelocity = updateCamSpeed;
-        if(editorInputManager->IsPressed(EInputList::RIGHT))
-            strafeVelocity = -updateCamSpeed;
-
-        if(editorInputManager->IsPressed(EInputList::UP))
-            editorCameraT.Translate(Vec3(0,-updateCamSpeed,0));
-        if(editorInputManager->IsPressed(EInputList::DOWN))
-            editorCameraT.Translate(Vec3(0,updateCamSpeed,0));
+			if(fs::exists(EngineInc))
+			{
+				const auto opt = fs::copy_options::recursive | fs::copy_options::update_existing;
+				fs::copy(EngineInc, EngineIncPath, opt);
+			}
 
 
-        /*editorCameraT.Translate(Vec3(forwardVelocity,
-                                     -forwardVelocity,
-                                     forwardVelocity));
+			fs::create_directory(EngineIncPath.string() + "/INIT");
 
-        editorCameraT.Translate(Vec3(strafeVelocity,
-                                     0,
-                                     strafeVelocity));*/
 
-        editorCameraT.Translate(Vec3(sin(-rot.y) * cos(-rot.x) * forwardVelocity,
-                                     -(sin(rot.x) * forwardVelocity),
-                                     cos(rot.y) * cos(rot.x) * forwardVelocity));
+		}
+		auto editP =fs::current_path();
+		editP.append("Dlls");
+		auto t = CodePath;
+		t = t.append("Dlls");
+		if(!fs::exists(t))
+		{
+			fs::create_directory(t);
+			if(fs::exists(editP))
+			{
+				const auto opt = fs::copy_options::recursive | fs::copy_options::update_existing;
+				fs::copy(editP, t, opt);
+			}
+		}
 
-        editorCameraT.Translate(Vec3(cos(rot.y)  * strafeVelocity,
-                                     0,
-                                     sin(rot.y)  * strafeVelocity));
-    }
+		Compiler->srcPath = CodePath;
+		Compiler->IncludePath = EngineIncPath;
+		Compiler->ProjectName = ProjectName;
+		Compiler->CreateCmake();
+	}
 } //!namespace

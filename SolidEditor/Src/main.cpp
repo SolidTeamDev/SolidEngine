@@ -21,14 +21,33 @@ int main(int argc, char** argv)
 	    bool b = false;
     	if(argc > 1)
 	    {
-    		std::string arg = argv[1];
-    		if(arg == "-Solid")
+		    for (int i = 1; i < argc; ++i)
 		    {
-    			b = true;
+			    std::string arg = argv[i];
+			    if(arg == "-Solid")
+			    {
+				    b = true;
+			    }
+
+			    else if(arg.find("-Project=") != std::string::npos)
+			    {
+			    	std::size_t pos = arg.find('=');
+			    	std::string ProjectPath = arg.substr(pos+1);
+			    	ProjectPath.erase(ProjectPath.end());
+			    	std::cout << ProjectPath << std::endl;
+			    	std::ifstream file(ProjectPath);
+			    	editor.CurrentProjectJson.clear();
+				    file >> editor.CurrentProjectJson;
+				    file.close();
+			    	editor.InitFromProject();
+			    }
+			    Solid::Log::Send(std::string("ARG :") +argv[i]);
+
 		    }
+
 	    }
 
-        editor.LoadResources(b);
+
         editor.Run();
 
     }

@@ -6,6 +6,7 @@
 
 #include "ECS/types.hpp"
 
+#include <PxActor.h>
 
 namespace Solid
 {
@@ -15,6 +16,7 @@ namespace Solid
     public:
 
         std::string name = "New GameObject";
+        physx::PxActor* physicsActor = nullptr;
 
         std::vector<Components*> compsList;
 

@@ -73,7 +73,7 @@ namespace Solid
 
     Vec2 Vec2::Slerp(const Vec2 &_v1, const Vec2 &_v2, float _r) noexcept
     {
-        return Maths::Slerp(_v1,_v2, _r).GetNormalized();
+        return Maths::Slerp(_v1,_v2, _r);
     }
 
 #pragma endregion

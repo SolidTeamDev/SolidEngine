@@ -11,6 +11,10 @@
 #include "ECS/Components/rigidBody.hpp"
 #include "ECS/Components/script.hpp"
 #include "ECS/Components/audioSource.hpp"
+#include "ECS/Components/rigidBody.hpp"
+#include "ECS/Components/boxCollider.hpp"
+#include "ECS/Components/sphereCollider.hpp"
+#include "ECS/Components/capsuleCollider.hpp"
 #include "Refureku/Refureku.h"
 
 namespace Solid
@@ -40,9 +44,12 @@ namespace Solid
         ecsManager.RegisterComponent<Transform>();
         ecsManager.RegisterComponent<MeshRenderer>();
         ecsManager.RegisterComponent<Camera>();
-        ecsManager.RegisterComponent<RigidBody>();
         ecsManager.RegisterComponent<Script*>();
         ecsManager.RegisterComponent<AudioSource>();
+        ecsManager.RegisterComponent<RigidBody>();
+        ecsManager.RegisterComponent<BoxCollider>();
+        ecsManager.RegisterComponent<SphereCollider>();
+        ecsManager.RegisterComponent<CapsuleCollider>();
 
         //Register Signature
         rendererSystem = ecsManager.RegisterSystem<RendererSystem>();
@@ -59,6 +66,13 @@ namespace Solid
             signature.set(ecsManager.GetComponentType<Transform>());
             signature.set(ecsManager.GetComponentType<AudioSource>());
             ecsManager.SetSystemSignature<AudioSystem>(signature);
+        }
+
+        physicsSystem = ecsManager.RegisterSystem<PhysicsSystem>();
+        {
+            Signature signature;
+            signature.set(ecsManager.GetComponentType<Transform>());
+            ecsManager.SetSystemSignature<PhysicsSystem>(signature);
         }
     }
 
@@ -109,7 +123,7 @@ namespace Solid
 
     void Engine::FixedUpdate()
     {
-
+        physicsSystem->Update(physics, (float)Time::DeltaTime());
     }
 
     void Engine::LateUpdate()

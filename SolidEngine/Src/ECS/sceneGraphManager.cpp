@@ -1,6 +1,3 @@
-//
-// Created by ryan1 on 14/04/2021.
-//
 #include "ECS/sceneGraphManager.hpp"
 
 #include "Core/engine.hpp"

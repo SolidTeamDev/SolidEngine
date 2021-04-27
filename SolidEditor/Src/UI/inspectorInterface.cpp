@@ -3,6 +3,7 @@
 #include "Core/engine.hpp"
 #include <imgui.h>
 #include <imgui_stdlib.h>
+
 namespace Solid
 {
     void InspectorInterface::Draw()
@@ -39,11 +40,17 @@ namespace Solid
 
         UI::Text("Name: ");
         EditText(gameObject->name, "##name");
+
+        //TODO: enable for custom scripts
+        /*for(auto& comp : gameObject->compsList)
+        {
+            EditComp(comp);
+        }*/
+
 	    if(engine->ecsManager.GotComponent<Transform>(gameObject->GetEntity()))
 	    {
 		    EditTransform(engine->ecsManager.GetComponent<Transform>(gameObject->GetEntity()));
 	    }
-
 
         if(engine->ecsManager.GotComponent<MeshRenderer>(gameObject->GetEntity()))
         {
@@ -72,6 +79,7 @@ namespace Solid
 		        if(UI::Button("Transform"))
 		        {
 			        engine->ecsManager.AddComponent(gameObject,Transform());
+                    UI::CloseCurrentPopup();
 		        }
 	        }
             if(!engine->ecsManager.GotComponent<MeshRenderer>(gameObject->GetEntity()))
@@ -79,6 +87,7 @@ namespace Solid
                 if(UI::Button("Mesh renderer"))
                 {
                     engine->ecsManager.AddComponent(gameObject,MeshRenderer());
+                    UI::CloseCurrentPopup();
                 }
             }
             if(!engine->ecsManager.GotComponent<AudioSource>(gameObject->GetEntity()))
@@ -86,7 +95,39 @@ namespace Solid
                 if(UI::Button("Audio source"))
                 {
                     engine->ecsManager.AddComponent<AudioSource>(gameObject,AudioSource());
-                    engine->ecsManager.GetComponent<AudioSource>(gameObject->GetEntity()).Init();
+                    UI::CloseCurrentPopup();
+                }
+            }
+            if(!engine->ecsManager.GotComponent<RigidBody>(gameObject->GetEntity()))
+            {
+                if(UI::Button("RigidBody"))
+                {
+                    engine->ecsManager.AddComponent<RigidBody>(gameObject,RigidBody());
+                    UI::CloseCurrentPopup();
+                }
+            }
+            if(!engine->ecsManager.GotComponent<BoxCollider>(gameObject->GetEntity()))
+            {
+                if(UI::Button("Box collider"))
+                {
+                    engine->ecsManager.AddComponent<BoxCollider>(gameObject,BoxCollider());
+                    UI::CloseCurrentPopup();
+                }
+            }
+            if(!engine->ecsManager.GotComponent<SphereCollider>(gameObject->GetEntity()))
+            {
+                if(UI::Button("Sphere collider"))
+                {
+                    engine->ecsManager.AddComponent<SphereCollider>(gameObject,SphereCollider());
+                    UI::CloseCurrentPopup();
+                }
+            }
+            if(!engine->ecsManager.GotComponent<CapsuleCollider>(gameObject->GetEntity()))
+            {
+                if(UI::Button("Capsule collider"))
+                {
+                    engine->ecsManager.AddComponent<CapsuleCollider>(gameObject,CapsuleCollider());
+                    UI::CloseCurrentPopup();
                 }
             }
             UI::EndPopup();
@@ -94,14 +135,40 @@ namespace Solid
 
     }
 
+    void InspectorInterface::EditComp(Components* _comp)
+    {
+        if(UI::CollapsingHeader(_comp->getArchetype().name.c_str(),ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            for (auto& f : _comp->getArchetype().fields)
+            {
+                std::string fieldName = f.name;
+                std::string typeName = f.type.archetype->name;
+
+                if(typeName == "bool")
+                    EditBool(*(bool*)f.getDataAddress(_comp),fieldName);
+                else if(typeName == "int")
+                    EditInt(*(int*)f.getDataAddress(_comp),fieldName,1);
+                else if(typeName == "float")
+                    EditFloat(*(float*)f.getDataAddress(_comp),fieldName,0.01f);
+                else if(typeName == "Vec2")
+                    EditVec2(*((Vec2*)f.getDataAddress(_comp)),fieldName,0.01f);
+                else if(typeName == "Vec3")
+                    EditVec3(*((Vec3*)f.getDataAddress(_comp)),fieldName,0.01f);
+                else if(typeName == "Vec4")
+                    EditVec4(*((Vec4*)f.getDataAddress(_comp)),fieldName,0.01f);
+                else if(typeName == "EditText")
+                    EditText(*((std::string*)f.getDataAddress(_comp)),fieldName);
+            }
+        }
+        UI::Separator();
+    }
+
     void InspectorInterface::EditTransform(Transform& _trs)
     {
-        ImVec2 pos = UI::GetCursorPos();
-        pos.y += 20;
-        UI::SetCursorPos(pos);
-
         if(UI::CollapsingHeader("Transform",ImGuiTreeNodeFlags_DefaultOpen))
         {
+            UI::Indent();
+
             Vec3 tempPos   = _trs.GetPosition();
             Vec3 tempRot   = _trs.GetEuler();
             Vec3 tempScale = _trs.GetScale();
@@ -120,6 +187,7 @@ namespace Solid
             }
             _trs.SetScale(tempScale);
         }
+        UI::Unindent();
         UI::Separator();
     }
 
@@ -156,7 +224,7 @@ namespace Solid
 
             };
 			UI::Indent();
- 			if(UI::CollapsingHeader("Materials"))
+ 			if(UI::TreeNode("Materials"))
  			{
 			for(MaterialResource* elt : _meshRenderer.GetMaterials())
 			{
@@ -190,13 +258,14 @@ namespace Solid
 				}
 				++i;
 			}
+			UI::TreePop();
 			}
 			i = 0;
 
 			for(MaterialResource* elt : _meshRenderer.GetMaterialSet())
 	        {
 		        std::string matName = elt == nullptr ? "DEFAULT Name" :  elt->name;
-	        	if(UI::CollapsingHeader((matName + "##" + std::to_string(i)).c_str()))
+	        	if(UI::TreeNode((matName + "##" + std::to_string(i)).c_str()))
 		        {
 
 	        		if(elt == nullptr)
@@ -290,7 +359,8 @@ namespace Solid
 					        matToModify = elt;
 				        }
 			        }
-		        }
+                    UI::TreePop();
+                }
 		        ++i;
 	        }
 	        UI::Unindent();
@@ -491,6 +561,21 @@ namespace Solid
 		}
 	}
 
+    void InspectorInterface::EditInt(int& _num, const std::string& _label, float _step)
+    {
+        UI::DragInt(_label.c_str(), &_num, _step);
+    }
+
+    void InspectorInterface::EditFloat(float &_num, const std::string& _label, float _step)
+    {
+        UI::DragFloat(_label.c_str(), &_num, _step);
+    }
+
+    void InspectorInterface::EditVec2(Vec2& _vec, const std::string& _label, float _step)
+    {
+        UI::DragFloat2(_label.c_str(), &_vec.x, _step);
+    }
+
 	bool InspectorInterface::EditVec3(Vec3 &_vec, const std::string &_label, float _step)
     {
         Vec3 temp = _vec;
@@ -504,28 +589,13 @@ namespace Solid
 	bool InspectorInterface::EditVec4(Vec4 &_vec, const std::string &_label, float _step)
 	{
 		Vec4 temp = _vec;
-		if(UI::DragFloat4(_label.c_str(), &temp.x, 0.01f))
+		if(UI::DragFloat4(_label.c_str(), &temp.x, _step))
 		{
 			_vec = temp;
 			return true;
 		}
 		return false;
 	}
-
-    void InspectorInterface::EditVec2(Vec2& _vec, const std::string& _label, float _step)
-    {
-        UI::DragFloat2(_label.c_str(), &_vec.x, _step);
-    }
-
-    void InspectorInterface::EditInt(int& _num, const std::string& _label, float _step)
-    {
-        UI::DragInt(_label.c_str(), &_num, _step);
-    }
-
-    void InspectorInterface::EditFloat(float &_num, const std::string& _label, float _step)
-    {
-        UI::DragFloat(_label.c_str(), &_num, _step);
-    }
 
     void InspectorInterface::EditText(std::string &_str, const std::string& _label)
     {

@@ -25,6 +25,8 @@
 #include "Core/engine.hpp"
 using namespace Solid;
 
+__declspec(dllexport) fs::path ResourcesLoader::SolidPath ="";
+
 #define SASSET_GEN 1
 struct ShaderLoaderWrapper
 {
@@ -84,6 +86,8 @@ void  ResourcesLoader::LoadRessourceNoAdd(const fs::path &Rpath, ResourcePtrWrap
         r=LoadSolidShader(Rpath);
     else if(extension == ".sanim")
         ;
+    else if(extension == ".sskel")
+	    ;
     /// Image Loading
     else if(extension == ".bmp")
         r=LoadImage(Rpath);
@@ -127,13 +131,100 @@ void ResourcesLoader::LoadRessource(const fs::path &Rpath)
 
 void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 {
-    if(!fs::exists(Rpath))
+    if(!fs::exists(Rpath) || fs::is_empty(Rpath))
         return;
     ///MultiThread Loading
     if(Manager->GetEngine()->MultiThreadEnabled())
     {
         TaskManager& TaskMan = Manager->GetEngine()->taskManager;
         using fp = bool (*)( const fs::path&);
+
+        /////////////////////////////
+	    auto SolidFind = [](const fs::path&item)
+	    {
+		    if(!fs::is_directory(item))
+		    {
+			    std::string name = item.extension().string();
+			    std::transform(name.begin(), name.end(), name.begin(),
+			                   [](unsigned char c){ return std::tolower(c); });
+
+			    return (name.find(".simage") != std::string::npos
+			        || name.find(".smesh") != std::string::npos
+			        || name.find(".scompute") != std::string::npos
+			        || name.find(".svertfrag") != std::string::npos
+			        || name.find(".sanim") != std::string::npos
+			        || name.find(".sskel") != std::string::npos
+			        || name.find(".smaterial") != std::string::npos
+			        || name.find(".saudio") != std::string::npos);
+
+		    }
+		    return false;
+	    };
+	    auto NormalFind = [](const fs::path&item)
+	    {
+		    if(fs::is_directory(item))
+		    {
+			    std::string name = item.filename().string();
+			    std::transform(name.begin(), name.end(), name.begin(),
+			                   [](unsigned char c){ return std::tolower(c); });
+			    return (name.find("shader") != std::string::npos || name.find("compute") != std::string::npos);
+
+		    }
+		    else
+		    {
+			    std::string name = item.filename().string();
+			    std::transform(name.begin(), name.end(), name.begin(),
+			                   [](unsigned char c){ return std::tolower(c); });
+			    return (name.find(".bmp") != std::string::npos
+			    || name.find(".png") != std::string::npos
+			    || name.find(".jpg") != std::string::npos
+			    || name.find(".jpeg") != std::string::npos
+			    || name.find(".obj") != std::string::npos
+			    || name.find(".fbx") != std::string::npos
+			    || name.find(".wav") != std::string::npos
+			    || name.find(".ogg") != std::string::npos);
+
+		    }
+		    return false;
+	    };
+	    std::vector<fs::path> normal;
+	    std::vector<fs::path> Solid;
+	    std::vector<fs::path> ToLoad;
+
+        for(auto& item : fs::directory_iterator(Rpath))
+        {
+			if(NormalFind(item))
+			{
+				normal.push_back(item);
+			}
+			else if(SolidFind(item))
+			{
+				Solid.push_back(item);
+			}
+        }
+		for(auto& elt : normal)
+		{
+			bool found = false;
+			for(auto& elt2 : Solid)
+		    {
+		        if(elt2.filename().string().find(elt.filename().string()) != std::string::npos)
+		        {
+		        	ToLoad.push_back(elt2);
+		        	found = true;
+			        break;
+		        }
+		    }
+			if(!found)
+			{
+				ToLoad.push_back(elt);
+			}
+		}
+
+
+
+        //////////////////////////////
+
+
         auto shaderFind = [](const fs::path&item)
         {
             if(fs::is_directory(item))
@@ -170,6 +261,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 	    const std::size_t numOfSound = std::count_if(fs::directory_iterator(Rpath), fs::directory_iterator{}, (fp)matFind);
         ResourcePtrWrapper* RessourceArray = new ResourcePtrWrapper[numOffiles + numOfShader - numOfMat - numOfSound]() ;
 
+
         auto Lambda = [this](const fs::path *Rpath, ResourcePtrWrapper *wrapper){LoadRessourceNoAdd(*Rpath,*wrapper); delete Rpath;};
         int i =0;
         std::vector<ShaderLoaderWrapper> Shaders;
@@ -178,10 +270,10 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
         Shaders.reserve(5);
 	    std::vector<fs::path> matPaths;
 	    std::vector<fs::path> soundPaths;
-        for (auto& item : fs::directory_iterator(Rpath))
+        for (auto& item : ToLoad)
         {
-            std::string name = item.path().filename().string();
-            fs::path* newP = new fs::path(item.path());
+            std::string name = item.filename().string();
+            fs::path* newP = new fs::path(item);
             if(fs::is_directory(item))
             {
                 std::transform(name.begin(), name.end(), name.begin(),
@@ -195,7 +287,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
             }
             else
             {
-                std::string extension = item.path().extension().string();
+                std::string extension = item.extension().string();
                 std::transform(extension.begin(), extension.end(), extension.begin(),
                                [](unsigned char c){ return std::tolower(c); });
                 if(extension == ".scompute" || extension == ".svertfrag")
@@ -630,7 +722,7 @@ Resource * ResourcesLoader::LoadImage(const fs::path &Rpath)
     //printf("Generate .SImage\n");
     std::vector<char> Data;
     Image->ToDataBuffer(Data);
-    fs::path cachePath = SolidPath;
+    fs::path cachePath = Rpath.parent_path();
     cachePath.append(Rpath.filename().string() + ".SImage");
     std::ofstream cacheFile(cachePath, std::fstream::binary | std::fstream::trunc);
     if(cacheFile.is_open())
@@ -691,7 +783,7 @@ Resource * ResourcesLoader::LoadMesh(const fs::path &Rpath)
 
 
 
-    fs::path cachePath = SolidPath;
+    fs::path cachePath = Rpath.parent_path();
     cachePath.append(Rpath.filename().string() + ".SMesh");
     std::ofstream cacheFile(cachePath, std::fstream::binary | std::fstream::trunc);
 
@@ -761,7 +853,7 @@ Resource * ResourcesLoader::LoadShader(const fs::path &Rpath)
         Compute->ToDataBuffer(Data);
 
 
-        fs::path cachePath = SolidPath;
+        fs::path cachePath = Rpath.parent_path();
         cachePath.append(Rpath.filename().string() + ".SCompute");
         std::ofstream cacheFile(cachePath, std::fstream::binary | std::fstream::trunc);
 
@@ -837,7 +929,7 @@ Resource * ResourcesLoader::LoadShader(const fs::path &Rpath)
 
 
 
-        fs::path cachePath =SolidPath;
+        fs::path cachePath =Rpath.parent_path();
         cachePath.append(Rpath.filename().string() + ".SVertFrag");
         std::ofstream cacheFile(cachePath, std::fstream::binary | std::fstream::trunc);
 
@@ -936,7 +1028,7 @@ Resource *ResourcesLoader::LoadAudio(const fs::path &Rpath)
 
 
 
-	fs::path cachePath =SolidPath;
+	fs::path cachePath =Rpath.parent_path();
 	cachePath.append(Rpath.filename().string() + ".SAudio");
 	std::ofstream cacheFile(cachePath, std::fstream::binary | std::fstream::trunc);
 

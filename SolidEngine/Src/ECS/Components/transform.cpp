@@ -12,6 +12,7 @@ namespace Solid
     transMat(Mat4<>::Identity),
     position(_position),
     rotation(_rotation),
+    euler(Maths::RadToDeg(rotation.ToEuler())),
     scale(_scale)
     {}
 
@@ -53,7 +54,7 @@ namespace Solid
 
     void Transform::Rotate(const Quat &_quat)
     {
-        rotation.Rotate(_quat);
+        rotation = rotation.Rotate(_quat);
 
         hasToUpdateMat = true;
     }

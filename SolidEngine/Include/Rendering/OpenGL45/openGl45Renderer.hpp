@@ -35,7 +35,8 @@ namespace Solid
         ShaderBinary GetShaderBinary(uint _PID) const final;
         uint CreateShaderFromBinary(ShaderBinary _binary) const final;
 
-	    virtual void DrawSolidGrid(Camera &_camera, float _gridSize, Vec3 _color, float _thickness) override;
+	    void DrawSolidGrid(const Camera& _camera, float _gridSize, Vec3 _color, float _thickness) const final;
+	    void DrawSkybox(const Camera& _camera)const final;
     };
 
 } //!namespace

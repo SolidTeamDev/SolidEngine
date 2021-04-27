@@ -3,24 +3,9 @@
 #include "Core/engine.hpp"
 #include "GameCompiler/gameCompiler.hpp"
 
-#include "ECS/Components/camera.hpp"
-
 namespace Solid
 {
-	class SOLID_API EngineCleanerInterface
-	{
-	protected:
-		EngineCleanerInterface()
-		{
 
-		}
-
-		~EngineCleanerInterface()
-		{
-			Engine::DeleteInstance();
-		}
-
-	};
 
     class Editor
     {
@@ -39,21 +24,22 @@ namespace Solid
 		    }
 	    }Clean;
 
-        InputManager<int>* editorInputManager = nullptr;
+
         Engine* engine = nullptr;
         GameCompiler* Compiler;
 
-
-        void UpdateEditorCamera();
     public:
+        static InputManager<int>* editorInputManager;
 
         static float camSpeed;
         static Framebuffer sceneFramebuffer;
         static Camera editorCamera;
+        json CurrentProjectJson;
 
         Editor();
         ~Editor();
-	    void LoadResources(bool _solid);
+        void InitFromProject();
+	    void LoadResources(fs::path& p);
         void Run();
         friend class EngineCleanerInterface;
     };

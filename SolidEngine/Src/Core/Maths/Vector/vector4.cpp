@@ -76,7 +76,7 @@ namespace Solid
 
     Vec4 Vec4::Slerp(const Vec4 &_v1, const Vec4 &_v2, float _r) noexcept
     {
-        return Maths::Slerp(_v1,_v2, _r).GetNormalized();
+        return Maths::Slerp(_v1,_v2, _r);
     }
 
 #pragma endregion
