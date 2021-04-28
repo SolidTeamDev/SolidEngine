@@ -16,7 +16,13 @@ namespace Solid
         if(!pxFoundation)
             throw ThrowError("Physx initialization failed ! (PxCreateFoundation)",ESolidErrorCode::S_INIT_ERROR);
 
-        pxPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *pxFoundation, PxTolerancesScale(), true, nullptr);
+        ///PVD
+        pxPvd       = PxCreatePvd(*pxFoundation);
+        pxTransport = PxDefaultPvdSocketTransportCreate("127.0.0.1",5425,10);
+        pxPvd->connect(*pxTransport,PxPvdInstrumentationFlag::eDEBUG);
+        ///
+
+        pxPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *pxFoundation, PxTolerancesScale(), true, pxPvd);
         if(!pxPhysics)
             throw ThrowError("Physx initialization failed ! (PxCreatePhysics)",ESolidErrorCode::S_INIT_ERROR);
 
@@ -42,6 +48,8 @@ namespace Solid
     Physics::~Physics()
     {
         pxPhysics->release();
+        pxPvd->release();
+        pxTransport->release();
         pxFoundation->release();
     }
 
