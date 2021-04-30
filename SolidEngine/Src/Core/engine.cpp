@@ -15,6 +15,7 @@
 #include "ECS/Components/boxCollider.hpp"
 #include "ECS/Components/sphereCollider.hpp"
 #include "ECS/Components/capsuleCollider.hpp"
+#include "ECS/Components/light.hpp"
 #include "Refureku/Refureku.h"
 
 namespace Solid
@@ -50,6 +51,7 @@ namespace Solid
         ecsManager.RegisterComponent<BoxCollider>();
         ecsManager.RegisterComponent<SphereCollider>();
         ecsManager.RegisterComponent<CapsuleCollider>();
+        ecsManager.RegisterComponent<Light>();
 
         //Register Signature
         rendererSystem = ecsManager.RegisterSystem<RendererSystem>();
