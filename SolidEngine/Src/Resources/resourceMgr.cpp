@@ -231,4 +231,9 @@ MaterialResource *ResourceManager::CreateMaterial(const char *name)
 	return mat;
 }
 
+ResourceManager::ResourceManager(struct Engine *_engine)
+{
+	EnginePtr =_engine;
+}
+
 

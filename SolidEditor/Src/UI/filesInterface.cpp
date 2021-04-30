@@ -5,7 +5,7 @@
 #include <imgui_internal.h>
 #include "Core/engine.hpp"
 #include "imgui_stdlib.h"
-
+#include "GameCompiler/gameCompiler.hpp"
 namespace Solid
 {
     void FilesInterface::Draw()
@@ -28,18 +28,17 @@ namespace Solid
 
     void FilesInterface::DrawCreateFile()
     {
+
         if(UI::BeginPopupContextWindow("createFile"))
         {
             if(UI::BeginMenu("New"))
             {
-                if(UI::MenuItem("Create .hpp"))
-                {
 
-                }
-                if(UI::MenuItem("Create .cpp"))
+	            if(UI::MenuItem("Create New Script"))
                 {
-
+	            	open = true;
                 }
+
 	            if (UI::MenuItem("Create Material"))
 	            {
 
@@ -52,6 +51,29 @@ namespace Solid
             }
 
             UI::EndPopup();
+        }
+        if(open)
+        {
+	        open = false;
+	        fName = "";
+        	UI::OpenPopup("FName");
+        }
+
+        if(UI::BeginPopup("FName"))
+        {
+	        UI::InputText("File Name",&fName);
+	        if(UI::Button("Create"))
+	        {
+		        GameCompiler* Compiler = GameCompiler::GetInstance();
+		        fs::path p = Compiler->srcPath.string() +"/Include/" + fName + ".hpp";
+		        if(fName == "" || fs::exists(p))
+		        {
+					//error
+		        }
+		        else
+		        	Compiler->CreateScript(fName);
+	        }
+        	UI::EndPopup();
         }
     }
 

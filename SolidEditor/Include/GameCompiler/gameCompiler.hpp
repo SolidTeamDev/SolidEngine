@@ -28,7 +28,13 @@ namespace Solid
         void operator=(const GameCompiler&) = delete;
         static GameCompiler* GetInstance();
         void LaunchCompile();
-        void CreateCmake();
+	    void CreateCmake();
+	    void CreateToml(fs::path& p);
+	    void ReloadCmake();
+	    void HotReload();
+	    void Build();
+	    void CreateScript(const std::string& _name);
+
         void AddLib();
     };
 

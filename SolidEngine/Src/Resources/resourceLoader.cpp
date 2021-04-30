@@ -172,7 +172,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 		    }
 		    else
 		    {
-			    std::string name = item.filename().string();
+			    std::string name = item.extension().string();
 			    std::transform(name.begin(), name.end(), name.begin(),
 			                   [](unsigned char c){ return std::tolower(c); });
 			    return (name.find(".bmp") != std::string::npos

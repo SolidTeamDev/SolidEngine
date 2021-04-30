@@ -58,10 +58,7 @@ namespace Solid
 
 
     public:
-	    explicit ResourceManager(class Engine* _engine)
-	    {
-		    EnginePtr =_engine;
-	    }
+	    explicit ResourceManager(class Engine* _engine);
 	    ~ResourceManager()
 	    {
 

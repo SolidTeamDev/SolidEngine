@@ -78,6 +78,8 @@ namespace Solid
          */
         bool IsEngineContextInitialized() const;
 
+	    void LoadScene(const fs::path& p);
+
         void Update();
 
         void FixedUpdate();

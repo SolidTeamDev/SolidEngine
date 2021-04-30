@@ -137,6 +137,14 @@ namespace Solid
 				fs::copy(editP, t, opt);
 			}
 		}
+		else
+		{
+			if(fs::exists(editP))
+			{
+				const auto opt = fs::copy_options::recursive | fs::copy_options::update_existing;
+				fs::copy(editP, t, opt);
+			}
+		}
 
 		Compiler->srcPath = CodePath;
 		Compiler->IncludePath = EngineIncPath;
