@@ -61,6 +61,11 @@ namespace Solid
         {
             EditAudioSource(engine->ecsManager.GetComponent<AudioSource>(gameObject->GetEntity()));
         }
+
+        if(engine->ecsManager.GotComponent<Animation>(gameObject->GetEntity()))
+        {
+            EditAnimation(engine->ecsManager.GetComponent<Animation>(gameObject->GetEntity()));
+        }
     }
 
     void InspectorInterface::AddComponents()
@@ -133,11 +138,11 @@ namespace Solid
 
             if(!engine->ecsManager.GotComponent<Animation>(gameObject->GetEntity()))
             {
-                /*if(UI::Button("Animation"))
+                if(UI::Button("Animation"))
                 {
                     engine->ecsManager.AddComponent<Animation>(gameObject,Animation());
                     UI::CloseCurrentPopup();
-                }*/
+                }
             }
             UI::EndPopup();
         }
@@ -439,6 +444,11 @@ namespace Solid
         }
 
         UI::Separator();
+    }
+
+    void InspectorInterface::EditAnimation(Animation& _audioSource)
+    {
+
     }
 
     void InspectorInterface::CreateScriptWindow()

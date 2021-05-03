@@ -51,6 +51,8 @@ namespace Solid
         ecsManager.RegisterComponent<BoxCollider>();
         ecsManager.RegisterComponent<SphereCollider>();
         ecsManager.RegisterComponent<CapsuleCollider>();
+        ecsManager.RegisterComponent<Animation>();
+
 
         //Register Signature
         rendererSystem = ecsManager.RegisterSystem<RendererSystem>();
