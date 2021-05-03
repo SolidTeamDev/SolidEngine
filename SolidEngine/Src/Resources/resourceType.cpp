@@ -804,7 +804,7 @@ void *SkeletonResource::Bone::operator new(std::size_t size)
 
 void SkeletonResource::Bone::operator delete(void* p)
 {
-	free(p);
+	::operator delete (p);
 }
 
 SkeletonResource::Bone *SkeletonResource::Bone::FindBoneByName(const char *_name)

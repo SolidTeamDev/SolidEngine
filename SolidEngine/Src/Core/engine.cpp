@@ -15,6 +15,7 @@
 #include "ECS/Components/boxCollider.hpp"
 #include "ECS/Components/sphereCollider.hpp"
 #include "ECS/Components/capsuleCollider.hpp"
+#include "ECS/Components/animation.hpp"
 #include "Refureku/Refureku.h"
 
 namespace Solid

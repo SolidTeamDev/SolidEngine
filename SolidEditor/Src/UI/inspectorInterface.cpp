@@ -130,6 +130,15 @@ namespace Solid
                     UI::CloseCurrentPopup();
                 }
             }
+
+            if(!engine->ecsManager.GotComponent<Animation>(gameObject->GetEntity()))
+            {
+                /*if(UI::Button("Animation"))
+                {
+                    engine->ecsManager.AddComponent<Animation>(gameObject,Animation());
+                    UI::CloseCurrentPopup();
+                }*/
+            }
             UI::EndPopup();
         }
 
