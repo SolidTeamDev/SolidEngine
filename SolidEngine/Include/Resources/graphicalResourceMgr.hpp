@@ -1,16 +1,11 @@
-//
-// Created by ryan1 on 09/03/2021.
-//
+#pragma once
 
-#ifndef SOLIDEDITOR_GRAPHICALRESOURCEMGR_HPP
-#define SOLIDEDITOR_GRAPHICALRESOURCEMGR_HPP
 #include "resourceMgr.hpp"
 #include "graphicalResource.hpp"
 #include <unordered_map>
+
 namespace Solid
 {
-
-
 	class SOLID_API GraphicalResourceMgr
 	{
 	public:
@@ -156,4 +151,3 @@ namespace Solid
 
 	};
 }
-#endif //SOLIDEDITOR_GRAPHICALRESOURCEMGR_HPP

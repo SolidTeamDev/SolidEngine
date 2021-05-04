@@ -1,9 +1,4 @@
-//
-// Created by ryan1 on 09/03/2021.
-//
-
-#ifndef SOLIDEDITOR_GRAPHICALRESOURCE_HPP
-#define SOLIDEDITOR_GRAPHICALRESOURCE_HPP
+#pragma once
 
 #include "graphicalResourceInterface.hpp"
 
@@ -90,8 +85,12 @@ namespace Solid
 
 			virtual void GetInt(const char *_name, int *_value) override;
 
+            void LoadShaderFields() override;
 
-			~Shader() = default;
+            std::vector<ShaderUniform>& GetUniformList() override;
+
+
+            ~Shader() = default;
 
 		};
 		class SOLID_API ComputeShader : public Shader
@@ -140,4 +139,3 @@ namespace Solid
 
 
 }
-#endif //SOLIDEDITOR_GRAPHICALRESOURCE_HPP

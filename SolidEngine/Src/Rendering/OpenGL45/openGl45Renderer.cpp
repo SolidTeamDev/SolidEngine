@@ -389,7 +389,7 @@ namespace Solid
 
     void OpenGL45Renderer::DrawSkybox(const Camera& _camera) const
     {
-        
+
     }
 
 } //!namespace

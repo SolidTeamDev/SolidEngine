@@ -1,10 +1,7 @@
-//
-// Created by ryan1 on 26/02/2021.
-//
+#pragma once
 
-#ifndef SOLIDEDITOR_RESOURCELOADER_HPP
-#define SOLIDEDITOR_RESOURCELOADER_HPP
 namespace fs = std::filesystem;
+
 namespace Solid
 {
 	struct SOLID_API FBXWrapper
@@ -61,9 +58,4 @@ namespace Solid
         //inline static void ReadFromBuffer(std::vector<char>& DataBuffer, void* Data, std::uint64_t sizeInByte, std::uint64_t& ReadPos);
         static void ReadFromBuffer(char* DataBuffer, void* Data, std::uint64_t sizeInByte, std::uint64_t& ReadPos);
     };
-
-
-
 }
-
-#endif //SOLIDEDITOR_RESOURCELOADER_HPP

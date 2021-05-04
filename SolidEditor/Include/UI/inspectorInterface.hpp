@@ -38,18 +38,10 @@ namespace Solid
         void EditVec2(Vec2 &_vec, const std::string &_label, float _step);
         void EditText(std::string& _str, const std::string& _label);
         void EditFloat(float&      _num, const std::string& _label, float _step);
+        void EditTexture(const std::shared_ptr<ITexture> _texture, const std::string& _label);
 
         bool p_open = true;
         bool openCreateScript = false;
-	    bool fvAdd = false;
-	    bool textureAdd = false;
-	    bool namePopup = false;
-	    std::string nameStr;
-	    MaterialResource* matToModify = nullptr;
-	    const char* beginField = "NONE";
-	    int chosenType =(int)MaterialResource::EFieldType::NONE;
-	    void DrawUniformNamePopup();
-
     };
 
 

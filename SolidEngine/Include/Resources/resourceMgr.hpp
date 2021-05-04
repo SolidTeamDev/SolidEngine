@@ -1,13 +1,11 @@
-//
-// Created by ryan1 on 26/02/2021.
-//
+#pragma once
 
-#ifndef SOLIDEDITOR_RESOURCEMGR_HPP
-#define SOLIDEDITOR_RESOURCEMGR_HPP
 #include <mutex>
 #include <unordered_map>
 #include "Core/Debug/throwError.hpp"
+
 namespace fs = std::filesystem;
+
 namespace Solid
 {
 
@@ -156,6 +154,3 @@ namespace Solid
 
     };
 }
-
-
-#endif //SOLIDEDITOR_RESOURCEMGR_HPP
