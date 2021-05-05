@@ -443,7 +443,8 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 {
 	MeshResource *Mesh = new MeshResource;
 	bool hasFoundSkeleton = false;
-	SkeletonResource* Skeleton = new SkeletonResource;
+	SkeletonResource* Skeleton = new SkeletonResource();
+
 	Assimp::Importer importer;
 	std::string str = Rpath.string();
 	Mesh->name = Rpath.filename().string();
@@ -458,7 +459,7 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 
 
 	aiBone* b;
-
+    Skeleton->name = "New Skeleton";
 
 	if (!scene)
 	{
@@ -490,7 +491,7 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 			std::function<void(SkeletonResource::Bone*, aiNode*)> lambda = [&](SkeletonResource::Bone* _bone, aiNode* _aiNode){
 
 				_bone->name = _aiNode->mName.C_Str();
-
+                ///HERE TODO REMOVE TAG _$Assimp_Fbx$_ from Bone Name
 				_bone->Childrens.reserve(_aiNode->mNumChildren);
 				for (int j = 0; j < _aiNode->mNumChildren; ++j)
 				{
@@ -502,6 +503,7 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 							            _aiNode->mTransformation.c1, _aiNode->mTransformation.c2, _aiNode->mTransformation.c3, _aiNode->mTransformation.c4,
 							            _aiNode->mTransformation.d1, _aiNode->mTransformation.d2, _aiNode->mTransformation.d3, _aiNode->mTransformation.d4);
 					cBone->Parent = _bone;
+					//_bone->FinalTrans = _bone->Parent->FinalTrans * _bone->transfo;
 					lambda(cBone, _aiNode->mChildren[j]);
 
 				}

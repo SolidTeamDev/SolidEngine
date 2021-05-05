@@ -101,6 +101,7 @@ namespace Solid
         Mat4& operator /= (Mat4& _mat) noexcept;
 
         T& operator[](unsigned int _index);
+        Vec4 operator * (const Vec4& _vec) const;
 
 #pragma endregion
 

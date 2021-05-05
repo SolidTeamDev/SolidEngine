@@ -1,5 +1,6 @@
 #include "matrix4.hpp"
 #include "../Quaternion/quaternion.hpp"
+#include "../Vector/vector4.hpp"
 #include "Core/Maths/Utils/numerics.hpp"
 
 namespace Solid
@@ -690,10 +691,25 @@ namespace Solid
     }
 
     template<typename T>
+    Vec4 Mat4<T>::operator * (const Vec4& _vec) const
+    {
+        Vec4 resultVect(0,0,0,0);
+        for (unsigned int i = 0; i < 4; i++)
+        {
+            for (unsigned int j = 0; j < 4; j++)
+                resultVect[i] += elements[(i*4)+j]*_vec[j];
+
+        }
+        return resultVect;
+    }
+    template<typename T>
     constexpr Mat4<T> operator*(T _value, const Mat4<T> &_mat) noexcept
     {
         return _mat * _value;
     }
+
+
+
 
 
     template<typename T>

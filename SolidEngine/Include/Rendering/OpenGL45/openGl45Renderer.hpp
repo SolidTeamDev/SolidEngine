@@ -14,7 +14,11 @@ namespace Solid
         uint gridProgram;
         uint grid_vbo;
         uint grid_ebo;
+        uint linesProgram;
+        uint lines_vbo;
+        uint lines_ebo;
         void InitGridGL();
+        void InitLinesGL();
 
     public:
         static Renderer* InitRenderer();
@@ -37,6 +41,7 @@ namespace Solid
 
 	    void DrawSolidGrid(const Camera& _camera, float _gridSize, Vec3 _color, float _thickness) const final;
 	    void DrawSkybox(const Camera& _camera)const final;
+	    void DrawLines(const Camera& _camera, std::vector<Vec3> _points, std::vector<uint> indices) const final;
     };
 
 } //!namespace

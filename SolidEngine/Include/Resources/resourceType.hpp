@@ -159,7 +159,7 @@ namespace Solid {
 		}rootBone;
 		SkeletonResource()
 		{
-			type = EResourceType::Anim;
+			type = EResourceType::Skeleton;
 		}
 
 		~SkeletonResource()

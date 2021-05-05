@@ -67,12 +67,14 @@ namespace Solid
         virtual void EndFramebuffer() const = 0;
         virtual void DrawSolidGrid(const Camera& _camera, float _gridSize, Vec3 _color, float _thickness) const = 0;
         virtual void DrawSkybox(const Camera& _camera) const = 0;
+        virtual void DrawLines(const Camera& _camera, std::vector<Vec3> _points, std::vector<uint> indices) const = 0;
 
 
         virtual ShaderBinary GetShaderBinary(uint _PID) const = 0;
         virtual uint CreateShaderFromBinary(ShaderBinary _binary) const = 0;
         virtual void SetRendererType(ERendererType _type) final{ if(type==ERendererType::NONE) type = _type; }
         virtual ERendererType GetRenderType() final {return type;}
+
     };
 
 } //!namespace

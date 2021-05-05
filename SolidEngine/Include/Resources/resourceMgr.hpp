@@ -112,6 +112,8 @@ namespace Solid
             if(type_value == AudioList.type_value)
                 return  &(AudioList.List);
 
+            if(type_value == SkeletonList.type_value)
+                return  &(SkeletonList.List);
 
             return nullptr;
         }

@@ -446,8 +446,32 @@ namespace Solid
         UI::Separator();
     }
 
-    void InspectorInterface::EditAnimation(Animation& _audioSource)
+    void InspectorInterface::EditAnimation(Animation& _anim)
     {
+        Engine* engine = Engine::GetInstance();
+
+        if(UI::CollapsingHeader("Animation",ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            const char* SKName = _anim.GetSkeleton() == nullptr ? "" : _anim.GetSkeleton()->name.c_str();
+            if(UI::BeginCombo("##Skeleton", SKName))
+            {
+                auto* skelList = engine->resourceManager.GetResourcesVecByType<SkeletonResource>();
+
+                for(auto skel : *skelList)
+                {
+                    bool selected = (SKName == skel.second->name);
+                    if(UI::Selectable(skel.second->name.c_str(), selected))
+                    {
+                        _anim.SetSkeleton( (SkeletonResource*)skel.second);
+
+                    }
+                    if(selected)
+                        UI::SetItemDefaultFocus();
+                }
+
+                UI::EndCombo();
+            }
+        }
 
     }
 

@@ -29,7 +29,7 @@ namespace Solid
         void EditTransform(Transform& _trs);
         void EditMeshRenderer(MeshRenderer& _meshRenderer);
         void EditAudioSource(AudioSource& _audioSource);
-        void EditAnimation(Animation& _audioSource);
+        void EditAnimation(Animation& _anim);
 
 
         void EditComp(Components* _comp);

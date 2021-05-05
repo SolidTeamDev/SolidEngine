@@ -15,9 +15,14 @@ namespace Solid SLDNamespace()
         Animation() = default;
         Animation(SkeletonResource* _Skeleton);
         ~Animation() = default;
+        void DrawSkeleton(std::vector<Vec3>& points, std::vector<uint>& indices,
+                          const SkeletonResource::Bone* bone = nullptr, uint index = 0);
+        void SetSkeleton(SkeletonResource* _Skeleton);
+        const SkeletonResource* GetSkeleton();
 
     private:
         SkeletonResource* Skeleton = nullptr;
+
 
     };
 }
