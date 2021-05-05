@@ -2,6 +2,7 @@
 // Created by ryan1 on 23/02/2021.
 //
 
+
 #include "GameCompiler/gameCompiler.hpp"
 #include <fstream>
 
@@ -20,20 +21,26 @@ namespace Solid
         return instance;
     }
 
-    void GameCompiler::LaunchCompile()
+    bool GameCompiler::LaunchCompile()
     {
         fs::path log = srcPath;
 	    fs::path CmakeP= srcPath;
 	    fs::path build= srcPath;
 	    fs::path Toml= srcPath;
 	    build.append("Build");
-        CmakeP.append("CMakeLists.txt");
+
+
+	    CmakeP.append("CMakeLists.txt");
         Toml.append("Dlls").append("RefurekuSettings.toml");
         CreateToml(Toml);
 
         std::string Compile = "@call vcvarsall.bat x64 >"+srcPath.string()+"\\vcvars.log && cmake --build "+build.string()+" --target "+ ProjectName+" >"+srcPath.string()+"\\SolidGameCompile.log";
-        std::system(Compile.c_str());
+        if(std::system(Compile.c_str()) != 0)
+        {
+        	return false;
+        }
         HotReload();
+	    return true;
 
     }
 
@@ -213,13 +220,21 @@ namespace Solid
 	                          "\n";
 
 	    std::string MainCpp=  "#include <iostream>\n"
-	                          "\n"
+	                          "#include \"Refureku/Refureku.h\"\n"
+						      "#include \"entry.hpp\"\n"
 							  "int Entry()\n"
 			                  "{\n"
 					          "     std::cout << \"Hello World \" << std::endl;\n"
                               "     return 0;\n"
                               "}\n"
-                              "\n"
+                              "std::size_t  GetClass(const std::string& _s)\n"
+	                          "{\n"
+	                          "     return (std::size_t) rfk::Database::getClass(_s);\n"
+	                          "}\n"
+	                          "std::size_t  GetNamespace(const std::string& _s)\n"
+	                          "{\n"
+	                          "     return (std::size_t) rfk::Database::getNamespace(_s);\n"
+	                          "}\n"
                               "\n"
                               "\n"
                               "\n"

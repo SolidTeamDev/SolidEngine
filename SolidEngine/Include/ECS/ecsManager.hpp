@@ -28,6 +28,8 @@ namespace Solid
             sceneGraphManager = std::make_unique<SceneGraphManager>();
         }
 
+
+
         GameObject* CreateEntity()
         {
             Entity temp = entityManager->CreateEntity();
@@ -105,11 +107,16 @@ namespace Solid
             c->Init();
             return (T*)c;
         }
+	    template<typename T>
+	    std::shared_ptr<ComponentArray<T>> GetCompArray()
+	    {
 
+		    return componentManager->GetComponentArray<T>();
+	    }
         template<typename T>
         void RemoveComponent(GameObject* _entity)
         {
-            Components* c = componentManager->RemoveComponent<T>(_entity);
+            Components* c = componentManager->RemoveComponent<T>(_entity->GetEntity());
             c->Release();
 	        for (auto it= _entity->compsList.begin(); it != _entity->compsList.end(); ++it)
 	        {

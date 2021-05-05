@@ -1,5 +1,6 @@
 #include <string>
 #include "editor.hpp"
+#undef ERROR
 #include "UI/solidUI.hpp"
 #include "UI/editorInterface.hpp"
 #include "Inputs/editorInputs.hpp"
@@ -63,7 +64,9 @@ namespace Solid
             editorInputManager->Update();
 
             //TODO: Update engine task in engine
-            engine->Update();
+            bool play = true;
+            if(play)
+                engine->Update();
             engine->FixedUpdate();
             engine->LateUpdate();
 
@@ -148,7 +151,30 @@ namespace Solid
 
 		Compiler->srcPath = CodePath;
 		Compiler->IncludePath = EngineIncPath;
+		Compiler->DllPath = CodePath;
+		Compiler->DllPath.append("Build").append(ProjectName+".dll");
 		Compiler->ProjectName = ProjectName;
+
+		fs::path tmp = fs::current_path();
+		tmp.append("Temp").append(ProjectName+"_Tmp.dll");
+		if(fs::exists(tmp))
+		{
+			Compiler->hGetProcIDDLL = LoadLibrary(tmp.string().c_str());
+			if(Compiler->hGetProcIDDLL == nullptr)
+			{
+				Log::Send("LIB LOAD FAILED", Log::ELogSeverity::ERROR);
+				Compiler->entryPoint = nullptr;
+				Compiler->getClass = nullptr;
+				Compiler->getNamespace = nullptr;
+			}
+			else
+			{
+				Compiler->entryPoint = (f_Entry)GetProcAddress(Compiler->hGetProcIDDLL, "Entry");
+				Compiler->getClass = (f_GetClass)GetProcAddress(Compiler->hGetProcIDDLL, "GetClass");
+				Compiler->getNamespace = (f_GetNamespace)GetProcAddress(Compiler->hGetProcIDDLL, "GetNamespace");
+			}
+		}
+
 		Compiler->CreateCmake();
 	}
 } //!namespace

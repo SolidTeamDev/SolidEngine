@@ -1,3 +1,4 @@
+
 #ifdef __unix__
 #define OS_WIN 0
 
@@ -5,7 +6,6 @@
 #define OS_WIN 1
 #include <windows.h>
 #endif
-
 
 
 #include "UI/editorInterface.hpp"
@@ -20,12 +20,23 @@
 #include "ECS/Components/script.hpp"
 
 
-typedef int (__stdcall *f_Entry)();
-typedef const  rfk::Class* (__stdcall *f_GetClass)(const std::string&);
-typedef const  rfk::Namespace* (__stdcall *f_GetNamespace)(const std::string&);
+
 
 Solid::GameObject* Solid::EditorInterface::selectedGO = nullptr;
 bool               Solid::EditorInterface::draggingEnt = false;
+
+struct FieldData
+{
+	std::string fName;
+	std::vector<unsigned char> fData;
+};
+
+struct CompData
+{
+	std::string compName;
+	std::vector<FieldData> fields;
+	std::size_t compIndex;
+};
 
 namespace Solid {
     EditorInterface::EditorInterface() :
@@ -221,6 +232,7 @@ namespace Solid {
             }
 	        if (UI::BeginMenu("Build"))
             {
+
 	            if (UI::MenuItem("Windows"))
 	            {
 		            GameCompiler::GetInstance()->Build();
@@ -239,47 +251,130 @@ namespace Solid {
 
 	            if (UI::MenuItem("Compile"))
 	            {
-		            GameCompiler::GetInstance()->LaunchCompile();
-		            Log::Send("Compiling", Log::ELogSeverity::ERROR);
-	            }
-	            if (UI::MenuItem("Load DLL"))
-	            {
-
-	            	fs::path p = fs::current_path();
-	            	p.append("MyProj.dll");
-		            HMODULE hGetProcIDDLL = nullptr;
-		            if(hGetProcIDDLL)
+	            	auto compiler = GameCompiler::GetInstance();
+	            	auto compArray =Engine::GetInstance()->ecsManager.GetCompArray<Script*>();
+		            std::array<Script*, MAX_ENTITIES>& array = compArray->GetArray();
+		            std::unordered_map<Entity, size_t>& idArray = compArray->GetIndexesArray();
+		            std::unordered_map<size_t , Entity>& entArray = compArray->GetEntitiesArray();
+		            std::vector<CompData> compsSave;
+	            	for(auto& elt : idArray)
+	            	{
+	            		Script* scriptToSave =array[elt.second];
+	            		CompData compD;
+	            		compD.compName = scriptToSave->getArchetype().name;
+	            		for(auto& field : scriptToSave->getArchetype().fields)
+	            		{
+	            			FieldData fieldD;
+	            			fieldD.fName= field.name;
+	            		    void* fData =field.getDataAddress(scriptToSave);
+	            		    uint fSize = field.type.archetype->memorySize;
+	            		    fieldD.fData.resize(fSize);
+	            		    std::memcpy(fieldD.fData.data(), fData, fSize);
+	            		    compD.fields.push_back(std::move(fieldD));
+	            		}
+	            		delete array[elt.second];
+			            array[elt.second] = nullptr;
+			            compD.compIndex = elt.second;
+	            		compsSave.push_back(std::move(compD));
+	            	}
+		            if(compiler->hGetProcIDDLL)
 		            {
-			            FreeLibrary(hGetProcIDDLL);
+			            FreeLibrary(compiler->hGetProcIDDLL);
+			            compiler->hGetProcIDDLL = nullptr;
+			            compiler->entryPoint = nullptr;
+			            compiler->getClass = nullptr;
+			            compiler->getNamespace = nullptr;
 		            }
-		            hGetProcIDDLL = LoadLibrary(p.string().c_str());
-		            if(hGetProcIDDLL == nullptr)
+		            fs::path DLLPath = GameCompiler::GetInstance()->DllPath;
+		            fs::path TmpDir = fs::current_path();
+		            TmpDir.append("Temp");
+		            fs::path TempDLL = TmpDir;
+		            TempDLL.append(GameCompiler::GetInstance()->ProjectName+"_Tmp.dll");
+		            if(!GameCompiler::GetInstance()->LaunchCompile())
 		            {
-			            Log::Send("LIB LOAD FAILED", Log::ELogSeverity::ERROR);
+
+			            if(!fs::exists(TmpDir))
+			            {
+			            	//No Temp / First Gen ?
+			            }
+			            else
+			            {
+
+				            if(!fs::exists(TempDLL))
+				            {
+					            //No Temp / First Gen ?
+				            }
+				            else
+				            {
+					            std::ifstream in (TempDLL.string(), std::fstream::binary);
+					            std::ofstream out (DLLPath.string(), std::fstream::binary | std::fstream::trunc);
+					            out << in.rdbuf();
+					            in.close();
+					            out.close();
+				            }
+			            }
+
 
 		            }
 		            else
 		            {
-			            f_Entry entryPoint = (f_Entry)GetProcAddress(hGetProcIDDLL, "Entry");
-			            f_GetClass getClass = (f_GetClass)GetProcAddress(hGetProcIDDLL, "GetClass");
-			            f_GetNamespace getNamespace = (f_GetNamespace)GetProcAddress(hGetProcIDDLL, "GetNamespace");
-
-			            if(entryPoint == nullptr)
+			            if(!fs::exists(TmpDir))
+				            fs::create_directory(TmpDir);
+			            std::ifstream in (DLLPath.string(), std::fstream::binary);
+			            std::ofstream out (TempDLL.string(), std::fstream::binary | std::fstream::trunc);
+			            out << in.rdbuf();
+			            in.close();
+			            out.close();
+		            }
+		            compiler->hGetProcIDDLL = LoadLibrary(TempDLL.string().c_str());
+		            if(compiler->hGetProcIDDLL == nullptr)
+		            {
+			            Log::Send("LIB LOAD FAILED", Log::ELogSeverity::ERROR);
+			            compiler->entryPoint = nullptr;
+			            compiler->getClass = nullptr;
+			            compiler->getNamespace = nullptr;
+		            }
+		            else
+		            {
+			            compiler->entryPoint = (f_Entry)GetProcAddress(compiler->hGetProcIDDLL, "Entry");
+			            compiler->getClass = (f_GetClass)GetProcAddress(compiler->hGetProcIDDLL, "GetClass");
+			            compiler->getNamespace = (f_GetNamespace)GetProcAddress(compiler->hGetProcIDDLL, "GetNamespace");
+			            if(compiler->entryPoint == nullptr)
 			            {
 				            Log::Send("entryPoint = nullptr", Log::ELogSeverity::ERROR);
 
 			            }
-			            if(getNamespace != nullptr)
+			            if(compiler->getNamespace != nullptr)
 			            {
-				            const rfk::Class* c= getNamespace("Solid")->getClass("TestScript");
-				            if(c == nullptr)
-					            Log::Send("TestScript = nullptr", Log::ELogSeverity::ERROR);
-				            else
+				            std::array<Script*, MAX_ENTITIES> newCompArray {};
+				            std::vector<Entity> compsNotCreated;
+				            for(auto& elt : compsSave)
 				            {
-					            Log::Send("TestScript Defined", Log::ELogSeverity::ERROR);
-					            Script* test =c->makeInstance<Script>();
-					            test->Update();
+					            const rfk::Class* c= compiler->getNamespace("Solid")->getClass(elt.compName);
+					            if(c == nullptr)
+					            {
+						            compsNotCreated.push_back(entArray[elt.compIndex]);
+					            	///OUCH
+					            }
+					            else
+					            {
+						            Script* newComp= c->makeInstance<Script>();
+									for(auto& field : elt.fields)
+									{
+									        const rfk::Field* f= newComp->getArchetype().getField(field.fName);
+									        if(f != nullptr)
+									        	f->setData(newComp, field.fData.data(), field.fData.size());
+									}
+									newCompArray[elt.compIndex] = newComp;
+					            }
 				            }
+				            compArray->SetArray(std::move(newCompArray));
+				            for(auto& elt : compsNotCreated)
+				            {
+					            GameObject* go = Engine::GetInstance()->ecsManager.GetGameObjectFromEntity(elt);
+					            Engine::GetInstance()->ecsManager.RemoveComponent<Script*>(go);
+				            }
+
 			            }
 			            else
 			            {
@@ -290,11 +385,11 @@ namespace Solid {
 		            }
 
 
+		            Log::Send("Compiling", Log::ELogSeverity::ERROR);
 	            }
-
-
-                UI::EndMenu();
+	            UI::EndMenu();
             }
+
             UI::EndMenu();
         }
     }

@@ -14,6 +14,7 @@
 #include "ECS/System/rendererSystem.hpp"
 #include "ECS/System/audioSystem.hpp"
 #include "ECS/System/physicsSystem.hpp"
+#include "ECS/System/scriptSystem.hpp"
 
 #include "Resources/graphicalResourceMgr.hpp"
 
@@ -54,7 +55,8 @@ namespace Solid
         ECSManager ecsManager;
         std::shared_ptr<RendererSystem> rendererSystem;
         std::shared_ptr<AudioSystem> audioSystem;
-        std::shared_ptr<PhysicsSystem> physicsSystem;
+	    std::shared_ptr<PhysicsSystem> physicsSystem;
+	    std::shared_ptr<ScriptSystem> scriptSystem;
         ResourceManager resourceManager;
         TaskManager taskManager;
         ThreadManager threadPool;

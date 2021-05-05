@@ -77,6 +77,13 @@ namespace Solid
             signature.set(ecsManager.GetComponentType<Transform>());
             ecsManager.SetSystemSignature<PhysicsSystem>(signature);
         }
+
+	    scriptSystem = ecsManager.RegisterSystem<ScriptSystem>();
+	    {
+		    Signature signature;
+		    signature.set(ecsManager.GetComponentType<Script*>());
+		    ecsManager.SetSystemSignature<ScriptSystem>(signature);
+	    }
     }
 
     void Engine::InitEngineContext(const WindowParams& _windowParams, const RendererParams& _rendererParams)
@@ -121,7 +128,7 @@ namespace Solid
 
     void Engine::Update()
     {
-
+		scriptSystem->Update();
     }
 
     void Engine::FixedUpdate()
