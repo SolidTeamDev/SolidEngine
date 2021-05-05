@@ -292,9 +292,9 @@ namespace Solid {
                 Vec2   v2;
                 Vec3   v3;
                 Vec4   v4;
-                std::shared_ptr<ITexture> text;
-            };
 
+            };
+            std::shared_ptr<ITexture> text;
             ShaderField(EShaderFieldType _type);
             ShaderField(const struct ShaderUniform& _uniform);
             ShaderField(const ShaderField& _copy);

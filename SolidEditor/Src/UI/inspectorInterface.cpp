@@ -197,6 +197,7 @@ namespace Solid
             Engine* engine = Engine::GetInstance();
             auto mesh = _meshRenderer.GetMesh();
             const char* meshName = mesh == nullptr ? "" : mesh->name.c_str();
+            std::vector<MaterialResource*> differentMaterials;
 
             UI::Text("Mesh  ");UI::SameLine();
             if(UI::BeginCombo("##Mesh", meshName))
@@ -218,48 +219,84 @@ namespace Solid
                 UI::EndCombo();
             }
 
-            if(UI::TreeNode("Materials"))
+            if(UI::TreeNode("Used Materials"))
             {
                 UI::Indent();
+
                 int id = 0;
                 for (auto* mat : _meshRenderer.GetMaterials())
                 {
                     std::string matName = mat == nullptr ? "Default Material" : mat->name;
                     std::string matId = std::to_string(id);
 
-                    if(UI::TreeNode(matName.c_str()))
+                    // Choose Material
+                    UI::Text(("Mat "+matId).c_str());UI::SameLine();
+                    if(UI::BeginCombo(std::string("##Mat"+matId).c_str(),matName.c_str()))
                     {
-                        // Choose Material
-                        if(UI::BeginCombo(std::string("##Mat"+matId).c_str(),matName.c_str()))
+                        auto* matList = engine->resourceManager.GetResourcesVecByType<MaterialResource>();
                         {
-                            auto* matList = engine->resourceManager.GetResourcesVecByType<MaterialResource>();
+                            bool selected = (matName == "DEFAULT MATERIAL");
+                            if(UI::Selectable("DEFAULT MATERIAL", selected))
                             {
-                                bool selected = (matName == "DEFAULT MATERIAL");
-                                if(UI::Selectable("DEFAULT MATERIAL", selected))
-                                {
-
-                                    _meshRenderer.SetMaterialAt(id, nullptr);
-                                }
-                                if(selected)
-                                    UI::SetItemDefaultFocus();
+                                _meshRenderer.SetMaterialAt(id, nullptr);
                             }
-                            for(auto mat : *matList)
+                            if(selected)
+                                UI::SetItemDefaultFocus();
+                        }
+                        for(auto mat : *matList)
+                        {
+                            bool selected = (matName == mat.second->name);
+                            if(UI::Selectable(mat.second->name.c_str(), selected))
                             {
-                                bool selected = (matName == mat.second->name);
-                                if(UI::Selectable(mat.second->name.c_str(), selected))
-                                {
-                                    _meshRenderer.SetMaterialAt(id, (MaterialResource*)mat.second);
-                                }
-                                if(selected)
-                                    UI::SetItemDefaultFocus();
+                                _meshRenderer.SetMaterialAt(id, (MaterialResource*)mat.second);
                             }
-
-                            UI::EndCombo();
+                            if(selected)
+                                UI::SetItemDefaultFocus();
                         }
 
+                        UI::EndCombo();
+                    }
+
+                    // Set different used material
+                    if(mat != nullptr)
+                    {
+                        bool isDifferent = true;
+
+                        for(auto* difMat : differentMaterials)
+                        {
+                            if(difMat == mat)
+                            {
+                                isDifferent = false;
+                                break;
+                            }
+                        }
+
+                        if(isDifferent)
+                            differentMaterials.push_back(mat);
+                    }
+
+                    ++id;
+                }
+
+                UI::Unindent();
+                UI::TreePop();
+            }
+
+            // Edit Material
+            if(UI::TreeNode("Edit Materials"))
+            {
+                UI::Indent();
+
+                int Id = 0;
+                for(auto* mat : differentMaterials)
+                {
+                    std::string matId = std::to_string(Id);
+
+                    if(UI::TreeNode(mat->name.c_str()))
+                    {
                         // Choose Shader
-                        const char* shaderName = mat == nullptr ? "Default Shader" : mat->GetShader()->name.c_str();
-                        if(UI::BeginCombo(std::string("##Shader"+matId).c_str(),shaderName))
+                        const char* shaderName = mat->GetShader()->name.c_str();
+                        if(UI::BeginCombo(std::string("Shader##"+matId).c_str(),shaderName))
                         {
                             auto* shaderList = engine->resourceManager.GetResourcesVecByType<ShaderResource>();
                             for(auto shader : *shaderList)
@@ -275,8 +312,8 @@ namespace Solid
                             UI::EndCombo();
                         }
 
-                        // Edit shader
-                        if(UI::TreeNode(std::string("Edit "+std::string(shaderName)+"##"+matId).c_str()))
+                        // Edit Shader
+                        if(UI::TreeNode(std::string("Edit "+std::string(shaderName) + "##" + matId).c_str()))
                         {
                             for(auto& field : mat->fields)
                             {
@@ -309,11 +346,9 @@ namespace Solid
                             }
                             UI::TreePop();
                         }
-
                         UI::TreePop();
                     }
-
-                    ++id;
+                    ++Id;
                 }
 
                 UI::Unindent();
@@ -483,9 +518,28 @@ namespace Solid
         UI::InputText(_label.c_str(), &_str);
     }
 
-    void InspectorInterface::EditTexture(const std::shared_ptr<ITexture> _texture, const std::string &_label)
+    void InspectorInterface::EditTexture(std::shared_ptr<ITexture>& _texture, const std::string &_label)
     {
-        Engine* engine = Engine::GetInstance();
+        Engine *engine = Engine::GetInstance();
+
+        std::string textName = _texture == nullptr ? "None" : _texture->name;
+
+        if (UI::BeginCombo(_label.c_str(),textName.c_str()))
+        {
+            auto *textures = engine->resourceManager.GetResourcesVecByType<ImageResource>();
+            for (auto text : *textures)
+            {
+                bool selected = (textName == text.second->name);
+                if(UI::Selectable(text.second->name.c_str(), selected))
+                {
+                    _texture = engine->graphicsResourceMgr.GetTexture(text.second->name.c_str());
+                }
+                if(selected)
+                    UI::SetItemDefaultFocus();
+            }
+
+            UI::EndCombo();
+        }
         //UI::Image(engine->graphicsResourceMgr.GetTexture(_texture->name))
     }
 }

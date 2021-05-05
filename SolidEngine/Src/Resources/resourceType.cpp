@@ -584,7 +584,7 @@ void MaterialResource::SetShader(const std::shared_ptr<IShader> _shader)
 
     auto uniforms = _shader->GetUniformList();
 
-    for(auto uniform: uniforms)
+    for(const auto& uniform: uniforms)
         fields.emplace_back(uniform);
 }
 
@@ -623,6 +623,7 @@ MaterialResource::ShaderField::ShaderField(MaterialResource::EShaderFieldType _t
 MaterialResource::ShaderField::ShaderField(const MaterialResource::ShaderField& _copy)
 {
     type = _copy.type;
+    name = _copy.name;
     switch (type)
     {
         case EShaderFieldType::BOOL:
@@ -645,8 +646,8 @@ MaterialResource::ShaderField::ShaderField(const MaterialResource::ShaderField& 
             break;
         case EShaderFieldType::TEXT:
             {
-                if(_copy.text != nullptr)
-                    text = _copy.text;
+
+               text = _copy.text;
                 break;
             }
         default:
@@ -681,7 +682,7 @@ MaterialResource::ShaderField::ShaderField(const ShaderUniform &_uniform)
             v4 = (0,0,0);
             break;
         case EShaderFieldType::TEXT:
-            //text = nullptr;
+            text = nullptr;
             break;
         default:
             type = EShaderFieldType::NONE;
