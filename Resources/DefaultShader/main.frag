@@ -34,7 +34,7 @@ struct Light
 
 layout (std450, binding=1) buffer lights_data
 {
-    Light[] lights;
+    Light lights[];
 };
 
 

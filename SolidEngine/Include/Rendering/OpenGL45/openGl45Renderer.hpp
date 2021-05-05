@@ -14,6 +14,7 @@ namespace Solid
         uint gridProgram;
         uint grid_vbo;
         uint grid_ebo;
+
         void InitGridGL();
 
     public:

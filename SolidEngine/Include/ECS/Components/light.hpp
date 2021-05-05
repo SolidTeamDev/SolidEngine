@@ -11,8 +11,9 @@ namespace Solid SLDNamespace()
     class SOLID_API SLDClass() Light : public Components
     {
     private:
-        //static std::vector<Light> lightList;
+        static std::vector<Light> lightList;
     public:
+
         enum ELightType
         {
             DIRECTIONAL,
@@ -21,8 +22,8 @@ namespace Solid SLDNamespace()
         };
 
         ELightType type = ELightType::DIRECTIONAL;
-        Vec3i color = {1,1,1};
-        Vec3  intensity = 1;
+        Vec3 color = {1,1,1};
+        float  intensity = 1;
 
         Light() = default;
         ~Light() override = default;
