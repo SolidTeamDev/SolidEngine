@@ -59,6 +59,8 @@ namespace Solid
 
 			void SetMVP(Transform& _model, Camera& _camera) const override;
 
+			void SetLights() const override;
+
 			void SetMaterial(const char *_name) override;
 
 			void SetVec2(const char *_name, Vec2 _value) override;

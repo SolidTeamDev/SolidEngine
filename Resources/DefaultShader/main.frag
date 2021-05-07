@@ -32,11 +32,8 @@ struct Light
     float intensity;
 };
 
-layout (std450, binding=1) buffer lights_data
-{
-    Light lights[];
-};
-
+uniform Light lights[256];
+uniform int nbLights;
 
 const float PI =  3.14159265359;
 
@@ -120,9 +117,9 @@ void main()
 
     // reflectance equation
     vec3 Lo = vec3(0.0);
-    for(int i = 0; i < lights_data.lights.length(); ++i)
+    for(int i = 0; i < nbLights; ++i)
     {
-        Light curLight = lights_data.lights[i];
+        Light curLight = lights[i];
         // calculate per-light radiance
         vec3 L = normalize(curLight.pos - vWorldPos);
         vec3 H = normalize(V + L);

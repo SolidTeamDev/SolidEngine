@@ -48,7 +48,6 @@ void Solid::HierarchyTreeInterface::DrawCreateObject()
                 else
                     tmp = engine->ecsManager.CreateEntity();
 
-                engine->ecsManager.AddComponent(tmp,Transform());
                 EditorInterface::selectedGO = tmp;
 
             }
@@ -62,7 +61,6 @@ void Solid::HierarchyTreeInterface::DrawCreateObject()
                 else
                     tmp = engine->ecsManager.CreateEntity();
 
-                engine->ecsManager.AddComponent(tmp,Transform());
                 engine->ecsManager.AddComponent(tmp,MeshRenderer(
                 		engine->graphicsResourceMgr.GetMesh("cube.obj"))
                 );
@@ -75,7 +73,6 @@ void Solid::HierarchyTreeInterface::DrawCreateObject()
             if(UI::MenuItem("Solid"))
             {
                 GameObject* tmp = engine->ecsManager.CreateEntity();
-                engine->ecsManager.AddComponent(tmp,Transform());
                 engine->ecsManager.AddComponent(tmp,MeshRenderer(
 		                engine->graphicsResourceMgr.GetMesh("solid.obj"))
                 );

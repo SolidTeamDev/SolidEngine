@@ -4,6 +4,7 @@
 #include <glad/glad.h>
 #include "Resources/resourceType.hpp"
 #include "Resources/graphicalResource.hpp"
+#include "ECS/Components/light.hpp"
 
 #include <editor.hpp>
 
@@ -155,6 +156,7 @@ void GL::Mesh::DrawMesh(const std::vector<MaterialResource *>& _list, Transform&
 				}
 
 				shader->SetMVP(_tr, _cam);
+				shader->SetLights();
 			}
 		}
 
@@ -285,6 +287,25 @@ void GL::Shader::SetMVP(Transform& _model, Camera& _camera)const
 	glUniformMatrix4fv(glGetUniformLocation(ProgID,"view"),1,GL_FALSE,_camera.GetView().elements.data());
 	glUniformMatrix4fv(glGetUniformLocation(ProgID,"model"),1,GL_FALSE,_model.GetMatrix().elements.data());
 
+}
+
+void GL::Shader::SetLights() const
+{
+    glUseProgram(ProgID);
+
+    std::vector<Light> lights = Light::GetLightList();
+    int i = 0;
+    for(auto light : lights)
+    {
+        std::string id = std::to_string(i);
+        Vec3 pos = light.gameObject->transform->GetPosition();
+        glUniform3fv(glGetUniformLocation(ProgID,std::string("lights[" + id + "].pos").c_str()),1,&pos.x);
+        glUniform3fv(glGetUniformLocation(ProgID,std::string("lights[" + id + "].color").c_str()),1,&light.color.x);
+        glUniform1f(glGetUniformLocation(ProgID,std::string("lights[" + id + "].intensity").c_str()),light.intensity);
+
+        ++i;
+    }
+    glUniform1i(glGetUniformLocation(ProgID,"nbLights"),lights.size());
 }
 
 void GL::Shader::SetMaterial(const char *_name)

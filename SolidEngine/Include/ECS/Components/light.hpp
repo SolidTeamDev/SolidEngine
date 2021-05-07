@@ -31,6 +31,8 @@ namespace Solid SLDNamespace()
         void Init() override;
         void Release() override;
 
+        static std::vector<Light> GetLightList();
+
         Light_GENERATED
     };
 } //!namespace

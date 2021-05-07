@@ -60,6 +60,11 @@ namespace Solid
         {
             EditAudioSource(engine->ecsManager.GetComponent<AudioSource>(gameObject->GetEntity()));
         }
+
+        if(engine->ecsManager.GotComponent<Light>(gameObject->GetEntity()))
+        {
+            EditLight(engine->ecsManager.GetComponent<Light>(gameObject->GetEntity()));
+        }
     }
 
     void InspectorInterface::AddComponents()
@@ -126,6 +131,14 @@ namespace Solid
                 if(UI::Button("Capsule collider"))
                 {
                     engine->ecsManager.AddComponent<CapsuleCollider>(gameObject,CapsuleCollider());
+                    UI::CloseCurrentPopup();
+                }
+            }
+            if(!engine->ecsManager.GotComponent<Light>(gameObject->GetEntity()))
+            {
+                if(UI::Button("Light"))
+                {
+                    engine->ecsManager.AddComponent<Light>(gameObject,Light());
                     UI::CloseCurrentPopup();
                 }
             }
@@ -420,6 +433,20 @@ namespace Solid
         }
 
         UI::Separator();
+    }
+
+    void InspectorInterface::EditLight(Light &_light)
+    {
+        Engine* engine = Engine::GetInstance();
+
+        if(UI::CollapsingHeader("Light",ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            UI::ColorEdit3("Color",&_light.color.x);
+            EditFloat(_light.intensity,"Intensity",0.01f);
+        }
+
+        UI::Separator();
+
     }
 
     void InspectorInterface::CreateScriptWindow()

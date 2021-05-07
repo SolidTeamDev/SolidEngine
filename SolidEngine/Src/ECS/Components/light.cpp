@@ -13,4 +13,9 @@ namespace Solid
     {
         //TODO: Remove light of the list
     }
+
+    std::vector<Light> Light::GetLightList()
+    {
+        return lightList;
+    }
 } //!namespace

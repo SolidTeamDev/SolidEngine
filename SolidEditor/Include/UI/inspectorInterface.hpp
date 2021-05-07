@@ -8,6 +8,7 @@
 #include "ECS/Components/boxCollider.hpp"
 #include "ECS/Components/sphereCollider.hpp"
 #include "ECS/Components/capsuleCollider.hpp"
+#include "ECS/Components/light.hpp"
 
 #include <string>
 
@@ -28,6 +29,7 @@ namespace Solid
         void EditTransform(Transform& _trs);
         void EditMeshRenderer(MeshRenderer& _meshRenderer);
         void EditAudioSource(AudioSource& _audioSource);
+        void EditLight(Light& _light);
 
         void EditComp(Components* _comp);
 
