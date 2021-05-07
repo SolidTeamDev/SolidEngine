@@ -6,6 +6,8 @@
 #include <array>
 #include <fstream>
 
+#undef ERROR
+
 constexpr int maxLogMessage = 100;
 
 namespace Solid {

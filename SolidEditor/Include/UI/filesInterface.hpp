@@ -18,5 +18,7 @@ namespace Solid
 	    void DrawMatNamePopup();
 
         bool p_open = true;
+	    bool open = false;
+	    std::string fName;
     };
 }

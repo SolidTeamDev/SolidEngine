@@ -1,6 +1,8 @@
 #include "UI/inspectorInterface.hpp"
 #include "UI/editorInterface.hpp"
 #include "Core/engine.hpp"
+#include "editor.hpp"
+#include "ECS/Components/script.hpp"
 #include <imgui.h>
 #include <imgui_stdlib.h>
 
@@ -60,6 +62,10 @@ namespace Solid
         if(engine->ecsManager.GotComponent<AudioSource>(gameObject->GetEntity()))
         {
             EditAudioSource(engine->ecsManager.GetComponent<AudioSource>(gameObject->GetEntity()));
+        }
+        if(engine->ecsManager.GotComponent<Script*>(gameObject->GetEntity()))
+        {
+	        EditComp(engine->ecsManager.GetComponent<Script*>(gameObject->GetEntity()));
         }
     }
 
@@ -130,6 +136,24 @@ namespace Solid
                     UI::CloseCurrentPopup();
                 }
             }
+	        if(!engine->ecsManager.GotComponent<Script*>(gameObject->GetEntity()))
+	        {
+	        	const rfk::Namespace* n = GameCompiler::GetInstance()->getNamespace("Solid");
+
+		        for(auto& elt : n->archetypes)
+		        {
+		        	const rfk::Class* c = n->getClass(elt->name);
+					if(c->isSubclassOf(*n->getClass("Script")))
+					{
+						if(UI::Button(elt->name.c_str()))
+						{
+							engine->ecsManager.AddComponent<Script*>(gameObject, c->makeInstance<Script>());
+							UI::CloseCurrentPopup();
+						}
+					}
+
+		        }
+	        }
             UI::EndPopup();
         }
 
