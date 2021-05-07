@@ -332,7 +332,7 @@ void ShaderResource::FromDataBuffer(char *buffer, int bSize)
 
 void MaterialResource::ToDataBuffer(std::vector<char> &buffer)
 {
-	/*std::string pString = this->path.string();
+	std::string pString = this->path.string();
 	std::uint32_t size = pString.size();
 	ResourcesLoader::Append(buffer, &(this->type), sizeof(this->type));
 
@@ -359,53 +359,79 @@ void MaterialResource::ToDataBuffer(std::vector<char> &buffer)
 
 	}
 
-
-	size = this->TexturesProperties.size();
+	size = this->fields.size();
 	ResourcesLoader::Append(buffer, &(size), sizeof(size));
-	for (auto& tex : this->TexturesProperties)
+
+	for(auto& field : this->fields)
 	{
-		//property name
-		size = tex.first.size();
+		//store field name
+		size = field.name.size();
 		ResourcesLoader::Append(buffer, &(size), sizeof(size));
-		ResourcesLoader::Append(buffer, (void *) (tex.first.c_str()), size * sizeof(std::string::value_type));
-
-		//is texture empty
-		size = (tex.second == nullptr) ? 128 : 256;
-		ResourcesLoader::Append(buffer, &(size), sizeof(size));
-		if(size == 128)
+		ResourcesLoader::Append(buffer, (void *) (field.name.c_str()), size * sizeof(std::string::value_type));
+		//store field type
+		ResourcesLoader::Append(buffer, &(field.type), sizeof(EShaderFieldType));
+		switch (field.type)
 		{
+			case EShaderFieldType::BOOL:
+			{
+				ResourcesLoader::Append(buffer, &(field.b), sizeof(bool));
+				break;
+			}
+			case EShaderFieldType::INT:
+			{
+				ResourcesLoader::Append(buffer, &(field.i), sizeof(int));
 
-		}
-		else
-		{
-			//property value
-			size = tex.second->name.size();
-			ResourcesLoader::Append(buffer, &(size), sizeof(size));
-			ResourcesLoader::Append(buffer, (void *) (tex.second->name.c_str()), size * sizeof(std::string::value_type));
-			// append  property name and value (tex name)
-		}
+				break;
+			}
+			case EShaderFieldType::FLOAT:
+			{
+				ResourcesLoader::Append(buffer, &(field.f), sizeof(float));
 
+				break;
+			}
+			case EShaderFieldType::VEC2:
+			{
+				ResourcesLoader::Append(buffer, &(field.v2), sizeof(Vec2));
+
+				break;
+			}
+			case EShaderFieldType::VEC3:
+			{
+				ResourcesLoader::Append(buffer, &(field.v3), sizeof(Vec3));
+
+				break;
+			}
+			case EShaderFieldType::VEC4:
+			{
+				ResourcesLoader::Append(buffer, &(field.v4), sizeof(Vec4));
+
+				break;
+			}
+			case EShaderFieldType::TEXT:
+			{
+				size =  field.text == nullptr ? 256 : 128;
+				ResourcesLoader::Append(buffer, &(size), sizeof(size));
+				if(field.text != nullptr)
+				{
+					size = field.text->name.size();
+					ResourcesLoader::Append(buffer, &(size), sizeof(size));
+					ResourcesLoader::Append(buffer, (void *) (field.text->name.c_str()), size * sizeof(std::string::value_type));
+
+				}
+
+				break;
+			}
+			default:
+				break;
+		}
 	}
 
-	////HERE
-	size = this->ValuesProperties.size();
-	ResourcesLoader::Append(buffer, &(size), sizeof(size));
-	for (auto& tex : this->ValuesProperties)
-	{
-		//property name
-		size = tex.first.size();
-		ResourcesLoader::Append(buffer, &(size), sizeof(size));
-		ResourcesLoader::Append(buffer, (void *) (tex.first.c_str()), size * sizeof(std::string::value_type));
-		//property value
-		ResourcesLoader::Append(buffer, (void *) &(tex.second),  sizeof(FieldValue));
-		// append  property name and value (float value)
-	}*/
 }
 
 void MaterialResource::FromDataBuffer(char *buffer, int bSize)
 {
 	//WARNING : No test for read overflow
-	/*std::uint64_t ReadPos = 0;
+	std::uint64_t ReadPos = 0;
 
 
 	ResourcesLoader::ReadFromBuffer(buffer, &(this->type), sizeof(this->type), ReadPos);
@@ -446,50 +472,78 @@ void MaterialResource::FromDataBuffer(char *buffer, int bSize)
 
 	size = 0;
 	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
-	for (int i = 0; i < size; ++i)
-	{
-		std::uint32_t pSize = 0;
-		std::string pName;
-		std::uint32_t vSize = 0;
-		std::string vName;
-		//property name
-		ResourcesLoader::ReadFromBuffer(buffer, &(pSize), sizeof(pSize), ReadPos);
-		pName.resize(pSize);
-		ResourcesLoader::ReadFromBuffer(buffer, (void *) (pName.data()), pSize * sizeof(std::string::value_type), ReadPos);
+	this->fields.resize(size);
 
-		//is texture empty
-		ResourcesLoader::ReadFromBuffer(buffer, &(pSize), sizeof(pSize), ReadPos);
-		if(pSize == 128)
+	for(auto& field : this->fields)
+	{
+	    //load field name
+	    size = 0;
+		ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
+		field.name.resize(size);
+		ResourcesLoader::ReadFromBuffer(buffer, (void *) (field.name.data()), size * sizeof(std::string::value_type), ReadPos);
+		//load field type
+		ResourcesLoader::ReadFromBuffer(buffer, &(field.type), sizeof(EShaderFieldType), ReadPos);
+		switch (field.type)
 		{
-			this->TexturesProperties.emplace(pName, nullptr);
-		}
-		else
-		{
-			//property value
-			ResourcesLoader::ReadFromBuffer(buffer, &(vSize), sizeof(vSize), ReadPos);
-			vName.resize(vSize);
-			ResourcesLoader::ReadFromBuffer(buffer, (void *) (vName.data()), vSize * sizeof(std::string::value_type), ReadPos);
-			// append  Texture
-			this->TexturesProperties.emplace(pName, engine->graphicsResourceMgr.GetTexture(vName.c_str()));
+			case EShaderFieldType::BOOL:
+			{
+				ResourcesLoader::ReadFromBuffer(buffer, &(field.b), sizeof(bool), ReadPos);
+				break;
+			}
+			case EShaderFieldType::INT:
+			{
+				ResourcesLoader::ReadFromBuffer(buffer, &(field.i), sizeof(int), ReadPos);
+
+				break;
+			}
+			case EShaderFieldType::FLOAT:
+			{
+				ResourcesLoader::ReadFromBuffer(buffer, &(field.f), sizeof(float), ReadPos);
+
+				break;
+			}
+			case EShaderFieldType::VEC2:
+			{
+				ResourcesLoader::ReadFromBuffer(buffer, &(field.v2), sizeof(Vec2), ReadPos);
+
+				break;
+			}
+			case EShaderFieldType::VEC3:
+			{
+				ResourcesLoader::ReadFromBuffer(buffer, &(field.v3), sizeof(Vec3), ReadPos);
+
+				break;
+			}
+			case EShaderFieldType::VEC4:
+			{
+				ResourcesLoader::ReadFromBuffer(buffer, &(field.v4), sizeof(Vec4), ReadPos);
+
+				break;
+			}
+			case EShaderFieldType::TEXT:
+			{
+				size =  256;//field.text == nullptr ? 256 : 128;
+				ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
+				if(size == 128)
+				{
+					size = 0;
+					std::string tStr ;
+
+					ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
+					tStr.resize(size);
+
+					ResourcesLoader::ReadFromBuffer(buffer, (void *) (tStr.data()), size * sizeof(std::string::value_type),ReadPos);
+					field.text = Engine::GetInstance()->graphicsResourceMgr.GetTexture(tStr.c_str());
+				}
+
+				break;
+			}
+			default:
+				break;
 		}
 	}
 
-	size = 0;
-	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
-	for (int i = 0; i < size; ++i)
-	{
-		std::uint32_t pSize = 0;
-		std::string pName;
-		FieldValue Value(EShaderFieldType::NONE);
-		//property name
-		ResourcesLoader::ReadFromBuffer(buffer, &(pSize), sizeof(pSize), ReadPos);
-		pName.resize(pSize);
-		ResourcesLoader::ReadFromBuffer(buffer, (void *) (pName.data()), pSize * sizeof(std::string::value_type), ReadPos);
-		//property value
-		ResourcesLoader::ReadFromBuffer(buffer, (void *) &(Value), sizeof(FieldValue), ReadPos);
-		// append  FieldValue
-		this->ValuesProperties.emplace(pName, Value);
-	}*/
+
 
 
 }
@@ -722,6 +776,12 @@ MaterialResource::ShaderField::operator=(const MaterialResource::ShaderField &_c
     }
 
     return *this;
+}
+
+MaterialResource::ShaderField::ShaderField()
+{
+	name = "ERROR 404";
+	type = EShaderFieldType::NONE;
 }
 
 SkeletonResource::Bone::~Bone()

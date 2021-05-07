@@ -295,6 +295,8 @@ namespace Solid {
 
             };
             std::shared_ptr<ITexture> text;
+	        ShaderField();
+
             ShaderField(EShaderFieldType _type);
             ShaderField(const struct ShaderUniform& _uniform);
             ShaderField(const ShaderField& _copy);

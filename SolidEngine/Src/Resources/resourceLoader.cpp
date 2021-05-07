@@ -205,14 +205,17 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 		for(auto& elt : normal)
 		{
 			bool found = false;
+			int count = 0;
 			for(auto& elt2 : Solid)
 		    {
 		        if(elt2.filename().string().find(elt.filename().string()) != std::string::npos)
 		        {
 		        	ToLoad.push_back(elt2);
+		        	Solid.erase(Solid.begin()+count);
 		        	found = true;
 			        break;
 		        }
+		        count++;
 		    }
 			if(!found)
 			{
@@ -220,7 +223,10 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 			}
 		}
 
-
+	    for(auto& elt : Solid)
+	    {
+		    ToLoad.push_back(elt);
+	    }
 
         //////////////////////////////
 
