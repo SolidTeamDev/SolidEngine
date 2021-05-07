@@ -25,18 +25,7 @@
 Solid::GameObject* Solid::EditorInterface::selectedGO = nullptr;
 bool               Solid::EditorInterface::draggingEnt = false;
 
-struct FieldData
-{
-	std::string fName;
-	std::vector<unsigned char> fData;
-};
 
-struct CompData
-{
-	std::string compName;
-	std::vector<FieldData> fields;
-	std::size_t compIndex;
-};
 
 namespace Solid {
     EditorInterface::EditorInterface() :
@@ -91,7 +80,12 @@ namespace Solid {
         {
             DrawMenuFiles();
             DrawMenuWindows();
-
+	        if(UI::Button("Play"))
+		        Editor::Play();
+	        if(UI::Button("Pause"))
+		        Editor::Pause();
+	        if(UI::Button("Stop"))
+		        Editor::Stop();
             UI::EndMainMenuBar();
         }
 
