@@ -1,9 +1,5 @@
-//
-// Created by ryan1 on 26/02/2021.
-//
+#pragma once
 
-#ifndef SOLIDEDITOR_RESOURCETYPE_HPP
-#define SOLIDEDITOR_RESOURCETYPE_HPP
 #include <filesystem>
 #include <sndfile.h>
 
@@ -268,43 +264,47 @@ namespace Solid {
 
     class SOLID_API MaterialResource : public Resource
     {
-
+    private:
+        std::shared_ptr<IShader> shader;
+        std::shared_ptr<const IShader> defaultshader;
     public:
-	    enum class EFieldType : int
-	    {
-	    	BOOL = 1,
-	    	INT,
-	    	FLOAT,
-	    	VEC2,
-	    	VEC3,
-	    	VEC4,
-	    	NONE
-	    };
-		class SOLID_API FieldValue
-		{
-		public:
-			EFieldType type;
-			union
-			{
-				bool   b;
-				int    i;
-				float  f;
-				Vec2   v2;
-				Vec3   v3;
-				Vec4   v4;
-			};
+        enum class EShaderFieldType : int
+        {
+            BOOL,
+            INT,
+            FLOAT,
+            VEC2,
+            VEC3,
+            VEC4,
+            TEXT,
+            NONE
+        };
+        class SOLID_API ShaderField
+        {
+        public:
+            std::string name;
+            EShaderFieldType type;
+            union
+            {
+                bool   b;
+                int    i;
+                float  f;
+                Vec2   v2;
+                Vec3   v3;
+                Vec4   v4;
 
-			FieldValue(EFieldType _type);
-			FieldValue(const FieldValue& copy);
-		};
+            };
+            std::shared_ptr<ITexture> text;
+            ShaderField(EShaderFieldType _type);
+            ShaderField(const struct ShaderUniform& _uniform);
+            ShaderField(const ShaderField& _copy);
+            ~ShaderField(){};
+            ShaderField& operator=(const ShaderField& _copy);
+        };
 
-    	std::shared_ptr<IShader> shader;
 	    bool shouldGenerateFileAtDestroy = true;
 
-	    std::shared_ptr<const IShader> defaultshader;
-	    std::unordered_map<std::string, std::shared_ptr<ITexture>> TexturesProperties;
-	    std::unordered_map<std::string, FieldValue> ValuesProperties;
-
+	    std::vector<ShaderField> fields;
 
         MaterialResource();
 	    MaterialResource(const char* _name, bool _genfile = true);
@@ -313,8 +313,12 @@ namespace Solid {
         ~MaterialResource();
 
 	    void ToDataBuffer(std::vector<char> &buffer);
-
 	    void FromDataBuffer(char *buffer, int bSize);
+
+        const std::shared_ptr<IShader> GetShader() const;
+        const std::shared_ptr<const IShader> GetDefaultshader() const;
+
+        void SetShader(const std::shared_ptr<IShader> _shader);
 
     };
 
@@ -352,6 +356,3 @@ namespace Solid {
 
 	};
 }
-
-
-#endif //SOLIDEDITOR_RESOURCETYPE_HPP

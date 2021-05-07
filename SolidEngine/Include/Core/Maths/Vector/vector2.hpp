@@ -13,8 +13,6 @@ namespace Solid SLDNamespace()
 
     class Vec4;
 
-    //TODO: SEE TO TEMPLATE VECTOR
-
     struct SOLID_API SLDStruct() Vec2i
     {
     	SLDField()

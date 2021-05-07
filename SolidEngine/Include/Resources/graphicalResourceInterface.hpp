@@ -1,12 +1,10 @@
-//
-// Created by ryan1 on 09/03/2021.
-//
+#pragma once
 
-#ifndef SOLIDEDITOR_GRAPHICALRESOURCEINTERFACE_HPP
-#define SOLIDEDITOR_GRAPHICALRESOURCEINTERFACE_HPP
 #include "Build/solidAPI.hpp"
 #include "ECS/Components/transform.hpp"
 #include "ECS/Components/camera.hpp"
+#include "Resources/resourceType.hpp"
+
 namespace Solid
 {
 
@@ -30,15 +28,23 @@ namespace Solid
 
 	};
 
+    struct ShaderUniform
+    {
+        std::string name;
+        MaterialResource::EShaderFieldType type;
+    };
+
 	class SOLID_API IShader
 	{
 	public:
+
 		//public members
 		std::string name;
 		const EResourceType type;
+
 	protected:
 		//protected members
-
+        std::vector<ShaderUniform> uniforms;
 
 	public:
 		//public func
@@ -58,6 +64,10 @@ namespace Solid
 		virtual void SetMatrixArray(const char *_name, int size, Mat4<float>* _value) = 0;
 		virtual void GetIntArray(const char *_name, int size, int* _value) = 0;
 		virtual void GetInt(const char *_name, int* _value) = 0;
+
+		virtual void LoadShaderFields() = 0;
+
+		virtual std::vector<ShaderUniform>& GetUniformList() = 0;
 
 		virtual void SetMVP(Transform& _model, Camera& _camera) const = 0;
 		virtual void SetMaterial(const char* _name) = 0;
@@ -82,4 +92,3 @@ namespace Solid
 
 	};
 }
-#endif //SOLIDEDITOR_GRAPHICALRESOURCEINTERFACE_HPP

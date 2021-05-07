@@ -95,7 +95,7 @@ namespace Solid
 				UI::ShowDemoWindow();
 				Engine* engine = Engine::GetInstance();
 				MaterialResource* mat =engine->resourceManager.CreateMaterial(matNamestr.c_str());
-				mat->shader = engine->graphicsResourceMgr.GetShader("DefaultShader");
+				mat->SetShader(engine->graphicsResourceMgr.GetShader("DefaultShader"));
 				UI::CloseCurrentPopup();
 			}
 			UI::EndPopup();

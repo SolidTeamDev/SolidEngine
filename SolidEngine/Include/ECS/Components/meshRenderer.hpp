@@ -20,6 +20,7 @@ namespace Solid SLDNamespace()
         vectorStr MatNames;
 	    SLDField()
 	    String MeshName;
+
 	    std::vector<MaterialResource*> materials;
 	    std::set<MaterialResource*> materialSet;
 

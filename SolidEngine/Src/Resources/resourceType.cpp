@@ -1,7 +1,3 @@
-//
-// Created by ryan1 on 26/02/2021.
-//
-
 #include "Resources/ressources.hpp"
 #include <sstream>
 #include <Resources/resourceType.hpp>
@@ -15,13 +11,6 @@ int Resource::NoNameNum = 0;
 
 #define SASSET_GEN 1
 
-
-
-
-
-///
-/// Resources Classes
-///
 ImageResource::~ImageResource() = default;
 
 
@@ -343,7 +332,7 @@ void ShaderResource::FromDataBuffer(char *buffer, int bSize)
 
 void MaterialResource::ToDataBuffer(std::vector<char> &buffer)
 {
-	std::string pString = this->path.string();
+	/*std::string pString = this->path.string();
 	std::uint32_t size = pString.size();
 	ResourcesLoader::Append(buffer, &(this->type), sizeof(this->type));
 
@@ -410,13 +399,13 @@ void MaterialResource::ToDataBuffer(std::vector<char> &buffer)
 		//property value
 		ResourcesLoader::Append(buffer, (void *) &(tex.second),  sizeof(FieldValue));
 		// append  property name and value (float value)
-	}
+	}*/
 }
 
 void MaterialResource::FromDataBuffer(char *buffer, int bSize)
 {
 	//WARNING : No test for read overflow
-	std::uint64_t ReadPos = 0;
+	/*std::uint64_t ReadPos = 0;
 
 
 	ResourcesLoader::ReadFromBuffer(buffer, &(this->type), sizeof(this->type), ReadPos);
@@ -491,7 +480,7 @@ void MaterialResource::FromDataBuffer(char *buffer, int bSize)
 	{
 		std::uint32_t pSize = 0;
 		std::string pName;
-		FieldValue Value(EFieldType::NONE);
+		FieldValue Value(EShaderFieldType::NONE);
 		//property name
 		ResourcesLoader::ReadFromBuffer(buffer, &(pSize), sizeof(pSize), ReadPos);
 		pName.resize(pSize);
@@ -500,7 +489,7 @@ void MaterialResource::FromDataBuffer(char *buffer, int bSize)
 		ResourcesLoader::ReadFromBuffer(buffer, (void *) &(Value), sizeof(FieldValue), ReadPos);
 		// append  FieldValue
 		this->ValuesProperties.emplace(pName, Value);
-	}
+	}*/
 
 
 }
@@ -577,64 +566,162 @@ MaterialResource::MaterialResource(const char *_name, bool _genfile)
 	shouldGenerateFileAtDestroy = _genfile;
 }
 
-MaterialResource::FieldValue::FieldValue(MaterialResource::EFieldType _type)
+const std::shared_ptr<IShader> MaterialResource::GetShader() const
+{
+    return shader;
+}
+
+const std::shared_ptr<const IShader> MaterialResource::GetDefaultshader() const
+{
+    return defaultshader;
+}
+
+void MaterialResource::SetShader(const std::shared_ptr<IShader> _shader)
+{
+    shader = _shader;
+
+    fields.clear();
+
+    auto uniforms = _shader->GetUniformList();
+
+    for(const auto& uniform: uniforms)
+        fields.emplace_back(uniform);
+}
+
+MaterialResource::ShaderField::ShaderField(MaterialResource::EShaderFieldType _type)
 {
 	type = _type;
 	switch (type)
 	{
-		case EFieldType::BOOL:
+		case EShaderFieldType::BOOL:
 			b = false;
 			break;
-		case EFieldType::INT:
+		case EShaderFieldType::INT:
 			i = 0;
 			break;
-		case EFieldType::FLOAT:
+		case EShaderFieldType::FLOAT:
 			f = 0.0f;
 			break;
-		case EFieldType::VEC2:
+		case EShaderFieldType::VEC2:
 			v2 = (0,0,0);
 			break;
-		case EFieldType::VEC3:
+		case EShaderFieldType::VEC3:
 			v3 = (0,0,0);
 			break;
-		case EFieldType::VEC4:
+		case EShaderFieldType::VEC4:
 			v4 = (0,0,0);
 			break;
+	    case EShaderFieldType::TEXT:
+	        text = nullptr;
+            break;
 		default:
-			b = false;
-			type = EFieldType::BOOL;
+			type = EShaderFieldType::NONE;
 			break;
 	}
 }
 
-MaterialResource::FieldValue::FieldValue(const MaterialResource::FieldValue &copy)
+MaterialResource::ShaderField::ShaderField(const MaterialResource::ShaderField& _copy)
 {
-	type = copy.type;
-	switch (type)
-	{
-		case EFieldType::BOOL:
-			b = copy.b;
-			break;
-		case EFieldType::INT:
-			i = copy.i;
-			break;
-		case EFieldType::FLOAT:
-			f = copy.f;
-			break;
-		case EFieldType::VEC2:
-			v2 = copy.v2;
-			break;
-		case EFieldType::VEC3:
-			v3 = copy.v3;
-			break;
-		case EFieldType::VEC4:
-			v4 = copy.v4;
-			break;
-		default:
-			b = copy.b;
-			type = EFieldType::BOOL;
-			break;
-	}
+    type = _copy.type;
+    name = _copy.name;
+    switch (type)
+    {
+        case EShaderFieldType::BOOL:
+            b = _copy.b;
+            break;
+        case EShaderFieldType::INT:
+            i = _copy.i;
+            break;
+        case EShaderFieldType::FLOAT:
+            f = _copy.f;
+            break;
+        case EShaderFieldType::VEC2:
+            v2 = _copy.v2;
+            break;
+        case EShaderFieldType::VEC3:
+            v3 = _copy.v3;
+            break;
+        case EShaderFieldType::VEC4:
+            v4 = _copy.v4;
+            break;
+        case EShaderFieldType::TEXT:
+            {
+
+               text = _copy.text;
+                break;
+            }
+        default:
+            type = EShaderFieldType::NONE;
+            break;
+    }
+}
+
+MaterialResource::ShaderField::ShaderField(const ShaderUniform &_uniform)
+{
+    name = _uniform.name;
+    type = _uniform.type;
+
+    switch (type)
+    {
+        case EShaderFieldType::BOOL:
+            b = false;
+            break;
+        case EShaderFieldType::INT:
+            i = 0;
+            break;
+        case EShaderFieldType::FLOAT:
+            f = 0.0f;
+            break;
+        case EShaderFieldType::VEC2:
+            v2 = (0,0,0);
+            break;
+        case EShaderFieldType::VEC3:
+            v3 = (0,0,0);
+            break;
+        case EShaderFieldType::VEC4:
+            v4 = (0,0,0);
+            break;
+        case EShaderFieldType::TEXT:
+            text = nullptr;
+            break;
+        default:
+            type = EShaderFieldType::NONE;
+            break;
+    }
+}
+MaterialResource::ShaderField &
+MaterialResource::ShaderField::operator=(const MaterialResource::ShaderField &_copy)
+{
+    type = _copy.type;
+    switch (type)
+    {
+        case EShaderFieldType::BOOL:
+            b = _copy.b;
+            break;
+        case EShaderFieldType::INT:
+            i = _copy.i;
+            break;
+        case EShaderFieldType::FLOAT:
+            f = _copy.f;
+            break;
+        case EShaderFieldType::VEC2:
+            v2 = _copy.v2;
+            break;
+        case EShaderFieldType::VEC3:
+            v3 = _copy.v3;
+            break;
+        case EShaderFieldType::VEC4:
+            v4 = _copy.v4;
+            break;
+        case EShaderFieldType::TEXT:
+            text = _copy.text;
+            break;
+        default:
+            type = EShaderFieldType::NONE;
+            break;
+    }
+
+    return *this;
 }
 
 SkeletonResource::Bone::~Bone()

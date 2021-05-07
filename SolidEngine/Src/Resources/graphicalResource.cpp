@@ -104,54 +104,57 @@ void GL::Mesh::DrawMesh(const std::vector<MaterialResource *>& _list, Transform&
 	{
 		SubMesh& subMesh = Meshes.at(i);
 		const MaterialResource* mat = _list.at(i);
-
+        std::shared_ptr<IShader> shader = nullptr;
 		if(mat == nullptr)
 		{
 			mat = Engine::GetInstance()->resourceManager.GetDefaultMat();
-			mat->defaultshader->SetMVP(_tr, _cam);
+			mat->GetDefaultshader()->SetMVP(_tr, _cam);
 		}
 		else
 		{
-			if(mat->shader == nullptr)
-				mat->defaultshader->SetMVP(_tr, _cam);
+            shader = mat->GetShader();
+            if(shader == nullptr)
+				mat->GetDefaultshader()->SetMVP(_tr, _cam);
 			else
 			{
-				for(auto& value : mat->ValuesProperties)
+				for(auto& value : mat->fields)
 				{
-					switch (value.second.type)
+					switch (value.type)
 					{
-						case MaterialResource::EFieldType::BOOL:
-							mat->shader->SetBool(value.first.c_str(), value.second.b);
+						case MaterialResource::EShaderFieldType::BOOL:
+							shader->SetBool(value.name.c_str(), value.b);
 							break;
-						case  MaterialResource::EFieldType::INT:
-							mat->shader->SetInt(value.first.c_str(), value.second.i);
+						case  MaterialResource::EShaderFieldType::INT:
+							shader->SetInt(value.name.c_str(), value.i);
 							break;
-						case  MaterialResource::EFieldType::FLOAT:
-							mat->shader->SetFloat(value.first.c_str(), value.second.f);
+						case  MaterialResource::EShaderFieldType::FLOAT:
+							shader->SetFloat(value.name.c_str(), value.f);
 							break;
-						case  MaterialResource::EFieldType::VEC2:
-							mat->shader->SetVec2(value.first.c_str(), value.second.v2);
+						case  MaterialResource::EShaderFieldType::VEC2:
+							shader->SetVec2(value.name.c_str(), value.v2);
 							break;
-						case  MaterialResource::EFieldType::VEC3:
-							mat->shader->SetVec3(value.first.c_str(), value.second.v3);
+						case  MaterialResource::EShaderFieldType::VEC3:
+							shader->SetVec3(value.name.c_str(), value.v3);
 							break;
-						case  MaterialResource::EFieldType::VEC4:
-							mat->shader->SetVec4(value.first.c_str(), value.second.v4);
+						case  MaterialResource::EShaderFieldType::VEC4:
+							shader->SetVec4(value.name.c_str(), value.v4);
 							break;
+                        case MaterialResource::EShaderFieldType::TEXT:
+                            {
+                                if(value.text == nullptr)
+                                    continue;
+
+                                int TexUnit = 0;
+                                shader->GetInt(value.name.c_str(), &TexUnit);
+                                value.text->BindTexture(TexUnit);
+                                break;
+                            }
 						default:
 							break;
 					}
 				}
 
-				for(auto& value : mat->TexturesProperties)
-				{
-					if(value.second == nullptr)
-						continue;
-					int TexUnit = 0;
-					mat->shader->GetInt(value.first.c_str(), &TexUnit);
-					value.second->BindTexture(TexUnit);
-				}
-				mat->shader->SetMVP(_tr, _cam);
+				shader->SetMVP(_tr, _cam);
 			}
 		}
 
@@ -161,19 +164,21 @@ void GL::Mesh::DrawMesh(const std::vector<MaterialResource *>& _list, Transform&
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,subMesh.EBO);
 		glDrawElements(GL_TRIANGLES, subMesh.numOfIndices,GL_UNSIGNED_INT, nullptr);
 
-		if(mat->shader != nullptr)
+		if(shader != nullptr)
 		{
-			for(auto& value : mat->TexturesProperties)
-			{
-				if(value.second == nullptr)
-					continue;
-				int TexUnit = 0;
-				mat->shader->GetInt(value.first.c_str(), &TexUnit);
-				value.second->UnBindTexture(TexUnit);
+            for(auto& value : mat->fields)
+            {
+                if(value.type == MaterialResource::EShaderFieldType::TEXT)
+                {
+                    if(value.text == nullptr)
+                        continue;
 
-			}
+                    int TexUnit = 0;
+                    shader->GetInt(value.name.c_str(), &TexUnit);
+                    value.text->UnBindTexture(TexUnit);
+                }
+            }
 		}
-
 	}
 	glBindVertexArray(0);
 }
@@ -210,6 +215,8 @@ GL::Shader::Shader(ShaderResource *_s) :IShader(EResourceType::Shader)
 		printf("Program link error: %s", infoLog);
 		//TODO : cleanup at return
 	}
+
+	LoadShaderFields();
 }
 
 GL::ComputeShader::ComputeShader(ComputeShaderResource *_cs) :Shader(EResourceType::Compute)
@@ -359,6 +366,61 @@ void GL::Shader::GetInt(const char *_name, int *_value)
 	if(loc == -1)
 		return;
 	glGetUniformiv(ProgID, loc, _value);
+}
+
+void GL::Shader::LoadShaderFields()
+{
+    uniforms.clear();
+    int count = -1;
+    glGetProgramiv(ProgID, GL_ACTIVE_UNIFORMS,&count);
+
+    for (int i = 0; i < count; ++i)
+    {
+        ShaderUniform shaderUniform;
+        int name_len=-1, num=-1;
+        GLenum type = GL_ZERO;
+        char name[100];
+        glGetActiveUniform(ProgID, GLuint(i), sizeof(name)-1,
+                            &name_len, &num, &type, name );
+        name[name_len] = 0;
+        //GLuint location = glGetUniformLocation(ProgID, name );
+
+        shaderUniform.name = name;
+        switch (type)
+        {
+            case GL_BOOL:
+                shaderUniform.type = MaterialResource::EShaderFieldType::BOOL;
+                break;
+            case GL_INT:
+                shaderUniform.type = MaterialResource::EShaderFieldType::INT;
+                break;
+            case GL_FLOAT:
+                shaderUniform.type = MaterialResource::EShaderFieldType::FLOAT;
+                break;
+            case GL_FLOAT_VEC2:
+                shaderUniform.type = MaterialResource::EShaderFieldType::VEC2;
+                break;
+            case GL_FLOAT_VEC3:
+                shaderUniform.type = MaterialResource::EShaderFieldType::VEC3;
+                break;
+            case GL_FLOAT_VEC4:
+                shaderUniform.type = MaterialResource::EShaderFieldType::VEC4;
+                break;
+            case GL_SAMPLER_2D:
+                shaderUniform.type = MaterialResource::EShaderFieldType::TEXT;
+                break;
+            default:
+                shaderUniform.type = MaterialResource::EShaderFieldType::NONE;
+                break;
+        }
+
+        uniforms.push_back(shaderUniform);
+    }
+}
+
+std::vector<ShaderUniform> &GL::Shader::GetUniformList()
+{
+    return uniforms;
 }
 
 GL::Texture::Texture(ImageResource *_image)
