@@ -612,7 +612,7 @@ namespace Solid
     }
 
     template<typename T>
-    constexpr Mat4<T> Mat4<T>::operator*(const Mat4<T> &_mat) const noexcept
+    Mat4<T> Mat4<T>::operator*(const Mat4<T> &_mat) const
     {
         //TODO mAKE MULTIPLICATION LINE CONVENTION
         return Mat4<T>(

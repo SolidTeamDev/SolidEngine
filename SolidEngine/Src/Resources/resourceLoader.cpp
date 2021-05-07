@@ -449,12 +449,14 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 	std::string str = Rpath.string();
 	Mesh->name = Rpath.filename().string();
 	importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_ANIMATIONS, true);
-	importer.SetPropertyBool(AI_CONFIG_IMPORT_REMOVE_EMPTY_BONES, false);
+    importer.SetPropertyBool(AI_CONFIG_IMPORT_REMOVE_EMPTY_BONES, false);
+    importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
+
 
 
 	const aiScene *scene = importer.ReadFile(str, aiProcess_JoinIdenticalVertices | aiProcess_OptimizeMeshes |
 	                                              aiProcess_SplitLargeMeshes | aiProcess_Triangulate |
-	                                              aiProcess_SortByPType | aiProcess_LimitBoneWeights   );
+	                                              aiProcess_SortByPType | aiProcess_LimitBoneWeights | aiProcess_GlobalScale  );
 
 
 
@@ -488,16 +490,20 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 			auto skelRoot = boneNode;
 
 
-			std::function<void(SkeletonResource::Bone*, aiNode*)> lambda = [&](SkeletonResource::Bone* _bone, aiNode* _aiNode){
-
+			std::function<void(SkeletonResource::Bone*, aiNode*)> lambda = [&](SkeletonResource::Bone* _bone, aiNode* _aiNode)
+			{
 				_bone->name = _aiNode->mName.C_Str();
-                ///HERE TODO REMOVE TAG _$Assimp_Fbx$_ from Bone Name
+                ///HERE TODO REMOVE TAG _$AssimpFbx$_ from Bone Name
+                std::size_t pos = _bone->name.find("_$AssimpFbx$_");
+                if(pos != std::string::npos)
+                    _bone->name.erase(_bone->name.begin()+pos, _bone->name.end());
+
 				_bone->Childrens.reserve(_aiNode->mNumChildren);
 				for (int j = 0; j < _aiNode->mNumChildren; ++j)
 				{
 					SkeletonResource::Bone* cBone = new SkeletonResource::Bone;
 					_bone->Childrens.push_back(cBone);
-					_bone->transfo =
+					_bone->LocalTrans =
 							Mat4<float>(_aiNode->mTransformation.a1, _aiNode->mTransformation.a2, _aiNode->mTransformation.a3, _aiNode->mTransformation.a4,
 							            _aiNode->mTransformation.b1, _aiNode->mTransformation.b2, _aiNode->mTransformation.b3, _aiNode->mTransformation.b4,
 							            _aiNode->mTransformation.c1, _aiNode->mTransformation.c2, _aiNode->mTransformation.c3, _aiNode->mTransformation.c4,
@@ -520,7 +526,7 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 							            _aiBone->mOffsetMatrix.d1, _aiBone->mOffsetMatrix.d2, _aiBone->mOffsetMatrix.d3, _aiBone->mOffsetMatrix.d4);
 					_bone->offset = offset;
 					_bone->WeightInit = true;
-					_bone->FinalTrans = offset * _bone->transfo;
+					_bone->FinalTrans =  _bone->LocalTrans * offset;
 					///WARN : trasfo matrix of aiBone and ai node *=-1 ?
 					for (int j = 0; j < _aiBone->mNumWeights; ++j)
 					{

@@ -657,7 +657,7 @@ SkeletonResource::Bone &SkeletonResource::Bone::operator=(const SkeletonResource
 		name = b.name;
 		Parent = nullptr;
 		Weights = b.Weights;
-		transfo = b.transfo;
+        LocalTrans = b.LocalTrans;
 		offset =b.offset;
 		FinalTrans= b.FinalTrans;
 		std::function<void(Bone*, Bone*,Bone*)> lambda = [&](Bone* child,Bone* Parent, Bone* childToCopy){
@@ -665,7 +665,7 @@ SkeletonResource::Bone &SkeletonResource::Bone::operator=(const SkeletonResource
 			child->name = childToCopy->name;
 			child->Parent = Parent;
 			child->Weights = childToCopy->Weights;
-			child->transfo = childToCopy->transfo;
+			child->LocalTrans = childToCopy->LocalTrans;
 			child->offset =childToCopy->offset;
 			child->FinalTrans= childToCopy->FinalTrans;
 
@@ -706,7 +706,7 @@ SkeletonResource::Bone::Bone(const SkeletonResource::Bone &b)
 		name = b.name;
 		Parent = nullptr;
 		Weights = b.Weights;
-		transfo = b.transfo;
+        LocalTrans = b.LocalTrans;
 		offset =b.offset;
 		FinalTrans= b.FinalTrans;
 		std::function<void(Bone*, Bone*,Bone*)> lambda = [&](Bone* child,Bone* Parent, Bone* childToCopy){
@@ -715,7 +715,7 @@ SkeletonResource::Bone::Bone(const SkeletonResource::Bone &b)
 			child->name = childToCopy->name;
 			child->Parent = Parent;
 			child->Weights = childToCopy->Weights;
-			child->transfo = childToCopy->transfo;
+			child->LocalTrans = childToCopy->LocalTrans;
 			child->offset =childToCopy->offset;
 			child->FinalTrans= childToCopy->FinalTrans;
 
@@ -756,7 +756,7 @@ SkeletonResource::Bone::Bone(const SkeletonResource::Bone &b, SkeletonResource::
 	name = b.name;
 	Parent = nullptr;
 	Weights = b.Weights;
-	transfo = b.transfo;
+    LocalTrans = b.LocalTrans;
 	offset =b.offset;
 	FinalTrans= b.FinalTrans;
 	std::function<void(Bone*, Bone*,Bone*)> lambda = [&](Bone* child,Bone* Parent, Bone* childToCopy){
@@ -764,7 +764,7 @@ SkeletonResource::Bone::Bone(const SkeletonResource::Bone &b, SkeletonResource::
 		child->name = childToCopy->name;
 		child->Parent = Parent;
 		child->Weights = childToCopy->Weights;
-		child->transfo = childToCopy->transfo;
+		child->LocalTrans = childToCopy->LocalTrans;
 		child->offset =childToCopy->offset;
 		child->FinalTrans= childToCopy->FinalTrans;
 

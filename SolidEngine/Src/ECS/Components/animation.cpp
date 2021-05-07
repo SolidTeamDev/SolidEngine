@@ -7,8 +7,9 @@ namespace Solid
     Skeleton{_Skeleton}
     {}
 
+    /// don't forget const bone*
     void Animation::DrawSkeleton(std::vector<Vec3>& points, std::vector<uint>& indices,
-                                 const SkeletonResource::Bone* bone, uint index)
+                                 SkeletonResource::Bone* bone, uint index)
 
     {
         if(!Skeleton)
@@ -19,10 +20,27 @@ namespace Solid
 
         else
         {
-            Vec4 parentPos = (bone->Parent == nullptr ? bone->FinalTrans : bone->Parent->FinalTrans) * Vec4::Zero;
-            Vec4 childPos = bone->FinalTrans * Vec4::Zero;
-            points.push_back(childPos);
+            Vec4 parentPos = Vec4::Zero;
+            Vec4 childPos = Vec4::Zero;
+            if(bone->Parent == nullptr)
+            {
+                bone->GlobalTrans = bone->LocalTrans;
+
+                parentPos = (bone->GlobalTrans * bone->offset) * Vec4::Zero;
+                childPos = (bone->GlobalTrans * bone->offset) * Vec4::Zero;
+            }
+            else
+            {
+                bone->GlobalTrans = bone->Parent->GlobalTrans * bone->LocalTrans;
+
+                parentPos = (bone->Parent->GlobalTrans * bone->offset) * Vec4::Zero;
+                childPos = (bone->GlobalTrans * bone->offset) * Vec4::Zero;
+            }
+            //Vec4 parentPos = (bone->Parent == nullptr ? bone->FinalTrans : bone->Parent->FinalTrans) * Vec4::Zero;
+            //Vec4 childPos = ((bone->Parent == nullptr ? bone->FinalTrans : (bone->Parent->FinalTrans* bone->transfo)*bone->offset) ) * Vec4::Zero;
+
             points.push_back(parentPos);
+            points.push_back(childPos);
             indices.push_back(index);
             indices.push_back(index+1);
             index += 2;
