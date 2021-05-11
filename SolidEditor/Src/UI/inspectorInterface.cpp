@@ -452,17 +452,17 @@ namespace Solid
 
         if(UI::CollapsingHeader("Animation",ImGuiTreeNodeFlags_DefaultOpen))
         {
-            const char* SKName = _anim.GetSkeleton() == nullptr ? "" : _anim.GetSkeleton()->name.c_str();
-            if(UI::BeginCombo("##Skeleton", SKName))
+            const char* SKName = _anim.GetAnim() == nullptr ? "NO ANIM" : _anim.GetAnim()->name.c_str();
+            if(UI::BeginCombo("##ANIMATION", SKName))
             {
-                auto* skelList = engine->resourceManager.GetResourcesVecByType<SkeletonResource>();
+                auto* animList = engine->resourceManager.GetResourcesVecByType<AnimResource>();
 
-                for(auto skel : *skelList)
+                for(auto anim : *animList)
                 {
-                    bool selected = (SKName == skel.second->name);
-                    if(UI::Selectable(skel.second->name.c_str(), selected))
+                    bool selected = (SKName == anim.second->name);
+                    if(UI::Selectable(anim.second->name.c_str(), selected))
                     {
-                        _anim.SetSkeleton( (SkeletonResource*)skel.second);
+                        _anim.SetAnim((AnimResource *) anim.second);
 
                     }
                     if(selected)

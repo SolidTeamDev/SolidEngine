@@ -104,8 +104,8 @@ namespace Solid
                 {
                     std::vector<Vec3> points;
                     std::vector<uint> indices;
-                    engine->ecsManager.GetComponent<Animation>(gameObject->GetEntity()).DrawSkeleton(points,
-                                                                                                     indices);
+                    Animation& anim = engine->ecsManager.GetComponent<Animation>(gameObject->GetEntity());
+                    anim.DrawSkeleton(points,indices);
                     engine->renderer->DrawLines(sceneCam, points, indices);
                 }
             }

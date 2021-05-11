@@ -8,7 +8,7 @@ namespace Solid
     template<typename T>
     Mat4<T>::Mat4()
     {
-        elements = Mat4::Zero.elements;
+        elements = Mat4::Identity.elements;
     }
 
     template<typename T>

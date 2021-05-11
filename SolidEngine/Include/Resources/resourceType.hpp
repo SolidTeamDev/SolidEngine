@@ -148,6 +148,8 @@ namespace Solid {
             Mat4<float> GlobalTrans;
             Mat4<float> offset; // inverse bind pose
 			Mat4<float> FinalTrans;
+			int id = -1;
+			bool isAnimated = false;
 			Bone() = default;
 			~Bone();
 			Bone& operator=(const Bone& b);
@@ -158,6 +160,8 @@ namespace Solid {
 			//find Bone Anywhere on the tree below used node
 			Bone* FindBoneByName(const char* name);
 		}rootBone;
+
+		uint numOfBone = 0;
 		SkeletonResource()
 		{
 			type = EResourceType::Skeleton;
@@ -191,6 +195,7 @@ namespace Solid {
 	    };
 	    std::vector<BoneChannel> Channels;
 	    SkeletonResource::Bone* Root = nullptr;
+	    uint numOfBones = 0;
     	double numTicks;
 	    double ticksPerSeconds;
 

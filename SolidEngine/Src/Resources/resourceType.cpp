@@ -660,6 +660,8 @@ SkeletonResource::Bone &SkeletonResource::Bone::operator=(const SkeletonResource
         LocalTrans = b.LocalTrans;
 		offset =b.offset;
 		FinalTrans= b.FinalTrans;
+        id = b.id;
+        isAnimated = b.isAnimated;
 		std::function<void(Bone*, Bone*,Bone*)> lambda = [&](Bone* child,Bone* Parent, Bone* childToCopy){
 			child->Childrens.reserve(childToCopy->Childrens.size());
 			child->name = childToCopy->name;
@@ -668,6 +670,8 @@ SkeletonResource::Bone &SkeletonResource::Bone::operator=(const SkeletonResource
 			child->LocalTrans = childToCopy->LocalTrans;
 			child->offset =childToCopy->offset;
 			child->FinalTrans= childToCopy->FinalTrans;
+            child->id = childToCopy->id;
+            child->isAnimated = childToCopy->isAnimated;
 
 			for (int i = 0; i < childToCopy->Childrens.size(); ++i)
 			{
@@ -709,6 +713,8 @@ SkeletonResource::Bone::Bone(const SkeletonResource::Bone &b)
         LocalTrans = b.LocalTrans;
 		offset =b.offset;
 		FinalTrans= b.FinalTrans;
+		id = b.id;
+		isAnimated = b.isAnimated;
 		std::function<void(Bone*, Bone*,Bone*)> lambda = [&](Bone* child,Bone* Parent, Bone* childToCopy){
 			Parent->Childrens.push_back(child);
 			child->Childrens.reserve(childToCopy->Childrens.size());
@@ -718,6 +724,8 @@ SkeletonResource::Bone::Bone(const SkeletonResource::Bone &b)
 			child->LocalTrans = childToCopy->LocalTrans;
 			child->offset =childToCopy->offset;
 			child->FinalTrans= childToCopy->FinalTrans;
+            child->id = childToCopy->id;
+            child->isAnimated = childToCopy->isAnimated;
 
 			for (int i = 0; i < childToCopy->Childrens.size(); ++i)
 			{
@@ -759,6 +767,8 @@ SkeletonResource::Bone::Bone(const SkeletonResource::Bone &b, SkeletonResource::
     LocalTrans = b.LocalTrans;
 	offset =b.offset;
 	FinalTrans= b.FinalTrans;
+    id = b.id;
+    isAnimated = b.isAnimated;
 	std::function<void(Bone*, Bone*,Bone*)> lambda = [&](Bone* child,Bone* Parent, Bone* childToCopy){
 		child->Childrens.reserve(childToCopy->Childrens.size());
 		child->name = childToCopy->name;
@@ -767,6 +777,8 @@ SkeletonResource::Bone::Bone(const SkeletonResource::Bone &b, SkeletonResource::
 		child->LocalTrans = childToCopy->LocalTrans;
 		child->offset =childToCopy->offset;
 		child->FinalTrans= childToCopy->FinalTrans;
+        child->id = childToCopy->id;
+        child->isAnimated = childToCopy->isAnimated;
 
 		for (int i = 0; i < childToCopy->Childrens.size(); ++i)
 		{
