@@ -156,7 +156,7 @@ void GL::Mesh::DrawMesh(const std::vector<MaterialResource *>& _list, Transform&
 				}
 
 				shader->SetMVP(_tr, _cam);
-				shader->SetLights();
+				shader->SetLights(_cam);
 			}
 		}
 
@@ -289,23 +289,24 @@ void GL::Shader::SetMVP(Transform& _model, Camera& _camera)const
 
 }
 
-void GL::Shader::SetLights() const
+void GL::Shader::SetLights(Camera& _camera) const
 {
     glUseProgram(ProgID);
 
     std::vector<Light> lights = Light::GetLightList();
     int i = 0;
-    for(auto light : lights)
+    for(const auto& light : lights)
     {
         std::string id = std::to_string(i);
         Vec3 pos = light.gameObject->transform->GetPosition();
-        glUniform3fv(glGetUniformLocation(ProgID,std::string("lights[" + id + "].pos").c_str()),1,&pos.x);
-        glUniform3fv(glGetUniformLocation(ProgID,std::string("lights[" + id + "].color").c_str()),1,&light.color.x);
-        glUniform1f(glGetUniformLocation(ProgID,std::string("lights[" + id + "].intensity").c_str()),light.intensity);
+        glUniform3fv(glGetUniformLocation(ProgID,std::string("_lights[" + id + "].pos").c_str()),1,&pos.x);
+        glUniform3fv(glGetUniformLocation(ProgID,std::string("_lights[" + id + "].color").c_str()),1,&light.color.x);
+        glUniform1f(glGetUniformLocation(ProgID,std::string("_lights[" + id + "].intensity").c_str()),light.intensity);
 
         ++i;
     }
-    glUniform1i(glGetUniformLocation(ProgID,"nbLights"),lights.size());
+    glUniform1i(glGetUniformLocation(ProgID,"_nbLights"),lights.size());
+    glUniform3fv(glGetUniformLocation(ProgID,"_camPos"),1,&_camera.Euler.x);
 }
 
 void GL::Shader::SetMaterial(const char *_name)
@@ -405,6 +406,8 @@ void GL::Shader::LoadShaderFields()
                             &name_len, &num, &type, name );
         name[name_len] = 0;
         //GLuint location = glGetUniformLocation(ProgID, name );
+        if(name[0] == '_')
+            continue;
 
         shaderUniform.name = name;
         switch (type)

@@ -70,7 +70,7 @@ namespace Solid
 		virtual std::vector<ShaderUniform>& GetUniformList() = 0;
 
 		virtual void SetMVP(Transform& _model, Camera& _camera) const = 0;
-		virtual void SetLights() const = 0;
+		virtual void SetLights(Camera& _camera) const = 0;
 		virtual void SetMaterial(const char* _name) = 0;
 
 
