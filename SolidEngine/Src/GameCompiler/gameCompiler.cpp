@@ -35,7 +35,7 @@ namespace Solid
         CreateToml(Toml);
 
         std::string Compile = "@call vcvarsall.bat x64 >"+srcPath.string()+"\\vcvars.log && cmake --build "+build.string()+" --target "+ ProjectName+" >"+srcPath.string()+"\\SolidGameCompile.log";
-	    std::string Gen2 = "vcvarsall.bat x64  && cmake.exe --build "+build.string()+" --target "+ ProjectName;
+	    std::string Gen2 = "\""+vcVarsP.string()+" x64  && cmake.exe --build "+build.string()+" --target "+ ProjectName+"\"";
 
 	    std::string output;
 #if SOLID_WIN
@@ -128,6 +128,7 @@ namespace Solid
 	}
     void GameCompiler::CreateCmake()
     {
+	    updateVCPath();
         //CMAKE_CURRENT_LIST_DIR CMAKE_CXX_COMPILER
         //
 	    fs::path CmakeP= srcPath;
@@ -321,7 +322,7 @@ namespace Solid
 
         std::system(Gen.c_str());
 
-	    std::string Gen2 = "vcvarsall.bat x64  && cmake.exe -DCMAKE_BUILD_TYPE=Debug -G \"CodeBlocks - NMake Makefiles\" -S "+ srcPath.string()+" -B "+buildP.string();
+	    std::string Gen2 = "\""+vcVarsP.string()+" x64  && cmake.exe -DCMAKE_BUILD_TYPE=Debug -G \"CodeBlocks - NMake Makefiles\" -S "+ srcPath.string()+" -B "+buildP.string()+"\"";
 	    std::string output;
 #if SOLID_WIN
 
@@ -428,7 +429,7 @@ namespace Solid
 		std::string t = buildP.string();
 		std::string Gen = " @call vcvarsall.bat x64 >" + srcPath.string()+"\\vcvars.log && cmake.exe -DCMAKE_BUILD_TYPE=Debug -G \"CodeBlocks - NMake Makefiles\" -S "+ srcPath.string()+" -B "+buildP.string()+
 		                  " >" + srcPath.string()+"\\SolidCMakeProjectGen.log\n";
-		std::string Gen2 = "vcvarsall.bat x64  && cmake.exe -DCMAKE_BUILD_TYPE=Debug -G \"CodeBlocks - NMake Makefiles\" -S "+ srcPath.string()+" -B "+buildP.string();
+		std::string Gen2 = "\""+vcVarsP.string()+" x64  && cmake.exe -DCMAKE_BUILD_TYPE=Debug -G \"CodeBlocks - NMake Makefiles\" -S "+ srcPath.string()+" -B "+buildP.string()+"\"";
 		std::string output;
 #if SOLID_WIN
 
@@ -515,7 +516,7 @@ namespace Solid
 		std::string Compile = "@call vcvarsall.bat x64 >"+srcPath.string()+"\\vcvars.log && cmake --build "+build.string()+" --target Game >"+srcPath.string()+"\\SolidGameCompile.log";
 		std::system(Compile.c_str());
 
-		std::string Gen2 = "vcvarsall.bat x64  && cmake.exe cmake --build "+build.string()+" --target Game";
+		std::string Gen2 = "\""+vcVarsP.string()+ " x64  && cmake.exe cmake --build "+build.string()+" --target Game \"";
 		std::string output;
 #if SOLID_WIN
 
@@ -531,7 +532,35 @@ namespace Solid
 
 	}
 
+	void GameCompiler::updateVCPath()
+	{
+		fs::path vcvars = fs::current_path();
+		vcvars.append("vcvars.bat");
+		fs::absolute(vcvars);
 
+		std::string Gen2 = vcvars.string();
+		std::string output;
+#if SOLID_WIN
+
+
+		wincmd(Gen2, output, 1024000);
+
+#else
+		std::system(Gen.c_str());
+
+#endif
+		output.erase(output.begin());
+		std::string o2 = output.substr(0, output.size()-2);
+		//%ProgramFiles(x86)% C:\Program Files (x86)
+		o2 = "\"" + o2 +"\"";
+
+		vcVarsP = o2;
+
+		fs::path sym = fs::current_path();
+		sym.append("vcvarsall.bat");
+		fs::absolute(vcVarsP);
+		//fs::create_symlink(o2, sym);
+	}
 
 
 }

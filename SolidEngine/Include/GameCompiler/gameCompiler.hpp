@@ -34,6 +34,7 @@ namespace Solid
 	    fs::path srcPath = "";
 	    fs::path IncludePath = "";
 	    fs::path DllPath = "";
+	    fs::path vcVarsP = "";
 	    HMODULE hGetProcIDDLL = nullptr;
 	    f_Entry entryPoint = nullptr;
 	    f_GetClass getClass = nullptr;
@@ -53,6 +54,7 @@ namespace Solid
 	    void HotReload();
 	    void Build();
 	    void CreateScript(const std::string& _name);
+	    void updateVCPath();
 
         void AddLib();
     };
