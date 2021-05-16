@@ -112,4 +112,14 @@ namespace Solid
         hasToUpdateMat = false;
     }
 
+	void Transform::SetParentMatrix(const Mat4<float>& mat)
+	{
+		ParentTransMat = mat;
+	}
+
+	Mat4<float> Transform::GetParentMatrix()
+	{
+		return ParentTransMat;
+	}
+
 } //!namespace

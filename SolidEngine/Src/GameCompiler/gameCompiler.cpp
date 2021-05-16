@@ -2,7 +2,7 @@
 // Created by ryan1 on 23/02/2021.
 //
 
-
+#include "Core/engine.hpp"
 #include "GameCompiler/gameCompiler.hpp"
 #include <fstream>
 
@@ -35,10 +35,28 @@ namespace Solid
         CreateToml(Toml);
 
         std::string Compile = "@call vcvarsall.bat x64 >"+srcPath.string()+"\\vcvars.log && cmake --build "+build.string()+" --target "+ ProjectName+" >"+srcPath.string()+"\\SolidGameCompile.log";
-        if(std::system(Compile.c_str()) != 0)
+	    std::string Gen2 = "vcvarsall.bat x64  && cmake.exe --build "+build.string()+" --target "+ ProjectName;
+
+	    std::string output;
+#if SOLID_WIN
+
+
+	    if(wincmd(Gen2, output, 1024000) != 0)
+	    {
+		    Log::Send(output, Log::ELogSeverity::ERROR);
+			return false;
+	    }
+
+#else
+	    if(std::system(Compile.c_str()) != 0)
         {
         	return false;
         }
+
+#endif
+	    Log::Send(output, Log::ELogSeverity::INFO);
+
+
         HotReload();
 	    return true;
 
@@ -71,7 +89,7 @@ namespace Solid
 		                       "\n"
 		                       "# Files contained in the directories of this list will be ignored\n"
 		                       "ignoredDirectories = [\n"
-		                       "#\t'''Include/EngineGenerated''',\n"
+		                       "\t'''Include/EngineGenerated''',\n"
 		                       "#\t'''Path/To/Directory/To/Ignore'''\n"
 		                       "]\n"
 		                       "\n"
@@ -120,9 +138,11 @@ namespace Solid
 	    fs::create_directory(src);
 	    fs::create_directory(inc);
 	    src.append("EntryPoint.cpp");
+	    inc.append("entry.hpp");
         CmakeP.append("CMakeLists.txt");
         std::ofstream CmakeFile (CmakeP, std::fstream::binary | std::fstream::trunc);
 	    std::ofstream main (src, std::fstream::binary | std::fstream::trunc);
+	    std::ofstream incmain (inc, std::fstream::binary | std::fstream::trunc);
         std::string RawFile = "cmake_minimum_required(VERSION 3.17)\n"
                               "project("+ProjectName+")\n"
                               "\n"
@@ -150,8 +170,9 @@ namespace Solid
                               "link_directories(Dlls)\n"
                               "#add_executable("+ProjectName+" ${GAME_SOURCE_FILES})\n"
 							  "add_library("+ProjectName+" SHARED ${GAME_SOURCE_FILES})\n"
-							  "target_compile_definitions("+ProjectName+" PUBLIC \"IMGUI_API=__declspec(dllexport)\")\n"
-							  "target_compile_definitions("+ProjectName+" PUBLIC \"SOLID_API=__declspec(dllexport)\")\n"
+							  "target_compile_definitions("+ProjectName+" PUBLIC \"IMGUI_API=__declspec(dllimport)\")\n"
+		                      "target_compile_definitions("+ProjectName+" PUBLIC \"SOLID_API=__declspec(dllimport)\")\n"
+                              "target_compile_definitions("+ProjectName+" PUBLIC \"SOLID_SCRIPT_API=__declspec(dllexport)\")"
 							  "#Extern Lib\n"
 			                  "\n"
 	                          "if(CMAKE_BUILD_TYPE MATCHES Debug)#DEBUG\n"
@@ -220,6 +241,7 @@ namespace Solid
 	                          "\n";
 
 	    std::string MainCpp=  "#include <iostream>\n"
+						      "#include \"Core/engine.hpp\"\n"
 	                          "#include \"Refureku/Refureku.h\"\n"
 						      "#include \"entry.hpp\"\n"
 							  "int Entry()\n"
@@ -250,6 +272,29 @@ namespace Solid
                               "";
 
 
+	    std::string mainhpp = "//\n"
+	                          "// Created by ryan1 on 22/01/2021.\n"
+	                          "//\n"
+	                          "\n"
+	                          "#ifndef DLL_LOADER_GAMETEST_H\n"
+	                          "#define DLL_LOADER_GAMETEST_H\n"
+	                          "\n"
+	                          "#ifdef __cplusplus\n"
+	                          "\n"
+	                          "#include <string>\n"
+	                          "#include \"Refureku/Refureku.h\"\n"
+	                          "\n"
+	                          "extern \"C\" int __declspec(dllexport) __stdcall Entry(); \n"
+	                          "extern \"C\" std::size_t __declspec(dllexport) __stdcall GetClass(const std::string& );\n"
+	                          "extern \"C\" std::size_t __declspec(dllexport) __stdcall GetNamespace(const std::string& );\n"
+	                          "\n"
+	                          "#endif\n"
+	                          "\n"
+	                          "\n"
+	                          "\n"
+	                          "\n"
+	                          "#endif //DLL_LOADER_GAMETEST_H";
+
 
         if(CmakeFile.is_open())
         {
@@ -261,6 +306,11 @@ namespace Solid
 		    main.write(MainCpp.c_str(), MainCpp.size());
 		    main.close();
 	    }
+	    if(incmain.is_open())
+	    {
+		    incmain.write(mainhpp.c_str(), mainhpp.size());
+		    incmain.close();
+	    }
 		auto buildP = srcPath;
 	    buildP.append("Build");
 	    if(!fs::exists(buildP))
@@ -270,6 +320,20 @@ namespace Solid
         		" >" + srcPath.string()+"\\SolidCMakeProjectGen.log\n";
 
         std::system(Gen.c_str());
+
+	    std::string Gen2 = "vcvarsall.bat x64  && cmake.exe -DCMAKE_BUILD_TYPE=Debug -G \"CodeBlocks - NMake Makefiles\" -S "+ srcPath.string()+" -B "+buildP.string();
+	    std::string output;
+#if SOLID_WIN
+
+
+	    wincmd(Gen2, output, 1024000);
+
+
+#else
+	    std::system(Compile.c_str());
+
+#endif
+	    Log::Send(output, Log::ELogSeverity::INFO);
 
 
     }
@@ -358,13 +422,24 @@ namespace Solid
 	{
 		auto buildP = srcPath;
 		buildP.append("Build");
+		buildP =fs::absolute(buildP);
 		if(!fs::exists(buildP))
 			fs::create_directory(buildP);
 		std::string t = buildP.string();
 		std::string Gen = " @call vcvarsall.bat x64 >" + srcPath.string()+"\\vcvars.log && cmake.exe -DCMAKE_BUILD_TYPE=Debug -G \"CodeBlocks - NMake Makefiles\" -S "+ srcPath.string()+" -B "+buildP.string()+
 		                  " >" + srcPath.string()+"\\SolidCMakeProjectGen.log\n";
+		std::string Gen2 = "vcvarsall.bat x64  && cmake.exe -DCMAKE_BUILD_TYPE=Debug -G \"CodeBlocks - NMake Makefiles\" -S "+ srcPath.string()+" -B "+buildP.string();
+		std::string output;
+#if SOLID_WIN
 
+
+		wincmd(Gen2, output, 102400);
+
+#else
 		std::system(Gen.c_str());
+
+#endif
+		Log::Send(output, Log::ELogSeverity::INFO);
 	}
 
 	void GameCompiler::HotReload()
@@ -439,6 +514,21 @@ namespace Solid
 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
 		std::string Compile = "@call vcvarsall.bat x64 >"+srcPath.string()+"\\vcvars.log && cmake --build "+build.string()+" --target Game >"+srcPath.string()+"\\SolidGameCompile.log";
 		std::system(Compile.c_str());
+
+		std::string Gen2 = "vcvarsall.bat x64  && cmake.exe cmake --build "+build.string()+" --target Game";
+		std::string output;
+#if SOLID_WIN
+
+
+		wincmd(Gen2, output, 1024000);
+
+#else
+		std::system(Gen.c_str());
+
+#endif
+		Log::Send(output, Log::ELogSeverity::INFO);
+
+
 	}
 
 

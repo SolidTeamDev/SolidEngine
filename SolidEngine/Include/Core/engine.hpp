@@ -7,19 +7,21 @@
 #include "solidMultiThread.hpp"
 #include "Time/time.hpp"
 #include "InputManager/inputManager.hpp"
-
 #include "Core/Debug/debug.hpp"
-
 #include "ECS/ecsManager.hpp"
+
 #include "ECS/System/rendererSystem.hpp"
 #include "ECS/System/audioSystem.hpp"
 #include "ECS/System/physicsSystem.hpp"
 #include "ECS/System/scriptSystem.hpp"
-
 #include "Resources/graphicalResourceMgr.hpp"
 
 #include "Physics/physics.hpp"
+
 #include "std_wrapper.hpp"
+#include "GameCompiler/gameCompiler.hpp"
+#include "systemCmd.hpp"
+#undef ERROR
 
 namespace Solid
 {
@@ -51,6 +53,7 @@ namespace Solid
     	//Engine** test = &instance;
         Window* window;
         Renderer* renderer = nullptr;
+	    GameCompiler* Compiler;
         Audio audio;
         ECSManager ecsManager;
         std::shared_ptr<RendererSystem> rendererSystem;
@@ -62,7 +65,7 @@ namespace Solid
         ThreadManager threadPool;
         GraphicalResourceMgr graphicsResourceMgr;
         Physics physics;
-        
+
         static Engine* GetInstance();
         bool MultiThreadEnabled()const {return mtEnabled;}
         void EnableMultiThread(bool _b);
@@ -81,6 +84,8 @@ namespace Solid
         bool IsEngineContextInitialized() const;
 
 	    void LoadScene(const fs::path& p);
+
+	    void SaveScene(const fs::path& p);
 
         void Update();
 

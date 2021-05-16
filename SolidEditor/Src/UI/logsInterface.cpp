@@ -44,6 +44,7 @@ namespace Solid
                     break;
 
             }
+
             UI::TextWrapped("%s", currMsg.c_str());
             UI::PopStyleColor(1);
         }

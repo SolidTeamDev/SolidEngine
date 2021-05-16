@@ -66,13 +66,15 @@ namespace Solid
         GameObject* go = EditorInterface::selectedGO;
         if (go != nullptr && engine->ecsManager.GotComponent<Transform>(go->GetEntity()))
         {
-            Mat4<float> transMat = engine->ecsManager.GetComponent<Transform>(go->GetEntity()).GetMatrix();
-
+	        Mat4<float> transMat = engine->ecsManager.GetComponent<Transform>(go->GetEntity()).GetMatrix();
+	        Mat4<float> Parent = engine->ecsManager.GetComponent<Transform>(go->GetEntity()).GetParentMatrix();
+			transMat = (transMat*Parent );
             ImGuizmo::Manipulate(viewMat.elements.data(), projMat.elements.data(),
                                  gizmoMode, gizmoReferential,
-                                 transMat.elements.data());
+                                 transMat.elements.data() );
             if (ImGuizmo::IsUsing())
             {
+            	transMat =   transMat *Parent.GetInversed();
                 engine->ecsManager.GetComponent<Transform>(go->GetEntity()).SetTransformMatrix(transMat);
             }
         }

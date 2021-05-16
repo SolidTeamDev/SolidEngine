@@ -40,7 +40,7 @@ namespace Solid {
         Log();
         ~Log();
 
-        static void Send(const std::string &_logMessage, const ELogSeverity &_severity = ELogSeverity::INFO);
+	    static void Send(const std::string &_logMessage, const ELogSeverity &_severity = ELogSeverity::INFO);
         static LogMessage GetLogAt(unsigned int idx);
     };
 }

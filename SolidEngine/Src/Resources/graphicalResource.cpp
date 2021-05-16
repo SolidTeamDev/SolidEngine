@@ -283,7 +283,8 @@ void GL::Shader::SetMVP(Transform& _model, Camera& _camera)const
 
 	glUniformMatrix4fv(glGetUniformLocation(ProgID,"proj"),1,GL_FALSE,_camera.GetProjection().elements.data());
 	glUniformMatrix4fv(glGetUniformLocation(ProgID,"view"),1,GL_FALSE,_camera.GetView().elements.data());
-	glUniformMatrix4fv(glGetUniformLocation(ProgID,"model"),1,GL_FALSE,_model.GetMatrix().elements.data());
+	Mat4<float> modelM =  (_model.GetMatrix()*_model.GetParentMatrix()) ;
+	glUniformMatrix4fv(glGetUniformLocation(ProgID,"model"),1,GL_FALSE,modelM.elements.data());
 
 }
 

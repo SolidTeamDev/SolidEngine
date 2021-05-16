@@ -18,6 +18,58 @@ namespace Solid
         UI::Begin("Files", &p_open,
                   ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
         UI::TextWrapped("Welcome on the Solid files explorer!");
+        std::vector<ResourcesPathData> data = Engine::GetInstance()->resourceManager.GetAllResourcesPath();
+        counter -= Time::DeltaTime();
+        if(counter <= 0.0)
+        {
+        	counter = 60.0;
+        	root.childPaths.clear();
+        	root.fileNames.clear();
+	        for(auto& elt : data)
+	        {
+		        if(elt.rPath.size() == 1)
+		        {
+			        root.fileNames.push_back(elt.RName);
+			        continue;
+		        }
+		        if(elt.rPath.empty())
+			        continue;
+		        filePathData* node = &root;
+		        for (int i = 1; i < elt.rPath.size(); ++i)
+		        {
+			        if(node->childPaths.contains(elt.rPath[i]))
+			        {
+				        node = &(node->childPaths[elt.rPath[i]]);
+				        continue;
+			        }
+			        else
+			        {
+				        node->childPaths.emplace(elt.rPath[i], filePathData{.folderName=elt.rPath[i], .parent=node});
+				        node = &(node->childPaths[elt.rPath[i]]);
+				        continue;
+			        }
+		        }
+		        node->fileNames.push_back(elt.RName);
+	        }
+        }
+	    {
+	    	if(currentFolder->parent != nullptr && UI::Button("..##previous"))
+		    {
+	    		currentFolder = currentFolder->parent;
+		    }
+		    for(auto& elt : currentFolder->childPaths)
+		    {
+		        if(UI::Button(elt.first.c_str()))
+		        {
+		        	currentFolder = &elt.second;
+		        }
+		    }
+		    for(auto& elt : currentFolder->fileNames)
+		    {
+			    UI::Button(elt.c_str());
+		    }
+	    }
+
         DrawCreateFile();
 	    DrawMatNamePopup();
 	    UI::End();
@@ -101,5 +153,10 @@ namespace Solid
 			UI::EndPopup();
 		}
 
+	}
+
+	FilesInterface::FilesInterface()
+	{
+		root.folderName = "\\Assets\\";
 	}
 }

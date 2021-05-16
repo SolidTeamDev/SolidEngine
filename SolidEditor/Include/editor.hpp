@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/engine.hpp"
-#include "GameCompiler/gameCompiler.hpp"
+
 #include "ECS/Components/meshRenderer.hpp"
 #include "ECS/Components/audioSource.hpp"
 #include "ECS/Components/rigidBody.hpp"
@@ -21,14 +21,17 @@ namespace Solid
 	{
 		std::string compName;
 		std::vector<FieldData> fields;
-		std::size_t compIndex;
+		GameObject* go = nullptr;
+		std::size_t entityCompIndex;
+		std::size_t CompListIndex;
 	};
 
 	struct CompDataSave
 	{
 		void* compID;
 		std::vector<FieldData> fields;
-		std::size_t compIndex;
+		std::size_t entityCompIndex;
+		std::size_t CompListIndex;
 	};
 	template<class T>
 	struct PrimaryCompSave
@@ -59,7 +62,7 @@ namespace Solid
 	    static bool play;
 	    static bool paused;
         Engine* engine = nullptr;
-        GameCompiler* Compiler;
+
 	    static std::vector<CompDataSave> compsSave;
 	    static std::vector<PrimaryCompSave<Transform>> transSave;
 	    static std::vector<PrimaryCompSave<Camera>> camSave;

@@ -5,6 +5,7 @@
 #include "ECS/Components/script.hpp"
 #include <imgui.h>
 #include <imgui_stdlib.h>
+#include "ECS/Components/scriptList.hpp"
 
 namespace Solid
 {
@@ -62,9 +63,13 @@ namespace Solid
         {
             EditAudioSource(engine->ecsManager.GetComponent<AudioSource>(gameObject->GetEntity()));
         }
-        if(engine->ecsManager.GotComponent<Script*>(gameObject->GetEntity()))
+        if(engine->ecsManager.GotComponent<ScriptList>(gameObject->GetEntity()))
         {
-	        EditComp(engine->ecsManager.GetComponent<Script*>(gameObject->GetEntity()));
+	        ScriptList& sl = engine->ecsManager.GetComponent<ScriptList>(gameObject->GetEntity());
+	        for(Script* elt : sl.GetAllScripts())
+	        {
+		        EditComp(elt);
+	        }
         }
     }
 
@@ -135,7 +140,7 @@ namespace Solid
                     UI::CloseCurrentPopup();
                 }
             }
-	        if(!engine->ecsManager.GotComponent<Script*>(gameObject->GetEntity()))
+	        if(!engine->ecsManager.GotComponent<ScriptList>(gameObject->GetEntity()))
 	        {
 	        	const rfk::Namespace* n = GameCompiler::GetInstance()->getNamespace("Solid");
 
@@ -146,10 +151,34 @@ namespace Solid
 					{
 						if(UI::Button(elt->name.c_str()))
 						{
-							engine->ecsManager.AddComponent<Script*>(gameObject, c->makeInstance<Script>());
+							ScriptList* sl =engine->ecsManager.AddComponent<ScriptList>(gameObject, ScriptList());
+							sl->AddScript(c->makeInstance<Script>());
 							UI::CloseCurrentPopup();
 						}
 					}
+
+		        }
+	        }
+	        else
+	        {
+		        const rfk::Namespace* n = GameCompiler::GetInstance()->getNamespace("Solid");
+		        ScriptList& sl =engine->ecsManager.GetComponent<ScriptList>(gameObject->GetEntity());
+
+		        for(auto& elt : n->archetypes)
+		        {
+			        if(!sl.HasScript(elt->name.c_str()))
+			        {
+				        const rfk::Class* c = n->getClass(elt->name);
+				        if(c->isSubclassOf(*n->getClass("Script")))
+				        {
+					        if(UI::Button(elt->name.c_str()))
+					        {
+						        sl.AddScript(c->makeInstance<Script>());
+						        UI::CloseCurrentPopup();
+					        }
+				        }
+			        }
+
 
 		        }
 	        }

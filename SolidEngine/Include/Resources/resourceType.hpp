@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <sndfile.h>
+#include <deque>
 
 #include "Core/Maths/solidVector.hpp"
 #include "Core/Maths/Matrix/matrix4.hpp"
@@ -53,12 +54,14 @@ namespace Solid {
         static int NoNameNum;
     protected:
         EResourceType type;
-        fs::path path;
-        fs::path assetProjectPath;
     public:
-        std::string name;
+	    std::deque<std::string> path;
+	    std::string name;
 
         EResourceType GetType() { return type; }
+	    virtual void ToDataBuffer(std::vector<char> &buffer);
+
+	    virtual int FromDataBuffer(char *buffer, int bSize);
 
     };
 
@@ -76,10 +79,9 @@ namespace Solid {
 
         ~ImageResource();
 
-        void ToDataBuffer(std::vector<char> &buffer);
+	    virtual void ToDataBuffer(std::vector<char> &buffer) override;
 
-//        void FromDataBuffer(std::vector<char>& buffer);
-        void FromDataBuffer(char *buffer, int bSize);
+	    virtual int FromDataBuffer(char *buffer, int bSize) override;
 
     };
 
@@ -123,9 +125,9 @@ namespace Solid {
 
         }
 
-        void ToDataBuffer(std::vector<char> &buffer);
+	    virtual void ToDataBuffer(std::vector<char> &buffer) override;
 
-        void FromDataBuffer(char *buffer, int bSize);
+	    virtual int FromDataBuffer(char *buffer, int bSize) override;
     };
 
 	class SOLID_API SkeletonResource : public Resource
@@ -228,9 +230,9 @@ namespace Solid {
 
         }
 
-        void ToDataBuffer(std::vector<char> &buffer);
+	    virtual void ToDataBuffer(std::vector<char> &buffer) override;
 
-        void FromDataBuffer(char *buffer, int bSize);
+	    virtual int FromDataBuffer(char *buffer, int bSize) override;
     };
 
     class SOLID_API ComputeShaderResource : public Resource
@@ -257,9 +259,9 @@ namespace Solid {
 
         }
 
-        void ToDataBuffer(std::vector<char> &buffer);
+	    virtual void ToDataBuffer(std::vector<char> &buffer) override;
 
-        void FromDataBuffer(char *buffer, int bSize);
+	    virtual int FromDataBuffer(char *buffer, int bSize) override;
     };
 
     class SOLID_API MaterialResource : public Resource
@@ -314,8 +316,8 @@ namespace Solid {
 
         ~MaterialResource();
 
-	    void ToDataBuffer(std::vector<char> &buffer);
-	    void FromDataBuffer(char *buffer, int bSize);
+	    virtual void ToDataBuffer(std::vector<char> &buffer) override;
+	    virtual int FromDataBuffer(char *buffer, int bSize) override;
 
         const std::shared_ptr<IShader> GetShader() const;
         const std::shared_ptr<const IShader> GetDefaultshader() const;
@@ -352,9 +354,9 @@ namespace Solid {
 		}
 
 		~AudioResource();
-		void ToDataBuffer(std::vector<char> &buffer);
+		virtual void ToDataBuffer(std::vector<char> &buffer) override;
 
-		void FromDataBuffer(char *buffer, int bSize);
+		virtual int FromDataBuffer(char *buffer, int bSize) override;
 
 	};
 }

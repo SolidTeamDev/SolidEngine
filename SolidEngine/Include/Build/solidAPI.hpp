@@ -4,6 +4,11 @@
     #define SOLID_API //__declspec(dllexport)
 #endif
 
+#ifndef SOLID_SCRIPT_API
+	#define SOLID_SCRIPT_API
+#endif
+
+
 #ifndef SOLID_EDITOR_API
 #define SOLID_EDITOR_API //__declspec(dllexport)
 #endif

@@ -76,7 +76,7 @@ namespace Solid
     {
         Mat4<T> matrix;
 
-
+/*
         matrix.elements[0] = 1.0f - (2.0f * _rot.y * _rot.y) - (2.0f * _rot.z * _rot.z);
         matrix.elements[1] = 2.0f * _rot.x * _rot.y - 2.0f * _rot.w * _rot.z;
         matrix.elements[2] = 2.0f * _rot.x * _rot.z + 2.0f * _rot.w * _rot.y;
@@ -90,7 +90,22 @@ namespace Solid
         matrix.elements[8] = 2.0f * _rot.x * _rot.z - 2.0f * _rot.w * _rot.y;
         matrix.elements[9] = 2.0f * _rot.y * _rot.z + 2.0f * _rot.w * _rot.x;
         matrix.elements[10] = 1.0f - (2.0f * _rot.x * _rot.x) - (2.0f * _rot.y * _rot.y);
-        matrix.elements[11] = 0;
+        matrix.elements[11] = 0;*/
+
+	    matrix.elements[0] = 2.0f * (_rot.w * _rot.w +  _rot.x * _rot.x) -1.0f;
+	    matrix.elements[1] = 2.0f * _rot.x * _rot.y - 2.0f * _rot.w * _rot.z;
+	    matrix.elements[2] = 2.0f * _rot.x * _rot.z + 2.0f * _rot.w * _rot.y;
+	    matrix.elements[3] = 0;
+
+	    matrix.elements[4] = 2.0f * _rot.x * _rot.y + 2.0f * _rot.w * _rot.z;
+	    matrix.elements[5] =  2.0f *( _rot.w * _rot.w+ _rot.y * _rot.y) -1.0f;
+	    matrix.elements[6] = 2.0f * _rot.y * _rot.z - 2.0f * _rot.w * _rot.x;
+	    matrix.elements[7] = 0;
+
+	    matrix.elements[8] = 2.0f * _rot.x * _rot.z - 2.0f * _rot.w * _rot.y;
+	    matrix.elements[9] = 2.0f * _rot.y * _rot.z + 2.0f * _rot.w * _rot.x;
+	    matrix.elements[10] = 2.0f *( _rot.w * _rot.w + _rot.z * _rot.z) -1.0f;
+	    matrix.elements[11] = 0;
 
         matrix.elements[12] = 0;
         matrix.elements[13] = 0;
@@ -611,10 +626,10 @@ namespace Solid
     }
 
     template<typename T>
-    constexpr Mat4<T> Mat4<T>::operator*(const Mat4<T> &_mat) const noexcept
+    Mat4<T> Mat4<T>::operator*(const Mat4<T> &_mat) const noexcept
     {
         //TODO mAKE MULTIPLICATION LINE CONVENTION
-        return Mat4<T>(
+        /*return Mat4<T>(
                 elements[0] * _mat.elements[0] + elements[1] * _mat.elements[4] + elements[2] * _mat.elements[8] +
                 elements[3] * _mat.elements[12],
                 elements[0] * _mat.elements[1] + elements[1] * _mat.elements[5] + elements[2] * _mat.elements[9] +
@@ -650,7 +665,13 @@ namespace Solid
                 elements[15] * _mat.elements[14],
                 elements[12] * _mat.elements[3] + elements[13] * _mat.elements[7] + elements[14] * _mat.elements[11] +
                 elements[15] * _mat.elements[15]
-        );
+        );*/
+	    Mat4<T> res = Zero;
+	    for (int c = 0; c < 4; ++c)
+		    for (int r = 0; r < 4; ++r)
+			    for (int k = 0; k < 4; ++k)
+				    res.elements[c + 4*r] += this->elements[k + 4*r] * _mat.elements[c +4*k];
+			    return res;
     }
 
     template<typename T>

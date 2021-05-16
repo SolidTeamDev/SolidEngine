@@ -18,6 +18,7 @@
 #include <string>
 #include <sstream>
 #include "ECS/Components/script.hpp"
+#include "ECS/Components/scriptList.hpp"
 
 
 
@@ -98,129 +99,17 @@ namespace Solid {
 
             if (UI::MenuItem("Save Scene"))
             {
-	            json j;
-	            j["Scene"].array();
-	            j = j.flatten();
-	            std::string elt = "/Scene";
-	            GameObject* world = Engine::GetInstance()->ecsManager.GetWorld();
-	            std::function<void(json&, GameObject*, std::string&)> Lambda = [&](json& j, GameObject* elt, std::string& path){
 
-		            for(GameObject* sub : elt->childs)
-		            {
-			            std::string subP = path + "/{GameObject_"+ std::to_string(sub->GetEntity()) + "}" ;
-			            j[subP + "/Name"] = sub->name;
-			            Lambda(std::ref(j), sub, std::ref(subP));
-		            }
-
-	            };
-	            Lambda(std::ref(j), world, std::ref(elt));
-	            j = j.unflatten();
-				std::string name = "test.SolidScene";
-	            std::ofstream file(name, std::ifstream::binary);
-	            std::vector<char> buffer;
-	            std::stringstream sstr;
-	            sstr << std::setw(4) << j << std::endl;
-	            std::size_t sstrSize = sstr.str().size() * sizeof(std::string::value_type);
-	            ResourcesLoader::Append(buffer, &sstrSize , sizeof(std::size_t));
-
-	            ResourcesLoader::Append(buffer, sstr.str().data(), sstrSize);
-	            std::function<void(GameObject*)> LambdaCmp = [&](GameObject* elt){
-		            //store Num of Childs
-	            	std::size_t ChildNum = elt->childs.size();
-		            ResourcesLoader::Append(buffer, &ChildNum, sizeof(std::size_t));
-		            for(GameObject* sub : elt->childs)
-		            {
-						//store num of comps
-		            	std::size_t cmpNum = sub->compsList.size();
-			            ResourcesLoader::Append(buffer, &cmpNum, sizeof(std::size_t));
-						for(Components* cmp : sub->compsList)
-						{
-						    Log::Send(cmp->getArchetype().name);
-							std::size_t offset =0;
-
-							std::size_t cmpNameSize = 0;
-
-							//store comp name / string
-							cmpNameSize = cmp->getArchetype().name.size()*sizeof(std::string::value_type);
-							ResourcesLoader::Append(buffer, &cmpNameSize, sizeof(std::size_t));
-							ResourcesLoader::Append(buffer, (void*)cmp->getArchetype().name.data(),  cmpNameSize);
-
-							//store num of fields
-							std::size_t numFields = cmp->getArchetype().fields.size();
-							ResourcesLoader::Append(buffer, &numFields, sizeof(std::size_t));
-							for(auto& elt : cmp->getArchetype().fields)//2 elt var WARN
-						    {
-								std::size_t size = 0;
-								size = elt.name.size()*sizeof(std::string::value_type);
-							    //store field name / string
-								ResourcesLoader::Append(buffer, &size, sizeof(std::size_t));
-							    ResourcesLoader::Append(buffer, (void*)elt.name.data(),  size);
-							    short isNull = 128;
-								if(elt.type.archetype == nullptr)
-								{
-									isNull = 256;
-									std::string str = elt.getData<std::string>(cmp);
-									std::size_t strS =  str.size()*sizeof(std::string::value_type);
-									//store isNull
-									ResourcesLoader::Append(buffer, &isNull, sizeof(short));
-									//store field data
-									ResourcesLoader::Append(buffer, &strS, sizeof(std::size_t));
-									ResourcesLoader::Append(buffer, str.data(), strS);
-								}
-								else
-								{
-									ResourcesLoader::Append(buffer, &isNull, sizeof(short));
-									if(elt.type.archetype->name == "String")
-									{
-										String* str = (String*)elt.getDataAddress(cmp);
-										size = str->size()*sizeof(std::string::value_type);
-										ResourcesLoader::Append(buffer, &size, sizeof(std::size_t));
-										ResourcesLoader::Append(buffer, str->data(), size);
-									}
-									else if(elt.type.archetype->name == "vectorStr")
-									{
-										vectorStr* vstr = (vectorStr*)elt.getDataAddress(cmp);
-										size = vstr->size();
-										ResourcesLoader::Append(buffer, &size, sizeof(std::size_t));
-										for(auto& str : *vstr)
-										{
-											std::size_t strSize = str.size()*sizeof(std::string::value_type);
-											ResourcesLoader::Append(buffer, &strSize, sizeof(std::size_t));
-											ResourcesLoader::Append(buffer, str.data(), strSize);
-										}
-									}
-									else
-									{
-										size = elt.type.archetype->memorySize;
-										//store isNull
-										//store field data
-										ResourcesLoader::Append(buffer, &size, sizeof(std::size_t));
-										ResourcesLoader::Append(buffer, elt.getDataAddress(cmp), size);
-
-									}
-								}
-
-						    }
-
-
-						}
-			            LambdaCmp(sub);
-		            }
-
-	            };
-	            LambdaCmp(world);
-				file.write(buffer.data(), buffer.size());
-				SceneResource* scene = new SceneResource();
-				scene->rawScene = buffer;
-				scene->name = name;
-				Engine::GetInstance()->resourceManager.AddResource(scene);
-
+	            fs::path p = fs::current_path();
+	            p.append("test.SolidScene");
+	            Engine::GetInstance()->SaveScene(p);
 
             }
             if (UI::MenuItem("Load Scene"))
             {
 	            EditorInterface::selectedGO = nullptr;
 	            fs::path p = fs::current_path();
+	            p.append("test.SolidScene");
             	Engine::GetInstance()->LoadScene(p);
 
             }
@@ -245,31 +134,41 @@ namespace Solid {
 
 	            if (UI::MenuItem("Compile"))
 	            {
+		            GameCompiler::GetInstance()->ReloadCmake();
 	            	auto compiler = GameCompiler::GetInstance();
-	            	auto compArray =Engine::GetInstance()->ecsManager.GetCompArray<Script*>();
-		            std::array<Script*, MAX_ENTITIES>& array = compArray->GetArray();
-		            std::unordered_map<Entity, size_t>& idArray = compArray->GetIndexesArray();
-		            std::unordered_map<size_t , Entity>& entArray = compArray->GetEntitiesArray();
+	            	auto scriptListArray =Engine::GetInstance()->ecsManager.GetCompArray<ScriptList>();
+		            std::array<ScriptList, MAX_ENTITIES>& array = scriptListArray->GetArray();
+		            std::unordered_map<Entity, size_t>& idArray = scriptListArray->GetIndexesArray();
+		            std::unordered_map<size_t , Entity>& entArray = scriptListArray->GetEntitiesArray();
 		            std::vector<CompData> compsSave;
 	            	for(auto& elt : idArray)
 	            	{
-	            		Script* scriptToSave =array[elt.second];
-	            		CompData compD;
-	            		compD.compName = scriptToSave->getArchetype().name;
-	            		for(auto& field : scriptToSave->getArchetype().fields)
+	            		ScriptList scriptListToSave =array[elt.second];
+	            		std::vector<Script*> allS = scriptListToSave.GetAllScripts();
+	            		int i = 0;
+	            		for(Script* scriptToSave : allS)
 	            		{
-	            			FieldData fieldD;
-	            			fieldD.fName= field.name;
-	            		    void* fData =field.getDataAddress(scriptToSave);
-	            		    uint fSize = field.type.archetype->memorySize;
-	            		    fieldD.fData.resize(fSize);
-	            		    std::memcpy(fieldD.fData.data(), fData, fSize);
-	            		    compD.fields.push_back(std::move(fieldD));
+				            CompData compD;
+				            compD.compName = scriptToSave->getArchetype().name;
+				            compD.go = scriptToSave->gameObject;
+				            for(auto& field : scriptToSave->getArchetype().fields)
+				            {
+					            FieldData fieldD;
+					            fieldD.fName= field.name;
+					            void* fData =field.getDataAddress(scriptToSave);
+					            uint fSize = field.type.archetype->memorySize;
+					            fieldD.fData.resize(fSize);
+					            std::memcpy(fieldD.fData.data(), fData, fSize);
+					            compD.fields.push_back(std::move(fieldD));
+				            }
+				            delete allS[i];
+				            allS[i] = nullptr;
+				            compD.entityCompIndex = elt.second;
+				            compD.CompListIndex = i;
+				            compsSave.push_back(std::move(compD));
+				            ++i;
 	            		}
-	            		delete array[elt.second];
-			            array[elt.second] = nullptr;
-			            compD.compIndex = elt.second;
-	            		compsSave.push_back(std::move(compD));
+
 	            	}
 		            if(compiler->hGetProcIDDLL)
 		            {
@@ -340,34 +239,35 @@ namespace Solid {
 			            }
 			            if(compiler->getNamespace != nullptr)
 			            {
-				            std::array<Script*, MAX_ENTITIES> newCompArray {};
-				            std::vector<Entity> compsNotCreated;
+
 				            for(auto& elt : compsSave)
 				            {
 					            const rfk::Class* c= compiler->getNamespace("Solid")->getClass(elt.compName);
 					            if(c == nullptr)
 					            {
-						            compsNotCreated.push_back(entArray[elt.compIndex]);
+
 					            	///OUCH
 					            }
 					            else
 					            {
 						            Script* newComp= c->makeInstance<Script>();
+						            newComp->gameObject = elt.go;
 									for(auto& field : elt.fields)
 									{
 									        const rfk::Field* f= newComp->getArchetype().getField(field.fName);
 									        if(f != nullptr)
 									        	f->setData(newComp, field.fData.data(), field.fData.size());
 									}
-									newCompArray[elt.compIndex] = newComp;
+									array[elt.entityCompIndex].GetAllScripts()[elt.CompListIndex] = newComp;
 					            }
+
 				            }
-				            compArray->SetArray(std::move(newCompArray));
-				            for(auto& elt : compsNotCreated)
+				            for(auto& elt : idArray)
 				            {
-					            GameObject* go = Engine::GetInstance()->ecsManager.GetGameObjectFromEntity(elt);
-					            Engine::GetInstance()->ecsManager.RemoveComponent<Script*>(go);
+					            ScriptList scriptListToClean =array[elt.second];
+					            scriptListToClean.CleanAllNullptr();
 				            }
+
 
 			            }
 			            else
@@ -379,7 +279,6 @@ namespace Solid {
 		            }
 
 
-		            Log::Send("Compiling", Log::ELogSeverity::ERROR);
 	            }
 	            UI::EndMenu();
             }

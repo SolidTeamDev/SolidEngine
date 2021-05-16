@@ -1,13 +1,25 @@
 #pragma once
 
+#include <vector>
+#include <unordered_map>
+
 namespace Solid
 {
     class FilesInterface
     {
 	    bool        matNamePopup = false;
 	    std::string matNamestr;
+	    struct filePathData
+	    {
+	    	std::string folderName;
+	    	filePathData* parent = nullptr;
+	    	std::vector<std::string> fileNames;
+	    	std::unordered_map<std::string, filePathData> childPaths;
+	    } root;
+	    double counter =0.0f;
+	    filePathData* currentFolder = &root;
     public:
-        FilesInterface()  = default;
+        FilesInterface();
         ~FilesInterface() = default;
 
         void Draw();

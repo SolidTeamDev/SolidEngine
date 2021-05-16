@@ -9,6 +9,12 @@ namespace fs = std::filesystem;
 namespace Solid
 {
 
+	struct ResourcesPathData
+	{
+		std::string RName;
+		std::deque<std::string> rPath;
+	};
+
     template<class T>
     struct SOLID_API ResourceList
     {
@@ -30,6 +36,13 @@ namespace Solid
             else
                 return (T*)it->second;
 
+        }
+        void addPathToVec(std::vector<ResourcesPathData>& vec)
+        {
+        	for(auto& elt : List)
+        	{
+        	    vec.push_back({.RName=elt.second->name, .rPath=elt.second->path});
+        	}
         }
     };
 
@@ -73,6 +86,7 @@ namespace Solid
 
 	    template<class T>
 	    T* GetResourceByName(const char* name);
+	    std::vector<ResourcesPathData> GetAllResourcesPath();
 	    MeshResource* GetRawMeshByName(const char* name);
 	    ShaderResource* GetRawShaderByName(const char* name);
 	    ComputeShaderResource* GetRawComputeByName(const char* name);

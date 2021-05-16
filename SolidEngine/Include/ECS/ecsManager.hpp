@@ -107,6 +107,21 @@ namespace Solid
             c->Init();
             return (T*)c;
         }
+	    template<>
+	    Script** AddComponent(GameObject* _entity, Script* _component)
+	    {
+		    //HERE
+		    Components* c =componentManager->AddComponent<Script*>(_entity->GetEntity(),_component);
+		    c->gameObject = _entity;
+		    _entity->compsList.push_back(c);
+		    auto signature = entityManager->GetSignature(_entity->GetEntity());
+		    signature.set(componentManager->GetComponentType<Script*>(), true);
+		    entityManager->SetSignature(_entity->GetEntity(),signature);
+
+		    systemManager->EntitySignatureChanged(_entity->GetEntity(),signature);
+		    c->Init();
+		    return (Script**)c;
+	    }
 	    template<typename T>
 	    std::shared_ptr<ComponentArray<T>> GetCompArray()
 	    {

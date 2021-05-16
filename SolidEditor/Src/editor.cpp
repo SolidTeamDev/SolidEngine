@@ -1,4 +1,5 @@
 #include <string>
+
 #include "editor.hpp"
 #undef ERROR
 #include "UI/solidUI.hpp"
@@ -8,7 +9,7 @@
 
 #include "ECS/Components/transform.hpp"
 #include "ECS/Components/meshRenderer.hpp"
-
+#include "ECS/Components/scriptList.hpp"
 namespace Solid
 {
     InputManager<int>* Editor::editorInputManager = nullptr;
@@ -46,7 +47,7 @@ namespace Solid
         editorInputManager = new InputManager<int>(window->GetHandle());
         InitEditorInputList(editorInputManager);
 
-        Compiler = GameCompiler::GetInstance();
+
 
 
     }
@@ -122,7 +123,9 @@ namespace Solid
 		fs::path EngineIncPath =ProjectPath.string() +"/" +(std::string(CurrentProjectJson["Project"]["EngineIncludeFolder"])) ;
 
 		LoadResources(AssetPath);
-		bool b = (!fs::is_empty(EngineIncPath) && fs::exists(EngineIncPath.append("INIT")));
+		fs::path init = EngineIncPath;
+		init.append("INIT");
+		bool b = (!fs::is_empty(EngineIncPath) && fs::exists(init));
 		if(!b)
 		{
 			auto editP =fs::current_path();
@@ -135,7 +138,7 @@ namespace Solid
 			}
 
 
-			fs::create_directory(EngineIncPath.string() + "/INIT");
+			fs::create_directory(init);
 
 
 		}
@@ -160,7 +163,7 @@ namespace Solid
 				fs::copy(editP, t, opt);
 			}
 		}
-
+		GameCompiler* Compiler = Engine::GetInstance()->Compiler;
 		Compiler->srcPath = CodePath;
 		Compiler->IncludePath = EngineIncPath;
 		Compiler->DllPath = CodePath;
@@ -203,32 +206,37 @@ namespace Solid
 		    boxSave.clear();
 		    sphereSave.clear();
 		    capsuleSave.clear();
-		    auto compArray =Engine::GetInstance()->ecsManager.GetCompArray<Script*>();
-		    std::array<Script*, MAX_ENTITIES>& array = compArray->GetArray();
+		    auto compArray =Engine::GetInstance()->ecsManager.GetCompArray<ScriptList>();
+		    std::array<ScriptList, MAX_ENTITIES>& array = compArray->GetArray();
 		    std::unordered_map<Entity, size_t>& idArray = compArray->GetIndexesArray();
 		    std::unordered_map<size_t , Entity>& entArray = compArray->GetEntitiesArray();
 
 		    for(auto& elt : idArray)
 		    {
-			    Script* scriptToSave =array[elt.second];
-			    CompDataSave compD;
-			    compD.compID = (void*)scriptToSave;
-			    for(auto& field : scriptToSave->getArchetype().fields)
+			    ScriptList& scriptListToSave =array[elt.second];
+			    for(Script* scriptToSave : scriptListToSave.GetAllScripts())
 			    {
-				    FieldData fieldD;
-				    fieldD.fName= field.name;
-				    void* fData =field.getDataAddress(scriptToSave);
-				    uint fSize = field.type.archetype->memorySize;
-				    fieldD.fData.resize(fSize);
-				    std::memcpy(fieldD.fData.data(), fData, fSize);
-				    compD.fields.push_back(std::move(fieldD));
+				    CompDataSave compD;
+				    compD.compID = (void*)scriptToSave;
+				    for(auto& field : scriptToSave->getArchetype().fields)
+				    {
+					    FieldData fieldD;
+					    fieldD.fName= field.name;
+					    void* fData =field.getDataAddress(scriptToSave);
+					    uint fSize = field.type.archetype->memorySize;
+					    fieldD.fData.resize(fSize);
+					    std::memcpy(fieldD.fData.data(), fData, fSize);
+					    compD.fields.push_back(std::move(fieldD));
+				    }
+
+				    compD.entityCompIndex = elt.second;
+				    compsSave.push_back(std::move(compD));
 			    }
 
-			    compD.compIndex = elt.second;
-			    compsSave.push_back(std::move(compD));
 		    }
 		    //primary Comps Save
 		    {
+
 			    {
 				    auto compA =Engine::GetInstance()->ecsManager.GetCompArray<Transform>();
 				    std::array<Transform, MAX_ENTITIES>& array = compA->GetArray();
@@ -342,8 +350,8 @@ namespace Solid
 		{
 			if(paused)
 				paused = false;
-			auto compArray =Engine::GetInstance()->ecsManager.GetCompArray<Script*>();
-			std::array<Script*, MAX_ENTITIES>& array = compArray->GetArray();
+			auto compArray =Engine::GetInstance()->ecsManager.GetCompArray<ScriptList>();
+			std::array<ScriptList, MAX_ENTITIES>& array = compArray->GetArray();
 			std::unordered_map<Entity, size_t>& idArray = compArray->GetIndexesArray();
 			std::unordered_map<size_t , Entity>& entArray = compArray->GetEntitiesArray();
 			// reset state
@@ -351,21 +359,24 @@ namespace Solid
 			//std::vector<Entity> compsNotCreated;
 			for(auto& elt : compsSave)
 			{
-
-				for(Script* eltScript : array)
+				for(ScriptList& sl : array)
 				{
-					if((std::size_t)eltScript == (std::size_t)elt.compID)
+					for(Script* eltScript : sl.GetAllScripts())
 					{
-						for(auto& field : elt.fields)
+						if((std::size_t)eltScript == (std::size_t)elt.compID)
 						{
-							const rfk::Field* f= eltScript->getArchetype().getField(field.fName);
-							if(f != nullptr)
-								f->setData(eltScript, field.fData.data(), field.fData.size());
+							for(auto& field : elt.fields)
+							{
+								const rfk::Field* f= eltScript->getArchetype().getField(field.fName);
+								if(f != nullptr)
+									f->setData(eltScript, field.fData.data(), field.fData.size());
+							}
 						}
+
+
 					}
-
-
 				}
+
 			}
 
 			for(auto& elt : transSave)

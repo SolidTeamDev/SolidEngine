@@ -10,6 +10,8 @@
 
 #include "Resources/ressources.hpp"
 #include <sstream>
+#include <Resources/resourceMgr.hpp>
+
 
 #include "glad/glad.h"
 #include "Core/engine.hpp"
@@ -234,6 +236,21 @@ MaterialResource *ResourceManager::CreateMaterial(const char *name)
 ResourceManager::ResourceManager(struct Engine *_engine)
 {
 	EnginePtr =_engine;
+}
+
+std::vector<ResourcesPathData> ResourceManager::GetAllResourcesPath()
+{
+	std::vector<ResourcesPathData> vec;
+	ImageList.addPathToVec(vec);
+	MeshList.addPathToVec(vec);
+	AnimList.addPathToVec(vec);
+	SkeletonList.addPathToVec(vec);
+	ShaderList.addPathToVec(vec);
+	ComputeList.addPathToVec(vec);
+	MaterialList.addPathToVec(vec);
+	AudioList.addPathToVec(vec);
+	SceneList.addPathToVec(vec);
+	return vec;
 }
 
 

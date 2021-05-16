@@ -4,27 +4,29 @@
 
 #ifndef SOLIDEDITOR_GAMECOMPILER_HPP
 #define SOLIDEDITOR_GAMECOMPILER_HPP
+
 #ifdef __unix__
 #define OS_WIN 0
 
 #elif defined(_WIN32) || defined(WIN32)
 #define OS_WIN 1
-#include <windows.h>
+#include <Windows.h>
 #endif
+#include "Build/solidAPI.hpp"
 #include "Refureku/Refureku.h"
 #include <filesystem>
 #include <mutex>
 
 namespace fs = std::filesystem;
 
-typedef int (__stdcall *f_Entry)();
-typedef const  rfk::Class* (__stdcall *f_GetClass)(const std::string&);
-typedef const  rfk::Namespace* (__stdcall *f_GetNamespace)(const std::string&);
+typedef        int              (__stdcall *f_Entry)();
+typedef const  rfk::Class*      (__stdcall *f_GetClass)(const std::string&);
+typedef const  rfk::Namespace*  (__stdcall *f_GetNamespace)(const std::string&);
 
 namespace Solid
 {
 
-    class GameCompiler {
+    class SOLID_API GameCompiler {
         static std::mutex mutex;
         static GameCompiler* instance;
     public:
