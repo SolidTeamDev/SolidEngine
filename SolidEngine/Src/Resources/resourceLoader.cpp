@@ -1291,7 +1291,7 @@ Resource *ResourcesLoader::LoadSolidAudio(const fs::path &Rpath)
 	ifs.read(&buffer[0], pos);
 
 
-
+	audio->FromDataBuffer(buffer.data(),buffer.size());
 
 
 	ALsizei numBytes = (ALsizei)(audio->numFrames * audio->info.channels) * (ALsizei)sizeof(short);
