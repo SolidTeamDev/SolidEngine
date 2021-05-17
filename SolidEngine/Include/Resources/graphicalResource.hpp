@@ -47,7 +47,8 @@ namespace Solid
 		protected:
 		//protected members
 			struct ShaderWrapper{uint id; bool error = false;};
-
+            uint vert;
+            uint frag;
 		public:
 		//public func
 
@@ -55,6 +56,9 @@ namespace Solid
 			Shader(ShaderResource* _s);
 			Shader(EResourceType _type):IShader(_type){}
 			ShaderWrapper CreateShader(uint _type, int _sourceCount, std::vector<char*>& _sources);
+
+			void ReloadShader() override;
+
 			void SetFloat(const char *_name, float _value) override;
 
 			void SetMVP(Transform& _model, Camera& _camera) const override;
@@ -90,6 +94,11 @@ namespace Solid
             void LoadShaderFields() override;
 
             std::vector<ShaderUniform>& GetUniformList() override;
+
+            std::string& GetFragSource() override;
+            std::string& GetVertSource() override;
+            void SetFragSource(const std::string& _src) override;
+            void SetVertSource(const std::string& _src) override;
 
 
             ~Shader() = default;

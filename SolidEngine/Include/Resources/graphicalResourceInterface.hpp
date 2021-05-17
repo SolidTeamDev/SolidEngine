@@ -45,13 +45,17 @@ namespace Solid
 	protected:
 		//protected members
         std::vector<ShaderUniform> uniforms;
+		ShaderResource* source = nullptr;
 
 	public:
 		//public func
 		IShader() = default;
 		IShader(EResourceType _type):type(_type){}
 		~IShader() = default;
-		virtual void SetFloat(const char *_name, float _value) = 0;
+
+        virtual void ReloadShader() = 0;
+
+        virtual void SetFloat(const char *_name, float _value) = 0;
 		virtual void SetInt(const char *_name, int _value) = 0;
 		virtual void SetBool(const char *_name, bool _value) = 0;
 		virtual void SetVec2(const char *_name, Vec2 _value) = 0;
@@ -73,7 +77,10 @@ namespace Solid
 		virtual void SetLights(Camera& _camera) const = 0;
 		virtual void SetMaterial(const char* _name) = 0;
 
-
+        virtual std::string& GetFragSource() = 0;
+        virtual std::string& GetVertSource() = 0;
+        virtual void SetFragSource(const std::string& _src) = 0;
+        virtual void SetVertSource(const std::string& _src) = 0;
 	};
 	class SOLID_API ITexture
 	{

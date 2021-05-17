@@ -2,11 +2,11 @@
 
 namespace Solid
 {
-    std::vector<Light> Light::lightList;
+    std::vector<Light*> Light::lightList;
 
     void Light::Init()
     {
-        lightList.push_back(*this);
+        lightList.push_back(this);
     }
 
     void Light::Release()
@@ -14,7 +14,7 @@ namespace Solid
         //TODO: Remove light of the list
     }
 
-    std::vector<Light> Light::GetLightList()
+    std::vector<Light*> Light::GetLightList()
     {
         return lightList;
     }

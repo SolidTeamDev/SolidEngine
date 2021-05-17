@@ -210,7 +210,6 @@ namespace Solid
             Engine* engine = Engine::GetInstance();
             auto mesh = _meshRenderer.GetMesh();
             const char* meshName = mesh == nullptr ? "" : mesh->name.c_str();
-            std::vector<MaterialResource*> differentMaterials;
 
             UI::Text("Mesh  ");UI::SameLine();
             if(UI::BeginCombo("##Mesh", meshName))
@@ -269,25 +268,6 @@ namespace Solid
 
                         UI::EndCombo();
                     }
-
-                    // Set different used material
-                    if(mat != nullptr)
-                    {
-                        bool isDifferent = true;
-
-                        for(auto* difMat : differentMaterials)
-                        {
-                            if(difMat == mat)
-                            {
-                                isDifferent = false;
-                                break;
-                            }
-                        }
-
-                        if(isDifferent)
-                            differentMaterials.push_back(mat);
-                    }
-
                     ++id;
                 }
 
@@ -301,12 +281,91 @@ namespace Solid
                 UI::Indent();
 
                 int Id = 0;
-                for(auto* mat : differentMaterials)
+                auto matSet = _meshRenderer.GetMaterialSet();
+                for(auto* mat : matSet)
                 {
+                    if(mat == nullptr)
+                        continue;
+
                     std::string matId = std::to_string(Id);
 
                     if(UI::TreeNode(mat->name.c_str()))
                     {
+                        if(UI::Button("Edit vertex shader"))
+                        {
+                            isCodeEditorOpen = true;
+                            codeEditor.SetText(mat->GetShader()->GetVertSource());
+                        }
+                        if(UI::Button("Edit fragment shader"))
+                        {
+                            isCodeEditorOpen = true;
+                            codeEditor.SetText(mat->GetShader()->GetFragSource());
+                        }
+
+                        //Open window to edit shader
+                        if(isCodeEditorOpen)
+                        {
+                            auto cpos = codeEditor.GetCursorPosition();
+                            UI::Begin("Edit shader##Window", &isCodeEditorOpen,ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking);
+                            if (ImGui::BeginMenuBar())
+                            {
+                                if (ImGui::BeginMenu("File"))
+                                {
+                                    if (ImGui::MenuItem("Save"))
+                                    {
+                                        mat->GetShader()->SetFragSource(codeEditor.GetText());
+                                        mat->GetShader()->ReloadShader();
+                                    }
+                                    if (ImGui::MenuItem("Quit", "Alt-F4"))
+                                        isCodeEditorOpen = false;
+                                    ImGui::EndMenu();
+                                }
+                                if (ImGui::BeginMenu("Edit"))
+                                {
+                                    if (ImGui::MenuItem("Undo", "ALT-Backspace", nullptr, codeEditor.CanUndo()))
+                                        codeEditor.Undo();
+                                    if (ImGui::MenuItem("Redo", "Ctrl-Y", nullptr, codeEditor.CanRedo()))
+                                        codeEditor.Redo();
+
+                                    ImGui::Separator();
+
+                                    if (ImGui::MenuItem("Copy", "Ctrl-C", nullptr, codeEditor.HasSelection()))
+                                        codeEditor.Copy();
+                                    if (ImGui::MenuItem("Cut", "Ctrl-X", nullptr, codeEditor.HasSelection()))
+                                        codeEditor.Cut();
+                                    if (ImGui::MenuItem("Delete", "Del", nullptr, codeEditor.HasSelection()))
+                                        codeEditor.Delete();
+                                    if (ImGui::MenuItem("Paste", "Ctrl-V", nullptr, ImGui::GetClipboardText() != nullptr))
+                                        codeEditor.Paste();
+
+                                    ImGui::Separator();
+
+                                    if (ImGui::MenuItem("Select all", nullptr, nullptr))
+                                        codeEditor.SelectAll();
+
+                                    ImGui::EndMenu();
+                                }
+
+                                if (ImGui::BeginMenu("View"))
+                                {
+                                    if (ImGui::MenuItem("Dark palette"))
+                                        codeEditor.SetPalette(TextEditor::GetDarkPalette());
+                                    if (ImGui::MenuItem("Light palette"))
+                                        codeEditor.SetPalette(TextEditor::GetLightPalette());
+                                    ImGui::EndMenu();
+                                }
+                                ImGui::EndMenuBar();
+                            }
+
+                            ImGui::Text("%6d/%-6d %6d lines  | %s | %s | %s | %s", cpos.mLine + 1, cpos.mColumn + 1, codeEditor.GetTotalLines(),
+                                        codeEditor.IsOverwrite() ? "Ovr" : "Ins",
+                                        codeEditor.CanUndo() ? "*" : " ",
+                                        codeEditor.GetLanguageDefinition().mName.c_str(), mat->GetShader()->name.c_str());
+
+                            codeEditor.Render("Edit shader",UI::GetWindowSize(),true);
+                            UI::End();
+                        }
+
                         // Choose Shader
                         const char* shaderName = mat->GetShader()->name.c_str();
                         if(UI::BeginCombo(std::string("Shader##"+matId).c_str(),shaderName))
@@ -569,4 +628,5 @@ namespace Solid
         }
         //UI::Image(engine->graphicsResourceMgr.GetTexture(_texture->name))
     }
-}
+
+} //namespace

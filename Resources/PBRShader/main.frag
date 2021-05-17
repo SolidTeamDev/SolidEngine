@@ -20,6 +20,7 @@ uniform float metallicValue;
 uniform float roughnessValue;
 
 uniform bool isUsingAlbedoMap;
+uniform bool isUsingNormalMap;
 uniform bool isUsingMetallicMap;
 uniform bool isUsingRoughnessMap;
 uniform bool isUsingAoMap; 
@@ -107,7 +108,7 @@ void main()
     float roughness = isUsingRoughnessMap ? texture(roughnessMap, vUV).r : roughnessValue;
     float ao        = isUsingAoMap ? texture(aoMap, vUV).r : 1.f;
 
-    vec3 N = getNormalFromMap();
+    vec3 N = isUsingNormalMap ? getNormalFromMap() : normalize(vNormal);
     vec3 V = normalize(_camPos - vWorldPos);
 
     // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0

@@ -10,6 +10,8 @@
 #include "ECS/Components/capsuleCollider.hpp"
 #include "ECS/Components/light.hpp"
 
+#include <TextEditor.h>
+
 #include <string>
 
 namespace Solid
@@ -17,12 +19,15 @@ namespace Solid
     class Engine;
     class InspectorInterface
     {
+        TextEditor codeEditor;
+        bool isCodeEditorOpen = false;
     public:
         InspectorInterface()  = default;
         ~InspectorInterface() = default;
 
         void Draw();
         void DrawComponents();
+
         void AddComponents();
         void CreateScriptWindow();
 

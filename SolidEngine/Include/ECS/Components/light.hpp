@@ -11,7 +11,7 @@ namespace Solid SLDNamespace()
     class SOLID_API SLDClass() Light : public Components
     {
     private:
-        static std::vector<Light> lightList;
+        static std::vector<Light*> lightList;
     public:
 
         enum ELightType
@@ -31,7 +31,7 @@ namespace Solid SLDNamespace()
         void Init() override;
         void Release() override;
 
-        static std::vector<Light> GetLightList();
+        static std::vector<Light*> GetLightList();
 
         Light_GENERATED
     };
