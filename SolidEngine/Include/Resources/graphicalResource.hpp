@@ -111,7 +111,7 @@ namespace Solid
 
 		};
 
-		class Texture : public ITexture
+		class SOLID_API Texture : public ITexture
 		{
 		public:
 		//public members

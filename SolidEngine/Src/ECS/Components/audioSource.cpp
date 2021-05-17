@@ -173,4 +173,14 @@ namespace Solid
     {
         return loop;
     }
+
+	void AudioSource::Release()
+	{
+		if(!isInit)
+			return;
+		Components::Release();
+		isInit = false;
+		audioResource = nullptr;
+		alDeleteSources(1, &sourceID);
+	}
 } //!namespace

@@ -58,6 +58,7 @@ namespace Solid {
         hierarchyTreeInterface.Draw();
         playInterface.Draw();
         logsInterface.Draw();
+        buttonInterface.Draw();
 
         if (colorOpen)
             DrawChangeColors();
@@ -81,12 +82,7 @@ namespace Solid {
         {
             DrawMenuFiles();
             DrawMenuWindows();
-	        if(UI::Button("Play"))
-		        Editor::Play();
-	        if(UI::Button("Pause"))
-		        Editor::Pause();
-	        if(UI::Button("Stop"))
-		        Editor::Stop();
+
             UI::EndMainMenuBar();
         }
 
@@ -136,154 +132,7 @@ namespace Solid {
 		            Log::Send("Reloading Cmake", Log::ELogSeverity::ERROR);
 	            }
 
-	            if (UI::MenuItem("Compile"))
-	            {
-		            GameCompiler::GetInstance()->ReloadCmake();
-	            	auto compiler = GameCompiler::GetInstance();
-	            	auto scriptListArray =Engine::GetInstance()->ecsManager.GetCompArray<ScriptList>();
-		            std::array<ScriptList, MAX_ENTITIES>& array = scriptListArray->GetArray();
-		            std::unordered_map<Entity, size_t>& idArray = scriptListArray->GetIndexesArray();
-		            std::unordered_map<size_t , Entity>& entArray = scriptListArray->GetEntitiesArray();
-		            std::vector<CompData> compsSave;
-	            	for(auto& elt : idArray)
-	            	{
-	            		ScriptList scriptListToSave =array[elt.second];
-	            		std::vector<Script*> allS = scriptListToSave.GetAllScripts();
-	            		int i = 0;
-	            		for(Script* scriptToSave : allS)
-	            		{
-				            CompData compD;
-				            compD.compName = scriptToSave->getArchetype().name;
-				            compD.go = scriptToSave->gameObject;
-				            for(auto& field : scriptToSave->getArchetype().fields)
-				            {
-					            FieldData fieldD;
-					            fieldD.fName= field.name;
-					            void* fData =field.getDataAddress(scriptToSave);
-					            uint fSize = field.type.archetype->memorySize;
-					            fieldD.fData.resize(fSize);
-					            std::memcpy(fieldD.fData.data(), fData, fSize);
-					            compD.fields.push_back(std::move(fieldD));
-				            }
-				            delete allS[i];
-				            allS[i] = nullptr;
-				            compD.entityCompIndex = elt.second;
-				            compD.CompListIndex = i;
-				            compsSave.push_back(std::move(compD));
-				            ++i;
-	            		}
 
-	            	}
-		            if(compiler->hGetProcIDDLL)
-		            {
-			            FreeLibrary(compiler->hGetProcIDDLL);
-			            compiler->hGetProcIDDLL = nullptr;
-			            compiler->entryPoint = nullptr;
-			            compiler->getClass = nullptr;
-			            compiler->getNamespace = nullptr;
-		            }
-		            fs::path DLLPath = GameCompiler::GetInstance()->DllPath;
-		            fs::path TmpDir = fs::current_path();
-		            TmpDir.append("Temp");
-		            fs::path TempDLL = TmpDir;
-		            TempDLL.append(GameCompiler::GetInstance()->ProjectName+"_Tmp.dll");
-		            if(!GameCompiler::GetInstance()->LaunchCompile())
-		            {
-
-			            if(!fs::exists(TmpDir))
-			            {
-			            	//No Temp / First Gen ?
-			            }
-			            else
-			            {
-
-				            if(!fs::exists(TempDLL))
-				            {
-					            //No Temp / First Gen ?
-				            }
-				            else
-				            {
-					            std::ifstream in (TempDLL.string(), std::fstream::binary);
-					            std::ofstream out (DLLPath.string(), std::fstream::binary | std::fstream::trunc);
-					            out << in.rdbuf();
-					            in.close();
-					            out.close();
-				            }
-			            }
-
-
-		            }
-		            else
-		            {
-			            if(!fs::exists(TmpDir))
-				            fs::create_directory(TmpDir);
-			            std::ifstream in (DLLPath.string(), std::fstream::binary);
-			            std::ofstream out (TempDLL.string(), std::fstream::binary | std::fstream::trunc);
-			            out << in.rdbuf();
-			            in.close();
-			            out.close();
-		            }
-		            compiler->hGetProcIDDLL = LoadLibrary(TempDLL.string().c_str());
-		            if(compiler->hGetProcIDDLL == nullptr)
-		            {
-			            Log::Send("LIB LOAD FAILED", Log::ELogSeverity::ERROR);
-			            compiler->entryPoint = nullptr;
-			            compiler->getClass = nullptr;
-			            compiler->getNamespace = nullptr;
-		            }
-		            else
-		            {
-			            compiler->entryPoint = (f_Entry)GetProcAddress(compiler->hGetProcIDDLL, "Entry");
-			            compiler->getClass = (f_GetClass)GetProcAddress(compiler->hGetProcIDDLL, "GetClass");
-			            compiler->getNamespace = (f_GetNamespace)GetProcAddress(compiler->hGetProcIDDLL, "GetNamespace");
-			            if(compiler->entryPoint == nullptr)
-			            {
-				            Log::Send("entryPoint = nullptr", Log::ELogSeverity::ERROR);
-
-			            }
-			            if(compiler->getNamespace != nullptr)
-			            {
-
-				            for(auto& elt : compsSave)
-				            {
-					            const rfk::Class* c= compiler->getNamespace("Solid")->getClass(elt.compName);
-					            if(c == nullptr)
-					            {
-
-					            	///OUCH
-					            }
-					            else
-					            {
-						            Script* newComp= c->makeInstance<Script>();
-						            newComp->gameObject = elt.go;
-									for(auto& field : elt.fields)
-									{
-									        const rfk::Field* f= newComp->getArchetype().getField(field.fName);
-									        if(f != nullptr)
-									        	f->setData(newComp, field.fData.data(), field.fData.size());
-									}
-									array[elt.entityCompIndex].GetAllScripts()[elt.CompListIndex] = newComp;
-					            }
-
-				            }
-				            for(auto& elt : idArray)
-				            {
-					            ScriptList scriptListToClean =array[elt.second];
-					            scriptListToClean.CleanAllNullptr();
-				            }
-
-
-			            }
-			            else
-			            {
-				            Log::Send("getNamespace = nullptr", Log::ELogSeverity::ERROR);
-			            }
-
-
-		            }
-
-
-	            }
 	            UI::EndMenu();
             }
 

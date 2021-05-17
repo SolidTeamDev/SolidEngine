@@ -22,7 +22,7 @@ namespace Solid
         counter -= Time::DeltaTime();
         if(counter <= 0.0)
         {
-        	counter = 60.0;
+        	counter = 2.0;
         	root.childPaths.clear();
         	root.fileNames.clear();
 	        for(auto& elt : data)

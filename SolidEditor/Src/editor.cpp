@@ -114,10 +114,10 @@ namespace Solid
     }
 
 
-	void Editor::InitFromProject()
+	void Editor::InitFromProject(fs::path _projectPath)
 	{
 		std::string ProjectName =CurrentProjectJson["Project"]["Name"] ;
-		fs::path ProjectPath =std::string(CurrentProjectJson["Project"]["Path"]) ;
+		fs::path ProjectPath =_projectPath.parent_path().string() ;
 		fs::path AssetPath =ProjectPath.string() + "/" +(std::string(CurrentProjectJson["Project"]["AssetFolder"])) ;
 		fs::path CodePath =ProjectPath.string() +"/" +(std::string(CurrentProjectJson["Project"]["SourcesFolder"])) ;
 		fs::path EngineIncPath =ProjectPath.string() +"/" +(std::string(CurrentProjectJson["Project"]["EngineIncludeFolder"])) ;

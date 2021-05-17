@@ -11,6 +11,7 @@
 #include "UI/inspectorInterface.hpp"
 #include "UI/hierarchyTreeInterface.hpp"
 #include "UI/logsInterface.hpp"
+#include "UI/buttonInterface.hpp"
 
 namespace Solid
 {
@@ -34,6 +35,7 @@ namespace Solid
         SceneInterface          sceneInterface;
         InspectorInterface      inspectorInterface;
         HierarchyTreeInterface  hierarchyTreeInterface;
+        ButtonInterface         buttonInterface;
 
     public:
         EditorInterface();

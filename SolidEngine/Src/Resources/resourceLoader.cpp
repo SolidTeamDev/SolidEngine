@@ -248,6 +248,58 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 	        if(newFolders)
 	        	it = othersFolders.begin()+counting;
         }
+	    for(auto& elt : normal)
+	    {
+		    int i = 0;
+		    for(auto it = normal.begin(); it!= normal.end() ; ++it)
+		    {
+			    fs::path& elt2 = *it;
+			    if(elt == elt2)
+				    continue;
+			    if(elt.filename() == elt2.filename())
+			    {
+				    int count = 0;
+				    for(auto& elt3 : Solid)
+				    {
+					    if(elt3.filename().string().find(elt2.filename().string()) != std::string::npos)
+					    {
+						    fs::remove(elt3);
+						    Solid.erase(Solid.begin()+count);
+						    break;
+					    }
+					    count++;
+				    }
+				    fs::remove(elt2);
+				    Log::Send(elt2.filename().string() + " AT " + elt2.string() + " Was Removed Because a Duplicate File was Found ", Log::ELogSeverity::WARNING);
+				    normal.erase(it);
+				    it = normal.begin()+i;
+				    continue;
+			    }
+			    i++;
+		    }
+
+	    }
+
+	    for(auto& elt : Solid)
+	    {
+		    int i = 0;
+		    for(auto it = Solid.begin(); it!= Solid.end() ; ++it)
+		    {
+			    fs::path& elt2 = *it;
+			    if(elt == elt2)
+				    continue;
+			    if(elt.filename() == elt2.filename())
+			    {
+				    fs::remove(elt2);
+				    Log::Send(elt2.filename().string() + " AT " + elt2.string() + " Was Removed Because a Duplicate File was Found ", Log::ELogSeverity::WARNING);
+				    normal.erase(it);
+				    it = normal.begin()+i;
+				    continue;
+			    }
+			    i++;
+		    }
+
+	    }
 		for(auto& elt : normal)
 		{
 			bool found = false;
@@ -273,6 +325,8 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 	    {
 		    ToLoad.push_back(elt);
 	    }
+
+
 
         //////////////////////////////
 
@@ -1159,6 +1213,9 @@ Resource * ResourcesLoader::LoadSolidImage(const fs::path &Rpath)
     ifs.seekg(0, std::ios::beg);
     ifs.read(&buffer[0], pos);
     Image->FromDataBuffer(buffer.data(), buffer.size());
+	Image->path.clear();
+	Image->path.push_front(rootFolder);
+	SetPath(Image->path, Rpath);
     if(Image->name == "")
     {
         Image->name = "NoName" + std::to_string(Resource::NoNameNum);
@@ -1181,6 +1238,9 @@ Resource * ResourcesLoader::LoadSolidMesh(const fs::path &Rpath)
     ifs.read(&buffer[0], pos);
 
     Mesh->FromDataBuffer(buffer.data(), buffer.size());
+	Mesh->path.clear();
+	Mesh->path.push_front(rootFolder);
+	SetPath(Mesh->path, Rpath);
     if(Mesh->name == "")
     {
         Mesh->name = "NoName" + std::to_string(Resource::NoNameNum);
@@ -1203,6 +1263,9 @@ Resource * ResourcesLoader::LoadSolidComputeShader(const fs::path &Rpath)
     ifs.read(&buffer[0], pos);
 
     cs->FromDataBuffer(buffer.data(), buffer.size());
+	cs->path.clear();
+	cs->path.push_front(rootFolder);
+	SetPath(cs->path, Rpath);
     if(cs->name == "")
     {
         cs->name = "NoName" + std::to_string(Resource::NoNameNum);
@@ -1224,6 +1287,9 @@ Resource * ResourcesLoader::LoadSolidShader(const fs::path &Rpath)
     ifs.read(&buffer[0], pos);
 
     s->FromDataBuffer(buffer.data(), buffer.size());
+	s->path.clear();
+	s->path.push_front(rootFolder);
+	SetPath(s->path, Rpath);
     if(s->name == "")
     {
         s->name = "NoName" + std::to_string(Resource::NoNameNum);
@@ -1245,6 +1311,12 @@ void ResourcesLoader::SaveMaterialToFile(MaterialResource *_mat)
 	fs::path cachePath =SolidPath.parent_path() ;
 	for(std::string& elt : _mat->path)
 	{
+		if(elt == rootFolder)
+		{
+			cachePath.append("Assets");
+			continue;
+		}
+
 		cachePath.append(elt);
 	}
 	cachePath.append(_mat->name + ".SMaterial");
@@ -1270,6 +1342,10 @@ Resource *ResourcesLoader::LoadSolidMaterial(const fs::path &Rpath)
 	ifs.read(&buffer[0], pos);
 
 	mat->FromDataBuffer(buffer.data(), buffer.size());
+
+	mat->path.clear();
+	mat->path.push_front(rootFolder);
+	SetPath(mat->path, Rpath);
 	if(mat->name == "")
 	{
 		mat->name = "NoName" + std::to_string(Resource::NoNameNum);
@@ -1304,6 +1380,9 @@ Resource *ResourcesLoader::LoadSolidAudio(const fs::path &Rpath)
 		audio->name = "NoName" + std::to_string(Resource::NoNameNum);
 		Resource::NoNameNum++;
 	}
+	audio->path.clear();
+	audio->path.push_front(rootFolder);
+	SetPath(audio->path, Rpath);
 	audio->audioRawBinary.clear();
 	audio->audioRawBinary.reserve(0);
 	return audio;
@@ -1323,7 +1402,7 @@ void ResourcesLoader::SetPath(std::deque<std::string> &resPath, const fs::path& 
 			invPaths.push_front(p.filename().string());
 
 			p =p.parent_path();
-			if(fs::exists(p))
+			if(p.filename().empty())
 				return pathFind(p);
 			else
 			{
@@ -1333,7 +1412,8 @@ void ResourcesLoader::SetPath(std::deque<std::string> &resPath, const fs::path& 
 		else
 			return true;
 	};
-	pathFind(copy);
+	if(!pathFind(copy))
+		return;
 	resPath.insert(resPath.end(), invPaths.begin(),invPaths.end());
 
 }

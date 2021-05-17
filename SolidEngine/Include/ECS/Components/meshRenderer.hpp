@@ -43,6 +43,8 @@ namespace Solid SLDNamespace()
 
 	    void Init() override;
 
+	    void Release() override;
+
         MeshRenderer_GENERATED
     };
 

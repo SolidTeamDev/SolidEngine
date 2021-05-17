@@ -12,7 +12,8 @@ namespace Solid
 
     void CapsuleCollider::Release()
     {
-        Physics& physics = Engine::GetInstance()->physics;
+	    Components::Release();
+	    Physics& physics = Engine::GetInstance()->physics;
         physics.DeleteShape(gameObject->physicsActor,capsuleCollider);
         capsuleCollider = nullptr;
     }

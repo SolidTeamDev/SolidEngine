@@ -83,6 +83,19 @@ void Solid::HierarchyTreeInterface::DrawCreateObject()
             }
             UI::EndMenu();
         }
+	    if(UI::BeginMenu("Remove"))
+	    {
+		    if(UI::MenuItem("Remove Gameobject"))
+		    {
+			    if (EditorInterface::selectedGO != nullptr)
+			    {
+			    	engine->ecsManager.DestroyEntity(EditorInterface::selectedGO->GetEntity());
+				    EditorInterface::selectedGO = nullptr;
+			    }
+
+		    }
+			UI::EndMenu();
+	    }
 	    if(UI::BeginMenu("Prefab"))
 	    {
 		    if(UI::MenuItem("Create Prefab"))

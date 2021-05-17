@@ -296,6 +296,67 @@ namespace Solid
 	                          "\n"
 	                          "#endif //DLL_LOADER_GAMETEST_H";
 
+	    fs::path cpp = srcPath.string() + "/main" + ".cpp";
+	    std::ofstream file(cpp);
+
+	    std::string RawCpp = "#include \"Core/engine.hpp\"\n"
+	                         "#include \"Resources/ressources.hpp\"\n"
+	                         "#include <filesystem>\n"
+	                         "\n"
+	                         "namespace fs = std::filesystem;\n"
+	                         "using namespace Solid;\n"
+	                         "\n"
+	                         "int main()\n"
+	                         "{\n"
+	                         "\t""Engine* engine = Engine::GetInstance();\n"
+	                         "\t""WindowParams windowParams\n"
+	                         "\t""{\n"
+	                         "\t""    .title = \"Solid "+ProjectName+"\",\n"
+	                                                                 "\t""    .windowSize = {1280,720}\n"
+	                                                                 "\t""};\n"
+	                                                                 "\t""RendererParams rendererParams\n"
+	                                                                 "\t""{\n"
+	                                                                 "\t""    .rendererType = ERendererType::OpenGl45\n"
+	                                                                 "\t""};\n"
+	                                                                 "\t""engine->InitEngineContext(windowParams, rendererParams);\n"
+	                                                                 "\t""if(!engine->IsEngineContextInitialized())\n"
+	                                                                 "\t\t""throw ThrowError(\"Engine not correctly initialized !\",ESolidErrorCode::S_INIT_ERROR);\n"
+	                                                                 "\t""Window* window = engine->window;\n"
+	                                                                 "\t""Renderer* renderer = engine->renderer;\n"
+	                                                                 "\t""InputManager<int> * GameInputManager = new InputManager<int>(window->GetHandle());\n"
+	                                                                 "\t""glfwSwapInterval(0);\n"
+	                                                                 "\t""ResourcesLoader loader;\n"
+	                                                                 "\t""loader.SetManager(&(engine->resourceManager));\n"
+	                                                                 "\t""engine->EnableMultiThread(true);\n"
+	                                                                 "\t""fs::path p = fs::current_path();\n"
+	                                                                 "\t""p.append(\"Assets\");\n"
+	                                                                 "\t""loader.LoadResourcesFromFolder(p);\n"
+	                                                                 "\t""engine->LoadScene(fs::current_path());\n"
+	                                                                 "\t""engine->EnableMultiThread(false);\n"
+	                                                                 "\t""Camera sceneCam;\n"
+	                                                                 "\t""while (!glfwWindowShouldClose(window->GetHandle()))\n"
+	                                                                 "\t""{\n"
+	                                                                 "\t\t""glfwPollEvents();\n"
+	                                                                 "\t\t""GameInputManager->Update();\n"
+	                                                                 "\t\t""engine->Update();\n"
+	                                                                 "\t\t""engine->FixedUpdate();\n"
+	                                                                 "\t\t""engine->LateUpdate();\n"
+	                                                                 "\t\t""renderer->ClearColor({0,0,0,1});\n"
+	                                                                 "\t\t""renderer->Clear(window->GetWindowSize());\n"
+	                                                                 "\t\t""sceneCam.UpdateCamera(window->GetWindowSize());\n"
+	                                                                 "\t\t""engine->rendererSystem->Update(engine->renderer,sceneCam);\n"
+	                                                                 "\t\t""engine->audioSystem->Update(sceneCam);\n"
+	                                                                 "\t\t""Time::Update();\n"
+	                                                                 "\t\t""\n"
+	                                                                 "\t\t""window->SwapBuffers();\n"
+	                                                                 "\t""}\n"
+	                                                                 "\t""return 0;\n"
+	                                                                 "}\n";
+	    if(file.is_open())
+	    {
+		    file.write(RawCpp.c_str(), RawCpp.size());
+		    file.close();
+	    }
 
         if(CmakeFile.is_open())
         {
@@ -452,64 +513,7 @@ namespace Solid
 	{
     	ReloadCmake();
 		LaunchCompile();
-		fs::path cpp = srcPath.string() + "/main" + ".cpp";
-		std::ofstream file(cpp);
 
-		std::string RawCpp = "#include \"Core/engine.hpp\"\n"
-		                     "#include \"Resources/ressources.hpp\"\n"
-		                     "#include <filesystem>\n"
-		                     "\n"
-		                     "namespace fs = std::filesystem;\n"
-		                     "using namespace Solid;\n"
-		                     "\n"
-		                     "int main()\n"
-		                     "{\n"
-		                     "\t""Engine* engine = Engine::GetInstance();\n"
-		                     "\t""WindowParams windowParams\n"
-		                     "\t""{\n"
-		                     "\t""    .title = \"Solid "+ProjectName+"\",\n"
-		                     "\t""    .windowSize = {1280,720}\n"
-		                     "\t""};\n"
-		                     "\t""RendererParams rendererParams\n"
-		                     "\t""{\n"
-		                     "\t""    .rendererType = ERendererType::OpenGl45\n"
-		                     "\t""};\n"
-		                     "\t""engine->InitEngineContext(windowParams, rendererParams);\n"
-		                     "\t""if(!engine->IsEngineContextInitialized())\n"
-		                     "\t\t""throw ThrowError(\"Engine not correctly initialized !\",ESolidErrorCode::S_INIT_ERROR);\n"
-		                     "\t""Window* window = engine->window;\n"
-		                     "\t""Renderer* renderer = engine->renderer;\n"
-		                     "\t""InputManager<int> * GameInputManager = new InputManager<int>(window->GetHandle());\n"
-		                     "\t""glfwSwapInterval(0);\n"
-		                     "\t""ResourcesLoader loader;\n"
-		                     "\t""loader.SetManager(&(engine->resourceManager));\n"
-		                     "\t""engine->EnableMultiThread(true);\n"
-		                     "\t""fs::path p = fs::current_path();\n"
-		                     "\t""p.append(\"Assets\");\n"
-		                     "\t""loader.LoadResourcesFromFolder(p);\n"
-		                     "\t""engine->LoadScene(fs::current_path());\n"
-		                     "\t""engine->EnableMultiThread(false);\n"
-		                     "\t""Camera sceneCam;\n"
-		                     "\t""while (!glfwWindowShouldClose(window->GetHandle()))\n"
-		                     "\t""{\n"
-		                     "\t\t""glfwPollEvents();\n"
-		                     "\t\t""GameInputManager->Update();\n"
-		                     "\t\t""engine->Update();\n"
-		                     "\t\t""engine->FixedUpdate();\n"
-		                     "\t\t""engine->LateUpdate();\n"
-		                     "\t\t""renderer->ClearColor({0,0,0,1});\n"
-		                     "\t\t""renderer->Clear(window->GetWindowSize());\n"
-		                     "\t\t""sceneCam.UpdateCamera(window->GetWindowSize());\n"
-		                     "\t\t""engine->rendererSystem->Update(engine->renderer,sceneCam);\n"
-		                     "\t\t""engine->audioSystem->Update(sceneCam);\n"
-		                     "\t\t""Time::Update();\n"
-		                     "\t\t""\n"
-		                     "\t\t""window->SwapBuffers();\n"
-		                     "\t""}\n"
-		                     "\t""return 0;\n"
-		                     "}\n";
-		file.write(RawCpp.c_str(), RawCpp.size());
-		file.close();
 		fs::path build= srcPath;
 		build.append("Build");
 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -534,8 +538,22 @@ namespace Solid
 
 	void GameCompiler::updateVCPath()
 	{
-		fs::path vcvars = fs::current_path();
+
+		fs::path Dlls = fs::current_path();
+		Dlls.append("Dlls");
+		fs::path vcvars = Dlls;
+		std::string batFile = "@echo off\n"
+	                          "setlocal enabledelayedexpansion\n"
+	                          "\n"
+		"for /f \"usebackq tokens=*\" %%i in (`"+Dlls.string()+"\\vswhere.exe -latest -find VC\\Auxiliary\\Build\\vcvarsall.bat`) do (\n"
+	                          "  echo %%i\n"
+	                          "  exit /b !errorlevel!\n"
+	                          ")";
+
 		vcvars.append("vcvars.bat");
+		std::ofstream file (vcvars, std::fstream::trunc);
+		file.write(batFile.c_str(), batFile.size());
+		file.close();
 		fs::absolute(vcvars);
 
 		std::string Gen2 = vcvars.string();

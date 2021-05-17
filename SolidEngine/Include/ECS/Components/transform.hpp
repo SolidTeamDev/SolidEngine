@@ -52,6 +52,8 @@ namespace Solid SLDNamespace()
 	    void SetParentMatrix(const Mat4<float>& mat);
 	    Mat4<float> GetParentMatrix();
 
+	    void Release()override;
+
         Transform_GENERATED
     };
 } //!namespace

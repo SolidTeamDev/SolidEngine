@@ -43,8 +43,22 @@ namespace Solid SLDNamespace()
 
 		void CleanAllNullptr();
 		void RemoveScript(const char* _scriptName);
-
+		void RemoveScript(Script* _script);
 		void Update();
+
+		virtual void Init()override {} ;
+		virtual void Release()override
+		{
+			Components::Release();
+			for (int i = 0; i < Scripts.size(); ++i)
+			{
+				Script* elt = Scripts[i];
+				delete elt;
+				Scripts[i] = nullptr;
+
+			}
+			Scripts.clear();
+		};
 
 		ScriptList_GENERATED
 
@@ -53,5 +67,7 @@ namespace Solid SLDNamespace()
 }
 
 File_GENERATED
+
+
 
 #endif //SOLIDLAUNCHER_SCRIPTLIST_HPP

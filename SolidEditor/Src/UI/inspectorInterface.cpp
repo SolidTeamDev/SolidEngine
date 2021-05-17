@@ -80,6 +80,8 @@ namespace Solid
 
         if(UI::Button("Add Component",ImVec2(-1, 0)))
             UI::OpenPopup("AddComponent");
+	    if(UI::Button("Remove Component",ImVec2(-1, 0)))
+		    UI::OpenPopup("RemoveComponent");
         if(UI::BeginPopup("AddComponent"))
         {
             if (UI::Button("Create Custom Script"))
@@ -184,7 +186,81 @@ namespace Solid
 	        }
             UI::EndPopup();
         }
+	    if(UI::BeginPopup("RemoveComponent"))
+	    {
+		    if(engine->ecsManager.GotComponent<Transform>(gameObject->GetEntity()))
+		    {
+			    if(UI::Button("Transform"))
+			    {
+				    engine->ecsManager.RemoveComponent<Transform>(gameObject);
+				    UI::CloseCurrentPopup();
+			    }
+		    }
+		    if(engine->ecsManager.GotComponent<MeshRenderer>(gameObject->GetEntity()))
+		    {
+			    if(UI::Button("Mesh renderer"))
+			    {
+				    engine->ecsManager.RemoveComponent<MeshRenderer>(gameObject);
 
+				    UI::CloseCurrentPopup();
+			    }
+		    }
+		    if(engine->ecsManager.GotComponent<AudioSource>(gameObject->GetEntity()))
+		    {
+			    if(UI::Button("Audio source"))
+			    {
+				    engine->ecsManager.RemoveComponent<AudioSource>(gameObject);
+				    UI::CloseCurrentPopup();
+			    }
+		    }
+		    if(engine->ecsManager.GotComponent<RigidBody>(gameObject->GetEntity()))
+		    {
+			    if(UI::Button("RigidBody"))
+			    {
+				    engine->ecsManager.RemoveComponent<RigidBody>(gameObject);
+				    UI::CloseCurrentPopup();
+			    }
+		    }
+		    if(engine->ecsManager.GotComponent<BoxCollider>(gameObject->GetEntity()))
+		    {
+			    if(UI::Button("Box collider"))
+			    {
+				    engine->ecsManager.RemoveComponent<BoxCollider>(gameObject);
+				    UI::CloseCurrentPopup();
+			    }
+		    }
+		    if(engine->ecsManager.GotComponent<SphereCollider>(gameObject->GetEntity()))
+		    {
+			    if(UI::Button("Sphere collider"))
+			    {
+				    engine->ecsManager.RemoveComponent<SphereCollider>(gameObject);
+				    UI::CloseCurrentPopup();
+			    }
+		    }
+		    if(engine->ecsManager.GotComponent<CapsuleCollider>(gameObject->GetEntity()))
+		    {
+			    if(UI::Button("Capsule collider"))
+			    {
+				    engine->ecsManager.RemoveComponent<CapsuleCollider>(gameObject);
+				    UI::CloseCurrentPopup();
+			    }
+		    }
+		    if(engine->ecsManager.GotComponent<ScriptList>(gameObject->GetEntity()))
+		    {
+		    	ScriptList& sl = engine->ecsManager.GetComponent<ScriptList>(gameObject->GetEntity());
+		    	std::vector<Script*>& sv = sl.GetAllScripts();
+			    for(Script* elt : sv)
+			    {
+				    if(UI::Button(elt->getArchetype().name.c_str()))
+				    {
+					    sl.RemoveScript(elt);
+					    UI::CloseCurrentPopup();
+				    }
+			    }
+		    }
+
+		    UI::EndPopup();
+	    }
     }
 
     void InspectorInterface::EditComp(Components* _comp)

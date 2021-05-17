@@ -9,4 +9,8 @@ namespace Solid
         Physics& physics = Engine::GetInstance()->physics;
         physics.ConvertActor(gameObject->physicsActor,PhysicsActorType::DYNAMIC);
     }
+	void Solid::RigidBody::Release()
+	{
+		Components::Release();
+	}
 } //!namespace
