@@ -11,6 +11,7 @@ namespace Solid
 
     void Light::Release()
     {
-        //TODO: Remove light of the list
+	    Components::Release();
+	    //TODO: Remove light of the list
     }
 } //!namespace

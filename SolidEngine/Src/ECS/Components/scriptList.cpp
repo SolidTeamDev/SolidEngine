@@ -129,4 +129,17 @@ void ScriptList::CleanAllNullptr()
 }
 
 
-
+void Solid::ScriptList::RemoveScript(Solid::Script * _script)
+{
+	int i = 0;
+	for(Script* elt : Scripts)
+	{
+		if(elt == _script)
+		{
+			delete elt;
+			Scripts.erase(Scripts.begin()+i);
+			break;
+		}
+		++i;
+	}
+}

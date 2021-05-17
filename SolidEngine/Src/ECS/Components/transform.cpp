@@ -122,4 +122,9 @@ namespace Solid
 		return ParentTransMat;
 	}
 
+	void Transform::Release()
+	{
+		Components::Release();
+	}
+
 } //!namespace

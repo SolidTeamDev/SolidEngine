@@ -12,7 +12,9 @@ namespace Solid
 
     void SphereCollider::Release()
     {
-        Physics& physics = Engine::GetInstance()->physics;
+	    Components::Release();
+
+	    Physics& physics = Engine::GetInstance()->physics;
         physics.DeleteShape(gameObject->physicsActor,sphereCollider);
         sphereCollider = nullptr;
     }

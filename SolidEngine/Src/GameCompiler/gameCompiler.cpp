@@ -534,8 +534,22 @@ namespace Solid
 
 	void GameCompiler::updateVCPath()
 	{
-		fs::path vcvars = fs::current_path();
+
+		fs::path Dlls = fs::current_path();
+		Dlls.append("Dlls");
+		fs::path vcvars = Dlls;
+		std::string batFile = "@echo off\n"
+	                          "setlocal enabledelayedexpansion\n"
+	                          "\n"
+		"for /f \"usebackq tokens=*\" %%i in (`"+Dlls.string()+"\\vswhere.exe -latest -find VC\\Auxiliary\\Build\\vcvarsall.bat`) do (\n"
+	                          "  echo %%i\n"
+	                          "  exit /b !errorlevel!\n"
+	                          ")";
+
 		vcvars.append("vcvars.bat");
+		std::ofstream file (vcvars, std::fstream::trunc);
+		file.write(batFile.c_str(), batFile.size());
+		file.close();
 		fs::absolute(vcvars);
 
 		std::string Gen2 = vcvars.string();

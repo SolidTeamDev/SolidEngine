@@ -133,3 +133,13 @@ void MeshRenderer::Init()
 	}
 	materialSet.insert(materials.begin(), materials.end());
 }
+
+void MeshRenderer::Release()
+{
+	Components::Release();
+	mesh = nullptr;
+	materials.clear();
+	materialSet.clear();
+	MatNames.clear();
+	MeshName.clear();
+}

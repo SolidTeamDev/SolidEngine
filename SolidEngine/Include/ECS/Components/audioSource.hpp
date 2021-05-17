@@ -45,6 +45,8 @@ namespace Solid SLDNamespace()
         SLDMethod()
         void Init() override;
 	    SLDMethod()
+	    void Release() override;
+	    SLDMethod()
         void SetAudio(AudioResource* _audioResource);
 	    SLDMethod()
         void SetLoop(bool _loop);
