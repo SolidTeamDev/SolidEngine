@@ -4,7 +4,6 @@
 
 Solid::GameObject::GameObject(Solid::Entity _entity)
 {
-
 	entity = _entity;
 }
 

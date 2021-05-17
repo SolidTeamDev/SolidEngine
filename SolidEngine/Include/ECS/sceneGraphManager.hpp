@@ -5,8 +5,8 @@
 #include "Build/solidAPI.hpp"
 
 #include "ECS/types.hpp"
-
 #include <PxActor.h>
+#include "ECS/Components/transform.hpp"
 
 namespace Solid
 {
@@ -18,6 +18,7 @@ namespace Solid
         std::string name = "New GameObject";
         physx::PxActor* physicsActor = nullptr;
 
+        Transform* transform = nullptr;
         std::vector<Components*> compsList;
 
         GameObject* parent = nullptr;

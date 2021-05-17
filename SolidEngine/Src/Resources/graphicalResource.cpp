@@ -4,6 +4,7 @@
 #include <glad/glad.h>
 #include "Resources/resourceType.hpp"
 #include "Resources/graphicalResource.hpp"
+#include "ECS/Components/light.hpp"
 
 #include <editor.hpp>
 
@@ -102,6 +103,7 @@ void GL::Mesh::DrawMesh(const std::vector<MaterialResource *>& _list, Transform&
 
 	for (int i = 0; i < Meshes.size(); ++i)
 	{
+	    uint textID = 0;
 		SubMesh& subMesh = Meshes.at(i);
 		const MaterialResource* mat = _list.at(i);
         std::shared_ptr<IShader> shader = nullptr;
@@ -144,9 +146,9 @@ void GL::Mesh::DrawMesh(const std::vector<MaterialResource *>& _list, Transform&
                                 if(value.text == nullptr)
                                     continue;
 
-                                int TexUnit = 0;
-                                shader->GetInt(value.name.c_str(), &TexUnit);
-                                value.text->BindTexture(TexUnit);
+                                shader->SetInt(value.name.c_str(), textID);
+                                value.text->BindTexture(textID);
+                                ++textID;
                                 break;
                             }
 						default:
@@ -155,6 +157,7 @@ void GL::Mesh::DrawMesh(const std::vector<MaterialResource *>& _list, Transform&
 				}
 
 				shader->SetMVP(_tr, _cam);
+				shader->SetLights(_cam);
 			}
 		}
 
@@ -191,7 +194,7 @@ void GL::Mesh::DrawMesh(const std::vector<MaterialResource *>& _list, Transform&
 GL::Shader::Shader(ShaderResource *_s) :IShader(EResourceType::Shader)
 {
     name = _s->name;
-
+    source = _s;
     std::vector<char*> tab;
 	tab.push_back(_s->VertexSource.data());
 	ShaderWrapper vShader = CreateShader(GL_VERTEX_SHADER, 1, tab);
@@ -208,6 +211,8 @@ GL::Shader::Shader(ShaderResource *_s) :IShader(EResourceType::Shader)
 	glLinkProgram(ProgID);
 	GLint linkStatus;
 	glGetProgramiv(ProgID, GL_LINK_STATUS, &linkStatus);
+    vert = vShader.id;
+    frag = fShader.id;
 	if (linkStatus == GL_FALSE)
 	{
 		GLchar infoLog[1024];
@@ -270,6 +275,39 @@ GL::Shader::ShaderWrapper GL::Shader::CreateShader(GLenum _type, int _sourceCoun
 	return compute;
 }
 
+void GL::Shader::ReloadShader()
+{
+    std::vector<char*> fragS;
+    std::vector<char*> vertS;
+    fragS.push_back(source->FragSource.data());
+    vertS.push_back(source->VertexSource.data());
+    glShaderSource(frag,1,fragS.data(), nullptr);
+    glShaderSource(vert,1,vertS.data(), nullptr);
+    glCompileShader(frag);
+    glCompileShader(vert);
+    GLint success = 0;
+    glGetShaderiv(frag, GL_COMPILE_STATUS, &success);
+    if (success == GL_FALSE)
+    {
+        GLchar infoLog[1024];
+        glGetShaderInfoLog(frag, 1024, nullptr, infoLog);
+        printf("Shader compilation error: %s", infoLog);
+    }
+    success = 0;
+    glGetShaderiv(vert, GL_COMPILE_STATUS, &success);
+    if (success == GL_FALSE)
+    {
+        GLchar infoLog[1024];
+        glGetShaderInfoLog(vert, 1024, nullptr, infoLog);
+        printf("Shader compilation error: %s", infoLog);
+    }
+    if (success > 0)
+    {
+        glLinkProgram(ProgID);
+        LoadShaderFields();
+    }
+}
+
 void GL::Shader::SetFloat(const char *_name, float _value)
 {
 	glUseProgram(ProgID);
@@ -286,6 +324,26 @@ void GL::Shader::SetMVP(Transform& _model, Camera& _camera)const
 	Mat4<float> modelM =  (_model.GetMatrix()*_model.GetParentMatrix()) ;
 	glUniformMatrix4fv(glGetUniformLocation(ProgID,"model"),1,GL_FALSE,modelM.elements.data());
 
+}
+
+void GL::Shader::SetLights(Camera& _camera) const
+{
+    glUseProgram(ProgID);
+
+    std::vector<Light*> lights = Light::GetLightList();
+    int i = 0;
+    for(const auto& light : lights)
+    {
+        std::string id = std::to_string(i);
+        Vec3 pos = light->gameObject->transform->GetPosition();
+        glUniform3fv(glGetUniformLocation(ProgID,std::string("_lights[" + id + "].pos").c_str()),1,&pos.x);
+        glUniform3fv(glGetUniformLocation(ProgID,std::string("_lights[" + id + "].color").c_str()),1,&light->color.x);
+        glUniform1f(glGetUniformLocation(ProgID,std::string("_lights[" + id + "].intensity").c_str()),light->intensity);
+
+        ++i;
+    }
+    glUniform1i(glGetUniformLocation(ProgID,"_nbLights"),lights.size());
+    glUniform3fv(glGetUniformLocation(ProgID,"_camPos"),1,&_camera.position.x);
 }
 
 void GL::Shader::SetMaterial(const char *_name)
@@ -367,6 +425,12 @@ void GL::Shader::GetInt(const char *_name, int *_value)
 	if(loc == -1)
 		return;
 	glGetUniformiv(ProgID, loc, _value);
+	GLenum error = glGetError();
+    while (error != GL_NO_ERROR)
+    {
+        std::cout << glGetString(error) << "\n";
+        error = glGetError();
+    }
 }
 
 void GL::Shader::LoadShaderFields()
@@ -385,6 +449,8 @@ void GL::Shader::LoadShaderFields()
                             &name_len, &num, &type, name );
         name[name_len] = 0;
         //GLuint location = glGetUniformLocation(ProgID, name );
+        if(name[0] == '_')
+            continue;
 
         shaderUniform.name = name;
         switch (type)
@@ -441,6 +507,26 @@ GL::Texture::Texture(ImageResource *_image)
 	//	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, _image->x, _image->y, 0, GL_RGB, GL_UNSIGNED_BYTE, _image->image.data());
 	glGenerateMipmap(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+std::string& GL::Shader::GetFragSource()
+{
+    return source->FragSource;
+}
+
+std::string& GL::Shader::GetVertSource()
+{
+    return source->VertexSource;
+}
+
+void GL::Shader::SetFragSource(const std::string& _src)
+{
+    source->FragSource = _src;
+}
+
+void GL::Shader::SetVertSource(const std::string& _src)
+{
+    source->VertexSource = _src;
 }
 
 void GL::Texture::BindTexture(uint _texUnit)

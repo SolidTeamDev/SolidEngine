@@ -33,21 +33,25 @@ namespace Solid
         GameObject* CreateEntity()
         {
             Entity temp = entityManager->CreateEntity();
-
-            return sceneGraphManager->GetWorld()->AddToCurrent(temp);
+            GameObject* go = sceneGraphManager->GetWorld()->AddToCurrent(temp);
+            go->transform = AddComponent<Transform>(go,Transform());
+            return go;
         }
 
 	    GameObject* CreateEntity(Entity _parent)
         {
             Entity temp = entityManager->CreateEntity();
-            return sceneGraphManager->GetNodeFromEntity(_parent)->AddToCurrent(temp);
+            GameObject* go = sceneGraphManager->GetNodeFromEntity(_parent)->AddToCurrent(temp);
+            go->transform = AddComponent<Transform>(go,Transform());
+            return go;
         }
 	    GameObject* CreateEntity(std::string _name)
 	    {
 		    Entity temp = entityManager->CreateEntity();
-		    GameObject* obj =sceneGraphManager->GetWorld()->AddToCurrent(temp);
-		    obj->name = _name;
-		    return obj;
+		    GameObject* go =sceneGraphManager->GetWorld()->AddToCurrent(temp);
+		    go->name = _name;
+		    go->transform = AddComponent<Transform>(go,Transform());
+		    return go;
 	    }
 	    GameObject* CreateEntity(std::string _name,Entity _parent)
 	    {

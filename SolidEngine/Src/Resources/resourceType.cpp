@@ -578,9 +578,14 @@ void MaterialResource::SetShader(const std::shared_ptr<IShader> _shader)
 {
     shader = _shader;
 
+    LoadShaderFields();
+}
+
+void MaterialResource::LoadShaderFields()
+{
     fields.clear();
 
-    auto uniforms = _shader->GetUniformList();
+    auto uniforms = shader->GetUniformList();
 
     for(const auto& uniform: uniforms)
         fields.emplace_back(uniform);

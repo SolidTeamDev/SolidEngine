@@ -8,6 +8,9 @@
 #include "ECS/Components/boxCollider.hpp"
 #include "ECS/Components/sphereCollider.hpp"
 #include "ECS/Components/capsuleCollider.hpp"
+#include "ECS/Components/light.hpp"
+
+#include <TextEditor.h>
 
 #include <string>
 
@@ -16,18 +19,34 @@ namespace Solid
     class Engine;
     class InspectorInterface
     {
+        struct CodeEditor
+        {
+            enum class ECodeType
+            {
+                VERTEX,
+                FRAGMENT
+            };
+            TextEditor imCodeEditor;
+            ECodeType codeType;
+            bool isCodeEditorOpen = false;
+        };
+
+        CodeEditor codeEditor;
+
     public:
         InspectorInterface()  = default;
         ~InspectorInterface() = default;
 
         void Draw();
         void DrawComponents();
+
         void AddComponents();
         void CreateScriptWindow();
 
         void EditTransform(Transform& _trs);
         void EditMeshRenderer(MeshRenderer& _meshRenderer);
         void EditAudioSource(AudioSource& _audioSource);
+        void EditLight(Light& _light);
 
         void EditComp(Components* _comp);
 

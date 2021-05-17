@@ -323,6 +323,7 @@ namespace Solid {
         const std::shared_ptr<const IShader> GetDefaultshader() const;
 
         void SetShader(const std::shared_ptr<IShader> _shader);
+        void LoadShaderFields();
 
     };
 
