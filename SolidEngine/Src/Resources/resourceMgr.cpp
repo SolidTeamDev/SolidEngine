@@ -230,6 +230,8 @@ MaterialResource *ResourceManager::CreateMaterial(const char *name)
 	mat->path.emplace_back("\\Assets\\");
 
 	AddResource(mat);
+	ResourcesLoader loader;
+	loader.SaveMaterialToFile(mat);
 	Log::Send("Material {" + mat->name + "} Has been Created");
 	return mat;
 }

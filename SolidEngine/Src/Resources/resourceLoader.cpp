@@ -254,6 +254,8 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 		    for(auto it = normal.begin(); it!= normal.end() ; ++it)
 		    {
 			    fs::path& elt2 = *it;
+			    if(elt == elt2)
+				    continue;
 			    if(elt.filename() == elt2.filename())
 			    {
 				    int count = 0;
@@ -278,7 +280,26 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 
 	    }
 
+	    for(auto& elt : Solid)
+	    {
+		    int i = 0;
+		    for(auto it = Solid.begin(); it!= Solid.end() ; ++it)
+		    {
+			    fs::path& elt2 = *it;
+			    if(elt == elt2)
+				    continue;
+			    if(elt.filename() == elt2.filename())
+			    {
+				    fs::remove(elt2);
+				    Log::Send(elt2.filename().string() + " AT " + elt2.string() + " Was Removed Because a Duplicate File was Found ", Log::ELogSeverity::WARNING);
+				    normal.erase(it);
+				    it = normal.begin()+i;
+				    continue;
+			    }
+			    i++;
+		    }
 
+	    }
 		for(auto& elt : normal)
 		{
 			bool found = false;
@@ -1381,7 +1402,7 @@ void ResourcesLoader::SetPath(std::deque<std::string> &resPath, const fs::path& 
 			invPaths.push_front(p.filename().string());
 
 			p =p.parent_path();
-			if(fs::exists(p))
+			if(p.filename().empty())
 				return pathFind(p);
 			else
 			{
@@ -1391,7 +1412,8 @@ void ResourcesLoader::SetPath(std::deque<std::string> &resPath, const fs::path& 
 		else
 			return true;
 	};
-	pathFind(copy);
+	if(!pathFind(copy))
+		return;
 	resPath.insert(resPath.end(), invPaths.begin(),invPaths.end());
 
 }
