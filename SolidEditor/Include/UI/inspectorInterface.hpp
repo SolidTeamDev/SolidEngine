@@ -19,8 +19,20 @@ namespace Solid
     class Engine;
     class InspectorInterface
     {
-        TextEditor codeEditor;
-        bool isCodeEditorOpen = false;
+        struct CodeEditor
+        {
+            enum class ECodeType
+            {
+                VERTEX,
+                FRAGMENT
+            };
+            TextEditor imCodeEditor;
+            ECodeType codeType;
+            bool isCodeEditorOpen = false;
+        };
+
+        CodeEditor codeEditor;
+
     public:
         InspectorInterface()  = default;
         ~InspectorInterface() = default;

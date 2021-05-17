@@ -293,55 +293,62 @@ namespace Solid
                     {
                         if(UI::Button("Edit vertex shader"))
                         {
-                            isCodeEditorOpen = true;
-                            codeEditor.SetText(mat->GetShader()->GetVertSource());
+                            codeEditor.isCodeEditorOpen = true;
+                            codeEditor.imCodeEditor.SetText(mat->GetShader()->GetVertSource());
+                            codeEditor.codeType = CodeEditor::ECodeType::VERTEX;
                         }
                         if(UI::Button("Edit fragment shader"))
                         {
-                            isCodeEditorOpen = true;
-                            codeEditor.SetText(mat->GetShader()->GetFragSource());
+                            codeEditor.isCodeEditorOpen = true;
+                            codeEditor.imCodeEditor.SetText(mat->GetShader()->GetFragSource());
+                            codeEditor.codeType = CodeEditor::ECodeType::FRAGMENT;
                         }
 
                         //Open window to edit shader
-                        if(isCodeEditorOpen)
+                        if(codeEditor.isCodeEditorOpen)
                         {
-                            auto cpos = codeEditor.GetCursorPosition();
-                            UI::Begin("Edit shader##Window", &isCodeEditorOpen,ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking);
+                            auto cpos = codeEditor.imCodeEditor.GetCursorPosition();
+                            UI::Begin("Edit shader##Window", &codeEditor.isCodeEditorOpen,ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking);
                             if (ImGui::BeginMenuBar())
                             {
                                 if (ImGui::BeginMenu("File"))
                                 {
-                                    if (ImGui::MenuItem("Save"))
+                                    if (ImGui::MenuItem("Save","Ctrl-S"))
                                     {
-                                        mat->GetShader()->SetFragSource(codeEditor.GetText());
+                                        if(codeEditor.codeType == CodeEditor::ECodeType::FRAGMENT)
+                                            mat->GetShader()->SetFragSource(codeEditor.imCodeEditor.GetText());
+                                        else if(codeEditor.codeType == CodeEditor::ECodeType::VERTEX)
+                                            mat->GetShader()->SetVertSource(codeEditor.imCodeEditor.GetText());
+
                                         mat->GetShader()->ReloadShader();
+                                        mat->LoadShaderFields();
                                     }
                                     if (ImGui::MenuItem("Quit", "Alt-F4"))
-                                        isCodeEditorOpen = false;
+                                        codeEditor.isCodeEditorOpen = false;
                                     ImGui::EndMenu();
                                 }
                                 if (ImGui::BeginMenu("Edit"))
                                 {
-                                    if (ImGui::MenuItem("Undo", "ALT-Backspace", nullptr, codeEditor.CanUndo()))
-                                        codeEditor.Undo();
-                                    if (ImGui::MenuItem("Redo", "Ctrl-Y", nullptr, codeEditor.CanRedo()))
-                                        codeEditor.Redo();
+                                    if (ImGui::MenuItem("Undo", "ALT-Backspace", nullptr, codeEditor.imCodeEditor.CanUndo()))
+                                        codeEditor.imCodeEditor.Undo();
+                                    if (ImGui::MenuItem("Redo", "Ctrl-Y", nullptr, codeEditor.imCodeEditor.CanRedo()))
+                                        codeEditor.imCodeEditor.Redo();
 
                                     ImGui::Separator();
 
-                                    if (ImGui::MenuItem("Copy", "Ctrl-C", nullptr, codeEditor.HasSelection()))
-                                        codeEditor.Copy();
-                                    if (ImGui::MenuItem("Cut", "Ctrl-X", nullptr, codeEditor.HasSelection()))
-                                        codeEditor.Cut();
-                                    if (ImGui::MenuItem("Delete", "Del", nullptr, codeEditor.HasSelection()))
-                                        codeEditor.Delete();
+                                    if (ImGui::MenuItem("Copy", "Ctrl-C", nullptr, codeEditor.imCodeEditor.HasSelection()))
+                                        codeEditor.imCodeEditor.Copy();
+                                    if (ImGui::MenuItem("Cut", "Ctrl-X", nullptr, codeEditor.imCodeEditor.HasSelection()))
+                                        codeEditor.imCodeEditor.Cut();
+                                    if (ImGui::MenuItem("Delete", "Del", nullptr, codeEditor.imCodeEditor.HasSelection()))
+                                        codeEditor.imCodeEditor.Delete();
                                     if (ImGui::MenuItem("Paste", "Ctrl-V", nullptr, ImGui::GetClipboardText() != nullptr))
-                                        codeEditor.Paste();
+                                        codeEditor.imCodeEditor.Paste();
 
                                     ImGui::Separator();
 
                                     if (ImGui::MenuItem("Select all", nullptr, nullptr))
-                                        codeEditor.SelectAll();
+                                        codeEditor.imCodeEditor.SelectAll();
 
                                     ImGui::EndMenu();
                                 }
@@ -349,20 +356,20 @@ namespace Solid
                                 if (ImGui::BeginMenu("View"))
                                 {
                                     if (ImGui::MenuItem("Dark palette"))
-                                        codeEditor.SetPalette(TextEditor::GetDarkPalette());
+                                        codeEditor.imCodeEditor.SetPalette(TextEditor::GetDarkPalette());
                                     if (ImGui::MenuItem("Light palette"))
-                                        codeEditor.SetPalette(TextEditor::GetLightPalette());
+                                        codeEditor.imCodeEditor.SetPalette(TextEditor::GetLightPalette());
                                     ImGui::EndMenu();
                                 }
                                 ImGui::EndMenuBar();
                             }
 
-                            ImGui::Text("%6d/%-6d %6d lines  | %s | %s | %s | %s", cpos.mLine + 1, cpos.mColumn + 1, codeEditor.GetTotalLines(),
-                                        codeEditor.IsOverwrite() ? "Ovr" : "Ins",
-                                        codeEditor.CanUndo() ? "*" : " ",
-                                        codeEditor.GetLanguageDefinition().mName.c_str(), mat->GetShader()->name.c_str());
+                            ImGui::Text("%6d/%-6d %6d lines  | %s | %s | %s | %s", cpos.mLine + 1, cpos.mColumn + 1, codeEditor.imCodeEditor.GetTotalLines(),
+                                        codeEditor.imCodeEditor.IsOverwrite() ? "Ovr" : "Ins",
+                                        codeEditor.imCodeEditor.CanUndo() ? "*" : " ",
+                                        codeEditor.imCodeEditor.GetLanguageDefinition().mName.c_str(), mat->GetShader()->name.c_str());
 
-                            codeEditor.Render("Edit shader",UI::GetWindowSize(),true);
+                            codeEditor.imCodeEditor.Render("Edit shader",UI::GetContentRegionAvail(), false);
                             UI::End();
                         }
 

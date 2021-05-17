@@ -302,7 +302,10 @@ void GL::Shader::ReloadShader()
         printf("Shader compilation error: %s", infoLog);
     }
     if (success > 0)
+    {
         glLinkProgram(ProgID);
+        LoadShaderFields();
+    }
 }
 
 void GL::Shader::SetFloat(const char *_name, float _value)
