@@ -227,6 +227,7 @@ MaterialResource *ResourceManager::CreateMaterial(const char *name)
 {
 	MaterialResource* mat = new MaterialResource();
 	mat->name = name;
+	mat->path.emplace_back("\\Assets\\");
 
 	AddResource(mat);
 	Log::Send("Material {" + mat->name + "} Has been Created");

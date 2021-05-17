@@ -83,7 +83,7 @@ namespace Solid
 
         Editor();
         ~Editor();
-        void InitFromProject();
+        void InitFromProject(fs::path _projectPath);
 	    void LoadResources(fs::path& p);
         void Run();
         static void Play();
