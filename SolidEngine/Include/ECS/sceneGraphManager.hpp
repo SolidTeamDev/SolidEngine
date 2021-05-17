@@ -50,5 +50,7 @@ namespace Solid
         GameObject* GetWorld();
 
         GameObject* GetNodeFromEntity(Entity _entity);
+
+        GameObject* Instantiate(std::string _prefabName, GameObject* parent, std::string _name  );
     };
 } //!namespace

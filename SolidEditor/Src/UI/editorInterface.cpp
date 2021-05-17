@@ -121,7 +121,7 @@ namespace Solid {
 		            GameCompiler::GetInstance()->Build();
 		            Log::Send("Building for Windows", Log::ELogSeverity::ERROR);
 	            }
-	            if (UI::MenuItem("vcvars"))
+	            if (UI::MenuItem("Update VC compiler"))
 	            {
 		            GameCompiler::GetInstance()->updateVCPath();
 	            }
