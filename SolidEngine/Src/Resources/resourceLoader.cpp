@@ -85,6 +85,8 @@ void  ResourcesLoader::LoadRessourceNoAdd(const fs::path &Rpath, ResourcePtrWrap
         r=LoadSolidComputeShader(Rpath);
     else if(extension == ".svertfrag")
         r=LoadSolidShader(Rpath);
+    else if(extension == ".solidprefab")
+	    r=LoadSolidPrefab(Rpath);
     else if(extension == ".sanim")
         ;
     else if(extension == ".sskel")
@@ -156,6 +158,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 			        || name.find(".sanim") != std::string::npos
 			        || name.find(".sskel") != std::string::npos
 			        || name.find(".smaterial") != std::string::npos
+			        || name.find(".solidprefab") != std::string::npos
 			        || name.find(".saudio") != std::string::npos);
 
 		    }
@@ -1416,6 +1419,23 @@ void ResourcesLoader::SetPath(std::deque<std::string> &resPath, const fs::path& 
 		return;
 	resPath.insert(resPath.end(), invPaths.begin(),invPaths.end());
 
+}
+
+Resource *ResourcesLoader::LoadSolidPrefab(const fs::path &Rpath)
+{
+	PrefabResource* prefab = new PrefabResource();
+
+	std::ifstream ifs(Rpath, std::ios::binary|std::ios::ate);
+	std::ifstream::pos_type pos = ifs.tellg();
+
+	std::vector<char>  buffer(pos);
+
+	ifs.seekg(0, std::ios::beg);
+	ifs.read(&buffer[0], pos);
+
+	prefab->FromDataBuffer(buffer.data(),buffer.size());
+
+	return prefab;
 }
 
 

@@ -119,6 +119,8 @@ Solid::GameObject *
 Solid::SceneGraphManager::Instantiate(std::string _prefabName, Solid::GameObject *parent, std::string _name)
 {
 	PrefabResource* prefab =Engine::GetInstance()->resourceManager.GetPrefabByName(_prefabName.c_str());
+	if(prefab == nullptr)
+		return nullptr;
 	rfk::Namespace const* n = rfk::Database::getNamespace("Solid");
 	std::uint64_t readPos = 0;
 	std::size_t cmpNameSize = 0;
@@ -136,14 +138,16 @@ Solid::SceneGraphManager::Instantiate(std::string _prefabName, Solid::GameObject
 
 	Engine* engine = Engine::GetInstance();
 	ECSManager& ecsManager = engine->ecsManager;
+
+
 	std::function<void(json&,Entity)> Lambda = [&, engine](json& j,Entity e){
 		for(auto it = j.begin(); it != j.end(); ++it)
 		{
 			std::string key = (it).key();
 			if(key.find("GameObject") != std::string::npos)
 			{
-				GameObject* ent = engine->ecsManager.CreateEntity( it.value()["Name"], e);
-				Lambda(std::ref(it.value()), ent->GetEntity());
+				GameObject* enti = engine->ecsManager.CreateEntity( it.value()["Name"], e);
+				Lambda(std::ref(it.value()), enti->GetEntity());
 			}
 		}
 	};
@@ -163,6 +167,7 @@ Solid::SceneGraphManager::Instantiate(std::string _prefabName, Solid::GameObject
 		}
 	}
 	GameCompiler* Compiler = Engine::GetInstance()->Compiler;
+
 	std::function<void(GameObject*)> AddAllComps = [&](GameObject* elt)
 	{
 		//add comps to elt
@@ -408,5 +413,5 @@ Solid::SceneGraphManager::Instantiate(std::string _prefabName, Solid::GameObject
 		}
 	};
 	AddAllComps(ent);
-	return nullptr;
+	return ent;
 }

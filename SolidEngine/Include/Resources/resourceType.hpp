@@ -360,7 +360,7 @@ namespace Solid {
 		virtual int FromDataBuffer(char *buffer, int bSize) override;
 
 	};
-	class PrefabResource : public Resource
+	class SOLID_API PrefabResource : public Resource
 	{
 	public:
 	//public members
