@@ -12,8 +12,7 @@ namespace Solid
 {
     AudioSource::~AudioSource()
     {
-        if(isInit)
-            alDeleteSources(1, &sourceID);
+
     }
 
     void AudioSource::Init()

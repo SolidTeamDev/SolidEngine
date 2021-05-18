@@ -85,6 +85,8 @@ void  ResourcesLoader::LoadRessourceNoAdd(const fs::path &Rpath, ResourcePtrWrap
         r=LoadSolidComputeShader(Rpath);
     else if(extension == ".svertfrag")
         r=LoadSolidShader(Rpath);
+    else if(extension == ".solidprefab")
+	    r=LoadSolidPrefab(Rpath);
     else if(extension == ".sanim")
         ;
     else if(extension == ".sskel")
@@ -156,6 +158,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 			        || name.find(".sanim") != std::string::npos
 			        || name.find(".sskel") != std::string::npos
 			        || name.find(".smaterial") != std::string::npos
+			        || name.find(".solidprefab") != std::string::npos
 			        || name.find(".saudio") != std::string::npos);
 
 		    }
@@ -282,7 +285,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 
 	    for(auto& elt : Solid)
 	    {
-		    int i = 0;
+		    int index = 0;
 		    for(auto it = Solid.begin(); it!= Solid.end() ; ++it)
 		    {
 			    fs::path& elt2 = *it;
@@ -292,14 +295,36 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 			    {
 				    fs::remove(elt2);
 				    Log::Send(elt2.filename().string() + " AT " + elt2.string() + " Was Removed Because a Duplicate File was Found ", Log::ELogSeverity::WARNING);
-				    normal.erase(it);
-				    it = normal.begin()+i;
+				    Solid.erase(it);
+				    it = Solid.begin()+index;
 				    continue;
 			    }
-			    i++;
+			    index++;
 		    }
 
 	    }
+	    for(auto& elt : normal)
+	    {
+		    int index = 0;
+		    for(auto it = Solid.begin(); it!= Solid.end() ; ++it)
+		    {
+			    fs::path& elt2 = *it;
+			    if(elt == elt2)
+				    continue;
+			    if(elt2.filename().string().find(elt.filename().string()) != std::string::npos)
+			    {
+			    	if(elt.parent_path() == elt2.parent_path())
+					    continue;
+				    fs::remove(elt2);
+				    Log::Send(elt2.filename().string() + " AT " + elt2.string() + " Was Removed Because a Duplicate File was Found ", Log::ELogSeverity::WARNING);
+				    Solid.erase(it);
+				    it = Solid.begin()+index;
+				    continue;
+			    }
+			    index++;
+		    }
+	    }
+
 		for(auto& elt : normal)
 		{
 			bool found = false;
@@ -1416,6 +1441,23 @@ void ResourcesLoader::SetPath(std::deque<std::string> &resPath, const fs::path& 
 		return;
 	resPath.insert(resPath.end(), invPaths.begin(),invPaths.end());
 
+}
+
+Resource *ResourcesLoader::LoadSolidPrefab(const fs::path &Rpath)
+{
+	PrefabResource* prefab = new PrefabResource();
+
+	std::ifstream ifs(Rpath, std::ios::binary|std::ios::ate);
+	std::ifstream::pos_type pos = ifs.tellg();
+
+	std::vector<char>  buffer(pos);
+
+	ifs.seekg(0, std::ios::beg);
+	ifs.read(&buffer[0], pos);
+
+	prefab->FromDataBuffer(buffer.data(),buffer.size());
+
+	return prefab;
 }
 
 

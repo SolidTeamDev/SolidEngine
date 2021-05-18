@@ -5,6 +5,7 @@
 #include <string>
 #include "Resources/resourceType.hpp"
 #include "Resources/graphicalResource.hpp"
+#include "ImGuiFileBrowser.h"
 
 namespace Solid
 {
@@ -24,6 +25,8 @@ namespace Solid
 
         std::unordered_map<std::string, ImageResource*> editorImage;
         std::unordered_map<std::string, std::shared_ptr<GL::Texture>> editorTex;
+        
+	    imgui_addons::ImGuiFileBrowser fileBrowser;
     public:
         FilesInterface();
         ~FilesInterface() = default;

@@ -37,13 +37,16 @@ namespace Solid
         std::string Compile = "@call vcvarsall.bat x64 >"+srcPath.string()+"\\vcvars.log && cmake --build "+build.string()+" --target "+ ProjectName+" >"+srcPath.string()+"\\SolidGameCompile.log";
 	    std::string Gen2 = "\""+vcVarsP.string()+" x64  && cmake.exe --build "+build.string()+" --target "+ ProjectName+"\"";
 
-	    std::string output;
+	    std::vector<std::string> output;
 #if SOLID_WIN
 
 
 	    if(wincmd(Gen2, output, 1024000) != 0)
 	    {
-		    Log::Send(output, Log::ELogSeverity::ERROR);
+		    for(std::string& elt : output)
+		    {
+			    Log::Send(elt, Log::ELogSeverity::INFO);
+		    }
 			return false;
 	    }
 
@@ -54,7 +57,10 @@ namespace Solid
         }
 
 #endif
-	    Log::Send(output, Log::ELogSeverity::INFO);
+	    for(std::string& elt : output)
+	    {
+		    Log::Send(elt, Log::ELogSeverity::INFO);
+	    }
 
 
         HotReload();
@@ -384,7 +390,7 @@ namespace Solid
         std::system(Gen.c_str());
 
 	    std::string Gen2 = "\""+vcVarsP.string()+" x64  && cmake.exe -DCMAKE_BUILD_TYPE=Debug -G \"CodeBlocks - NMake Makefiles\" -S "+ srcPath.string()+" -B "+buildP.string()+"\"";
-	    std::string output;
+	    std::vector<std::string> output;
 #if SOLID_WIN
 
 
@@ -395,7 +401,10 @@ namespace Solid
 	    std::system(Compile.c_str());
 
 #endif
-	    Log::Send(output, Log::ELogSeverity::INFO);
+	    for(std::string& elt : output)
+	    {
+		    Log::Send(elt, Log::ELogSeverity::INFO);
+	    }
 
 
     }
@@ -491,7 +500,7 @@ namespace Solid
 		std::string Gen = " @call vcvarsall.bat x64 >" + srcPath.string()+"\\vcvars.log && cmake.exe -DCMAKE_BUILD_TYPE=Debug -G \"CodeBlocks - NMake Makefiles\" -S "+ srcPath.string()+" -B "+buildP.string()+
 		                  " >" + srcPath.string()+"\\SolidCMakeProjectGen.log\n";
 		std::string Gen2 = "\""+vcVarsP.string()+" x64  && cmake.exe -DCMAKE_BUILD_TYPE=Debug -G \"CodeBlocks - NMake Makefiles\" -S "+ srcPath.string()+" -B "+buildP.string()+"\"";
-		std::string output;
+		std::vector<std::string> output;
 #if SOLID_WIN
 
 
@@ -501,7 +510,10 @@ namespace Solid
 		std::system(Gen.c_str());
 
 #endif
-		Log::Send(output, Log::ELogSeverity::INFO);
+		for(std::string& elt : output)
+		{
+			Log::Send(elt, Log::ELogSeverity::INFO);
+		}
 	}
 
 	void GameCompiler::HotReload()
@@ -521,7 +533,7 @@ namespace Solid
 		std::system(Compile.c_str());
 
 		std::string Gen2 = "\""+vcVarsP.string()+ " x64  && cmake.exe cmake --build "+build.string()+" --target Game \"";
-		std::string output;
+		std::vector<std::string> output;
 #if SOLID_WIN
 
 
@@ -531,7 +543,10 @@ namespace Solid
 		std::system(Gen.c_str());
 
 #endif
-		Log::Send(output, Log::ELogSeverity::INFO);
+		for(std::string& elt : output)
+		{
+			Log::Send(elt, Log::ELogSeverity::INFO);
+		}
 
 
 	}
@@ -557,7 +572,7 @@ namespace Solid
 		fs::absolute(vcvars);
 
 		std::string Gen2 = vcvars.string();
-		std::string output;
+		std::vector<std::string> output;
 #if SOLID_WIN
 
 
@@ -567,15 +582,24 @@ namespace Solid
 		std::system(Gen.c_str());
 
 #endif
-		output.erase(output.begin());
-		std::string o2 = output.substr(0, output.size()-2);
+		std::string out;
+		for(std::string& elt : output)
+		{
+		    if(elt.size() >= 3)
+		    {
+		    	out = elt;
+				break;
+		    }
+
+		}
+
+		std::string o2 = out.substr(0, out.size()-1);
 		//%ProgramFiles(x86)% C:\Program Files (x86)
 		o2 = "\"" + o2 +"\"";
 
 		vcVarsP = o2;
 
-		fs::path sym = fs::current_path();
-		sym.append("vcvarsall.bat");
+
 		fs::absolute(vcVarsP);
 		//fs::create_symlink(o2, sym);
 	}

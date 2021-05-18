@@ -70,6 +70,9 @@ void ResourceManager::AddResource(Resource *r)
 		case EResourceType::Scene:
 			SceneList.List.emplace(r->name, r);
 			break;
+		case EResourceType::Prefab:
+			PrefabList.List.emplace(r->name, r);
+			break;
 		default:
 			ThrowError("Type Not Stored", ESolidErrorCode::S_INIT_ERROR);
 			break;
@@ -253,7 +256,109 @@ std::vector<ResourcesPathData> ResourceManager::GetAllResourcesPath()
 	MaterialList.addPathToVec(vec);
 	AudioList.addPathToVec(vec);
 	SceneList.addPathToVec(vec);
+	PrefabList.addPathToVec(vec);
 	return vec;
+}
+
+void ResourceManager::CreatePrefab(GameObject* _gameObject)
+{
+	PrefabResource* prefab = new PrefabResource();
+	prefab->name = _gameObject->name;
+	prefab->path.emplace_back("\\Assets\\");
+	prefab->UpdatePrefab(_gameObject);
+	AddResource(prefab);
+}
+
+PrefabResource *ResourceManager::GetPrefabByName(const char *name)
+{
+	auto list = PrefabList.List;
+	auto it = list.find(name);
+	if(it == list.end())
+		return nullptr;
+	return (PrefabResource*)it->second;
+	return nullptr;
+}
+
+bool ResourceManager::IsResourceExist(Resource *r)
+{
+	if(r == nullptr)
+		return false;
+	switch (r->GetType())
+	{
+		case EResourceType::Mesh:
+		{
+			if (MeshList.Find(r->name.c_str()) != nullptr)
+				return true;
+			else
+				return false;
+		}
+		case EResourceType::Shader:
+		{
+			if (ShaderList.Find(r->name.c_str()) != nullptr)
+				return true;
+			else
+				return false;
+		}
+		case EResourceType::Material:
+		{
+			if (MaterialList.Find(r->name.c_str()) != nullptr)
+				return true;
+			else
+				return false;
+		}
+		case EResourceType::Compute:
+		{
+			if (ComputeList.Find(r->name.c_str()) != nullptr)
+				return true;
+			else
+				return false;
+		}
+		case EResourceType::Image:
+		{
+			if (ImageList.Find(r->name.c_str()) != nullptr)
+				return true;
+			else
+				return false;
+		}
+		case EResourceType::Anim:
+		{
+			if (AnimList.Find(r->name.c_str()) != nullptr)
+				return true;
+			else
+				return false;
+		}
+		case EResourceType::Audio:
+		{
+			if (AudioList.Find(r->name.c_str()) != nullptr)
+				return true;
+			else
+				return false;
+		}
+		case EResourceType::Skeleton:
+		{
+			if (SkeletonList.Find(r->name.c_str()) != nullptr)
+				return true;
+			else
+				return false;
+		}
+		case EResourceType::Scene:
+		{
+			if (SceneList.Find(r->name.c_str()) != nullptr)
+				return true;
+			else
+				return false;
+		}
+		case EResourceType::Prefab:
+		{
+			if (PrefabList.Find(r->name.c_str()) != nullptr)
+				return true;
+			else
+				return false;
+		}
+		default:
+			ThrowError("Type Not Stored", ESolidErrorCode::S_INIT_ERROR);
+			break;
+	}
 }
 
 

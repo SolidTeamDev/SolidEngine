@@ -53,6 +53,65 @@ namespace Solid
 	        }
         }
 	    {
+	    	if(UI::Button("Import Resource"))
+		    {
+	    		UI::OpenPopup("Importer");
+		    }
+	    	if(fileBrowser.showFileDialog("Importer", imgui_addons::ImGuiFileBrowser::DialogMode::OPEN,{0,0}, ".jpg,.png,.bmp,.obj,.fbx,.ogg,.wav,.jpeg,.simage,.smesh,.scompute,.svertfrag,.solidprefab,.saudio,.smaterial,.vert,.frag,.compute"))
+		    {
+	    		fs::path path = fileBrowser.selected_path;
+			    ResourcesLoader loader;
+			    loader.SetManager(&Engine::GetInstance()->resourceManager);
+			    std::string fn = fileBrowser.selected_fn;
+			    std::transform(fn.begin(), fn.end(), fn.begin(),
+			                   [](unsigned char c){ return std::tolower(c); });
+	    		if(fn.find("vert") != std::string::npos
+	    		||fn.find("frag") != std::string::npos
+	    		||fn.find("compute") != std::string::npos)
+			    {
+	    			path =path.parent_path();
+	    			fs::path copy = ResourcesLoader::SolidPath;
+	    			copy.append(path.filename().string());
+	    			if(!fs::exists(copy))
+	    				fs::create_directory(copy);
+				    const auto opt = fs::copy_options::recursive | fs::copy_options::update_existing;
+				    fs::copy(path, copy, opt);
+				    ResourcePtrWrapper wrap{.r=nullptr};
+				    loader.LoadRessourceNoAdd(copy, wrap);
+				    if(!Engine::GetInstance()->resourceManager.IsResourceExist(wrap.r))
+				    {
+					    Engine::GetInstance()->resourceManager.AddResource(wrap.r);
+				    }
+				    else
+				    {
+				    	fs::remove(copy);
+					    if(wrap.r != nullptr)
+						    delete wrap.r;
+				    }
+			    }
+	    		else
+			    {
+				    fs::copy(fileBrowser.selected_path, ResourcesLoader::SolidPath);
+				    fs::path p = ResourcesLoader::SolidPath;
+				    p.append(fileBrowser.selected_fn);
+				    ResourcePtrWrapper wrap{.r=nullptr};
+				    loader.LoadRessourceNoAdd(p, wrap);
+				    if(!Engine::GetInstance()->resourceManager.IsResourceExist(wrap.r))
+				    {
+					    Engine::GetInstance()->resourceManager.AddResource(wrap.r);
+				    }
+				    else
+				    {
+					    fs::remove(p);
+					    if(wrap.r != nullptr)
+						    delete wrap.r;
+				    }
+			    }
+
+
+		    }
+	    	UI::Separator();
+
 	        int imgSize = 32;
 	    	if(currentFolder->parent != nullptr && UI::Button("..##previous"))
 		    {

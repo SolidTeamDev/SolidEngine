@@ -59,6 +59,7 @@ namespace Solid
 	    ResourceList<MaterialResource>       MaterialList;
 	    ResourceList<AudioResource>          AudioList;
 	    ResourceList<SceneResource>          SceneList;
+	    ResourceList<PrefabResource>         PrefabList;
         const MaterialResource* defaultMat = nullptr;
         class Engine* EnginePtr = nullptr;
         bool defaultMatInit = false;
@@ -86,6 +87,7 @@ namespace Solid
 
 	    template<class T>
 	    T* GetResourceByName(const char* name);
+	    bool IsResourceExist(Resource *r);
 	    std::vector<ResourcesPathData> GetAllResourcesPath();
 	    MeshResource* GetRawMeshByName(const char* name);
 	    ShaderResource* GetRawShaderByName(const char* name);
@@ -94,6 +96,8 @@ namespace Solid
 	    ImageResource* GetRawImageByName(const char* name);
 	    AudioResource* GetRawAudioByName(const char* name);
 	    MaterialResource* CreateMaterial(const char* name);
+	    PrefabResource* GetPrefabByName(const char* name);
+	    void CreatePrefab(GameObject* _gameObject);
 
         template<typename T>
         std::unordered_map<std::string,Resource*> * GetResourcesVecByType()
@@ -121,6 +125,8 @@ namespace Solid
             if(type_value == AudioList.type_value)
                 return  &(AudioList.List);
 
+	        if(type_value == PrefabList.type_value)
+		        return  &(PrefabList.List);
 
             return nullptr;
         }
@@ -155,6 +161,9 @@ namespace Solid
 				    break;
 			    case EResourceType::Scene:
 				    return &SceneList.List;
+				    break;
+			    case EResourceType::Prefab:
+				    return &PrefabList.List;
 				    break;
 			    default:
 				    ThrowError("Type Not Stored", ESolidErrorCode::S_INIT_ERROR);
