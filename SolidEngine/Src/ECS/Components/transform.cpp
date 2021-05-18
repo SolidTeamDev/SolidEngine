@@ -5,11 +5,13 @@
 namespace Solid
 {
     Transform::Transform():
-    transMat(Mat4<>::Identity)
+    transMat(Mat4<>::Identity),
+    ParentTransMat(Mat4<>::Identity)
     {}
 
     Transform::Transform(const Vec3 &_position, const Quat &_rotation, const Vec3 &_scale):
     transMat(Mat4<>::Identity),
+    ParentTransMat(Mat4<>::Identity),
     position(_position),
     rotation(_rotation),
     euler(Maths::RadToDeg(rotation.ToEuler())),

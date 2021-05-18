@@ -69,10 +69,27 @@ void Solid::HierarchyTreeInterface::DrawCreateObject()
             }
             if(UI::MenuItem("Sphere"))
             {
+                GameObject* tmp = nullptr;
+
+                if (EditorInterface::selectedGO != nullptr)
+                    tmp = engine->ecsManager.CreateEntity(EditorInterface::selectedGO->GetEntity());
+                else
+                    tmp = engine->ecsManager.CreateEntity();
+
+                engine->ecsManager.AddComponent(tmp,MeshRenderer(
+                        engine->graphicsResourceMgr.GetMesh("sphere.obj"))
+                );
+                EditorInterface::selectedGO = tmp;
             }
             if(UI::MenuItem("Solid"))
             {
-                GameObject* tmp = engine->ecsManager.CreateEntity();
+                GameObject* tmp = nullptr;
+
+                if (EditorInterface::selectedGO != nullptr)
+                    tmp = engine->ecsManager.CreateEntity(EditorInterface::selectedGO->GetEntity());
+                else
+                    tmp = engine->ecsManager.CreateEntity();
+
                 engine->ecsManager.AddComponent(tmp,MeshRenderer(
 		                engine->graphicsResourceMgr.GetMesh("solid.obj"))
                 );
@@ -80,9 +97,10 @@ void Solid::HierarchyTreeInterface::DrawCreateObject()
             }
             UI::EndMenu();
         }
-	    if(UI::BeginMenu("Remove"))
+	    if(EditorInterface::selectedGO != nullptr)
 	    {
-		    if(UI::MenuItem("Remove Gameobject"))
+            UI::Separator();
+		    if(UI::MenuItem("Remove GameObject"))
 		    {
 			    if (EditorInterface::selectedGO != nullptr)
 			    {
@@ -91,8 +109,6 @@ void Solid::HierarchyTreeInterface::DrawCreateObject()
 			    }
 
 		    }
-
-		    UI::EndMenu();
 	    }
         UI::EndPopup();
     }

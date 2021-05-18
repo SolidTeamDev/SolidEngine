@@ -1,7 +1,3 @@
-//
-// Created by ryan1 on 17/05/2021.
-//
-
 #include "UI/buttonInterface.hpp"
 #include <string>
 #include <filesystem>
@@ -10,7 +6,6 @@
 #include <ECS/Components/scriptList.hpp>
 #include "Core/engine.hpp"
 #include "editor.hpp"
-#include "imgui_stdlib.h"
 
 using namespace Solid;
 namespace fs = std::filesystem;
@@ -82,9 +77,9 @@ ButtonInterface::ButtonInterface()
 void ButtonInterface::Draw()
 {
 	UI::Begin("Buttons", nullptr,
-	          ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize| ImGuiWindowFlags_NoTitleBar);
+	          ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize| ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove);
 
-	ImVec2 bS = ImVec2(40 ,40);
+	ImVec2 bS = ImVec2(32 ,32);
 	if(UI::ImageButton((ImTextureID)editorTex["Play"]->texId, bS))
 		Editor::Play();
 
@@ -276,21 +271,6 @@ void ButtonInterface::Draw()
 		UI::EndPopup();
 
 	}
-
-	UI::SetCursorPos(ImVec2(15,UI::GetCursorPosY()));
-	UI::Text("Play");
-	UI::SameLine();
-	UI::SetCursorPos(ImVec2(68,UI::GetCursorPosY()));
-
-	UI::Text("Pause");
-	UI::SameLine();
-	UI::SetCursorPos(ImVec2(127,UI::GetCursorPosY()));
-
-	UI::Text("Stop");
-	UI::SameLine();
-	UI::SetCursorPos(ImVec2(174,UI::GetCursorPosY()));
-	UI::Text("Compile");
-	UI::SameLine();
 
 	UI::End();
 }

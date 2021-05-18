@@ -78,8 +78,6 @@ namespace Solid
                 engine->ecsManager.GetComponent<Transform>(go->GetEntity()).SetTransformMatrix(transMat);
             }
         }
-        //Show grid
-        //::DrawGrid(viewMat.elements.data(),projMat.elements.data(),Mat4<float>::Identity.elements.data(),10);
 
         UI::End();
     }
@@ -115,7 +113,7 @@ namespace Solid
         float speed = camSpeed/10;
         if (speed < 0.01f)
             speed = 0.01f;
-        UI::SliderFloat("Camera Speed", &camSpeed, 0.1f, 1000.f);
+        UI::DragFloat("Camera Speed", &camSpeed, 0.1f, 1000.f);
         camSpeed = std::clamp(camSpeed, 0.f, 50000.f);
 
         if(UI::Button("Local"))

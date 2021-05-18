@@ -2,6 +2,9 @@
 
 #include <vector>
 #include <unordered_map>
+#include <string>
+#include "Resources/resourceType.hpp"
+#include "Resources/graphicalResource.hpp"
 
 namespace Solid
 {
@@ -18,6 +21,9 @@ namespace Solid
 	    } root;
 	    double counter =0.0f;
 	    filePathData* currentFolder = &root;
+
+        std::unordered_map<std::string, ImageResource*> editorImage;
+        std::unordered_map<std::string, std::shared_ptr<GL::Texture>> editorTex;
     public:
         FilesInterface();
         ~FilesInterface() = default;

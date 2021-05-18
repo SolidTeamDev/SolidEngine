@@ -174,7 +174,7 @@ endif()
 
 ADD_CUSTOM_COMMAND (TARGET SolidEditor POST_BUILD
 
-COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/Resources ${CMAKE_BINARY_DIR}/Resources
+COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/EditorAssets ${CMAKE_BINARY_DIR}/EditorAssets
 # Output Message
 COMMENT "Copying Resources folder" VERBATIM)
 

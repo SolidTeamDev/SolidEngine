@@ -17,7 +17,7 @@ namespace Solid
 
         UI::Begin("Files", &p_open,
                   ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
-        UI::TextWrapped("Welcome on the Solid files explorer!");
+
         std::vector<ResourcesPathData> data = Engine::GetInstance()->resourceManager.GetAllResourcesPath();
         counter -= Time::DeltaTime();
         if(counter <= 0.0)
@@ -53,21 +53,40 @@ namespace Solid
 	        }
         }
 	    {
+	        int imgSize = 32;
 	    	if(currentFolder->parent != nullptr && UI::Button("..##previous"))
 		    {
 	    		currentFolder = currentFolder->parent;
 		    }
 		    for(auto& elt : currentFolder->childPaths)
 		    {
-		        if(UI::Button(elt.first.c_str()))
+		        if(UI::ImageButton((ImTextureID)editorTex["Folder"]->texId,ImVec2(imgSize,imgSize),ImVec2(0,1),ImVec2(1,0)))
 		        {
 		        	currentFolder = &elt.second;
 		        }
-		    }
+                UI::SameLine();
+                UI::SetCursorPosY(UI::GetCursorPosY()+imgSize/2);
+                UI::Text(elt.first.c_str());
+                UI::SetCursorPosY(UI::GetCursorPosY()-imgSize/2);
+
+            }
 		    for(auto& elt : currentFolder->fileNames)
 		    {
-			    UI::Button(elt.c_str());
-		    }
+		        std::string fileExt = elt.substr(elt.find('.') + 1);
+                std::string img = "File";
+		        if(fileExt == "png" || fileExt == "bmp" || fileExt == "jpg")
+		            img = "ImgFile";
+		        else if(fileExt == "wav")
+		            img = "SoundFile";
+                else if(fileExt == "SVertFrag")
+                    img = "ShaderFile";
+
+                UI::ImageButton((ImTextureID)editorTex[img]->texId,ImVec2(imgSize,imgSize),ImVec2(0,1),ImVec2(1,0));
+		        UI::SameLine();
+		        UI::SetCursorPosY(UI::GetCursorPosY()+imgSize/2);
+		        UI::Text(elt.c_str());
+                UI::SetCursorPosY(UI::GetCursorPosY()-imgSize/2);
+            }
 	    }
 
         DrawCreateFile();
@@ -158,5 +177,74 @@ namespace Solid
 	FilesInterface::FilesInterface()
 	{
 		root.folderName = "\\Assets\\";
+
+        fs::path EditorAssets = fs::current_path();
+        EditorAssets.append("EditorAssets");
+        ResourcesLoader loader;
+        {
+            ResourcePtrWrapper wrap{.r=nullptr};
+            loader.LoadRessourceNoAdd( EditorAssets.string() + "/Folder.png", wrap);
+            if(wrap.r != nullptr && wrap.r->GetType() == EResourceType::Image)
+            {
+                editorImage.emplace("Folder", (ImageResource*)wrap.r);
+                std::shared_ptr<GL::Texture> Tex = std::make_shared<GL::Texture>((ImageResource*)wrap.r);
+                if(Tex != nullptr)
+                {
+                    editorTex.emplace("Folder", Tex);
+                }
+            }
+        }
+        {
+            ResourcePtrWrapper wrap;
+            loader.LoadRessourceNoAdd( EditorAssets.string() + "/File.png", wrap);
+            if(wrap.r != nullptr && wrap.r->GetType() == EResourceType::Image)
+            {
+                editorImage.emplace("File", (ImageResource*)wrap.r);
+                std::shared_ptr<GL::Texture> Tex = std::make_shared<GL::Texture>((ImageResource*)wrap.r);
+                if(Tex != nullptr)
+                {
+                    editorTex.emplace("File", Tex);
+                }
+            }
+        }
+        {
+            ResourcePtrWrapper wrap;
+            loader.LoadRessourceNoAdd( EditorAssets.string() + "/ImgFile.png", wrap);
+            if(wrap.r != nullptr && wrap.r->GetType() == EResourceType::Image)
+            {
+                editorImage.emplace("ImgFile", (ImageResource*)wrap.r);
+                std::shared_ptr<GL::Texture> Tex = std::make_shared<GL::Texture>((ImageResource*)wrap.r);
+                if(Tex != nullptr)
+                {
+                    editorTex.emplace("ImgFile", Tex);
+                }
+            }
+        }
+        {
+            ResourcePtrWrapper wrap;
+            loader.LoadRessourceNoAdd( EditorAssets.string() + "/ShaderFile.png", wrap);
+            if(wrap.r != nullptr && wrap.r->GetType() == EResourceType::Image)
+            {
+                editorImage.emplace("ShaderFile", (ImageResource*)wrap.r);
+                std::shared_ptr<GL::Texture> Tex = std::make_shared<GL::Texture>((ImageResource*)wrap.r);
+                if(Tex != nullptr)
+                {
+                    editorTex.emplace("ShaderFile", Tex);
+                }
+            }
+        }
+        {
+            ResourcePtrWrapper wrap;
+            loader.LoadRessourceNoAdd( EditorAssets.string() + "/SoundFile.png", wrap);
+            if(wrap.r != nullptr && wrap.r->GetType() == EResourceType::Image)
+            {
+                editorImage.emplace("SoundFile", (ImageResource*)wrap.r);
+                std::shared_ptr<GL::Texture> Tex = std::make_shared<GL::Texture>((ImageResource*)wrap.r);
+                if(Tex != nullptr)
+                {
+                    editorTex.emplace("SoundFile", Tex);
+                }
+            }
+        }
 	}
 }
