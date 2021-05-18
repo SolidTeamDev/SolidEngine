@@ -285,7 +285,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 
 	    for(auto& elt : Solid)
 	    {
-		    int i = 0;
+		    int index = 0;
 		    for(auto it = Solid.begin(); it!= Solid.end() ; ++it)
 		    {
 			    fs::path& elt2 = *it;
@@ -295,14 +295,36 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 			    {
 				    fs::remove(elt2);
 				    Log::Send(elt2.filename().string() + " AT " + elt2.string() + " Was Removed Because a Duplicate File was Found ", Log::ELogSeverity::WARNING);
-				    normal.erase(it);
-				    it = normal.begin()+i;
+				    Solid.erase(it);
+				    it = Solid.begin()+index;
 				    continue;
 			    }
-			    i++;
+			    index++;
 		    }
 
 	    }
+	    for(auto& elt : normal)
+	    {
+		    int index = 0;
+		    for(auto it = Solid.begin(); it!= Solid.end() ; ++it)
+		    {
+			    fs::path& elt2 = *it;
+			    if(elt == elt2)
+				    continue;
+			    if(elt2.filename().string().find(elt.filename().string()) != std::string::npos)
+			    {
+			    	if(elt.parent_path() == elt2.parent_path())
+					    continue;
+				    fs::remove(elt2);
+				    Log::Send(elt2.filename().string() + " AT " + elt2.string() + " Was Removed Because a Duplicate File was Found ", Log::ELogSeverity::WARNING);
+				    Solid.erase(it);
+				    it = Solid.begin()+index;
+				    continue;
+			    }
+			    index++;
+		    }
+	    }
+
 		for(auto& elt : normal)
 		{
 			bool found = false;

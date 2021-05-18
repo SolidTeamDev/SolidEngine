@@ -279,4 +279,86 @@ PrefabResource *ResourceManager::GetPrefabByName(const char *name)
 	return nullptr;
 }
 
+bool ResourceManager::IsResourceExist(Resource *r)
+{
+	if(r == nullptr)
+		return false;
+	switch (r->GetType())
+	{
+		case EResourceType::Mesh:
+		{
+			if (MeshList.Find(r->name.c_str()) != nullptr)
+				return true;
+			else
+				return false;
+		}
+		case EResourceType::Shader:
+		{
+			if (ShaderList.Find(r->name.c_str()) != nullptr)
+				return true;
+			else
+				return false;
+		}
+		case EResourceType::Material:
+		{
+			if (MaterialList.Find(r->name.c_str()) != nullptr)
+				return true;
+			else
+				return false;
+		}
+		case EResourceType::Compute:
+		{
+			if (ComputeList.Find(r->name.c_str()) != nullptr)
+				return true;
+			else
+				return false;
+		}
+		case EResourceType::Image:
+		{
+			if (ImageList.Find(r->name.c_str()) != nullptr)
+				return true;
+			else
+				return false;
+		}
+		case EResourceType::Anim:
+		{
+			if (AnimList.Find(r->name.c_str()) != nullptr)
+				return true;
+			else
+				return false;
+		}
+		case EResourceType::Audio:
+		{
+			if (AudioList.Find(r->name.c_str()) != nullptr)
+				return true;
+			else
+				return false;
+		}
+		case EResourceType::Skeleton:
+		{
+			if (SkeletonList.Find(r->name.c_str()) != nullptr)
+				return true;
+			else
+				return false;
+		}
+		case EResourceType::Scene:
+		{
+			if (SceneList.Find(r->name.c_str()) != nullptr)
+				return true;
+			else
+				return false;
+		}
+		case EResourceType::Prefab:
+		{
+			if (PrefabList.Find(r->name.c_str()) != nullptr)
+				return true;
+			else
+				return false;
+		}
+		default:
+			ThrowError("Type Not Stored", ESolidErrorCode::S_INIT_ERROR);
+			break;
+	}
+}
+
 

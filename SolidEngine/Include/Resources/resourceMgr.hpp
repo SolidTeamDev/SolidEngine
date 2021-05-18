@@ -87,6 +87,7 @@ namespace Solid
 
 	    template<class T>
 	    T* GetResourceByName(const char* name);
+	    bool IsResourceExist(Resource *r);
 	    std::vector<ResourcesPathData> GetAllResourcesPath();
 	    MeshResource* GetRawMeshByName(const char* name);
 	    ShaderResource* GetRawShaderByName(const char* name);

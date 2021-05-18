@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <unordered_map>
-
+#include "ImGuiFileBrowser.h"
 namespace Solid
 {
     class FilesInterface
@@ -18,6 +18,7 @@ namespace Solid
 	    } root;
 	    double counter =0.0f;
 	    filePathData* currentFolder = &root;
+	    imgui_addons::ImGuiFileBrowser fileBrowser;
     public:
         FilesInterface();
         ~FilesInterface() = default;
