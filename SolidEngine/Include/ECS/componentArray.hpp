@@ -59,8 +59,8 @@ namespace Solid
         {
             if(entityToIndexMap.find(_entity) != entityToIndexMap.end())
             {
-                Log::Send("Cannot add component (Component already exist)",Log::ELogSeverity::ERROR);
-                return nullptr;
+                //Log::Send("Cannot add component (Component already exist)",Log::ELogSeverity::WARNING);
+                return &GetData(_entity);
             }
 
             size_t newIndex             = size;

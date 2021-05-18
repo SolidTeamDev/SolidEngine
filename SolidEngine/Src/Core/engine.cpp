@@ -248,6 +248,7 @@ namespace Solid
 					if (className == "Transform")
 					{
 						Transform *t = Engine::GetInstance()->ecsManager.AddComponent(go, *(Transform *) cmp);
+
 						for (int i = 0; i < FieldNum; ++i)
 						{
 							short isNull = -1;
@@ -279,6 +280,8 @@ namespace Solid
 								t->SetRotation(t->GetRotation());
 							}
 						}
+
+						delete cmp;
 
 					}
 					else if (className == "AudioSource")
@@ -336,6 +339,7 @@ namespace Solid
 
 						}
 						t->Init();
+						delete cmp;
 					}
 					else if (className == "MeshRenderer")
 					{
@@ -410,6 +414,7 @@ namespace Solid
 
 						}
 						t->Init();
+						delete cmp;
 					}
 					else if (myClass->isSubclassOf(*Compiler->getNamespace("Solid")->getClass("Script")))
 					{
