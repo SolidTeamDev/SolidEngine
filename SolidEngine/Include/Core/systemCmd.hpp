@@ -9,7 +9,7 @@
 #define SOLID_WIN 1
 #include <windows.h>
 
-int SOLID_API wincmd(std::string cmd, std::string& output, unsigned int maxOutput);
+int SOLID_API wincmd(std::string cmd, std::vector<std::string>& output, unsigned int maxOutput);
 
 
 #endif
