@@ -70,6 +70,9 @@ void ResourceManager::AddResource(Resource *r)
 		case EResourceType::Scene:
 			SceneList.List.emplace(r->name, r);
 			break;
+		case EResourceType::Prefab:
+			PrefabList.List.emplace(r->name, r);
+			break;
 		default:
 			ThrowError("Type Not Stored", ESolidErrorCode::S_INIT_ERROR);
 			break;
@@ -253,7 +256,27 @@ std::vector<ResourcesPathData> ResourceManager::GetAllResourcesPath()
 	MaterialList.addPathToVec(vec);
 	AudioList.addPathToVec(vec);
 	SceneList.addPathToVec(vec);
+	PrefabList.addPathToVec(vec);
 	return vec;
+}
+
+void ResourceManager::CreatePrefab(GameObject* _gameObject)
+{
+	PrefabResource* prefab = new PrefabResource();
+	prefab->name = _gameObject->name;
+	prefab->path.emplace_back("\\Assets\\");
+	prefab->UpdatePrefab(_gameObject);
+	AddResource(prefab);
+}
+
+PrefabResource *ResourceManager::GetPrefabByName(const char *name)
+{
+	auto list = PrefabList.List;
+	auto it = list.find(name);
+	if(it == list.end())
+		return nullptr;
+	return (PrefabResource*)it->second;
+	return nullptr;
 }
 
 

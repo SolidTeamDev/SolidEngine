@@ -1,6 +1,7 @@
 #include "Resources/ressources.hpp"
 #include <sstream>
-#include <Resources/resourceType.hpp>
+#include "Resources/resourceType.hpp"
+#include "ECS/Components/scriptList.hpp"
 
 #include "glad/glad.h"
 #include "Core/engine.hpp"
@@ -921,4 +922,243 @@ SkeletonResource::Bone *SkeletonResource::Bone::FindBoneByName(const char *_name
 	}
 
 	return nullptr;
+}
+
+void PrefabResource::UpdatePrefab(GameObject *_gameObject)
+{
+	fs::path p = ResourcesLoader::SolidPath.parent_path();
+	for(std::string& elt : path)
+	{
+		if(elt == "\\Assets\\")
+		{
+			p.append("Assets");
+		}
+		else
+	        p.append(elt);
+	}
+	p.append(name +".SolidPrefab");
+	json j;
+	j["Scene"].array();
+	j = j.flatten();
+	std::string elt = "/Scene";
+	GameObject* world = _gameObject;
+	std::function<void(json&, GameObject*, std::string&)> Lambda = [&](json& j, GameObject* elt, std::string& path){
+
+		std::string subP = path + "/{GameObject_"+ std::to_string(elt->GetEntity()) + "}" ;
+		j[subP + "/Name"] = elt->name;
+		for(GameObject* sub : elt->childs)
+		{
+			Lambda(std::ref(j), sub, std::ref(subP));
+		}
+
+	};
+	Lambda(std::ref(j), world, std::ref(elt));
+	j = j.unflatten();
+
+	std::ofstream file(p, std::ifstream::binary | std::ofstream::trunc);
+	std::vector<char> buffer;
+	std::stringstream sstr;
+	sstr << std::setw(4) << j << std::endl;
+	std::size_t sstrSize = sstr.str().size() * sizeof(std::string::value_type);
+	ResourcesLoader::Append(buffer, &sstrSize , sizeof(std::size_t));
+
+	ResourcesLoader::Append(buffer, sstr.str().data(), sstrSize);
+
+
+	std::function<void(GameObject*)> LambdaCmp = [&](GameObject* elt){
+
+
+		//store num of comps
+		std::size_t cmpNum = elt->compsList.size();
+		ResourcesLoader::Append(buffer, &cmpNum, sizeof(std::size_t));
+
+		for(Components* cmp : elt->compsList)
+		{
+			if(cmp->getArchetype().name == "ScriptList")
+			{
+				for(Script* script : ((ScriptList*)cmp)->GetAllScripts())
+				{
+					Log::Send(script->getArchetype().name);
+					std::size_t offset =0;
+
+					std::size_t scriptNameSize = 0;
+
+					//store comp name / string
+					scriptNameSize = script->getArchetype().name.size()*sizeof(std::string::value_type);
+					ResourcesLoader::Append(buffer, &scriptNameSize, sizeof(std::size_t));
+					ResourcesLoader::Append(buffer, (void*)script->getArchetype().name.data(),  scriptNameSize);
+
+					//store num of fields
+					std::size_t numFields = script->getArchetype().fields.size();
+					ResourcesLoader::Append(buffer, &numFields, sizeof(std::size_t));
+					for(auto& cField : script->getArchetype().fields)//2 cField var WARN
+					{
+						std::size_t size = 0;
+						size = cField.name.size()*sizeof(std::string::value_type);
+						//store field name / string
+						ResourcesLoader::Append(buffer, &size, sizeof(std::size_t));
+						ResourcesLoader::Append(buffer, (void*)cField.name.data(),  size);
+						short isNull = 128;
+						if(cField.type.archetype == nullptr)
+						{
+							isNull = 256;
+							std::string str = cField.getData<std::string>(script);
+							std::size_t strS =  str.size()*sizeof(std::string::value_type);
+							//store isNull
+							ResourcesLoader::Append(buffer, &isNull, sizeof(short));
+							//store field data
+							ResourcesLoader::Append(buffer, &strS, sizeof(std::size_t));
+							ResourcesLoader::Append(buffer, str.data(), strS);
+						}
+						else
+						{
+							ResourcesLoader::Append(buffer, &isNull, sizeof(short));
+							if(cField.type.archetype->name == "String")
+							{
+								String* str = (String*)cField.getDataAddress(script);
+								size = str->size()*sizeof(std::string::value_type);
+								ResourcesLoader::Append(buffer, &size, sizeof(std::size_t));
+								ResourcesLoader::Append(buffer, str->data(), size);
+							}
+							else if(cField.type.archetype->name == "vectorStr")
+							{
+								vectorStr* vstr = (vectorStr*)cField.getDataAddress(script);
+								size = vstr->size();
+								ResourcesLoader::Append(buffer, &size, sizeof(std::size_t));
+								for(auto& str : *vstr)
+								{
+									std::size_t strSize = str.size()*sizeof(std::string::value_type);
+									ResourcesLoader::Append(buffer, &strSize, sizeof(std::size_t));
+									ResourcesLoader::Append(buffer, str.data(), strSize);
+								}
+							}
+							else
+							{
+								size = cField.type.archetype->memorySize;
+								//store isNull
+								//store field data
+								ResourcesLoader::Append(buffer, &size, sizeof(std::size_t));
+								ResourcesLoader::Append(buffer, cField.getDataAddress(script), size);
+
+							}
+						}
+
+					}
+
+				}
+			}
+			else
+			{
+				Log::Send(cmp->getArchetype().name);
+				std::size_t offset =0;
+
+				std::size_t cmpNameSize = 0;
+
+				//store comp name / string
+				cmpNameSize = cmp->getArchetype().name.size()*sizeof(std::string::value_type);
+				ResourcesLoader::Append(buffer, &cmpNameSize, sizeof(std::size_t));
+				ResourcesLoader::Append(buffer, (void*)cmp->getArchetype().name.data(),  cmpNameSize);
+
+				//store num of fields
+				std::size_t numFields = cmp->getArchetype().fields.size();
+				ResourcesLoader::Append(buffer, &numFields, sizeof(std::size_t));
+				for(auto& cField : cmp->getArchetype().fields)//2 cField var WARN
+				{
+					std::size_t size = 0;
+					size = cField.name.size()*sizeof(std::string::value_type);
+					//store field name / string
+					ResourcesLoader::Append(buffer, &size, sizeof(std::size_t));
+					ResourcesLoader::Append(buffer, (void*)cField.name.data(),  size);
+					short isNull = 128;
+					if(cField.type.archetype == nullptr)
+					{
+						isNull = 256;
+						std::string str = cField.getData<std::string>(cmp);
+						std::size_t strS =  str.size()*sizeof(std::string::value_type);
+						//store isNull
+						ResourcesLoader::Append(buffer, &isNull, sizeof(short));
+						//store field data
+						ResourcesLoader::Append(buffer, &strS, sizeof(std::size_t));
+						ResourcesLoader::Append(buffer, str.data(), strS);
+					}
+					else
+					{
+						ResourcesLoader::Append(buffer, &isNull, sizeof(short));
+						if(cField.type.archetype->name == "String")
+						{
+							String* str = (String*)cField.getDataAddress(cmp);
+							size = str->size()*sizeof(std::string::value_type);
+							ResourcesLoader::Append(buffer, &size, sizeof(std::size_t));
+							ResourcesLoader::Append(buffer, str->data(), size);
+						}
+						else if(cField.type.archetype->name == "vectorStr")
+						{
+							vectorStr* vstr = (vectorStr*)cField.getDataAddress(cmp);
+							size = vstr->size();
+							ResourcesLoader::Append(buffer, &size, sizeof(std::size_t));
+							for(auto& str : *vstr)
+							{
+								std::size_t strSize = str.size()*sizeof(std::string::value_type);
+								ResourcesLoader::Append(buffer, &strSize, sizeof(std::size_t));
+								ResourcesLoader::Append(buffer, str.data(), strSize);
+							}
+						}
+						else
+						{
+							size = cField.type.archetype->memorySize;
+							//store isNull
+							//store field data
+							ResourcesLoader::Append(buffer, &size, sizeof(std::size_t));
+							ResourcesLoader::Append(buffer, cField.getDataAddress(cmp), size);
+
+						}
+					}
+
+				}
+
+			}
+
+
+		}
+
+
+		//store Num of Childs
+		std::size_t ChildNum = elt->childs.size();
+		ResourcesLoader::Append(buffer, &ChildNum, sizeof(std::size_t));
+		for(GameObject* sub : elt->childs)
+		{
+			LambdaCmp(sub);
+		}
+
+	};
+	LambdaCmp(world);
+	PrefabBinary = buffer;
+
+	std::vector<char>buf;
+	ToDataBuffer(buf);
+
+	file.write(buf.data(), buf.size());
+
+
+}
+
+void PrefabResource::ToDataBuffer(std::vector<char> &buffer)
+{
+	Resource::ToDataBuffer(buffer);
+	std::uint32_t size = this->PrefabBinary.size();
+
+	ResourcesLoader::Append(buffer, &(size), sizeof(size));
+	ResourcesLoader::Append(buffer, this->PrefabBinary.data(), size *sizeof(char));
+
+}
+
+int PrefabResource::FromDataBuffer(char *buffer, int bSize)
+{
+	std::uint64_t ReadPos =  Resource::FromDataBuffer(buffer, bSize);
+	std::uint32_t size =0;
+	//asset type
+	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
+	PrefabBinary.resize(size);
+	ResourcesLoader::ReadFromBuffer(buffer, PrefabBinary.data(), size*sizeof(char), ReadPos);
+	return ReadPos;
 }

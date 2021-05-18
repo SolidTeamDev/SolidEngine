@@ -36,6 +36,7 @@ namespace Solid {
         Scene,
         Audio,
         Skeleton,
+        Prefab,
         NONE,
     };
 
@@ -355,6 +356,31 @@ namespace Solid {
 		}
 
 		~AudioResource();
+		virtual void ToDataBuffer(std::vector<char> &buffer) override;
+
+		virtual int FromDataBuffer(char *buffer, int bSize) override;
+
+	};
+	class SOLID_API PrefabResource : public Resource
+	{
+	public:
+	//public members
+	std::vector<char> PrefabBinary;
+
+	protected:
+		//protected members
+
+	public:
+	//public func
+	    PrefabResource()
+		{
+			type =EResourceType::Prefab;
+		}
+	    ~PrefabResource() = default;
+
+		void UpdatePrefab(GameObject* _gameObject);
+
+
 		virtual void ToDataBuffer(std::vector<char> &buffer) override;
 
 		virtual int FromDataBuffer(char *buffer, int bSize) override;
