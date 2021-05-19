@@ -30,15 +30,15 @@ namespace Solid
         static std::mutex mutex;
         static GameCompiler* instance;
     public:
-        std::string ProjectName;
+	    f_Entry entryPoint = nullptr;
+	    f_GetClass getClass = nullptr;
+	    f_GetNamespace getNamespace = nullptr;
+	    std::string ProjectName;
 	    fs::path srcPath = "";
 	    fs::path IncludePath = "";
 	    fs::path DllPath = "";
 	    fs::path vcVarsP = "";
 	    HMODULE hGetProcIDDLL = nullptr;
-	    f_Entry entryPoint = nullptr;
-	    f_GetClass getClass = nullptr;
-	    f_GetNamespace getNamespace = nullptr;
 
     private:
         GameCompiler()=default;
@@ -55,6 +55,9 @@ namespace Solid
 	    void Build();
 	    void CreateScript(const std::string& _name);
 	    void updateVCPath();
+	    const rfk::Namespace * GetNamespace(std::string _str);
+	    const rfk::Class * GetClass(std::string _str);
+	    int EntryPoint();
 
         void AddLib();
     };

@@ -243,217 +243,261 @@ namespace Solid
 
 
 					rfk::Class const *myClass = n->getClass(className);
-					if(myClass == nullptr)
-						myClass = Compiler->getNamespace("Solid")->getClass(className);
+					rfk::Namespace const* ns =Compiler->GetNamespace("Solid");
+					if(myClass == nullptr && ns != nullptr)
+						myClass = ns->getClass(className);
 					//COMPCUSTO
-					Components *cmp = myClass->makeInstance<Components>();
 
-					if (className == "Transform")
+					if(myClass != nullptr)
 					{
-						Transform *t = Engine::GetInstance()->ecsManager.AddComponent(go, *(Transform *) cmp);
+						Components *cmp = myClass->makeInstance<Components>();
 
-						for (int i = 0; i < FieldNum; ++i)
+						if (className == "Transform")
 						{
-							short isNull = -1;
+							Transform *t = Engine::GetInstance()->ecsManager.AddComponent(go, *(Transform *) cmp);
 
-							//Get Comp FieldName
-							ResourcesLoader::ReadFromBuffer(buffer.data(), &cmpNameSize, sizeof(std::size_t),
-							                                readPos);
-							std::string Name;
-							Name.resize(cmpNameSize / sizeof(std::string::value_type));
-							ResourcesLoader::ReadFromBuffer(buffer.data(), Name.data(), cmpNameSize, readPos);
-
-							//Get is Null
-							ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(short), readPos);
-							std::size_t memSize = 0;
-							//Get Field Data
-							ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t), readPos);
-							if (isNull == 256)
-							{}
-							else
-							{}
-							char *buf = new char[memSize]();
-							ResourcesLoader::ReadFromBuffer(buffer.data(), buf, memSize, readPos);
-							const rfk::Field *f = t->getArchetype().getField(Name);
-							f->setData(t, ((void *) buf), memSize);
-							delete[] buf;
-
-							if (Name == "rotation")
+							for (int i = 0; i < FieldNum; ++i)
 							{
-								t->SetRotation(t->GetRotation());
-							}
-						}
+								short isNull = -1;
 
-						delete cmp;
-
-					}
-					else if (className == "AudioSource")
-					{
-						AudioSource *t = Engine::GetInstance()->ecsManager.AddComponent(go, *(AudioSource *) cmp);
-
-						//Get Comp FieldName
-						for (int i = 0; i < FieldNum; ++i)
-						{
-							short isNull = -1;
-
-							//Get Comp FieldName
-							ResourcesLoader::ReadFromBuffer(buffer.data(), &cmpNameSize, sizeof(std::size_t),
-							                                readPos);
-							std::string Name;
-							Name.resize(cmpNameSize / sizeof(std::string::value_type));
-							ResourcesLoader::ReadFromBuffer(buffer.data(), Name.data(), cmpNameSize, readPos);
-
-							//Get IsNull
-							ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(short), readPos);
-							std::size_t memSize = 0;
-							//get Field Data
-							const rfk::Field *f = t->getArchetype().getField(Name);
-							if (f->type.archetype->name == "String")
-							{
-								ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t),
+								//Get Comp FieldName
+								ResourcesLoader::ReadFromBuffer(buffer.data(), &cmpNameSize, sizeof(std::size_t),
 								                                readPos);
-								String *str = (String *) f->getDataAddress(t);
-								str->resize(memSize / sizeof(std::string::value_type));
+								std::string Name;
+								Name.resize(cmpNameSize / sizeof(std::string::value_type));
+								ResourcesLoader::ReadFromBuffer(buffer.data(), Name.data(), cmpNameSize, readPos);
 
-								ResourcesLoader::ReadFromBuffer(buffer.data(), str->data(), memSize, readPos);
-							}
-							else
-							{
-
-								ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t),
-								                                readPos);
+								//Get is Null
+								ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(short), readPos);
+								std::size_t memSize = 0;
+								//Get Field Data
+								ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t), readPos);
+								if (isNull == 256)
+								{}
+								else
+								{}
 								char *buf = new char[memSize]();
 								ResourcesLoader::ReadFromBuffer(buffer.data(), buf, memSize, readPos);
-
-								if (isNull == 256)
-								{
-									std::string s = std::string(buf, memSize);
-									f->setData(t, s);
-								}
-								else
-								{
-
-									f->setData(t, ((void *) buf), memSize);
-								}
-
-
+								const rfk::Field *f = t->getArchetype().getField(Name);
+								f->setData(t, ((void *) buf), memSize);
 								delete[] buf;
+
+								if (Name == "rotation")
+								{
+									t->SetRotation(t->GetRotation());
+								}
 							}
+
+							delete cmp;
 
 						}
-						t->Init();
-						delete cmp;
-					}
-					else if (className == "MeshRenderer")
-					{
-						MeshRenderer *t = Engine::GetInstance()->ecsManager.AddComponent(go, *(MeshRenderer *) cmp);
-
-						//Get Comp FieldName
-						for (int i = 0; i < FieldNum; ++i)
+						else if (className == "AudioSource")
 						{
-							short isNull = -1;
+							AudioSource *t = Engine::GetInstance()->ecsManager.AddComponent(go, *(AudioSource *) cmp);
 
 							//Get Comp FieldName
-							ResourcesLoader::ReadFromBuffer(buffer.data(), &cmpNameSize, sizeof(std::size_t),
-							                                readPos);
-							std::string Name;
-							Name.resize(cmpNameSize / sizeof(std::string::value_type));
-							ResourcesLoader::ReadFromBuffer(buffer.data(), Name.data(), cmpNameSize, readPos);
-
-							//Get IsNull
-							ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(short), readPos);
-							std::size_t memSize = 0;
-							//get Field Data
-							const rfk::Field *f = t->getArchetype().getField(Name);
-							if (f->type.archetype->name == "String")
+							for (int i = 0; i < FieldNum; ++i)
 							{
-								ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t),
-								                                readPos);
-								String *str = (String *) f->getDataAddress(t);
-								str->resize(memSize / sizeof(std::string::value_type));
+								short isNull = -1;
 
-								ResourcesLoader::ReadFromBuffer(buffer.data(), str->data(), memSize, readPos);
-							}
-							else if (f->type.archetype->name == "vectorStr")
-							{
-								std::size_t vecSize = 0;
-								ResourcesLoader::ReadFromBuffer(buffer.data(), &vecSize, sizeof(std::size_t),
+								//Get Comp FieldName
+								ResourcesLoader::ReadFromBuffer(buffer.data(), &cmpNameSize, sizeof(std::size_t),
 								                                readPos);
-								vectorStr *vstr = (vectorStr *) f->getDataAddress(t);
+								std::string Name;
+								Name.resize(cmpNameSize / sizeof(std::string::value_type));
+								ResourcesLoader::ReadFromBuffer(buffer.data(), Name.data(), cmpNameSize, readPos);
 
-								for (int k = 0; k < vecSize; ++k)
+								//Get IsNull
+								ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(short), readPos);
+								std::size_t memSize = 0;
+								//get Field Data
+								const rfk::Field *f = t->getArchetype().getField(Name);
+								if (f->type.archetype->name == "String")
 								{
-									String str;
 									ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t),
 									                                readPos);
-									str.resize(memSize);
-									ResourcesLoader::ReadFromBuffer(buffer.data(), str.data(), memSize, readPos);
+									String *str = (String *) f->getDataAddress(t);
+									str->resize(memSize / sizeof(std::string::value_type));
 
-									vstr->push_back(std::move(str));
-								}
-							}
-							else
-							{
-
-								ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t),
-								                                readPos);
-								char *buf = new char[memSize]();
-								ResourcesLoader::ReadFromBuffer(buffer.data(), buf, memSize, readPos);
-
-								if (isNull == 256)
-								{
-									std::string s = std::string(buf, memSize);
-									f->setData(t, s);
+									ResourcesLoader::ReadFromBuffer(buffer.data(), str->data(), memSize, readPos);
 								}
 								else
 								{
 
-									f->setData(t, ((void *) buf), memSize);
+									ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t),
+									                                readPos);
+									char *buf = new char[memSize]();
+									ResourcesLoader::ReadFromBuffer(buffer.data(), buf, memSize, readPos);
+
+									if (isNull == 256)
+									{
+										std::string s = std::string(buf, memSize);
+										f->setData(t, s);
+									}
+									else
+									{
+
+										f->setData(t, ((void *) buf), memSize);
+									}
+
+
+									delete[] buf;
+								}
+
+							}
+							t->Init();
+							delete cmp;
+						}
+						else if (className == "MeshRenderer")
+						{
+							MeshRenderer *t = Engine::GetInstance()->ecsManager.AddComponent(go, *(MeshRenderer *) cmp);
+
+							//Get Comp FieldName
+							for (int i = 0; i < FieldNum; ++i)
+							{
+								short isNull = -1;
+
+								//Get Comp FieldName
+								ResourcesLoader::ReadFromBuffer(buffer.data(), &cmpNameSize, sizeof(std::size_t),
+								                                readPos);
+								std::string Name;
+								Name.resize(cmpNameSize / sizeof(std::string::value_type));
+								ResourcesLoader::ReadFromBuffer(buffer.data(), Name.data(), cmpNameSize, readPos);
+
+								//Get IsNull
+								ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(short), readPos);
+								std::size_t memSize = 0;
+								//get Field Data
+								const rfk::Field *f = t->getArchetype().getField(Name);
+								if (f->type.archetype->name == "String")
+								{
+									ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t),
+									                                readPos);
+									String *str = (String *) f->getDataAddress(t);
+									str->resize(memSize / sizeof(std::string::value_type));
+
+									ResourcesLoader::ReadFromBuffer(buffer.data(), str->data(), memSize, readPos);
+								}
+								else if (f->type.archetype->name == "vectorStr")
+								{
+									std::size_t vecSize = 0;
+									ResourcesLoader::ReadFromBuffer(buffer.data(), &vecSize, sizeof(std::size_t),
+									                                readPos);
+									vectorStr *vstr = (vectorStr *) f->getDataAddress(t);
+
+									for (int k = 0; k < vecSize; ++k)
+									{
+										String str;
+										ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t),
+										                                readPos);
+										str.resize(memSize);
+										ResourcesLoader::ReadFromBuffer(buffer.data(), str.data(), memSize, readPos);
+
+										vstr->push_back(std::move(str));
+									}
+								}
+								else
+								{
+
+									ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t),
+									                                readPos);
+									char *buf = new char[memSize]();
+									ResourcesLoader::ReadFromBuffer(buffer.data(), buf, memSize, readPos);
+
+									if (isNull == 256)
+									{
+										std::string s = std::string(buf, memSize);
+										f->setData(t, s);
+									}
+									else
+									{
+
+										f->setData(t, ((void *) buf), memSize);
+									}
+
+
+									delete[] buf;
+								}
+
+							}
+							t->Init();
+							delete cmp;
+						}
+						else if (ns != nullptr && myClass->isSubclassOf(*ns->getClass("Script")))
+						{
+							if(!ecsManager.GotComponent<ScriptList>(go->GetEntity()))
+							{
+								ecsManager.AddComponent(go, ScriptList());
+							}
+							Script* s = ecsManager.GetComponent<ScriptList>(go->GetEntity()).AddScript((Script*)cmp);
+							for (int i = 0; i < FieldNum; ++i)
+							{
+								short isNull = -1;
+
+								//Get Comp FieldName
+								ResourcesLoader::ReadFromBuffer(buffer.data(), &cmpNameSize, sizeof(std::size_t),
+								                                readPos);
+								std::string Name;
+								Name.resize(cmpNameSize / sizeof(std::string::value_type));
+								ResourcesLoader::ReadFromBuffer(buffer.data(), Name.data(), cmpNameSize, readPos);
+
+								//Get is Null
+								ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(short), readPos);
+								std::size_t memSize = 0;
+								//Get Field Data
+
+								const rfk::Field *f = s->getArchetype().getField(Name);
+
+								if (f->type.archetype->name == "String")
+								{
+									ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t),
+									                                readPos);
+									String *str = (String *) f->getDataAddress(s);
+									str->resize(memSize / sizeof(std::string::value_type));
+
+									ResourcesLoader::ReadFromBuffer(buffer.data(), str->data(), memSize, readPos);
+								}
+								else if (f->type.archetype->name == "vectorStr")
+								{
+									std::size_t vecSize = 0;
+									ResourcesLoader::ReadFromBuffer(buffer.data(), &vecSize, sizeof(std::size_t),
+									                                readPos);
+									vectorStr *vstr = (vectorStr *) f->getDataAddress(s);
+
+									for (int k = 0; k < vecSize; ++k)
+									{
+										String str;
+										ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t),
+										                                readPos);
+										str.resize(memSize);
+										ResourcesLoader::ReadFromBuffer(buffer.data(), str.data(), memSize, readPos);
+
+										vstr->push_back(std::move(str));
+									}
+								}
+								else
+								{
+									ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t), readPos);
+									if (isNull == 256)
+									{}
+									else
+									{}
+									char *buf = new char[memSize]();
+									ResourcesLoader::ReadFromBuffer(buffer.data(), buf, memSize, readPos);
+
+									f->setData(s, ((void *) buf), memSize);
+									delete[] buf;
+
 								}
 
 
-								delete[] buf;
+
+
+
 							}
-
-						}
-						t->Init();
-						delete cmp;
-					}
-					else if (myClass->isSubclassOf(*Compiler->getNamespace("Solid")->getClass("Script")))
-					{
-						if(!ecsManager.GotComponent<ScriptList>(go->GetEntity()))
-						{
-							ecsManager.AddComponent(go, ScriptList());
-						}
-						Script* s = ecsManager.GetComponent<ScriptList>(go->GetEntity()).AddScript((Script*)cmp);
-						for (int i = 0; i < FieldNum; ++i)
-						{
-							short isNull = -1;
-
-							//Get Comp FieldName
-							ResourcesLoader::ReadFromBuffer(buffer.data(), &cmpNameSize, sizeof(std::size_t),
-							                                readPos);
-							std::string Name;
-							Name.resize(cmpNameSize / sizeof(std::string::value_type));
-							ResourcesLoader::ReadFromBuffer(buffer.data(), Name.data(), cmpNameSize, readPos);
-
-							//Get is Null
-							ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(short), readPos);
-							std::size_t memSize = 0;
-							//Get Field Data
-							ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t), readPos);
-							if (isNull == 256)
-							{}
-							else
-							{}
-							char *buf = new char[memSize]();
-							ResourcesLoader::ReadFromBuffer(buffer.data(), buf, memSize, readPos);
-							const rfk::Field *f = s->getArchetype().getField(Name);
-							f->setData(s, ((void *) buf), memSize);
-							delete[] buf;
-
 						}
 					}
+
 				}
 				AddAllComps(go);
 			}

@@ -157,45 +157,51 @@ namespace Solid
             }
 	        if(!engine->ecsManager.GotComponent<ScriptList>(gameObject->GetEntity()))
 	        {
-	        	const rfk::Namespace* n = GameCompiler::GetInstance()->getNamespace("Solid");
-
-		        for(auto& elt : n->archetypes)
+	        	const rfk::Namespace* n = GameCompiler::GetInstance()->GetNamespace("Solid");
+	        	if(n!= nullptr)
 		        {
-		        	const rfk::Class* c = n->getClass(elt->name);
-					if(c->isSubclassOf(*n->getClass("Script")))
-					{
-						if(UI::Button(elt->name.c_str()))
-						{
-							ScriptList* sl =engine->ecsManager.AddComponent<ScriptList>(gameObject, ScriptList());
-							sl->AddScript(c->makeInstance<Script>());
-							UI::CloseCurrentPopup();
-						}
-					}
-
-		        }
-	        }
-	        else
-	        {
-		        const rfk::Namespace* n = GameCompiler::GetInstance()->getNamespace("Solid");
-		        ScriptList& sl =engine->ecsManager.GetComponent<ScriptList>(gameObject->GetEntity());
-
-		        for(auto& elt : n->archetypes)
-		        {
-			        if(!sl.HasScript(elt->name.c_str()))
+			        for(auto& elt : n->archetypes)
 			        {
 				        const rfk::Class* c = n->getClass(elt->name);
 				        if(c->isSubclassOf(*n->getClass("Script")))
 				        {
 					        if(UI::Button(elt->name.c_str()))
 					        {
-						        sl.AddScript(c->makeInstance<Script>());
+						        ScriptList* sl =engine->ecsManager.AddComponent<ScriptList>(gameObject, ScriptList());
+						        sl->AddScript(c->makeInstance<Script>());
 						        UI::CloseCurrentPopup();
 					        }
 				        }
+
 			        }
-
-
 		        }
+	        }
+	        else
+	        {
+		        const rfk::Namespace* n = GameCompiler::GetInstance()->GetNamespace("Solid");
+		        if(n != nullptr)
+		        {
+			        ScriptList& sl =engine->ecsManager.GetComponent<ScriptList>(gameObject->GetEntity());
+
+			        for(auto& elt : n->archetypes)
+			        {
+				        if(!sl.HasScript(elt->name.c_str()))
+				        {
+					        const rfk::Class* c = n->getClass(elt->name);
+					        if(c->isSubclassOf(*n->getClass("Script")))
+					        {
+						        if(UI::Button(elt->name.c_str()))
+						        {
+							        sl.AddScript(c->makeInstance<Script>());
+							        UI::CloseCurrentPopup();
+						        }
+					        }
+				        }
+
+
+			        }
+		        }
+
 	        }
 
             if(!engine->ecsManager.GotComponent<Animation>(gameObject->GetEntity()))
@@ -306,8 +312,8 @@ namespace Solid
                     EditVec3(*((Vec3*)f.getDataAddress(_comp)),fieldName,0.01f);
                 else if(typeName == "Vec4")
                     EditVec4(*((Vec4*)f.getDataAddress(_comp)),fieldName,0.01f);
-                else if(typeName == "EditText")
-                    EditText(*((std::string*)f.getDataAddress(_comp)),fieldName);
+                else if(typeName == "String")
+                    EditText(*((String*)f.getDataAddress(_comp)),fieldName);
             }
         }
         UI::Separator();
@@ -350,7 +356,21 @@ namespace Solid
             const char* meshName = mesh == nullptr ? "" : mesh->name.c_str();
 
             UI::Text("Mesh  ");UI::SameLine();
-            if(UI::BeginCombo("##Mesh", meshName))
+
+			bool combo =UI::BeginCombo("##Mesh", meshName);
+	        if(UI::BeginDragDropTarget())
+	        {
+
+		        const ImGuiPayload* drop=UI::AcceptDragDropPayload("Mesh");
+		        if(drop != nullptr)
+		        {
+			        std::string s = std::string((char*)drop->Data, drop->DataSize);
+			        _meshRenderer.SetMesh(engine->graphicsResourceMgr.GetMesh(s.c_str()));
+
+		        }
+		        UI::EndDragDropTarget();
+	        }
+            if(combo)
             {
                 auto* meshList = engine->resourceManager.GetResourcesVecByType<MeshResource>();
 
@@ -381,7 +401,20 @@ namespace Solid
 
                     // Choose Material
                     UI::Text(("Mat "+matId).c_str());UI::SameLine();
-                    if(UI::BeginCombo(std::string("##Mat"+matId).c_str(),matName.c_str()))
+					bool combo =UI::BeginCombo(std::string("##Mat"+matId).c_str(),matName.c_str());
+	                if(UI::BeginDragDropTarget())
+	                {
+
+		                const ImGuiPayload* drop=UI::AcceptDragDropPayload("Material");
+		                if(drop != nullptr)
+		                {
+			                std::string s = std::string((char*)drop->Data, drop->DataSize);
+			                _meshRenderer.SetMaterialAt(id, engine->resourceManager.GetRawMaterialByName(s.c_str()));
+
+		                }
+		                UI::EndDragDropTarget();
+	                }
+                    if(combo)
                     {
                         auto* matList = engine->resourceManager.GetResourcesVecByType<MaterialResource>();
                         {
@@ -513,7 +546,20 @@ namespace Solid
 
                         // Choose Shader
                         const char* shaderName = mat->GetShader()->name.c_str();
-                        if(UI::BeginCombo(std::string("Shader##"+matId).c_str(),shaderName))
+                        bool combo =UI::BeginCombo(std::string("Shader##"+matId).c_str(),shaderName);
+	                    if(UI::BeginDragDropTarget())
+	                    {
+
+		                    const ImGuiPayload* drop=UI::AcceptDragDropPayload("Shader");
+		                    if(drop != nullptr)
+		                    {
+			                    std::string s = std::string((char*)drop->Data, drop->DataSize);
+			                    mat->SetShader(engine->graphicsResourceMgr.GetShader(s.c_str()));
+
+		                    }
+		                    UI::EndDragDropTarget();
+	                    }
+                        if(combo)
                         {
                             auto* shaderList = engine->resourceManager.GetResourcesVecByType<ShaderResource>();
                             for(auto shader : *shaderList)
@@ -582,7 +628,20 @@ namespace Solid
 
         if(UI::CollapsingHeader("Audio Source",ImGuiTreeNodeFlags_DefaultOpen))
         {
-            if(UI::BeginCombo("##Audio", audioName.c_str()))
+        	bool combo = UI::BeginCombo("##Audio", audioName.c_str());
+	        if(UI::BeginDragDropTarget())
+	        {
+
+		        const ImGuiPayload* drop=UI::AcceptDragDropPayload("Audio");
+		        if(drop != nullptr)
+		        {
+			        std::string s = std::string((char*)drop->Data, drop->DataSize);
+			        _audioSource.SetAudio(engine->resourceManager.GetRawAudioByName(s.c_str()));
+
+		        }
+		        UI::EndDragDropTarget();
+	        }
+            if(combo)
             {
                 auto* audioList = engine->resourceManager.GetResourcesVecByType<AudioResource>();
 
@@ -599,6 +658,8 @@ namespace Solid
 
                 UI::EndCombo();
             }
+
+
             
             {
                 float volume = _audioSource.GetVolume();
@@ -774,6 +835,18 @@ namespace Solid
     void InspectorInterface::EditText(std::string &_str, const std::string& _label)
     {
         UI::InputText(_label.c_str(), &_str);
+	    if(UI::BeginDragDropTarget())
+	    {
+
+		    const ImGuiPayload *drop = UI::GetDragDropPayload();
+		    if (drop != nullptr)
+		    {
+			    _str = std::string((char *) drop->Data, drop->DataSize);
+
+
+		    }
+		    UI::EndDragDropTarget();
+	    }
     }
 
     void InspectorInterface::EditTexture(std::shared_ptr<ITexture>& _texture, const std::string &_label)
@@ -782,7 +855,20 @@ namespace Solid
 
         std::string textName = _texture == nullptr ? "None" : _texture->name;
 
-        if (UI::BeginCombo(_label.c_str(),textName.c_str()))
+	    bool combo = UI::BeginCombo(_label.c_str(),textName.c_str());
+	    if(UI::BeginDragDropTarget())
+	    {
+
+		    const ImGuiPayload* drop=UI::AcceptDragDropPayload("Image");
+		    if(drop != nullptr)
+		    {
+			    std::string s = std::string((char*)drop->Data, drop->DataSize);
+			    _texture = engine->graphicsResourceMgr.GetTexture(s.c_str());
+
+		    }
+		    UI::EndDragDropTarget();
+	    }
+        if (combo)
         {
             auto *textures = engine->resourceManager.GetResourcesVecByType<ImageResource>();
             for (auto text : *textures)

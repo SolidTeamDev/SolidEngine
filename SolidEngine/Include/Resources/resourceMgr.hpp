@@ -12,6 +12,7 @@ namespace Solid
 	struct ResourcesPathData
 	{
 		std::string RName;
+		EResourceType RType;
 		std::deque<std::string> rPath;
 	};
 
@@ -41,7 +42,7 @@ namespace Solid
         {
         	for(auto& elt : List)
         	{
-        	    vec.push_back({.RName=elt.second->name, .rPath=elt.second->path});
+        	    vec.push_back({.RName=elt.second->name, .RType=elt.second->GetType(), .rPath=elt.second->path});
         	}
         }
     };

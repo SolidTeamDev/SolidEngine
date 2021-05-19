@@ -27,9 +27,66 @@ namespace Solid
         	root.fileNames.clear();
 	        for(auto& elt : data)
 	        {
-		        if(elt.rPath.size() == 1)
+		        std::string type = "NONE";
+		        switch (elt.RType)
 		        {
-			        root.fileNames.push_back(elt.RName);
+			        case EResourceType::Mesh:
+			        {
+				        type="Mesh";
+				        break;
+			        }
+			        case EResourceType::Shader:
+			        {
+				        type="Shader";
+				        break;
+			        }
+			        case EResourceType::Material:
+			        {
+				        type="Material";
+				        break;
+			        }
+			        case EResourceType::Compute:
+			        {
+				        type="Compute";
+				        break;
+			        }
+			        case EResourceType::Image:
+			        {
+				        type="Image";
+				        break;
+			        }
+			        case EResourceType::Anim:
+			        {
+				        type="Anim";
+				        break;
+			        }
+			        case EResourceType::Audio:
+			        {
+				        type="Audio";
+				        break;
+			        }
+			        case EResourceType::Skeleton:
+			        {
+				        type="Skeleton";
+				        break;
+			        }
+			        case EResourceType::Scene:
+			        {
+				        type="Scene";
+				        break;
+			        }
+			        case EResourceType::Prefab:
+			        {
+				        type="Prefab";
+				        break;
+			        }
+			        default:
+				        ThrowError("Type Not Stored", ESolidErrorCode::S_INIT_ERROR);
+				        break;
+		        }
+	        	if(elt.rPath.size() == 1)
+		        {
+			        root.fileNames.push_back(file{.fileNames=elt.RName, .ftype=type});
 			        continue;
 		        }
 		        if(elt.rPath.empty())
@@ -47,9 +104,10 @@ namespace Solid
 				        node->childPaths.emplace(elt.rPath[i], filePathData{.folderName=elt.rPath[i], .parent=node});
 				        node = &(node->childPaths[elt.rPath[i]]);
 				        continue;
+
 			        }
 		        }
-		        node->fileNames.push_back(elt.RName);
+		        node->fileNames.push_back(file{.fileNames=elt.RName, .ftype=type});
 	        }
         }
 	    {
@@ -57,6 +115,8 @@ namespace Solid
 		    {
 	    		UI::OpenPopup("Importer");
 		    }
+
+
 	    	if(fileBrowser.showFileDialog("Importer", imgui_addons::ImGuiFileBrowser::DialogMode::OPEN,{0,0}, ".jpg,.png,.bmp,.obj,.fbx,.ogg,.wav,.jpeg,.simage,.smesh,.scompute,.svertfrag,.solidprefab,.saudio,.smaterial,.vert,.frag,.compute"))
 		    {
 	    		fs::path path = fileBrowser.selected_path;
@@ -131,21 +191,32 @@ namespace Solid
             }
 		    for(auto& elt : currentFolder->fileNames)
 		    {
-		        std::string fileExt = elt.substr(elt.find('.') + 1);
+
                 std::string img = "File";
-		        if(fileExt == "png" || fileExt == "bmp" || fileExt == "jpg")
+		        if(elt.ftype == "Image" )
 		            img = "ImgFile";
-		        else if(fileExt == "wav")
+		        else if(elt.ftype == "Audio" )
 		            img = "SoundFile";
-                else if(fileExt == "SVertFrag")
+                else if(elt.ftype == "Shader" )
                     img = "ShaderFile";
 
                 UI::ImageButton((ImTextureID)editorTex[img]->texId,ImVec2(imgSize,imgSize),ImVec2(0,1),ImVec2(1,0));
+                if(UI::BeginDragDropSource())
+			    {
+			    	UI::Text(elt.fileNames.c_str());
+			    	UI::SetDragDropPayload(elt.ftype.c_str(), elt.fileNames.data(), elt.fileNames.size());
+
+
+				    UI::EndDragDropSource();
+			    }
 		        UI::SameLine();
 		        UI::SetCursorPosY(UI::GetCursorPosY()+imgSize/2);
-		        UI::Text(elt.c_str());
+		        UI::Text(elt.fileNames.c_str());
                 UI::SetCursorPosY(UI::GetCursorPosY()-imgSize/2);
             }
+			    
+
+		  
 	    }
 
         DrawCreateFile();
