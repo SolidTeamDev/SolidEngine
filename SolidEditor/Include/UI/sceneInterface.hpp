@@ -7,6 +7,8 @@ namespace Solid
 {
     class SceneInterface
     {
+        std::unordered_map<std::string, ImageResource*> editorImage;
+        std::unordered_map<std::string, std::shared_ptr<GL::Texture>> editorTex;
     public:
         SceneInterface();
         ~SceneInterface() = default;
@@ -18,7 +20,6 @@ namespace Solid
         inline const Framebuffer& getSceneFrameBuffer() {return sceneFramebuffer;};
 
     private:
-
 
         static float camSpeed;
         Camera sceneCam;
