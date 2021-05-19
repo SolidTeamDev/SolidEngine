@@ -13,6 +13,7 @@ namespace Solid
 	{
 		std::string RName;
 		EResourceType RType;
+		Resource* RPtr= nullptr;
 		std::deque<std::string> rPath;
 	};
 
@@ -42,7 +43,7 @@ namespace Solid
         {
         	for(auto& elt : List)
         	{
-        	    vec.push_back({.RName=elt.second->name, .RType=elt.second->GetType(), .rPath=elt.second->path});
+        	    vec.push_back({.RName=elt.second->name, .RType=elt.second->GetType(), .RPtr=elt.second, .rPath=elt.second->path});
         	}
         }
     };

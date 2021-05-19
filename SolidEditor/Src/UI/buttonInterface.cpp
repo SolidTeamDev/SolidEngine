@@ -1,15 +1,19 @@
-#include "UI/buttonInterface.hpp"
 #include <string>
 #include <filesystem>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <ECS/Components/scriptList.hpp>
 #include "Core/engine.hpp"
+
+#include "UI/buttonInterface.hpp"
 #include "editor.hpp"
+
+
 
 using namespace Solid;
 namespace fs = std::filesystem;
-
+ImGuizmo::OPERATION  ButtonInterface::gizmoMode = ImGuizmo::OPERATION::TRANSLATE;
+ImGuizmo::MODE      ButtonInterface::gizmoReferential = ImGuizmo::MODE::LOCAL;
 
 ButtonInterface::ButtonInterface()
 {
@@ -71,15 +75,89 @@ ButtonInterface::ButtonInterface()
 	}
 
 
+	{
+		ResourcePtrWrapper wrap{.r=nullptr};
+		loader.LoadRessourceNoAdd( EditorAssets.string() + "/Translate.png", wrap);
+		if(wrap.r != nullptr && wrap.r->GetType() == EResourceType::Image)
+		{
+			editorImage.emplace("Translate", (ImageResource*)wrap.r);
+			std::shared_ptr<GL::Texture> Tex = std::make_shared<GL::Texture>((ImageResource*)wrap.r);
+			if(Tex != nullptr)
+			{
+				editorTex.emplace("Translate", Tex);
+			}
+		}
+	}
+	{
+		ResourcePtrWrapper wrap;
+		loader.LoadRessourceNoAdd( EditorAssets.string() + "/Rotate.png", wrap);
+		if(wrap.r != nullptr && wrap.r->GetType() == EResourceType::Image)
+		{
+			editorImage.emplace("Rotate", (ImageResource*)wrap.r);
+			std::shared_ptr<GL::Texture> Tex = std::make_shared<GL::Texture>((ImageResource*)wrap.r);
+			if(Tex != nullptr)
+			{
+				editorTex.emplace("Rotate", Tex);
+			}
+		}
+	}
+	{
+		ResourcePtrWrapper wrap;
+		loader.LoadRessourceNoAdd( EditorAssets.string() + "/Scale.png", wrap);
+		if(wrap.r != nullptr && wrap.r->GetType() == EResourceType::Image)
+		{
+			editorImage.emplace("Scale", (ImageResource*)wrap.r);
+			std::shared_ptr<GL::Texture> Tex = std::make_shared<GL::Texture>((ImageResource*)wrap.r);
+			if(Tex != nullptr)
+			{
+				editorTex.emplace("Scale", Tex);
+			}
+		}
+	}
 
 }
 
 void ButtonInterface::Draw()
 {
-	UI::Begin("Buttons", nullptr,
-	          ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize| ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove);
+	ImGuiWindowClass window_class;
+	window_class.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoTabBar | ImGuiDockNodeFlags_NoResize | ImGuiDockNodeFlags_NoResizeY ;
+	ImGui::SetNextWindowClass(&window_class);
 
-	ImVec2 bS = ImVec2(32 ,32);
+	UI::Begin("Buttons", nullptr,
+	          ImGuiWindowFlags_NoCollapse |ImGuiWindowFlags_AlwaysAutoResize| ImGuiWindowFlags_NoResize| ImGuiWindowFlags_NoTitleBar );
+
+	ImVec2 bS = ImVec2(20 ,18);
+	UI::SetCursorPos(ImVec2{UI::GetCursorPosX(), UI::GetContentRegionAvail().y / 5.0f});
+
+	std::string modeName = ButtonInterface::gizmoReferential == ImGuizmo::MODE::LOCAL ? "Local" : "Global";
+	UI::SetNextItemWidth(75.f);
+	if(UI::BeginCombo("##TransformMode",modeName.c_str()))
+	{
+		bool selected = modeName == "Local";
+		if(UI::Selectable("Local", selected))
+			ButtonInterface::gizmoReferential = ImGuizmo::MODE::LOCAL;
+		if(selected)
+			UI::SetItemDefaultFocus();
+
+		if(UI::Selectable("Global", !selected))
+			ButtonInterface::gizmoReferential =  ImGuizmo::MODE::WORLD;
+		if(!selected)
+			UI::SetItemDefaultFocus();
+
+		UI::EndCombo();
+	}
+	UI::SameLine();
+	if(UI::ImageButton((ImTextureID)editorTex["Translate"]->texId, bS,ImVec2(0,1),ImVec2(1,0)))
+		gizmoMode = ImGuizmo::OPERATION::TRANSLATE;
+	UI::SameLine();
+	if(UI::ImageButton((ImTextureID)editorTex["Rotate"]->texId, bS,ImVec2(0,1),ImVec2(1,0)))
+		gizmoMode = ImGuizmo::OPERATION::ROTATE;
+	UI::SameLine();
+	if(UI::ImageButton((ImTextureID)editorTex["Scale"]->texId, bS,ImVec2(0,1),ImVec2(1,0)))
+		gizmoMode = ImGuizmo::OPERATION::SCALE;
+	UI::SameLine();
+	UI::SetCursorPos(ImVec2{UI::GetContentRegionAvail().x /2.0f - 44, UI::GetCursorPosY()});
+
 	if(UI::ImageButton((ImTextureID)editorTex["Play"]->texId, bS))
 		Editor::Play();
 
@@ -178,7 +256,12 @@ void ButtonInterface::Draw()
 			if(!fs::exists(TmpDir))
 				fs::create_directory(TmpDir);
 			std::ifstream in (DLLPath.string(), std::fstream::binary);
+			if(fs::exists(TempDLL.string()))
+				fs::remove(TempDLL.string());
+
 			std::ofstream out (TempDLL.string(), std::fstream::binary | std::fstream::trunc);
+			if(!out.is_open())
+				Log::Send("Temp DLL Not Openable", Log::ELogSeverity::ERROR);
 			out << in.rdbuf();
 			in.close();
 			out.close();
@@ -209,7 +292,7 @@ void ButtonInterface::Draw()
 					const rfk::Class* c= compiler->getNamespace("Solid")->getClass(elt.compName);
 					if(c == nullptr)
 					{
-
+						array[elt.entityCompIndex].GetAllScripts()[elt.CompListIndex] = nullptr;
 						///OUCH
 					}
 					else
@@ -228,7 +311,7 @@ void ButtonInterface::Draw()
 				}
 				for(auto& elt : idArray)
 				{
-					ScriptList scriptListToClean =array[elt.second];
+					ScriptList& scriptListToClean =array[elt.second];
 					scriptListToClean.CleanAllNullptr();
 				}
 

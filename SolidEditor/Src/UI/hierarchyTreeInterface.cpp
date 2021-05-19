@@ -32,8 +32,8 @@ namespace Solid
 		    const ImGuiPayload* drop=UI::AcceptDragDropPayload("Prefab");
 		    if(drop != nullptr)
 		    {
-			    std::string s = std::string((char*)drop->Data, drop->DataSize);
-			    Engine::GetInstance()->ecsManager.Instantiate(s, nullptr);
+			    Resource* r = *((Resource**)drop->Data);
+			    Engine::GetInstance()->ecsManager.Instantiate(r->name, nullptr);
 
 		    }
 		    UI::EndDragDropTarget();

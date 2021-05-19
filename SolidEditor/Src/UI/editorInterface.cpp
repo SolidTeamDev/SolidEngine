@@ -83,6 +83,7 @@ namespace Solid {
             DrawMenuFiles();
             DrawMenuWindows();
 
+
             UI::EndMainMenuBar();
         }
 

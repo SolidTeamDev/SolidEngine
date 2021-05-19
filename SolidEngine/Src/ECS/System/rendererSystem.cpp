@@ -13,9 +13,9 @@ namespace Solid
 	    	for(GameObject* child : object->childs)
 	    	{
 	    		if(!ecsManager.GotComponent<MeshRenderer>(child->GetEntity()))
-				    return ;
+				    continue ;
 			    if(!ecsManager.GotComponent<Transform>(child->GetEntity()))
-				    return ;
+				    continue ;
 			    auto& meshRenderer = ecsManager.GetComponent<MeshRenderer>(child->GetEntity());
 			    auto mesh = meshRenderer.GetMesh();
 			    if(mesh == nullptr)
