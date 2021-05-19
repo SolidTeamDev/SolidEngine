@@ -350,6 +350,8 @@ namespace Solid
 		            img = "SoundFile";
                 else if(elt.ftype == "Shader" )
                     img = "ShaderFile";
+                else if(elt.ftype == "Mesh")
+                    img = "ObjFile";
 			    UI::PushID(elt.fileNames.c_str());
                 UI::ImageButton((ImTextureID)editorTex[img]->texId,ImVec2(imgSize,imgSize),ImVec2(0,1),ImVec2(1,0));
                 UI::PopID();
@@ -525,6 +527,19 @@ namespace Solid
                 if(Tex != nullptr)
                 {
                     editorTex.emplace("SoundFile", Tex);
+                }
+            }
+        }
+        {
+            ResourcePtrWrapper wrap;
+            loader.LoadRessourceNoAdd( EditorAssets.string() + "/ObjFile.png", wrap);
+            if(wrap.r != nullptr && wrap.r->GetType() == EResourceType::Image)
+            {
+                editorImage.emplace("ObjFile", (ImageResource*)wrap.r);
+                std::shared_ptr<GL::Texture> Tex = std::make_shared<GL::Texture>((ImageResource*)wrap.r);
+                if(Tex != nullptr)
+                {
+                    editorTex.emplace("ObjFile", Tex);
                 }
             }
         }
