@@ -16,13 +16,28 @@ namespace Solid
         UI::Begin("Hierarchy", &p_open,
                   ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
 
+        UI::BeginChild("##HierarchyChild", UI::GetContentRegionAvail(), false, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar);
+
+
         if (UI::IsWindowHovered() && UI::IsAnyMouseDown())
             EditorInterface::selectedGO = nullptr;
 
         DrawEntities();
 
         DrawCreateObject();
+		UI::EndChild();
+	    if(UI::BeginDragDropTarget())
+	    {
 
+		    const ImGuiPayload* drop=UI::AcceptDragDropPayload("Prefab");
+		    if(drop != nullptr)
+		    {
+			    std::string s = std::string((char*)drop->Data, drop->DataSize);
+			    Engine::GetInstance()->ecsManager.Instantiate(s, nullptr);
+
+		    }
+		    UI::EndDragDropTarget();
+	    }
         UI::End();
     }
 }

@@ -604,5 +604,26 @@ namespace Solid
 		//fs::create_symlink(o2, sym);
 	}
 
+	const rfk::Namespace * GameCompiler::GetNamespace(std::string _str)
+	{
+    	if(getNamespace == nullptr)
+			return nullptr;
+    	return getNamespace(_str);
+	}
+
+	const rfk::Class * GameCompiler::GetClass(std::string _str)
+	{
+		if(getNamespace == nullptr)
+			return nullptr;
+		return getClass(_str);
+	}
+
+	int GameCompiler::EntryPoint()
+	{
+		if(getNamespace == nullptr)
+			return -1;
+		return entryPoint();
+	}
+
 
 }
