@@ -200,6 +200,7 @@ namespace Solid
                               "        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/Dlls/glfw3.dll ${CMAKE_BINARY_DIR}/\n"
                               "        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/Dlls/OpenAL32.dll ${CMAKE_BINARY_DIR}/\n"
                               "        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/Dlls/sndfile.dll ${CMAKE_BINARY_DIR}/\n"
+                              "        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/Dlls/SolidEngine.dll ${CMAKE_BINARY_DIR}/\n"
                               "\n"
                               "COMMENT \"Copying common binaries\" VERBATIM)\n"
                               "\n"
