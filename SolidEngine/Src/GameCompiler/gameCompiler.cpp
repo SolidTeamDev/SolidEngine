@@ -438,7 +438,7 @@ namespace Solid
 		                     "\t\n"
 		                     "}\n"
 		                     "\n"
-					         "~"+copyName+"::"+copyName+"()\n"
+					         +copyName+"::~"+copyName+"()\n"
 							 "{\n"
 		                     "\t\n"
 	                         "}\n"
@@ -448,8 +448,10 @@ namespace Solid
 		/////////////////////////////////////
 		std::string RawHpp = "#include \"ECS/types.hpp\"\n"
 		                     "#include \"Build/solidAPI.hpp\"\n"
+		                     "#include \"ECS/Components/script.hpp\"\n"
+		                     "#include \"EngineGenerated/EntityMacros.h\"\n"
 		                     "#include \"EngineGenerated/"+copyName+".sld.hpp\"\n"
-		                     "\n"
+
 		                     "namespace Solid SLDNamespace()\n"
 		                     "{\n"
 		                     "\tclass SOLID_API SLDClass() "+copyName+" : public Script\n"
