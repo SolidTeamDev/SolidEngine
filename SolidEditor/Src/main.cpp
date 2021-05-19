@@ -39,7 +39,7 @@ int main(int argc, char** argv)
 			    	editor.CurrentProjectJson.clear();
 				    file >> editor.CurrentProjectJson;
 				    file.close();
-			    	editor.InitFromProject();
+				    editor.InitFromProject(ProjectPath);
 			    }
 			    Solid::Log::Send(std::string("ARG :") +argv[i]);
 

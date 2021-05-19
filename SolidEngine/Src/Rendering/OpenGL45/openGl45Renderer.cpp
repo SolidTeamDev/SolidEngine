@@ -5,7 +5,6 @@
 #include <GLFW/glfw3.h>
 
 #include "Core/Debug/debug.hpp"
-#include "Core/Maths/Vector/vector4.hpp"
 
 namespace Solid
 {
@@ -462,7 +461,7 @@ namespace Solid
 
     void OpenGL45Renderer::DrawSkybox(const Camera& _camera) const
     {
-        
+
     }
 
     void OpenGL45Renderer::DrawLines(const Camera& _camera, std::vector<Vec3> _points, std::vector<uint> indices) const

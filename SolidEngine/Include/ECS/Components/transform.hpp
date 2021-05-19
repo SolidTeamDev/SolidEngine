@@ -23,12 +23,14 @@ namespace Solid SLDNamespace()
     	Vec3 scale {1,1,1};
         Vec3 euler{};
         Mat4<float> transMat;
-
+	    Mat4<float> ParentTransMat;
         bool hasToUpdateMat = true;
 
         void UpdateTransformMatrix();
 
     public:
+
+
         Transform();
         Transform(const Vec3& _position, const Quat& _rotation, const Vec3& _scale);
 
@@ -47,6 +49,10 @@ namespace Solid SLDNamespace()
         Vec3 GetScale() const;
 
         Mat4<float> GetMatrix();
+	    void SetParentMatrix(const Mat4<float>& mat);
+	    Mat4<float> GetParentMatrix();
+
+	    void Release()override;
 
         Transform_GENERATED
     };

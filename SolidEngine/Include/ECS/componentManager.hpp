@@ -19,23 +19,24 @@ namespace Solid
 
         ComponentType nextComponentType{};
 
-        template<typename T>
-        std::shared_ptr<ComponentArray<T>> GetComponentArray()
-        {
-            std::string_view typeName = typeid(T).name();
 
-            try
-            {
-                return std::static_pointer_cast<ComponentArray<T>>(componentArrays.at(typeName));
-            }
-            catch (const std::exception &e)
-            {
-                std::cerr << "Error : Cannot get component array (Component not registered)" << std::endl;
-                return nullptr;
-            }
-        }
 
     public:
+	    template<typename T>
+	    std::shared_ptr<ComponentArray<T>> GetComponentArray()
+	    {
+		    std::string_view typeName = typeid(T).name();
+
+		    try
+		    {
+			    return std::static_pointer_cast<ComponentArray<T>>(componentArrays.at(typeName));
+		    }
+		    catch (const std::exception &e)
+		    {
+			    std::cerr << "Error : Cannot get component array (Component not registered)" << std::endl;
+			    return nullptr;
+		    }
+	    }
 
         template<typename T>
         void RegisterComponent()

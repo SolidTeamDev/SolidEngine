@@ -93,7 +93,7 @@ namespace Solid
 
         constexpr Mat4 operator + (const Mat4& _mat) const noexcept;
         constexpr Mat4 operator - (const Mat4& _mat) const noexcept;
-        Mat4 operator * (const Mat4& _mat) const;
+        Mat4 operator * (const Mat4& _mat) const noexcept;
         constexpr Mat4 operator / (const Mat4& _mat) const noexcept;
         Mat4& operator += (Mat4& _mat) noexcept;
         Mat4& operator -= (Mat4& _mat) noexcept;

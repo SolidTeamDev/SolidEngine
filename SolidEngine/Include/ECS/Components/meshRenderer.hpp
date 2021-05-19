@@ -20,6 +20,7 @@ namespace Solid SLDNamespace()
         vectorStr MatNames;
 	    SLDField()
 	    String MeshName;
+
 	    std::vector<MaterialResource*> materials;
 	    std::set<MaterialResource*> materialSet;
 
@@ -41,6 +42,8 @@ namespace Solid SLDNamespace()
 	    void SetMaterialSet(const std::set<MaterialResource *> &_materialSet);
 
 	    void Init() override;
+
+	    void Release() override;
 
         MeshRenderer_GENERATED
     };

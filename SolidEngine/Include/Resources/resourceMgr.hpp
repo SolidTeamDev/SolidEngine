@@ -1,15 +1,19 @@
-//
-// Created by ryan1 on 26/02/2021.
-//
+#pragma once
 
-#ifndef SOLIDEDITOR_RESOURCEMGR_HPP
-#define SOLIDEDITOR_RESOURCEMGR_HPP
 #include <mutex>
 #include <unordered_map>
 #include "Core/Debug/throwError.hpp"
+
 namespace fs = std::filesystem;
+
 namespace Solid
 {
+
+	struct ResourcesPathData
+	{
+		std::string RName;
+		std::deque<std::string> rPath;
+	};
 
     template<class T>
     struct SOLID_API ResourceList
@@ -33,6 +37,13 @@ namespace Solid
                 return (T*)it->second;
 
         }
+        void addPathToVec(std::vector<ResourcesPathData>& vec)
+        {
+        	for(auto& elt : List)
+        	{
+        	    vec.push_back({.RName=elt.second->name, .rPath=elt.second->path});
+        	}
+        }
     };
 
     class SOLID_API ResourceManager
@@ -48,6 +59,7 @@ namespace Solid
 	    ResourceList<MaterialResource>       MaterialList;
 	    ResourceList<AudioResource>          AudioList;
 	    ResourceList<SceneResource>          SceneList;
+	    ResourceList<PrefabResource>         PrefabList;
         const MaterialResource* defaultMat = nullptr;
         class Engine* EnginePtr = nullptr;
         bool defaultMatInit = false;
@@ -58,10 +70,7 @@ namespace Solid
 
 
     public:
-	    explicit ResourceManager(class Engine* _engine)
-	    {
-		    EnginePtr =_engine;
-	    }
+	    explicit ResourceManager(class Engine* _engine);
 	    ~ResourceManager()
 	    {
 
@@ -78,6 +87,8 @@ namespace Solid
 
 	    template<class T>
 	    T* GetResourceByName(const char* name);
+	    bool IsResourceExist(Resource *r);
+	    std::vector<ResourcesPathData> GetAllResourcesPath();
 	    MeshResource* GetRawMeshByName(const char* name);
 	    ShaderResource* GetRawShaderByName(const char* name);
 	    ComputeShaderResource* GetRawComputeByName(const char* name);
@@ -85,6 +96,8 @@ namespace Solid
 	    ImageResource* GetRawImageByName(const char* name);
 	    AudioResource* GetRawAudioByName(const char* name);
 	    MaterialResource* CreateMaterial(const char* name);
+	    PrefabResource* GetPrefabByName(const char* name);
+	    void CreatePrefab(GameObject* _gameObject);
 
         template<typename T>
         std::unordered_map<std::string,Resource*> * GetResourcesVecByType()
@@ -112,6 +125,8 @@ namespace Solid
             if(type_value == AudioList.type_value)
                 return  &(AudioList.List);
 
+	        if(type_value == PrefabList.type_value)
+		        return  &(PrefabList.List);
             if(type_value == SkeletonList.type_value)
                 return  &(SkeletonList.List);
 
@@ -149,6 +164,9 @@ namespace Solid
 			    case EResourceType::Scene:
 				    return &SceneList.List;
 				    break;
+			    case EResourceType::Prefab:
+				    return &PrefabList.List;
+				    break;
 			    default:
 				    ThrowError("Type Not Stored", ESolidErrorCode::S_INIT_ERROR);
 				    return nullptr;
@@ -158,6 +176,3 @@ namespace Solid
 
     };
 }
-
-
-#endif //SOLIDEDITOR_RESOURCEMGR_HPP

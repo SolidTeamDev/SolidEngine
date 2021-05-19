@@ -8,19 +8,19 @@ namespace Solid SLDNamespace()
 {
     class SOLID_API SLDClass() Script : public Components
     {
-    protected:
-        GameObject* gameobject= nullptr;
+
+
     public:
 
         Script() = default;
-        Script(GameObject* _go) {gameobject = _go;}
+        Script(GameObject* _go) {gameObject = _go;}
         virtual ~Script() = default;
 
         virtual void Update() = 0;
         virtual void FixedUpdate() = 0;
         virtual void LateUpdate() = 0;
 
-        GameObject* GetGameObject(){return gameobject;}
+        GameObject* GetGameObject(){return gameObject;}
 
 		Script_GENERATED
     };

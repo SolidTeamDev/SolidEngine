@@ -5,11 +5,13 @@
 namespace Solid
 {
     Transform::Transform():
-    transMat(Mat4<>::Identity)
+    transMat(Mat4<>::Identity),
+    ParentTransMat(Mat4<>::Identity)
     {}
 
     Transform::Transform(const Vec3 &_position, const Quat &_rotation, const Vec3 &_scale):
     transMat(Mat4<>::Identity),
+    ParentTransMat(Mat4<>::Identity),
     position(_position),
     rotation(_rotation),
     euler(Maths::RadToDeg(rotation.ToEuler())),
@@ -111,5 +113,20 @@ namespace Solid
         euler = Vec3(Maths::RadToDeg(eulerRad.x),Maths::RadToDeg(eulerRad.y),Maths::RadToDeg(eulerRad.z));
         hasToUpdateMat = false;
     }
+
+	void Transform::SetParentMatrix(const Mat4<float>& mat)
+	{
+		ParentTransMat = mat;
+	}
+
+	Mat4<float> Transform::GetParentMatrix()
+	{
+		return ParentTransMat;
+	}
+
+	void Transform::Release()
+	{
+		Components::Release();
+	}
 
 } //!namespace

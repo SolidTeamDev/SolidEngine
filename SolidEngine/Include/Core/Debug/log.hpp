@@ -6,6 +6,8 @@
 #include <array>
 #include <fstream>
 
+#undef ERROR
+
 constexpr int maxLogMessage = 100;
 
 namespace Solid {
@@ -38,7 +40,7 @@ namespace Solid {
         Log();
         ~Log();
 
-        static void Send(const std::string &_logMessage, const ELogSeverity &_severity = ELogSeverity::INFO);
+	    static void Send(const std::string &_logMessage, const ELogSeverity &_severity = ELogSeverity::INFO);
         static LogMessage GetLogAt(unsigned int idx);
     };
 }

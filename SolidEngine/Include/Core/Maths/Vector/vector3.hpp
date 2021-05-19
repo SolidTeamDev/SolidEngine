@@ -10,6 +10,17 @@ namespace Solid SLDNamespace()
 
     class Quat;
 
+    struct SOLID_API SLDStruct() Vec3i
+    {
+        SLDField()
+        int x;
+        SLDField()
+        int y;
+        SLDField()
+        int z;
+        Vec3i_GENERATED
+    };
+
     class SOLID_API SLDClass() Vec3
     {
     public:

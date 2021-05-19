@@ -1,10 +1,7 @@
-//
-// Created by ryan1 on 26/02/2021.
-//
+#pragma once
 
-#ifndef SOLIDEDITOR_RESOURCELOADER_HPP
-#define SOLIDEDITOR_RESOURCELOADER_HPP
 namespace fs = std::filesystem;
+
 namespace Solid
 {
 	struct SOLID_API FBXWrapper
@@ -39,7 +36,9 @@ namespace Solid
 	    Resource * LoadSolidMaterial(const fs::path& Rpath);
 	    Resource * LoadSolidAnim(const fs::path& Rpath);
 	    Resource * LoadSolidAudio(const fs::path& Rpath);
+	    Resource * LoadSolidPrefab(const fs::path& Rpath);
 	    void LoadFBX(const fs::path& Rpath, FBXWrapper* fbx);
+	    void SetPath(std::deque<std::string> &resPath, const fs::path& Rpath);
     public:
 
 
@@ -61,9 +60,4 @@ namespace Solid
         //inline static void ReadFromBuffer(std::vector<char>& DataBuffer, void* Data, std::uint64_t sizeInByte, std::uint64_t& ReadPos);
         static void ReadFromBuffer(char* DataBuffer, void* Data, std::uint64_t sizeInByte, std::uint64_t& ReadPos);
     };
-
-
-
 }
-
-#endif //SOLIDEDITOR_RESOURCELOADER_HPP

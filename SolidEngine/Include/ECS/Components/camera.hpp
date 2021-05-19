@@ -22,9 +22,9 @@ namespace Solid SLDNamespace()
 	    SLDField()
 	    float fov;
 	    SLDField()
-	    float near;
+	    float _near;
 	    SLDField()
-	    float far;
+	    float _far;
 	    SLDField()
  		Vec3 Right = Vec3::Zero;
         SLDField()
