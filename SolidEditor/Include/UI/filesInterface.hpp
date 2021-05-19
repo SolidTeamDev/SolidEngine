@@ -17,16 +17,20 @@ namespace Solid
 	    {
 	    	std::string fileNames;
 	    	std::string ftype;
+	    	Resource* RPtr = nullptr;
 	    };
 	    struct filePathData
 	    {
+
+
 	    	std::string folderName;
 	    	filePathData* parent = nullptr;
 	    	std::vector<file> fileNames;
 	    	std::unordered_map<std::string, filePathData> childPaths;
-	    } root;
+	    }root;
+
 	    double counter =0.0f;
-	    filePathData* currentFolder = &root;
+	    filePathData* currentFolder ;
 
         std::unordered_map<std::string, ImageResource*> editorImage;
         std::unordered_map<std::string, std::shared_ptr<GL::Texture>> editorTex;
@@ -35,7 +39,7 @@ namespace Solid
 	    bool test = false;
     public:
         FilesInterface();
-        ~FilesInterface() = default;
+        ~FilesInterface() ;
 
         void Draw();
         void DrawCreateFile();

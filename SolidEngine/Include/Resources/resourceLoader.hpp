@@ -6,8 +6,8 @@ namespace Solid
 {
 	struct SOLID_API FBXWrapper
 	{
-		MeshResource* mesh;
-		SkeletonResource* Skeleton;
+		MeshResource* mesh = nullptr;
+		SkeletonResource* Skeleton = nullptr;
 		std::vector<AnimResource*> anims;
 
 	};
@@ -46,6 +46,7 @@ namespace Solid
 
 	    static fs::path SolidPath ;
 
+
         ResourcesLoader()
         {
 
@@ -53,10 +54,12 @@ namespace Solid
 	    ~ResourcesLoader() = default;
 	    void SetManager(ResourceManager* m);
 	    void LoadRessource(const fs::path& Rpath);
+	    void ReLoadRessource(Resource* _resource);
         void LoadRessourceNoAdd(const fs::path &Rpath, ResourcePtrWrapper &wrapper);
         void LoadResourcesFromFolder(const fs::path& Rpath);
         static void Append(std::vector<char>& DataBuffer, void* Data, std::uint64_t sizeInByte);
         void SaveMaterialToFile(MaterialResource* _mat);
+	    void SavePrefabToFile(PrefabResource* _prefab);
         //inline static void ReadFromBuffer(std::vector<char>& DataBuffer, void* Data, std::uint64_t sizeInByte, std::uint64_t& ReadPos);
         static void ReadFromBuffer(char* DataBuffer, void* Data, std::uint64_t sizeInByte, std::uint64_t& ReadPos);
     };

@@ -17,7 +17,7 @@ void Resource::ToDataBuffer(std::vector<char> &buffer)
 	//asset type
 	ResourcesLoader::Append(buffer, &(this->type), sizeof(this->type));
 
-	ResourcesLoader::Append(buffer, &(size), sizeof(size));
+	/*ResourcesLoader::Append(buffer, &(size), sizeof(size));
 
 	for(std::string& elt : this->path)
 	{
@@ -27,7 +27,7 @@ void Resource::ToDataBuffer(std::vector<char> &buffer)
 		ResourcesLoader::Append(buffer, &(size), sizeof(size));
 		ResourcesLoader::Append(buffer, (void *) (elt.c_str()),  size * sizeof( std::string::value_type));
 
-	}
+	}*/
 
 
 
@@ -50,7 +50,7 @@ int Resource::FromDataBuffer(char *buffer, int bSize)
 	//recup path string
 	std::uint32_t size = 0;
 	std::string pString;
-	ResourcesLoader::ReadFromBuffer(buffer, &size, sizeof(size), ReadPos);
+	/*ResourcesLoader::ReadFromBuffer(buffer, &size, sizeof(size), ReadPos);
 	this->path.resize(size);
 	for(std::string& elt : this->path)
 	{
@@ -59,7 +59,7 @@ int Resource::FromDataBuffer(char *buffer, int bSize)
 		ResourcesLoader::ReadFromBuffer(buffer, (void *) (elt.data()),  size * sizeof( std::string::value_type), ReadPos);
 
 	}
-
+*/
 
 	//recup name
 	size = 0;
@@ -926,17 +926,7 @@ SkeletonResource::Bone *SkeletonResource::Bone::FindBoneByName(const char *_name
 
 void PrefabResource::UpdatePrefab(GameObject *_gameObject)
 {
-	fs::path p = ResourcesLoader::SolidPath.parent_path();
-	for(std::string& elt : path)
-	{
-		if(elt == "\\Assets\\")
-		{
-			p.append("Assets");
-		}
-		else
-	        p.append(elt);
-	}
-	p.append(name +".SolidPrefab");
+
 	json j;
 	j["Scene"].array();
 	j = j.flatten();
@@ -955,7 +945,6 @@ void PrefabResource::UpdatePrefab(GameObject *_gameObject)
 	Lambda(std::ref(j), world, std::ref(elt));
 	j = j.unflatten();
 
-	std::ofstream file(p, std::ifstream::binary | std::ofstream::trunc);
 	std::vector<char> buffer;
 	std::stringstream sstr;
 	sstr << std::setw(4) << j << std::endl;
@@ -1134,10 +1123,8 @@ void PrefabResource::UpdatePrefab(GameObject *_gameObject)
 	LambdaCmp(world);
 	PrefabBinary = buffer;
 
-	std::vector<char>buf;
-	ToDataBuffer(buf);
-
-	file.write(buf.data(), buf.size());
+	ResourcesLoader loader;
+	loader.SavePrefabToFile(this);
 
 
 }
