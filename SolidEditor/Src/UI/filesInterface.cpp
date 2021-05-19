@@ -241,8 +241,18 @@ namespace Solid
 					        if(elt.path().filename().string().find(r->name) != std::string::npos)
 					        {
 
-					        	fs::copy(elt.path(), newp);
-					        	pArray[i] = elt.path();
+						        if(fs::is_directory(elt))
+						        {
+							        fs::path create = newp;
+							        create.append(elt.path().filename().string());
+							        fs::create_directory(create);
+							        fs::copy(elt.path(), create);
+						        }
+						        else
+						        {
+							        fs::copy(elt.path(), newp);
+						        }
+						        pArray[i] = elt.path();
 					        	++i;
 					        }
 					    }
@@ -326,7 +336,10 @@ namespace Solid
 					    }
 					    for (int j = 0; j < i; ++j)
 					    {
-						    fs::remove(pArray[j]);
+					    	if(!fs::is_directory(pArray[j]))
+						        fs::remove(pArray[j]);
+					    	else
+					    		fs::remove_all(pArray[j]);
 					    }
 					    ResourcesLoader loader;
 					    //loader.ReLoadRessource(r);
@@ -373,6 +386,7 @@ namespace Solid
 
         DrawCreateFile();
 	    DrawMatNamePopup();
+	    DrawFolderPopup();
 	    UI::End();
 
 
@@ -397,6 +411,14 @@ namespace Solid
 
 	            	matNamePopup = true;
 	            	matNamestr = "";
+
+
+	            }
+	            if (UI::MenuItem("Create Folder"))
+	            {
+
+		            folderPopup = true;
+		            folderstr = "";
 
 
 	            }
@@ -449,6 +471,29 @@ namespace Solid
 				Engine* engine = Engine::GetInstance();
 				MaterialResource* mat =engine->resourceManager.CreateMaterial(matNamestr.c_str());
 				mat->SetShader(engine->graphicsResourceMgr.GetShader("DefaultShader"));
+				UI::CloseCurrentPopup();
+			}
+			UI::EndPopup();
+		}
+
+	}
+	void FilesInterface::DrawFolderPopup()
+	{
+		if(folderPopup)
+		{
+			UI::OpenPopup("FolderPopUp");
+			folderstr = "";
+			folderPopup = false;
+		}
+
+		if (UI::BeginPopup("FolderPopUp"))
+		{
+			UI::Text("Folder Name :");
+			UI::SameLine();
+			UI::InputText("##Folder", &folderstr);
+			if(UI::Button("Create new Folder"))
+			{
+				currentFolder->childPaths.emplace(folderstr, filePathData{.folderName=folderstr, .parent=currentFolder});
 				UI::CloseCurrentPopup();
 			}
 			UI::EndPopup();

@@ -15,8 +15,7 @@
 namespace Solid
 {
     //TODO: Replace static
-    static ImGuizmo::OPERATION gizmoMode = ImGuizmo::OPERATION::TRANSLATE;
-    static ImGuizmo::MODE      gizmoReferential = ImGuizmo::MODE::LOCAL;
+
 
     float SceneInterface::camSpeed = 2.f;
 
@@ -26,49 +25,7 @@ namespace Solid
         sceneFramebuffer = engine->renderer->CreateFramebuffer(engine->window->GetWindowSize());
         sceneCam.MouseSensitivity = 35.f;
 
-        //Load Image interface
-        fs::path EditorAssets = fs::current_path();
-        EditorAssets.append("EditorAssets");
-        ResourcesLoader loader;
-        {
-            ResourcePtrWrapper wrap{.r=nullptr};
-            loader.LoadRessourceNoAdd( EditorAssets.string() + "/Translate.png", wrap);
-            if(wrap.r != nullptr && wrap.r->GetType() == EResourceType::Image)
-            {
-                editorImage.emplace("Translate", (ImageResource*)wrap.r);
-                std::shared_ptr<GL::Texture> Tex = std::make_shared<GL::Texture>((ImageResource*)wrap.r);
-                if(Tex != nullptr)
-                {
-                    editorTex.emplace("Translate", Tex);
-                }
-            }
-        }
-        {
-            ResourcePtrWrapper wrap;
-            loader.LoadRessourceNoAdd( EditorAssets.string() + "/Rotate.png", wrap);
-            if(wrap.r != nullptr && wrap.r->GetType() == EResourceType::Image)
-            {
-                editorImage.emplace("Rotate", (ImageResource*)wrap.r);
-                std::shared_ptr<GL::Texture> Tex = std::make_shared<GL::Texture>((ImageResource*)wrap.r);
-                if(Tex != nullptr)
-                {
-                    editorTex.emplace("Rotate", Tex);
-                }
-            }
-        }
-        {
-            ResourcePtrWrapper wrap;
-            loader.LoadRessourceNoAdd( EditorAssets.string() + "/Scale.png", wrap);
-            if(wrap.r != nullptr && wrap.r->GetType() == EResourceType::Image)
-            {
-                editorImage.emplace("Scale", (ImageResource*)wrap.r);
-                std::shared_ptr<GL::Texture> Tex = std::make_shared<GL::Texture>((ImageResource*)wrap.r);
-                if(Tex != nullptr)
-                {
-                    editorTex.emplace("Scale", Tex);
-                }
-            }
-        }
+
     }
 
     void SceneInterface::Draw()
@@ -114,7 +71,7 @@ namespace Solid
 	        Mat4<float> Parent = engine->ecsManager.GetComponent<Transform>(go->GetEntity()).GetParentMatrix();
 			transMat = (transMat*Parent );
             ImGuizmo::Manipulate(viewMat.elements.data(), projMat.elements.data(),
-                                 gizmoMode, gizmoReferential,
+                                 ButtonInterface::gizmoMode, ButtonInterface::gizmoReferential,
                                  transMat.elements.data() );
             if (ImGuizmo::IsUsing())
             {
@@ -163,36 +120,7 @@ namespace Solid
         UI::DragFloat("##CameraSpeed", &camSpeed, 0.1f, 1000.f);
         camSpeed = std::clamp(camSpeed, 0.f, 50000.f);
 
-        {
-            std::string modeName = gizmoReferential == ImGuizmo::MODE::LOCAL ? "Local" : "Global";
-            UI::SetNextItemWidth(75.f);
-            if(UI::BeginCombo("##TransformMode",modeName.c_str()))
-            {
-                bool selected = modeName == "Local";
-                if(UI::Selectable("Local", selected))
-                    gizmoReferential = ImGuizmo::MODE::LOCAL;
-                if(selected)
-                    UI::SetItemDefaultFocus();
 
-                if(UI::Selectable("Global", !selected))
-                    gizmoReferential =  ImGuizmo::MODE::WORLD;
-                if(!selected)
-                    UI::SetItemDefaultFocus();
-
-                UI::EndCombo();
-            }
-        }
-
-        {
-            ImVec2 imgSize = {16,16};
-
-            if(UI::ImageButton((ImTextureID)editorTex["Translate"]->texId, imgSize,ImVec2(0,1),ImVec2(1,0)))
-                gizmoMode = ImGuizmo::OPERATION::TRANSLATE;
-            if(UI::ImageButton((ImTextureID)editorTex["Rotate"]->texId, imgSize,ImVec2(0,1),ImVec2(1,0)))
-                gizmoMode = ImGuizmo::OPERATION::ROTATE;
-            if(UI::ImageButton((ImTextureID)editorTex["Scale"]->texId, imgSize,ImVec2(0,1),ImVec2(1,0)))
-                gizmoMode = ImGuizmo::OPERATION::SCALE; //TODO: Force Local
-        }
 
         UI::EndMenuBar();
     }

@@ -13,6 +13,8 @@ namespace Solid
     {
 	    bool        matNamePopup = false;
 	    std::string matNamestr;
+	    bool        folderPopup = false;
+	    std::string folderstr;
 	    struct file
 	    {
 	    	std::string fileNames;
@@ -47,6 +49,7 @@ namespace Solid
 		 * @brief Draws a poppu asking for a material name
 		 */
 	    void DrawMatNamePopup();
+	    void DrawFolderPopup();
 
         bool p_open = true;
 	    bool open = false;

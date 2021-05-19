@@ -422,6 +422,7 @@ namespace Solid
 						}
 						else if (ns != nullptr && myClass->isSubclassOf(*ns->getClass("Script")))
 						{
+
 							if(!ecsManager.GotComponent<ScriptList>(go->GetEntity()))
 							{
 								ecsManager.AddComponent(go, ScriptList());
