@@ -1,8 +1,9 @@
-#include "particleRenderer.hpp"
-#include "glParticleRenderer.hpp"
+#include "Rendering/FX/Particles/particleRenderer.hpp"
+#include "Rendering/FX/Particles/glParticleRenderer.hpp"
 
 #include <string>
 
+using namespace Solid;
 
 std::shared_ptr<IParticleRenderer> RendererFactory::Create(const char* name)
 {

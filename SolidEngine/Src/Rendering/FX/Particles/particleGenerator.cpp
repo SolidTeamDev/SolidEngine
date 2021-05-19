@@ -1,7 +1,9 @@
-#include "particleGenerator.hpp"
+#include "Rendering/FX/Particles/particleGenerator.hpp"
 #include <random>
 
 #define M_PI 3.14159265358979323846
+
+using namespace Solid;
 
 float LinearRand(float min, float max)
 {
@@ -11,8 +13,8 @@ float LinearRand(float min, float max)
 
 void BoxPosGen::Generate(double dt, ParticleData* p, size_t startId, size_t endId)
 {
-	float4 posMin{ pos.x - maxStartPosOffset.x, pos.y - maxStartPosOffset.y, pos.z - maxStartPosOffset.z, 1.0 };
-	float4 posMax{ pos.x + maxStartPosOffset.x, pos.y + maxStartPosOffset.y, pos.z + maxStartPosOffset.z, 1.0 };
+	Vec4 posMin{ pos.x - maxStartPosOffset.x, pos.y - maxStartPosOffset.y, pos.z - maxStartPosOffset.z, 1.0 };
+	Vec4 posMax{ pos.x + maxStartPosOffset.x, pos.y + maxStartPosOffset.y, pos.z + maxStartPosOffset.z, 1.0 };
 
 	for (size_t i = startId; i < endId; ++i)
 	{

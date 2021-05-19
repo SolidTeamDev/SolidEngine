@@ -1,112 +1,125 @@
 #pragma once
 
-#include "particleData.hpp"
+#include "Rendering/FX/Particles/particleData.hpp"
 
-class ParticleGenerator
+namespace Solid
 {
-public:
-	ParticleGenerator() {};
-	virtual ~ParticleGenerator() {};
+	class ParticleGenerator
+	{
+	public:
+		ParticleGenerator()
+		{};
 
-	virtual void Generate(double dt, ParticleData* p, size_t start, size_t end) = 0;
-};
+		virtual ~ParticleGenerator()
+		{};
 
-class BoxPosGen : public ParticleGenerator
-{
-public:
+		virtual void Generate(double dt, ParticleData *p, size_t start, size_t end) = 0;
+	};
 
-	float4 pos;
-	float4 maxStartPosOffset;
+	class BoxPosGen : public ParticleGenerator
+	{
+	public:
 
-	BoxPosGen() : pos(0.f, 0.f, 0.f, 0.f), maxStartPosOffset(0.f, 0.f, 0.f, 0.f) {}
-	BoxPosGen(const float4& _pos, const float4& _offset) :
-		pos(_pos),
-		maxStartPosOffset(_offset)
-	{};
+		Vec4 pos;
+		Vec4 maxStartPosOffset;
+
+		BoxPosGen() : pos(0.f, 0.f, 0.f, 0.f), maxStartPosOffset(0.f, 0.f, 0.f, 0.f)
+		{}
+
+		BoxPosGen(const Vec4 &_pos, const Vec4 &_offset) :
+				pos(_pos),
+				maxStartPosOffset(_offset)
+		{};
 
 
-	virtual void Generate(double dt, ParticleData* p, size_t start, size_t end) override;
-};
+		virtual void Generate(double dt, ParticleData *p, size_t start, size_t end) override;
+	};
 
-class CirclePosGen : public ParticleGenerator
-{
-public:
-	
-	float4 center;
-	float radX;
-	float radY;
+	class CirclePosGen : public ParticleGenerator
+	{
+	public:
 
-	CirclePosGen() : center(0.f, 0.f, 0.f, 0.f), radX(0.f), radY(0.f) {};
-	CirclePosGen(const float4& _center, float _radX, float _radY) :
-		center(_center),
-		radX(_radX),
-		radY(_radY)
-	{};
+		Vec4 center;
+		float radX;
+		float radY;
 
-	virtual void Generate(double dt, ParticleData* p, size_t start, size_t end) override;
-};
+		CirclePosGen() : center(0.f, 0.f, 0.f, 0.f), radX(0.f), radY(0.f)
+		{};
 
-class BasicColorGen : public ParticleGenerator
-{
-public:
-	float4 minStartCol;
-	float4 maxStartCol;
-	float4 minEndCol;
-	float4 maxEndCol;
-	
-	BasicColorGen() : minStartCol(0.f, 0.f, 0.f, 0.f), maxStartCol(0.f, 0.f, 0.f, 0.f),
-		minEndCol(0.f, 0.f, 0.f, 0.f), maxEndCol(0.f, 0.f, 0.f, 0.f)
-	{ };
+		CirclePosGen(const Vec4 &_center, float _radX, float _radY) :
+				center(_center),
+				radX(_radX),
+				radY(_radY)
+		{};
 
-	virtual void Generate(double dt, ParticleData* p, size_t startId, size_t endId) override;
-};
+		virtual void Generate(double dt, ParticleData *p, size_t start, size_t end) override;
+	};
 
-class BasicVelGen : public ParticleGenerator
-{
-public:
-	float4 minStartVel;
-	float4 maxStartVel;
-public:
-	BasicVelGen() : minStartVel(0.f, 0.f, 0.f, 0.f), maxStartVel(0.f, 0.f, 0.f, 0.f) { }
+	class BasicColorGen : public ParticleGenerator
+	{
+	public:
+		Vec4 minStartCol;
+		Vec4 maxStartCol;
+		Vec4 minEndCol;
+		Vec4 maxEndCol;
 
-	virtual void Generate(double dt, ParticleData* p, size_t startId, size_t endId) override;
-};
+		BasicColorGen() : minStartCol(0.f, 0.f, 0.f, 0.f), maxStartCol(0.f, 0.f, 0.f, 0.f),
+		                  minEndCol(0.f, 0.f, 0.f, 0.f), maxEndCol(0.f, 0.f, 0.f, 0.f)
+		{};
 
-class SphereVelGen : public ParticleGenerator
-{
-public:
-	float minVel;
-	float maxVel;
-public:
-	SphereVelGen() : minVel(0.0), maxVel(0.0) { }
+		virtual void Generate(double dt, ParticleData *p, size_t startId, size_t endId) override;
+	};
 
-	virtual void Generate(double dt, ParticleData* p, size_t startId, size_t endId) override;
-};
+	class BasicVelGen : public ParticleGenerator
+	{
+	public:
+		Vec4 minStartVel;
+		Vec4 maxStartVel;
+	public:
+		BasicVelGen() : minStartVel(0.f, 0.f, 0.f, 0.f), maxStartVel(0.f, 0.f, 0.f, 0.f)
+		{}
 
-class VelFromPosGen : public ParticleGenerator
-{
-public:
-	float4 offset;
-	float minScale;
-	float maxScale;
-public:
-	VelFromPosGen() : offset(0.f, 0.f, 0.f, 0.f), minScale(0.0), maxScale(0.0) { }
-	VelFromPosGen(const float4& off, double minS, double maxS)
-		: offset(off)
-		, minScale((float)minS)
-		, maxScale((float)maxS)
-	{ }
+		virtual void Generate(double dt, ParticleData *p, size_t startId, size_t endId) override;
+	};
 
-	virtual void Generate(double dt, ParticleData* p, size_t startId, size_t endId) override;
-};
+	class SphereVelGen : public ParticleGenerator
+	{
+	public:
+		float minVel;
+		float maxVel;
+	public:
+		SphereVelGen() : minVel(0.0), maxVel(0.0)
+		{}
 
-class BasicTimeGen : public ParticleGenerator
-{
-public:
-	float minTime;
-	float maxTime;
-public:
-	BasicTimeGen() : minTime(0.0), maxTime(0.0) { }
+		virtual void Generate(double dt, ParticleData *p, size_t startId, size_t endId) override;
+	};
 
-	virtual void Generate(double dt, ParticleData* p, size_t startId, size_t endId) override;
-};
+	class VelFromPosGen : public ParticleGenerator
+	{
+	public:
+		Vec4 offset;
+		float minScale;
+		float maxScale;
+	public:
+		VelFromPosGen() : offset(0.f, 0.f, 0.f, 0.f), minScale(0.0), maxScale(0.0)
+		{}
+
+		VelFromPosGen(const Vec4 &off, double minS, double maxS)
+				: offset(off), minScale((float) minS), maxScale((float) maxS)
+		{}
+
+		virtual void Generate(double dt, ParticleData *p, size_t startId, size_t endId) override;
+	};
+
+	class BasicTimeGen : public ParticleGenerator
+	{
+	public:
+		float minTime;
+		float maxTime;
+	public:
+		BasicTimeGen() : minTime(0.0), maxTime(0.0)
+		{}
+
+		virtual void Generate(double dt, ParticleData *p, size_t startId, size_t endId) override;
+	};
+}

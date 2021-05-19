@@ -1,44 +1,48 @@
-#ifndef __PARTICLE_DATA_HPP__
-#define __PARTICLE_DATA_HPP__
+#pragma once
 
 #include <memory>
 
-#include "calc.hpp"
+#include "Core/Maths/solidVector.hpp"
 
 
-
-#pragma once
-class ParticleData
+namespace Solid
 {
-public:
-	std::unique_ptr<float4[]>  startCol;
-	std::unique_ptr<float4[]>  endCol;
-	std::unique_ptr<float4[]>  time;
-	std::unique_ptr<float4[]>  pos;
-	std::unique_ptr<float4[]>  col;
-	std::unique_ptr<float4[]>  vel;
-	std::unique_ptr<float4[]>  acc;
-	std::unique_ptr<bool[]>    alive;
-
-	size_t count      = 0;
-	size_t countAlive = 0;
-
-	ParticleData() {};
-	explicit ParticleData(size_t maxCount);
-	~ParticleData() {};
-
-	ParticleData(const ParticleData&)            = delete;
-	ParticleData& operator=(const ParticleData&) = delete;
-
-	void SwapData(size_t a, size_t b);
-	void Generate(size_t maxSize);
-	void Kill(size_t ID);
-	void Wake(size_t ID);
-
-	static size_t ComputeMemoryUsage(const ParticleData& p)
+	class ParticleData
 	{
-		return p.count * (7 * sizeof(float4) + sizeof(bool)) + sizeof(size_t) * 2;
-	}
-};
+	public:
+		std::unique_ptr<Vec4[]> startCol;
+		std::unique_ptr<Vec4[]> endCol;
+		std::unique_ptr<Vec4[]> time;
+		std::unique_ptr<Vec4[]> pos;
+		std::unique_ptr<Vec4[]> col;
+		std::unique_ptr<Vec4[]> vel;
+		std::unique_ptr<Vec4[]> acc;
+		std::unique_ptr<bool[]> alive;
 
-#endif
+		size_t count = 0;
+		size_t countAlive = 0;
+
+		ParticleData() = default;
+
+		explicit ParticleData(size_t maxCount);
+
+		~ParticleData() = default;
+
+		ParticleData(const ParticleData &) = delete;
+
+		ParticleData &operator=(const ParticleData &) = delete;
+
+		void SwapData(size_t a, size_t b);
+
+		void Generate(size_t maxSize);
+
+		void Kill(size_t ID);
+
+		void Wake(size_t ID);
+
+		static size_t ComputeMemoryUsage(const ParticleData &p)
+		{
+			return p.count * (7 * sizeof(Vec4) + sizeof(bool)) + sizeof(size_t) * 2;
+		}
+	};
+}

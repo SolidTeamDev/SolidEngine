@@ -1,4 +1,6 @@
-#include "ParticleData.h"
+#include "Rendering/FX/Particles/particleData.hpp"
+
+using namespace Solid;
 
 ParticleData::ParticleData(size_t maxCount)
 {
@@ -9,14 +11,14 @@ void ParticleData::Generate(size_t maxSize)
 {
 	count      = maxSize;
 	countAlive = 0;
-	pos.reset(new float4[maxSize]);
-	col.reset(new float4[maxSize]);
-	vel.reset(new float4[maxSize]);
-	acc.reset(new float4[maxSize]);
+	pos.reset(new Vec4[maxSize]);
+	col.reset(new Vec4[maxSize]);
+	vel.reset(new Vec4[maxSize]);
+	acc.reset(new Vec4[maxSize]);
 	alive.reset(new bool[maxSize]);
-	time.reset(new float4[maxSize]);
-	endCol.reset(new float4[maxSize]);
-	startCol.reset(new float4[maxSize]);
+	time.reset(new Vec4[maxSize]);
+	endCol.reset(new Vec4[maxSize]);
+	startCol.reset(new Vec4[maxSize]);
 }
 
 void ParticleData::Kill(size_t ID)

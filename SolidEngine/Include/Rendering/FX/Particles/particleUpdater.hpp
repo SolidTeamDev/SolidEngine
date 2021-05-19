@@ -1,86 +1,96 @@
-#ifndef __PRTCL_UPDT_HPP__
-#define __PRTCL_UPDT_HPP__
-
+#pragma once
 #include <vector>
 #include <algorithm>
 
-#include "particleGenerator.hpp"
+#include "Rendering/FX/Particles/particleGenerator.hpp"
 
-class ParticleUpdater
+namespace Solid
 {
-public:
-	ParticleUpdater() { }
-	virtual ~ParticleUpdater() { }
+	class ParticleUpdater
+	{
+	public:
+		ParticleUpdater()
+		{}
 
-	virtual void Update(float dt, ParticleData* p) = 0;
-};
+		virtual ~ParticleUpdater()
+		{}
 
-class EulerUpdater : public ParticleUpdater
-{
-public:
-	float4 globalAcceleration;
-public:
-	EulerUpdater() : globalAcceleration(0.f, 0.f, 0.f, 0.f) { }
+		virtual void Update(float dt, ParticleData *p) = 0;
+	};
 
-	virtual void Update(float dt, ParticleData* p) override;
-};
+	class EulerUpdater : public ParticleUpdater
+	{
+	public:
+		Vec4 globalAcceleration;
+	public:
+		EulerUpdater() : globalAcceleration(0.f, 0.f, 0.f, 0.f)
+		{}
 
-// collision with the floor :) todo: implement a collision model
-class FloorUpdater : public ParticleUpdater
-{
-public:
-	float floorY;
-	float bounceFactor;
-public:
-	FloorUpdater() :floorY(0.0), bounceFactor(0.5f) { }
+		virtual void Update(float dt, ParticleData *p) override;
+	};
 
-	virtual void Update(float dt, ParticleData* p) override;
-};
+	class FloorUpdater : public ParticleUpdater
+	{
+	public:
+		float floorY;
+		float bounceFactor;
+	public:
+		FloorUpdater() : floorY(0.0), bounceFactor(0.5f)
+		{}
 
-class AttractorUpdater : public ParticleUpdater
-{
-protected:
-	std::vector<float4> attractors; // .w is force
-public:
-	virtual void Update(float dt, ParticleData* p) override;
+		virtual void Update(float dt, ParticleData *p) override;
+	};
 
-	size_t CollectionSize() const { return attractors.size(); }
-	void Add(const float4& attr) { attractors.push_back(attr); }
-	float4& Get(size_t id) { return attractors[id]; }
-};
+	class AttractorUpdater : public ParticleUpdater
+	{
+	protected:
+		std::vector<Vec4> attractors; // .w is force
+	public:
+		virtual void Update(float dt, ParticleData *p) override;
 
-class BasicColorUpdater : public ParticleUpdater
-{
-public:
-	virtual void Update(float dt, ParticleData* p) override;
-};
+		size_t CollectionSize() const
+		{ return attractors.size(); }
 
-class PosColorUpdater : public ParticleUpdater
-{
-public:
-	float4 minPos;
-	float4 maxPos;
-public:
-	PosColorUpdater() : minPos(0.f, 0.f, 0.f, 0.f), maxPos(1.f, 1.f, 1.f, 1.f) { }
+		void Add(const Vec4 &attr)
+		{ attractors.push_back(attr); }
 
-	virtual void Update(float dt, ParticleData* p) override;
-};
+		Vec4 &Get(size_t id)
+		{ return attractors[id]; }
+	};
 
-class VelColorUpdater : public ParticleUpdater
-{
-public:
-	float4 minVel;
-	float4 maxVel;
-public:
-	VelColorUpdater() : minVel(0.f, 0.f, 0.f, 0.f), maxVel(1.f, 1.f, 1.f, 1.f) { }
+	class BasicColorUpdater : public ParticleUpdater
+	{
+	public:
+		virtual void Update(float dt, ParticleData *p) override;
+	};
 
-	virtual void Update(float dt, ParticleData* p) override;
-};
+	class PosColorUpdater : public ParticleUpdater
+	{
+	public:
+		Vec4 minPos;
+		Vec4 maxPos;
+	public:
+		PosColorUpdater() : minPos(0.f, 0.f, 0.f, 0.f), maxPos(1.f, 1.f, 1.f, 1.f)
+		{}
 
-class BasicTimeUpdater : public ParticleUpdater
-{
-public:
-	virtual void Update(float dt, ParticleData* p) override;
-};
+		virtual void Update(float dt, ParticleData *p) override;
+	};
 
-#endif
+	class VelColorUpdater : public ParticleUpdater
+	{
+	public:
+		Vec4 minVel;
+		Vec4 maxVel;
+	public:
+		VelColorUpdater() : minVel(0.f, 0.f, 0.f, 0.f), maxVel(1.f, 1.f, 1.f, 1.f)
+		{}
+
+		virtual void Update(float dt, ParticleData *p) override;
+	};
+
+	class BasicTimeUpdater : public ParticleUpdater
+	{
+	public:
+		virtual void Update(float dt, ParticleData *p) override;
+	};
+}

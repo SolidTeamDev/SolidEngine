@@ -1,4 +1,7 @@
-#include "particleSystem.hpp"
+#include "Rendering/FX/Particles/particleSystem.hpp"
+
+
+using namespace Solid;
 
 ParticleSystem::ParticleSystem(size_t maxCount)
 {
@@ -19,7 +22,7 @@ void ParticleSystem::Update(double dt)
 
 	for (size_t i = 0; i < count; ++i)
 	{
-		particles.acc[i] = float4(0.f, 0.f, 0.f, 0.f);
+		particles.acc[i] = Vec4(0.f, 0.f, 0.f, 0.f);
 	}
 
 	for (auto& up : updaters)

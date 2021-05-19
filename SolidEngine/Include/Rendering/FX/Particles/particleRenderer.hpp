@@ -1,27 +1,33 @@
-#ifndef __PRTCL_RNDRR_HPP__
-#define __PRTCL_RNDRR_HPP__
+#pragma once
 
 #include <memory>
 
-class ParticleSystem;
-
-class IParticleRenderer
+namespace Solid
 {
-public:
-	IParticleRenderer() { }
-	virtual ~IParticleRenderer() { }
+	class ParticleSystem;
 
-	virtual void Generate(ParticleSystem* sys, bool useQuads) = 0;
-	virtual void Destroy() = 0;
-	virtual void Update() = 0;
-	virtual void Render() = 0;
-};
+	class IParticleRenderer
+	{
+	public:
+		IParticleRenderer()
+		{}
 
-class RendererFactory
-{
-public:
-	static std::shared_ptr<IParticleRenderer> Create(const char* name);
-};
+		virtual ~IParticleRenderer()
+		{}
 
+		virtual void Generate(ParticleSystem *sys, bool useQuads) = 0;
 
-#endif
+		virtual void Destroy() = 0;
+
+		virtual void Update() = 0;
+
+		virtual void Render() = 0;
+	};
+
+	class RendererFactory
+	{
+	public:
+		static std::shared_ptr<IParticleRenderer> Create(const char *name);
+	};
+}
+

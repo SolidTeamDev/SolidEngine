@@ -1,8 +1,11 @@
-#include "fountainEffect.hpp"
+#include "Rendering/FX/Particles/fountainEffect.hpp"
 #include "imgui.h"
 
 #include <cmath>
 #include <iostream>
+#include "Core/Maths/solidVector.hpp"
+
+using namespace Solid;
 
 bool FountainEffect::Initialize(size_t numParticles)
 {
@@ -20,20 +23,20 @@ bool FountainEffect::Initialize(size_t numParticles)
 
 	// pos:
 	posGenerator = std::make_shared<BoxPosGen>();
-	posGenerator->pos = float4{ 0.0f, 0.0f, 0.0f, 0.0f };
-	posGenerator->maxStartPosOffset = float4{ 0.0f, 0.0f, 0.0f, 0.0f};
+	posGenerator->pos = Vec4{ 0.0f, 0.0f, 0.0f, 0.0f };
+	posGenerator->maxStartPosOffset = Vec4{ 0.0f, 0.0f, 0.0f, 0.0f};
 	particleEmitter->AddGenerator(posGenerator);
 
 	colGenerator = std::make_shared<BasicColorGen>();
-	colGenerator->minStartCol = float4{ 0.7, 0.7, 0.7, 1.0 };
-	colGenerator->maxStartCol = float4{ 1.0, 1.0, 1.0, 1.0 };
-	colGenerator->minEndCol   = float4{ 0.5, 0.0, 0.6, 0.0 };
-	colGenerator->maxEndCol   = float4{ 0.7, 0.5, 1.0, 0.0 };
+	colGenerator->minStartCol = Vec4{ 0.7, 0.7, 0.7, 1.0 };
+	colGenerator->maxStartCol = Vec4{ 1.0, 1.0, 1.0, 1.0 };
+	colGenerator->minEndCol   = Vec4{ 0.5, 0.0, 0.6, 0.0 };
+	colGenerator->maxEndCol   = Vec4{ 0.7, 0.5, 1.0, 0.0 };
 	particleEmitter->AddGenerator(colGenerator);
 
 	auto velGenerator = std::make_shared<BasicVelGen>();
-	velGenerator->minStartVel = float4{ -0.05f, 0.62f, -0.05f, 0.0f };
-	velGenerator->maxStartVel = float4{ 0.05f, 0.85f, 0.05f, 0.0f };
+	velGenerator->minStartVel = Vec4{ -0.05f, 0.62f, -0.05f, 0.0f };
+	velGenerator->maxStartVel = Vec4{ 0.05f, 0.85f, 0.05f, 0.0f };
 	particleEmitter->AddGenerator(velGenerator);
 
 	auto timeGenerator = std::make_shared<BasicTimeGen>();
@@ -49,7 +52,7 @@ bool FountainEffect::Initialize(size_t numParticles)
 	system->AddUpdater(colorUpdater);
 
 	eulerUpdater = std::make_shared<EulerUpdater>();
-	eulerUpdater->globalAcceleration = float4{ 0.0, -15.0, 0.0, 0.0 };
+	eulerUpdater->globalAcceleration = Vec4{ 0.0, -15.0, 0.0, 0.0 };
 	system->AddUpdater(eulerUpdater);
 
 	floorUpdater = std::make_shared<FloorUpdater>();

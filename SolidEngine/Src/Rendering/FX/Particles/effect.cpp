@@ -1,7 +1,9 @@
-#include "effect.hpp"
+#include "Rendering/FX/Particles/effect.hpp"
 
 #include <string>
-#include "fountainEffect.hpp"
+#include "Rendering/FX/Particles/fountainEffect.hpp"
+
+using namespace Solid;
 
 std::shared_ptr<IEffect> EffectFactory::Create(const char* name)
 {

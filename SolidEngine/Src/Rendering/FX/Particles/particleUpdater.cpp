@@ -1,11 +1,13 @@
-#include "ParticleUpdater.hpp"
+#include "Rendering/FX/Particles/ParticleUpdater.hpp"
+
+using namespace Solid;
 
 float Mix(float x, float y, float a)
 {
 	return x * (1.0f - a) + y * a;
 }
 
-float Dot4(float4 a, float4 b)
+float Dot4(Vec4 a, Vec4 b)
 {
 	return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
 }
@@ -13,12 +15,12 @@ float Dot4(float4 a, float4 b)
 
 void EulerUpdater::Update(float dt, ParticleData* p)
 {
-	const float4 globalA{ dt * globalAcceleration.x, dt * globalAcceleration.y, dt * globalAcceleration.z, 0.0 };
+	const Vec4 globalA{ dt * globalAcceleration.x, dt * globalAcceleration.y, dt * globalAcceleration.z, 0.0 };
 	const float localDT = (float)dt;
 
-	float4* __restrict acc = p->acc.get();
-	float4* __restrict vel = p->vel.get();
-	float4* __restrict pos = p->pos.get();
+	Vec4* __restrict acc = p->acc.get();
+	Vec4* __restrict vel = p->vel.get();
+	Vec4* __restrict pos = p->pos.get();
 
 	const unsigned int endId = p->countAlive;
 	for (size_t i = 0; i < endId; ++i)
@@ -48,23 +50,23 @@ void FloorUpdater::Update(float dt, ParticleData* p)
 {
 	const float localDT = (float)dt;
 
-	float4* __restrict acc = p->acc.get();
-	float4* __restrict vel = p->vel.get();
-	float4* __restrict pos = p->pos.get();
+	Vec4* __restrict acc = p->acc.get();
+	Vec4* __restrict vel = p->vel.get();
+	Vec4* __restrict pos = p->pos.get();
 
 	const size_t endId = p->countAlive;
 	for (size_t i = 0; i < endId; ++i)
 	{
 		if (pos[i].y < floorY)
 		{
-			float4 force = p->acc[i];
-			float normalFactor = Dot4(force, float4(0.0f, 1.0f, 0.0f, 0.0f));
+			Vec4 force = p->acc[i];
+			float normalFactor = Dot4(force, Vec4(0.0f, 1.0f, 0.0f, 0.0f));
 			if (normalFactor < 0.0f)
 			{
 				force.y -= normalFactor;
 
 			}
-			float velFactor = Dot4(vel[i], float4(0.0f, 1.0f, 0.0f, 0.0f));
+			float velFactor = Dot4(vel[i], Vec4(0.0f, 1.0f, 0.0f, 0.0f));
 			//if (velFactor < 0.0)
 			vel[i].y -= (1.0f + bounceFactor) * velFactor;
 
@@ -78,13 +80,13 @@ void AttractorUpdater::Update(float dt, ParticleData* p)
 {
 	const float localDT = dt;
 
-	float4* __restrict acc = p->acc.get();
-	float4* __restrict vel = p->vel.get();
-	float4* __restrict pos = p->pos.get();
+	Vec4* __restrict acc = p->acc.get();
+	Vec4* __restrict vel = p->vel.get();
+	Vec4* __restrict pos = p->pos.get();
 
 	const size_t endId = p->countAlive;
 	const size_t countAttractors = attractors.size();
-	float4 off;
+	Vec4 off;
 	float dist;
 	size_t a;
 	for (size_t i = 0; i < endId; ++i)
@@ -110,10 +112,10 @@ void AttractorUpdater::Update(float dt, ParticleData* p)
 
 void BasicColorUpdater::Update(float dt, ParticleData* p)
 {
-	float4* __restrict col = p->col.get();
-	float4* __restrict startCol = p->startCol.get();
-	float4* __restrict endCol = p->endCol.get();
-	float4* __restrict t = p->time.get();
+	Vec4* __restrict col = p->col.get();
+	Vec4* __restrict startCol = p->startCol.get();
+	Vec4* __restrict endCol = p->endCol.get();
+	Vec4* __restrict t = p->time.get();
 
 	const size_t endId = p->countAlive;
 	for (size_t i = 0; i < endId; ++i)
@@ -127,11 +129,11 @@ void BasicColorUpdater::Update(float dt, ParticleData* p)
 
 void PosColorUpdater::Update(float dt, ParticleData* p)
 {
-	float4* __restrict col      = p->col.get();
-	float4* __restrict startCol = p->startCol.get();
-	float4* __restrict endCol   = p->endCol.get();
-	float4* __restrict t        = p->time.get();
-	float4* __restrict pos      = p->pos.get();
+	Vec4* __restrict col      = p->col.get();
+	Vec4* __restrict startCol = p->startCol.get();
+	Vec4* __restrict endCol   = p->endCol.get();
+	Vec4* __restrict t        = p->time.get();
+	Vec4* __restrict pos      = p->pos.get();
 
 	const int endId = (int)p->countAlive;
 	float scaler, scaleg, scaleb;
@@ -144,20 +146,20 @@ void PosColorUpdater::Update(float dt, ParticleData* p)
 		scaler = (pos[i].x - minPos.x) / diffr;
 		scaleg = (pos[i].y - minPos.y) / diffg;
 		scaleb = (pos[i].z - minPos.z) / diffb;
-		col[i].r = scaler;
-		col[i].g = scaleg;
-		col[i].b = scaleb;
-		col[i].a = Mix(startCol[i].a, endCol[i].a, t[i].z);
+		col[i].x = scaler;
+		col[i].y = scaleg;
+		col[i].z = scaleb;
+		col[i].w = Mix(startCol[i].w, endCol[i].w, t[i].z);
 	}
 }
 
 void VelColorUpdater::Update(float dt, ParticleData* p)
 {
-	float4* __restrict col      = p->col.get();
-	float4* __restrict startCol = p->startCol.get();
-	float4* __restrict endCol   = p->endCol.get();
-	float4* __restrict t        = p->time.get();
-	float4* __restrict vel      = p->vel.get();
+	Vec4* __restrict col      = p->col.get();
+	Vec4* __restrict startCol = p->startCol.get();
+	Vec4* __restrict endCol   = p->endCol.get();
+	Vec4* __restrict t        = p->time.get();
+	Vec4* __restrict vel      = p->vel.get();
 
 	const size_t endId = p->countAlive;
 	float scaler, scaleg, scaleb;
@@ -169,10 +171,10 @@ void VelColorUpdater::Update(float dt, ParticleData* p)
 		scaler = (vel[i].x - minVel.x) / diffr;
 		scaleg = (vel[i].y - minVel.y) / diffg;
 		scaleb = (vel[i].z - minVel.z) / diffb;
-		col[i].r = scaler;// glm::mix(p->m_startCol[i].r, p->m_endCol[i].r, scaler);
-		col[i].g = scaleg;// glm::mix(p->m_startCol[i].g, p->m_endCol[i].g, scaleg);
-		col[i].b = scaleb;// glm::mix(p->m_startCol[i].b, p->m_endCol[i].b, scaleb);
-		col[i].a = Mix(startCol[i].a, endCol[i].a, t[i].z);
+		col[i].x = scaler;// glm::mix(p->m_startCol[i].r, p->m_endCol[i].r, scaler);
+		col[i].y = scaleg;// glm::mix(p->m_startCol[i].g, p->m_endCol[i].g, scaleg);
+		col[i].z = scaleb;// glm::mix(p->m_startCol[i].b, p->m_endCol[i].b, scaleb);
+		col[i].w = Mix(startCol[i].w, endCol[i].w, t[i].z);
 	}
 }
 
@@ -181,7 +183,7 @@ void BasicTimeUpdater::Update(float dt, ParticleData* p)
 	unsigned int endId = p->countAlive;
 	const float localDT = (float)dt;
 
-	float4* __restrict t = p->time.get();
+	Vec4* __restrict t = p->time.get();
 
 	if (endId == 0) return;
 

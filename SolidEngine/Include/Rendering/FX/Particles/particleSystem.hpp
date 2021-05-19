@@ -1,42 +1,54 @@
-#ifndef __PRTRCL_SYS_HPP__
-#define __PRTRCL_SYS_HPP__
+#pragma once
 
 #include <vector>
 
-#include "particleData.hpp"
-#include "particleEmitter.hpp"
-#include "particleUpdater.hpp"
+#include "Rendering/FX/Particles/particleData.hpp"
+#include "Rendering/FX/Particles/particleEmitter.hpp"
+#include "Rendering/FX/Particles/particleUpdater.hpp"
 
-class ParticleSystem
+namespace Solid
 {
-public:
-	ParticleData particles;
-	ParticleData aliveParticles;
+	class ParticleSystem
+	{
+	public:
+		ParticleData particles;
+		ParticleData aliveParticles;
 
-	size_t count;
+		size_t count;
 
-	std::vector<std::shared_ptr<ParticleEmitter>> emitters;
-	std::vector<std::shared_ptr<ParticleUpdater>> updaters;
+		std::vector<std::shared_ptr<ParticleEmitter>> emitters;
+		std::vector<std::shared_ptr<ParticleUpdater>> updaters;
 
-public:
-	explicit ParticleSystem(size_t maxCount);
-	virtual ~ParticleSystem() { }
+	public:
+		explicit ParticleSystem(size_t maxCount);
 
-	ParticleSystem(const ParticleSystem&) = delete;
-	ParticleSystem& operator=(const ParticleSystem&) = delete;
+		virtual ~ParticleSystem()
+		{}
 
-	virtual void Update(double dt);
-	virtual void Reset();
+		ParticleSystem(const ParticleSystem &) = delete;
 
-	virtual size_t NumAllParticles() const { return particles.count; }
-	virtual size_t NumAliveParticles() const { return particles.countAlive; }
+		ParticleSystem &operator=(const ParticleSystem &) = delete;
 
-	void AddEmitter(std::shared_ptr<ParticleEmitter> em) { emitters.push_back(em); }
-	void AddUpdater(std::shared_ptr<ParticleUpdater> up) { updaters.push_back(up); }
+		virtual void Update(double dt);
 
-	ParticleData* FinalData() { return &particles; }
+		virtual void Reset();
 
-	static size_t ComputeMemoryUsage(const ParticleSystem& p);
-};
+		virtual size_t NumAllParticles() const
+		{ return particles.count; }
 
-#endif
+		virtual size_t NumAliveParticles() const
+		{ return particles.countAlive; }
+
+		void AddEmitter(std::shared_ptr<ParticleEmitter> em)
+		{ emitters.push_back(em); }
+
+		void AddUpdater(std::shared_ptr<ParticleUpdater> up)
+		{ updaters.push_back(up); }
+
+		ParticleData *FinalData()
+		{ return &particles; }
+
+		static size_t ComputeMemoryUsage(const ParticleSystem &p);
+	};
+}
+
