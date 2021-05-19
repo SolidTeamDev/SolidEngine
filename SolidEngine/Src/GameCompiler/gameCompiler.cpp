@@ -455,7 +455,7 @@ namespace Solid
 
 		                     "namespace Solid SLDNamespace()\n"
 		                     "{\n"
-		                     "\tclass SOLID_API SLDClass() "+copyName+" : public Script\n"
+		                     "\tclass SOLID_SCRIPT_API SLDClass() "+copyName+" : public Script\n"
 		                     "\t{\n"
 		                     "\t""public:\n"
 		                     "\t\t""\n"
@@ -469,7 +469,7 @@ namespace Solid
 		                     "\t\t""\n"
 		                     "\t\t""\n"
 		                     "\t\t"+copyName+"_GENERATED\n"
-							 "\t}\n"
+							 "\t};\n"
 		                     "\t\n"
 		                     "\t\n"
 		                     "\t\n"
