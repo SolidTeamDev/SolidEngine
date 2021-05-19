@@ -109,7 +109,6 @@ void Solid::HierarchyTreeInterface::DrawCreateObject()
 			    }
 
 		    }
-			UI::EndMenu();
 	    }
 	    if(UI::BeginMenu("Prefab"))
 	    {
