@@ -800,7 +800,10 @@ namespace Solid
 		    const ImGuiPayload *drop = UI::GetDragDropPayload();
 		    if (drop != nullptr)
 		    {
-			    _str = std::string((char *) drop->Data, drop->DataSize);
+
+			    Resource* r = *((Resource**)drop->Data);
+
+			    _str = r->name;
 
 
 		    }
