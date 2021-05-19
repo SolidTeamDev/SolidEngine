@@ -15,9 +15,13 @@ namespace Solid SLDNamespace()
         Animation() = default;
         Animation(AnimResource* _anim);
         ~Animation() = default;
+
+        void CalculateBoneTransform (SkeletonResource::Bone* bone, Solid::Mat4f _parent);
         void DrawSkeleton(std::vector<Vec3>& points, std::vector<uint>& indices,
-                          SkeletonResource::Bone* bone = nullptr, uint index = 0);
+                          SkeletonResource::Bone* bone = nullptr);
         void SetAnim(AnimResource *_anim);
+        void UpdateAnim(float dt);
+        void UpdateBone(float currTime, SkeletonResource::Bone* bone = nullptr);
         const AnimResource * GetAnim();
 
 
@@ -25,8 +29,8 @@ namespace Solid SLDNamespace()
     private:
         //SkeletonResource* Skeleton = nullptr;
         AnimResource* anim = nullptr;
-
-
+        float CurrentTime;
+        Mat4f InverseRootMat = Mat4f::Identity;
 
     };
 }

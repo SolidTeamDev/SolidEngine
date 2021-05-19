@@ -517,7 +517,8 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 
 				}
 			};
-			std::function<bool(SkeletonResource::Bone*, aiBone*, uint)> setWeights = [&](SkeletonResource::Bone* _bone, aiBone* _aiBone, uint id)-> bool{
+			std::function<bool(SkeletonResource::Bone*, aiBone*, uint)> setWeights = [&](SkeletonResource::Bone* _bone, aiBone* _aiBone, uint id)-> bool
+			{
 
 				if(_bone->name == _aiBone->mName.C_Str())
 				{
@@ -598,6 +599,10 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 			aiQuatKey* rotKeys =scene->mAnimations[i]->mChannels[j]->mRotationKeys;
 			int rotKeysNum =scene->mAnimations[i]->mChannels[j]->mNumRotationKeys;
 			aiVectorKey* scaleKeys =scene->mAnimations[i]->mChannels[j]->mScalingKeys;
+            //aiVector3t<ai_real> v = scene->mAnimations[i]->mChannels[j]->mPositionKeys[0].mValue;
+            //aiVector3t<ai_real> v2 = scene->mAnimations[i]->mChannels[j]->mPositionKeys[220].mValue;
+            //printf("x: %f, y: %f,z: %f\n", v.x, v.y, v.z);
+            //printf("x: %f, y: %f,z: %f\n", v2.x, v2.y, v2.z);
 			int scaleKeysNum =scene->mAnimations[i]->mChannels[j]->mNumScalingKeys;
 			int k = 0;
 			int l = 0;
@@ -673,13 +678,13 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 				if (hasRot)
 				{
 					frame.useRot = true;
-					frame.Rot = Quat(rotKeys[k].mValue.x,rotKeys[k].mValue.y,rotKeys[k].mValue.z,rotKeys[k].mValue.w);
+					frame.Rot = Quat(rotKeys[l].mValue.x,rotKeys[l].mValue.y,rotKeys[l].mValue.z,rotKeys[l].mValue.w);
 					l++;
 				}
 				if (hasScale)
 				{
 					frame.useScale = true;
-					frame.Scale = Vec3(scaleKeys[k].mValue.x,scaleKeys[k].mValue.y,scaleKeys[k].mValue.z);
+					frame.Scale = Vec3(scaleKeys[m].mValue.x,scaleKeys[m].mValue.y,scaleKeys[m].mValue.z);
 					m++;
 				}
 

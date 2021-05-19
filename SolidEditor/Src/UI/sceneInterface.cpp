@@ -85,7 +85,7 @@ namespace Solid
 
         sceneCam.UpdateCamera(sceneFramebuffer.size);
 
-        if(UI::IsWindowFocused() && !ImGuizmo::IsOver() && MouseInSceneInterface(mousePos))
+        if(UI::IsWindowFocused() && !ImGuizmo::IsUsing() && MouseInSceneInterface(mousePos))
         {
             MovementAndRotationCam(Time::DeltaTime()  * float((int)(engine->window->GetWindowSize().x/2) - mousePos.x ),
                                   Time::DeltaTime()  * float((int)(engine->window->GetWindowSize().y/2) - mousePos.y ));
@@ -105,6 +105,7 @@ namespace Solid
                     std::vector<Vec3> points;
                     std::vector<uint> indices;
                     Animation& anim = engine->ecsManager.GetComponent<Animation>(gameObject->GetEntity());
+                    anim.UpdateAnim(Time::DeltaTime());
                     anim.DrawSkeleton(points,indices);
                     engine->renderer->DrawLines(sceneCam, points, indices);
                 }

@@ -144,10 +144,12 @@ namespace Solid {
 			std::vector<Bone*> Childrens;
 			std::vector<float> Weights;
 			bool WeightInit = false;
-			Mat4<float> LocalTrans;
-            Mat4<float> GlobalTrans;
-            Mat4<float> offset; // inverse bind pose
-			Mat4<float> FinalTrans;
+
+            Mat4f T_pos;
+            Mat4f LocalTrans;
+            Mat4f GlobalTrans;
+            Mat4f offset; // inverse bind pose
+			Mat4f FinalTrans;
 			int id = -1;
 			bool isAnimated = false;
 			Bone() = default;
