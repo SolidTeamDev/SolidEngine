@@ -350,8 +350,8 @@ namespace Solid
 		        const ImGuiPayload* drop=UI::AcceptDragDropPayload("Mesh");
 		        if(drop != nullptr)
 		        {
-			        std::string s = std::string((char*)drop->Data, drop->DataSize);
-			        _meshRenderer.SetMesh(engine->graphicsResourceMgr.GetMesh(s.c_str()));
+			        Resource* r = *((Resource**)drop->Data);
+			        _meshRenderer.SetMesh(engine->graphicsResourceMgr.GetMesh(r->name.c_str()));
 
 		        }
 		        UI::EndDragDropTarget();
@@ -394,8 +394,8 @@ namespace Solid
 		                const ImGuiPayload* drop=UI::AcceptDragDropPayload("Material");
 		                if(drop != nullptr)
 		                {
-			                std::string s = std::string((char*)drop->Data, drop->DataSize);
-			                _meshRenderer.SetMaterialAt(id, engine->resourceManager.GetRawMaterialByName(s.c_str()));
+			                Resource* r = *((Resource**)drop->Data);
+			                _meshRenderer.SetMaterialAt(id, (MaterialResource*)r);
 
 		                }
 		                UI::EndDragDropTarget();
@@ -539,8 +539,8 @@ namespace Solid
 		                    const ImGuiPayload* drop=UI::AcceptDragDropPayload("Shader");
 		                    if(drop != nullptr)
 		                    {
-			                    std::string s = std::string((char*)drop->Data, drop->DataSize);
-			                    mat->SetShader(engine->graphicsResourceMgr.GetShader(s.c_str()));
+			                    Resource* r = *((Resource**)drop->Data);
+			                    mat->SetShader(engine->graphicsResourceMgr.GetShader(r->name.c_str()));
 
 		                    }
 		                    UI::EndDragDropTarget();
@@ -621,8 +621,8 @@ namespace Solid
 		        const ImGuiPayload* drop=UI::AcceptDragDropPayload("Audio");
 		        if(drop != nullptr)
 		        {
-			        std::string s = std::string((char*)drop->Data, drop->DataSize);
-			        _audioSource.SetAudio(engine->resourceManager.GetRawAudioByName(s.c_str()));
+			        Resource* r = *((Resource**)drop->Data);
+			        _audioSource.SetAudio((AudioResource*)r);
 
 		        }
 		        UI::EndDragDropTarget();
@@ -821,8 +821,8 @@ namespace Solid
 		    const ImGuiPayload* drop=UI::AcceptDragDropPayload("Image");
 		    if(drop != nullptr)
 		    {
-			    std::string s = std::string((char*)drop->Data, drop->DataSize);
-			    _texture = engine->graphicsResourceMgr.GetTexture(s.c_str());
+			    Resource* r = *((Resource**)drop->Data);
+			    _texture = engine->graphicsResourceMgr.GetTexture(r->name.c_str());
 
 		    }
 		    UI::EndDragDropTarget();

@@ -1326,7 +1326,7 @@ Resource * ResourcesLoader::LoadSolidShader(const fs::path &Rpath)
 
 void ResourcesLoader::SaveMaterialToFile(MaterialResource *_mat)
 {
-	printf("generate .SMaterial\n");
+	//rintf("generate .SMaterial\n");
 	std::vector<char> Data;
 	_mat->ToDataBuffer(Data);
 
@@ -1352,6 +1352,7 @@ void ResourcesLoader::SaveMaterialToFile(MaterialResource *_mat)
 	{
 		std::cout << "" << "\n";
 		cacheFile.write(Data.data(), Data.size());
+		cacheFile.close();
 	}
 }
 
@@ -1427,7 +1428,7 @@ void ResourcesLoader::SetPath(std::deque<std::string> &resPath, const fs::path& 
 			invPaths.push_front(p.filename().string());
 
 			p =p.parent_path();
-			if(p.filename().empty())
+			if(!p.filename().empty())
 				return pathFind(p);
 			else
 			{
@@ -1458,6 +1459,105 @@ Resource *ResourcesLoader::LoadSolidPrefab(const fs::path &Rpath)
 	prefab->FromDataBuffer(buffer.data(),buffer.size());
 
 	return prefab;
+}
+
+void ResourcesLoader::ReLoadRessource(Resource *_resource)
+{
+	std::vector<char>b;
+	_resource->ToDataBuffer(b);
+	fs::path Rpath = SolidPath;
+	for (int i = 1; i < _resource->path.size(); ++i)
+	{
+		Rpath.append(_resource->path[i]);
+	}
+
+	switch (_resource->GetType())
+	{
+		case EResourceType::Mesh:
+		{
+			Rpath.append(_resource->name+".SMesh");
+			break;
+		}
+		case EResourceType::Shader:
+		{
+			Rpath.append(_resource->name+".SVertFrag");
+			break;
+		}
+		case EResourceType::Material:
+		{
+			SaveMaterialToFile((MaterialResource*)_resource);
+			return;
+		}
+		case EResourceType::Compute:
+		{
+			Rpath.append(_resource->name+".SCompute");
+			break;
+		}
+		case EResourceType::Image:
+		{
+			Rpath.append(_resource->name+".SImage");
+			break;
+		}
+		case EResourceType::Anim:
+		{
+			Rpath.append(_resource->name+".SAnim");
+			break;
+		}
+		case EResourceType::Audio:
+		{
+			Rpath.append(_resource->name);
+			Resource* r = LoadAudio(Rpath);
+			delete r;
+			return;
+		}
+		case EResourceType::Skeleton:
+		{
+			Rpath.append(_resource->name);
+			break;
+		}
+		case EResourceType::Scene:
+		{
+			Rpath.append(_resource->name+ ".SolidScene");
+			break;
+		}
+		case EResourceType::Prefab:
+		{
+			SavePrefabToFile((PrefabResource *) _resource);
+			return;
+		}
+		default:
+			ThrowError("Type Not Stored", ESolidErrorCode::S_INIT_ERROR);
+			break;
+	}
+
+	std::ofstream cacheFile(Rpath, std::fstream::binary | std::fstream::trunc);
+	if(cacheFile.is_open())
+	{
+		cacheFile.write(b.data(),b.size());
+		cacheFile.close();
+	}
+
+
+}
+
+void ResourcesLoader::SavePrefabToFile(PrefabResource *_prefab)
+{
+	fs::path p = ResourcesLoader::SolidPath.parent_path();
+	for(std::string& elt : _prefab->path)
+	{
+		if(elt == "\\Assets\\")
+		{
+			p.append("Assets");
+		}
+		else
+			p.append(elt);
+	}
+	p.append(_prefab->name +".SolidPrefab");
+	std::vector<char>buf;
+	_prefab->ToDataBuffer(buf);
+	std::ofstream file(p, std::ifstream::binary | std::ofstream::trunc);
+	file.write(buf.data(), buf.size());
+	file.close();
 }
 
 

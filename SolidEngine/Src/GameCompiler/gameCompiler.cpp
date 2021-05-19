@@ -448,7 +448,7 @@ namespace Solid
 		/////////////////////////////////////
 		std::string RawHpp = "#include \"ECS/types.hpp\"\n"
 		                     "#include \"Build/solidAPI.hpp\"\n"
-		                     "#include \"GameGenerated/"+copyName+".sld.hpp\"\n"
+		                     "#include \"EngineGenerated/"+copyName+".sld.hpp\"\n"
 		                     "\n"
 		                     "namespace Solid SLDNamespace()\n"
 		                     "{\n"
