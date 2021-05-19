@@ -121,7 +121,12 @@ void ScriptList::CleanAllNullptr()
 	    if((*it) == nullptr)
 	    {
 	    	Scripts.erase(it);
-		    it = Scripts.begin() +((i > 0 ? i:1)-1);
+	    	int t = i-1;
+	    	if(t < 0)
+	    		t = 0;
+		    it = Scripts.begin() +t;
+		    if(it == Scripts.end())
+			    break;
 	    }
 	    else
 	    	++i;

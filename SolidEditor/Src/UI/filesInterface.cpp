@@ -446,7 +446,10 @@ namespace Solid
 					//error
 		        }
 		        else
+		        {
 		        	Compiler->CreateScript(fName);
+		            UI::CloseCurrentPopup();
+		        }
 	        }
         	UI::EndPopup();
         }
