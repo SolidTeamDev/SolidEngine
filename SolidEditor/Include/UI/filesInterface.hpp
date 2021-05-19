@@ -9,16 +9,22 @@ namespace Solid
     {
 	    bool        matNamePopup = false;
 	    std::string matNamestr;
+	    struct file
+	    {
+	    	std::string fileNames;
+	    	std::string ftype;
+	    };
 	    struct filePathData
 	    {
 	    	std::string folderName;
 	    	filePathData* parent = nullptr;
-	    	std::vector<std::string> fileNames;
+	    	std::vector<file> fileNames;
 	    	std::unordered_map<std::string, filePathData> childPaths;
 	    } root;
 	    double counter =0.0f;
 	    filePathData* currentFolder = &root;
 	    imgui_addons::ImGuiFileBrowser fileBrowser;
+	    bool test = false;
     public:
         FilesInterface();
         ~FilesInterface() = default;
