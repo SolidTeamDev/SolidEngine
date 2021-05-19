@@ -465,6 +465,7 @@ namespace Solid
                         if(codeEditor.isCodeEditorOpen)
                         {
                             auto cpos = codeEditor.imCodeEditor.GetCursorPosition();
+                            UI::SetNextWindowSize(ImVec2(800,600),ImGuiCond_Once);
                             UI::Begin("Edit shader##Window", &codeEditor.isCodeEditorOpen,ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking);
                             if (ImGui::BeginMenuBar())
                             {

@@ -365,6 +365,10 @@ namespace Solid
                     img = "ShaderFile";
                 else if(elt.ftype == "Mesh")
                     img = "ObjFile";
+                else if(elt.ftype == "Prefab")
+                    img = "PrefabFile";
+                else if(elt.ftype == "Material")
+                    img = "MatFile";
 			    UI::PushID(elt.fileNames.c_str());
                 UI::ImageButton((ImTextureID)editorTex[img]->texId,ImVec2(imgSize,imgSize),ImVec2(0,1),ImVec2(1,0));
                 UI::PopID();
@@ -585,6 +589,32 @@ namespace Solid
                 if(Tex != nullptr)
                 {
                     editorTex.emplace("ObjFile", Tex);
+                }
+            }
+        }
+        {
+            ResourcePtrWrapper wrap;
+            loader.LoadRessourceNoAdd( EditorAssets.string() + "/MatFile.png", wrap);
+            if(wrap.r != nullptr && wrap.r->GetType() == EResourceType::Image)
+            {
+                editorImage.emplace("MatFile", (ImageResource*)wrap.r);
+                std::shared_ptr<GL::Texture> Tex = std::make_shared<GL::Texture>((ImageResource*)wrap.r);
+                if(Tex != nullptr)
+                {
+                    editorTex.emplace("MatFile", Tex);
+                }
+            }
+        }
+        {
+            ResourcePtrWrapper wrap;
+            loader.LoadRessourceNoAdd( EditorAssets.string() + "/PrefabFile.png", wrap);
+            if(wrap.r != nullptr && wrap.r->GetType() == EResourceType::Image)
+            {
+                editorImage.emplace("PrefabFile", (ImageResource*)wrap.r);
+                std::shared_ptr<GL::Texture> Tex = std::make_shared<GL::Texture>((ImageResource*)wrap.r);
+                if(Tex != nullptr)
+                {
+                    editorTex.emplace("PrefabFile", Tex);
                 }
             }
         }
