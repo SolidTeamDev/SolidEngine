@@ -255,7 +255,12 @@ void ButtonInterface::Draw()
 			if(!fs::exists(TmpDir))
 				fs::create_directory(TmpDir);
 			std::ifstream in (DLLPath.string(), std::fstream::binary);
+			if(fs::exists(TempDLL.string()))
+				fs::remove(TempDLL.string());
+
 			std::ofstream out (TempDLL.string(), std::fstream::binary | std::fstream::trunc);
+			if(!out.is_open())
+				Log::Send("Temp DLL Not Openable", Log::ELogSeverity::ERROR);
 			out << in.rdbuf();
 			in.close();
 			out.close();
@@ -286,7 +291,7 @@ void ButtonInterface::Draw()
 					const rfk::Class* c= compiler->getNamespace("Solid")->getClass(elt.compName);
 					if(c == nullptr)
 					{
-
+						array[elt.entityCompIndex].GetAllScripts()[elt.CompListIndex] = nullptr;
 						///OUCH
 					}
 					else
@@ -305,7 +310,7 @@ void ButtonInterface::Draw()
 				}
 				for(auto& elt : idArray)
 				{
-					ScriptList scriptListToClean =array[elt.second];
+					ScriptList& scriptListToClean =array[elt.second];
 					scriptListToClean.CleanAllNullptr();
 				}
 
