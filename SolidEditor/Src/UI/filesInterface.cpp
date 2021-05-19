@@ -191,13 +191,13 @@ namespace Solid
             }
 		    for(auto& elt : currentFolder->fileNames)
 		    {
-		        std::string fileExt = elt.substr(elt.find('.') + 1);
+
                 std::string img = "File";
-		        if(fileExt == "png" || fileExt == "bmp" || fileExt == "jpg")
+		        if(elt.ftype == "Image" )
 		            img = "ImgFile";
-		        else if(fileExt == "wav")
+		        else if(elt.ftype == "Audio" )
 		            img = "SoundFile";
-                else if(fileExt == "SVertFrag")
+                else if(elt.ftype == "Shader" )
                     img = "ShaderFile";
 
                 UI::ImageButton((ImTextureID)editorTex[img]->texId,ImVec2(imgSize,imgSize),ImVec2(0,1),ImVec2(1,0));
@@ -211,7 +211,7 @@ namespace Solid
 			    }
 		        UI::SameLine();
 		        UI::SetCursorPosY(UI::GetCursorPosY()+imgSize/2);
-		        UI::Text(elt.c_str());
+		        UI::Text(elt.fileNames.c_str());
                 UI::SetCursorPosY(UI::GetCursorPosY()-imgSize/2);
             }
 			    
