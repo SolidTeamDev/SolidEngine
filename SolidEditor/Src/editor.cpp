@@ -66,9 +66,6 @@ namespace Solid
 
         glfwSwapInterval(0);
 
-        String t = "hh";
-
-
 	    while (!glfwWindowShouldClose(window->GetHandle()))
         {
             glfwPollEvents();
@@ -92,7 +89,6 @@ namespace Solid
 
             window->SwapBuffers();
         }
-
 
     }
 

@@ -108,6 +108,22 @@ void ScriptList::Update()
 	}
 }
 
+void ScriptList::FixedUpdate()
+{
+	for(Script* elt : Scripts)
+	{
+		elt->FixedUpdate();
+	}
+}
+
+void ScriptList::LateUpdate()
+{
+	for(Script* elt : Scripts)
+	{
+		elt->LateUpdate();
+	}
+}
+
 std::vector<Script *> &ScriptList::GetAllScripts()
 {
 	return Scripts;

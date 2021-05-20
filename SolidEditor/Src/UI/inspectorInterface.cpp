@@ -9,6 +9,12 @@
 
 namespace Solid
 {
+
+    InspectorInterface::InspectorInterface()
+    {
+        engine = Engine::GetInstance();
+    }
+
     void InspectorInterface::Draw()
     {
         if(!p_open)
@@ -37,7 +43,6 @@ namespace Solid
 
     void InspectorInterface::DrawComponents()
     {
-        Engine*     engine = Engine::GetInstance();
         GameObject* gameObject = EditorInterface::selectedGO;
 
         UI::Text("Name: ");
@@ -57,7 +62,17 @@ namespace Solid
         {
             EditAudioSource(engine->ecsManager.GetComponent<AudioSource>(gameObject->GetEntity()));
         }
-        
+
+        if(engine->ecsManager.GotComponent<Light>(gameObject->GetEntity()))
+        {
+            EditLight(engine->ecsManager.GetComponent<Light>(gameObject->GetEntity()));
+        }
+
+        if(engine->ecsManager.GotComponent<Camera>(gameObject->GetEntity()))
+        {
+            EditCamera(engine->ecsManager.GetComponent<Camera>(gameObject->GetEntity()));
+        }
+
         if(engine->ecsManager.GotComponent<ScriptList>(gameObject->GetEntity()))
         {
 	        ScriptList& sl = engine->ecsManager.GetComponent<ScriptList>(gameObject->GetEntity());
@@ -66,16 +81,10 @@ namespace Solid
 		        EditComp(elt);
 	        }
 	    }
-
-        if(engine->ecsManager.GotComponent<Light>(gameObject->GetEntity()))
-        {
-            EditLight(engine->ecsManager.GetComponent<Light>(gameObject->GetEntity()));
-        }
     }
 
     void InspectorInterface::AddComponents()
     {
-        Engine*     engine = Engine::GetInstance();
         GameObject* gameObject = EditorInterface::selectedGO;
 
         if(UI::Button("Add Component",ImVec2(-1, 0)))
@@ -147,6 +156,14 @@ namespace Solid
                 if(UI::Button("Light"))
                 {
                     engine->ecsManager.AddComponent<Light>(gameObject,Light());
+                    UI::CloseCurrentPopup();
+                }
+            }
+            if(!engine->ecsManager.GotComponent<Camera>(gameObject->GetEntity()))
+            {
+                if(UI::Button("Camera"))
+                {
+                    engine->ecsManager.AddComponent<Camera>(gameObject,Camera());
                     UI::CloseCurrentPopup();
                 }
             }
@@ -259,6 +276,22 @@ namespace Solid
 				    UI::CloseCurrentPopup();
 			    }
 		    }
+            if(engine->ecsManager.GotComponent<Light>(gameObject->GetEntity()))
+            {
+                if(UI::Button("Light"))
+                {
+                    engine->ecsManager.RemoveComponent<Light>(gameObject);
+                    UI::CloseCurrentPopup();
+                }
+            }
+            if(engine->ecsManager.GotComponent<Camera>(gameObject->GetEntity()))
+            {
+                if(UI::Button("Camera"))
+                {
+                    engine->ecsManager.RemoveComponent<Camera>(gameObject);
+                    UI::CloseCurrentPopup();
+                }
+            }
 		    if(engine->ecsManager.GotComponent<ScriptList>(gameObject->GetEntity()))
 		    {
 		    	ScriptList& sl = engine->ecsManager.GetComponent<ScriptList>(gameObject->GetEntity());
@@ -337,7 +370,6 @@ namespace Solid
     {
         if(UI::CollapsingHeader("MeshRenderer",ImGuiTreeNodeFlags_DefaultOpen))
         {
-            Engine* engine = Engine::GetInstance();
             auto mesh = _meshRenderer.GetMesh();
             const char* meshName = mesh == nullptr ? "" : mesh->name.c_str();
 
@@ -610,7 +642,6 @@ namespace Solid
 
     void InspectorInterface::EditAudioSource(AudioSource &_audioSource)
     {
-        Engine* engine = Engine::GetInstance();
         std::string audioName = _audioSource.GetName();
 
         if(UI::CollapsingHeader("Audio Source",ImGuiTreeNodeFlags_DefaultOpen))
@@ -687,10 +718,8 @@ namespace Solid
         UI::Separator();
     }
 
-    void InspectorInterface::EditLight(Light &_light)
+    void InspectorInterface::EditLight(Light& _light)
     {
-        Engine* engine = Engine::GetInstance();
-
         if(UI::CollapsingHeader("Light",ImGuiTreeNodeFlags_DefaultOpen))
         {
             UI::ColorEdit3("Color",&_light.color.x);
@@ -699,6 +728,20 @@ namespace Solid
 
         UI::Separator();
 
+    }
+
+    void InspectorInterface::EditCamera(Camera& _camera)
+    {
+        if(UI::CollapsingHeader("Camera",ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            if(UI::Button("Set active camera"))
+                _camera.SetActiveCamera();
+
+            EditFloat(_camera.fov,"Fov",0.01f);
+            EditFloat(_camera._near,"Near",0.01f);
+            EditFloat(_camera._far,"Far",0.01f);
+        }
+        UI::Separator();
     }
 
     void InspectorInterface::CreateScriptWindow()
@@ -814,8 +857,6 @@ namespace Solid
 
     void InspectorInterface::EditTexture(std::shared_ptr<ITexture>& _texture, const std::string &_label)
     {
-        Engine *engine = Engine::GetInstance();
-
         std::string textName = _texture == nullptr ? "None" : _texture->name;
 
 	    bool combo = UI::BeginCombo(_label.c_str(),textName.c_str());
