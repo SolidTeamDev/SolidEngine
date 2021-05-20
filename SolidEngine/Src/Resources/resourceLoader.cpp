@@ -1457,7 +1457,9 @@ Resource *ResourcesLoader::LoadSolidPrefab(const fs::path &Rpath)
 	ifs.read(&buffer[0], pos);
 
 	prefab->FromDataBuffer(buffer.data(),buffer.size());
-
+	prefab->path.clear();
+	prefab->path.push_front(rootFolder);
+	SetPath(prefab->path, Rpath);
 	return prefab;
 }
 
