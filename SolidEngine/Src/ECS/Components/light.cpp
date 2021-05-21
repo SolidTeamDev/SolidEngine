@@ -13,6 +13,7 @@ namespace Solid
     {
 	    Components::Release();
 	    //TODO: Remove light of the list
+	    //lightList.erase(lightList.begin()+id);
     }
 
     std::vector<Light*> Light::GetLightList()

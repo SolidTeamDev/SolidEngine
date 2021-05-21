@@ -58,6 +58,11 @@ namespace Solid
     {
         rotation = rotation.Rotate(_quat);
 
+        euler = rotation.ToEuler();
+        euler.x=Maths::RadToDeg(euler.x);
+        euler.y=Maths::RadToDeg(euler.y);
+        euler.z=Maths::RadToDeg(euler.z);
+
         hasToUpdateMat = true;
     }
 

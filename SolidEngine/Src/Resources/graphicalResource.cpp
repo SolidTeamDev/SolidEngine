@@ -492,7 +492,7 @@ std::vector<ShaderUniform> &GL::Shader::GetUniformList()
 
 GL::Texture::Texture(ImageResource *_image)
 {
-	Log::Send("IMAGE CHAN NUM = " + std::to_string(_image->ChannelsNum));
+	//Log::Send("IMAGE CHAN NUM = " + std::to_string(_image->ChannelsNum));
 	name = _image->name;
 	glGenTextures(1, &texId);
 	glBindTexture(GL_TEXTURE_2D, texId);

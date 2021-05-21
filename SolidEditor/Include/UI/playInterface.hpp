@@ -1,11 +1,18 @@
 #pragma once
 
+#include "Core/engine.hpp"
+
 namespace Solid
 {
     class PlayInterface
     {
+    private:
+        Framebuffer playFramebuffer;
+        Engine* engine = nullptr;
+
+        void DrawScene();
     public:
-        PlayInterface()  = default;
+        PlayInterface();
         ~PlayInterface() = default;
 
         void Draw();

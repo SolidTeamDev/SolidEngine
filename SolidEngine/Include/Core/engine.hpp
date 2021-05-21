@@ -66,6 +66,8 @@ namespace Solid
         GraphicalResourceMgr graphicsResourceMgr;
         Physics physics;
 
+        Camera* activeCamera = nullptr;
+
         static Engine* GetInstance();
         bool MultiThreadEnabled()const {return mtEnabled;}
         void EnableMultiThread(bool _b);

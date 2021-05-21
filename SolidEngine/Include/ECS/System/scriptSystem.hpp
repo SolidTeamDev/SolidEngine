@@ -1,9 +1,5 @@
-//
-// Created by ryan1 on 05/05/2021.
-//
+#pragma once
 
-#ifndef SOLIDLAUNCHER_SCRIPTSYSTEM_HPP
-#define SOLIDLAUNCHER_SCRIPTSYSTEM_HPP
 #include "Build/solidAPI.hpp"
 
 #include "ECS/system.hpp"
@@ -18,6 +14,7 @@ namespace Solid
 		ScriptSystem(ECSManager& _ecsManager): System(_ecsManager){};
 
 		void Update();
+		void FixedUpdate();
+		void LateUpdate();
 	};
 } //!namespace
-#endif //SOLIDLAUNCHER_SCRIPTSYSTEM_HPP

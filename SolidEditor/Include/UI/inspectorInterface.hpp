@@ -20,6 +20,7 @@ namespace Solid
     class Engine;
     class InspectorInterface
     {
+    private:
         struct CodeEditor
         {
             enum class ECodeType
@@ -34,8 +35,10 @@ namespace Solid
 
         CodeEditor codeEditor;
 
+        Engine* engine = nullptr;
+
     public:
-        InspectorInterface()  = default;
+        InspectorInterface();
         ~InspectorInterface() = default;
 
         void Draw();
@@ -50,6 +53,7 @@ namespace Solid
         void EditAnimation(Animation& _anim);
 
         void EditLight(Light& _light);
+        void EditCamera(Camera& _camera);
 
         void EditComp(Components* _comp);
 

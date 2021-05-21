@@ -76,7 +76,8 @@ namespace Solid
         static InputManager<int>* editorInputManager;
 
         static float camSpeed;
-        static Framebuffer sceneFramebuffer;
+        //static Framebuffer sceneFramebuffer;
+        //static Framebuffer playFramebuffer;
         static Camera editorCamera;
 
         json CurrentProjectJson;

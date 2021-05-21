@@ -120,14 +120,13 @@ ButtonInterface::ButtonInterface()
 void ButtonInterface::Draw()
 {
 	ImGuiWindowClass window_class;
-	window_class.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoTabBar | ImGuiDockNodeFlags_NoResize | ImGuiDockNodeFlags_NoResizeY ;
+	window_class.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoTabBar | ImGuiDockNodeFlags_NoResize | ImGuiDockNodeFlags_NoResizeY |
+                                            ImGuiDockNodeFlags_NoResizeY | ImGuiDockNodeFlags_NoDockingSplitMe | ImGuiDockNodeFlags_NoDockingOverMe;
 	ImGui::SetNextWindowClass(&window_class);
-
 	UI::Begin("Buttons", nullptr,
-	          ImGuiWindowFlags_NoCollapse |ImGuiWindowFlags_AlwaysAutoResize| ImGuiWindowFlags_NoResize| ImGuiWindowFlags_NoTitleBar );
+	          ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize| ImGuiWindowFlags_NoTitleBar );
 
-	ImVec2 bS = ImVec2(20 ,18);
-	UI::SetCursorPos(ImVec2{UI::GetCursorPosX(), UI::GetContentRegionAvail().y / 5.0f});
+	ImVec2 bS = ImVec2(20 ,20);
 
 	std::string modeName = ButtonInterface::gizmoReferential == ImGuizmo::MODE::LOCAL ? "Local" : "Global";
 	UI::SetNextItemWidth(75.f);

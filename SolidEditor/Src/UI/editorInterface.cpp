@@ -53,10 +53,10 @@ namespace Solid {
 
 
         filesInterface.Draw();
-        sceneInterface.Draw();
         inspectorInterface.Draw();
         hierarchyTreeInterface.Draw();
         playInterface.Draw();
+        sceneInterface.Draw();
         logsInterface.Draw();
         buttonInterface.Draw();
 
