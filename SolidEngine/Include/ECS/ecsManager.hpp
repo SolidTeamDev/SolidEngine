@@ -141,7 +141,7 @@ namespace Solid
         void RemoveComponent(GameObject* _entity)
         {
             Components* c = componentManager->RemoveComponent<T>(_entity->GetEntity());
-            c->Release();
+
 	        for (auto it= _entity->compsList.begin(); it != _entity->compsList.end(); ++it)
 	        {
 		        if(*it == c)

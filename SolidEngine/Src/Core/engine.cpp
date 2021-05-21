@@ -61,6 +61,12 @@ namespace Solid
         ecsManager.RegisterComponent<Light>();
 
         //Register Signature
+	    transformSystem = ecsManager.RegisterSystem<TransformSystem>();
+	    {
+		    Signature signature;
+		    signature.set(ecsManager.GetComponentType<Transform>());
+		    ecsManager.SetSystemSignature<TransformSystem>(signature);
+	    }
         rendererSystem = ecsManager.RegisterSystem<RendererSystem>();
         {
             Signature signature;
@@ -150,6 +156,13 @@ namespace Solid
 
 
     }
+
+	void Engine::ForceUpdate()
+	{
+		transformSystem->Update();
+
+
+	}
 
 	void Engine::LoadScene(const fs::path &p)
 	{
@@ -420,6 +433,40 @@ namespace Solid
 
 							}
 							t->Init();
+							delete cmp;
+						}
+						else if (className == "Light")
+						{
+							Light *t = Engine::GetInstance()->ecsManager.AddComponent(go, *(Light *) cmp);
+
+							for (int i = 0; i < FieldNum; ++i)
+							{
+								short isNull = -1;
+
+								//Get Comp FieldName
+								ResourcesLoader::ReadFromBuffer(buffer.data(), &cmpNameSize, sizeof(std::size_t),
+								                                readPos);
+								std::string Name;
+								Name.resize(cmpNameSize / sizeof(std::string::value_type));
+								ResourcesLoader::ReadFromBuffer(buffer.data(), Name.data(), cmpNameSize, readPos);
+
+								//Get is Null
+								ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(short), readPos);
+								std::size_t memSize = 0;
+								//Get Field Data
+								ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t), readPos);
+								if (isNull == 256)
+								{}
+								else
+								{}
+								char *buf = new char[memSize]();
+								ResourcesLoader::ReadFromBuffer(buffer.data(), buf, memSize, readPos);
+								const rfk::Field *f = t->getArchetype().getField(Name);
+								f->setData(t, ((void *) buf), memSize);
+								delete[] buf;
+
+							}
+
 							delete cmp;
 						}
 						else if (ns != nullptr && myClass->isSubclassOf(*ns->getClass("Script")))

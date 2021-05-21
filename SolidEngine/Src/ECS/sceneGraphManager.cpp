@@ -365,6 +365,40 @@ Solid::SceneGraphManager::Instantiate(std::string _prefabName, Solid::GameObject
 						}
 						t->Init();
 					}
+					else if (className == "Light")
+					{
+						Light *t = Engine::GetInstance()->ecsManager.AddComponent(go, *(Light *) cmp);
+
+						for (int i = 0; i < FieldNum; ++i)
+						{
+							short isNull = -1;
+
+							//Get Comp FieldName
+							ResourcesLoader::ReadFromBuffer(buffer.data(), &cmpNameSize, sizeof(std::size_t),
+							                                readPos);
+							std::string Name;
+							Name.resize(cmpNameSize / sizeof(std::string::value_type));
+							ResourcesLoader::ReadFromBuffer(buffer.data(), Name.data(), cmpNameSize, readPos);
+
+							//Get is Null
+							ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(short), readPos);
+							std::size_t memSize = 0;
+							//Get Field Data
+							ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t), readPos);
+							if (isNull == 256)
+							{}
+							else
+							{}
+							char *buf = new char[memSize]();
+							ResourcesLoader::ReadFromBuffer(buffer.data(), buf, memSize, readPos);
+							const rfk::Field *f = t->getArchetype().getField(Name);
+							f->setData(t, ((void *) buf), memSize);
+							delete[] buf;
+
+						}
+
+						delete cmp;
+					}
 					else if (ns != nullptr && myClass->isSubclassOf(*ns->getClass("Script")))
 					{
 						if(!ecsManager.GotComponent<ScriptList>(go->GetEntity()))

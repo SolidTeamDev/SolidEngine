@@ -410,7 +410,14 @@ namespace Solid
             if(UI::TreeNode("Used Materials"))
             {
                 UI::Indent();
-
+				if(UI::Button("Apply Mat0 to all mat"))
+				{
+					auto& mats =_meshRenderer.GetMaterials();
+					for (int i = 1; i < mats.size(); ++i)
+					{
+						_meshRenderer.SetMaterialAt(i, mats[0]);
+					}
+				}
                 int id = 0;
                 for (auto* mat : _meshRenderer.GetMaterials())
                 {
@@ -841,7 +848,7 @@ namespace Solid
 	    if(UI::BeginDragDropTarget())
 	    {
 
-		    const ImGuiPayload *drop = UI::GetDragDropPayload();
+		    const ImGuiPayload *drop = UI::AcceptDragDropPayload(nullptr);
 		    if (drop != nullptr)
 		    {
 

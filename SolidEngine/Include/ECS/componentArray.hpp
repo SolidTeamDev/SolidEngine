@@ -83,6 +83,7 @@ namespace Solid
             size_t indexOfRemovedEntity             = entityToIndexMap[_entity];
             size_t indexOfLastElement               = size-1;
             Components* c = (Components*)&(componentArray[indexOfRemovedEntity]);
+	        c->Release();
             componentArray[indexOfRemovedEntity]    = componentArray[indexOfLastElement];
 
             Entity entityOfLastElement              = indexToEntityMap[indexOfLastElement];
