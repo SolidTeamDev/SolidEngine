@@ -51,6 +51,10 @@ namespace Solid
         void EditAudioSource(AudioSource& _audioSource);
         void EditLight(Light& _light);
         void EditCamera(Camera& _camera);
+        void EditRigidBody(RigidBody& _rigidBody);
+        void EditBoxCollider(BoxCollider& _boxCollider);
+        void EditSphereCollider(SphereCollider& _sphereCollider);
+        void EditCapsuleCollider(CapsuleCollider& _capsuleCollider);
 
         void EditComp(Components* _comp);
 

@@ -73,6 +73,26 @@ namespace Solid
             EditCamera(engine->ecsManager.GetComponent<Camera>(gameObject->GetEntity()));
         }
 
+        if(engine->ecsManager.GotComponent<RigidBody>(gameObject->GetEntity()))
+        {
+            EditRigidBody(engine->ecsManager.GetComponent<RigidBody>(gameObject->GetEntity()));
+        }
+
+        if(engine->ecsManager.GotComponent<BoxCollider>(gameObject->GetEntity()))
+        {
+            EditBoxCollider(engine->ecsManager.GetComponent<BoxCollider>(gameObject->GetEntity()));
+        }
+
+        if(engine->ecsManager.GotComponent<SphereCollider>(gameObject->GetEntity()))
+        {
+            EditSphereCollider(engine->ecsManager.GetComponent<SphereCollider>(gameObject->GetEntity()));
+        }
+
+        if(engine->ecsManager.GotComponent<CapsuleCollider>(gameObject->GetEntity()))
+        {
+            EditCapsuleCollider(engine->ecsManager.GetComponent<CapsuleCollider>(gameObject->GetEntity()));
+        }
+
         if(engine->ecsManager.GotComponent<ScriptList>(gameObject->GetEntity()))
         {
 	        ScriptList& sl = engine->ecsManager.GetComponent<ScriptList>(gameObject->GetEntity());
@@ -740,6 +760,122 @@ namespace Solid
             EditFloat(_camera.fov,"Fov",0.01f);
             EditFloat(_camera._near,"Near",0.01f);
             EditFloat(_camera._far,"Far",0.01f);
+        }
+        UI::Separator();
+    }
+
+    void InspectorInterface::EditRigidBody(RigidBody& _rigidBody)
+    {
+        if(UI::CollapsingHeader("RigidBody", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            if(UI::Button("Reset velocity"))
+            {
+                _rigidBody.SetLinearVelocity(Vec3(0));
+                _rigidBody.SetAngularVelocity(Vec3(0));
+            }
+            {
+                bool gravity = _rigidBody.IsGravityEnabled();
+                if(UI::Checkbox("Enable gravity", &gravity))
+                    _rigidBody.EnableGravity(gravity);
+            }
+            {
+                bool kinematic = _rigidBody.IsKinematic();
+                if(UI::Checkbox("Kinematic",&kinematic))
+                    _rigidBody.SetKinematic(kinematic);
+            }
+            {
+                float mass = _rigidBody.GetMass();
+                if(UI::DragFloat("Mass",&mass))
+                    _rigidBody.SetMass(mass);
+            }
+            {
+                float drag = _rigidBody.GetDrag();
+                if(UI::DragFloat("Drag",&drag))
+                    _rigidBody.SetDrag(drag);
+            }
+            {
+                float angularDrag = _rigidBody.GetAngularDrag();
+                if(UI::DragFloat("Angular drag",&angularDrag))
+                    _rigidBody.SetAngularDrag(angularDrag);
+            }
+
+            if(UI::TreeNode("Constraints"))
+            {
+                {
+                    bool x = _rigidBody.IsFreezePosX();
+                    bool y = _rigidBody.IsFreezePosY();
+                    bool z = _rigidBody.IsFreezePosZ();
+                    UI::Text("Freeze position : ");
+                    if(UI::Checkbox("X##XPosConstraints",&x))
+                        _rigidBody.FreezePosX(x);
+                    UI::SameLine();
+                    if(UI::Checkbox("Y##YPosConstraints",&y))
+                        _rigidBody.FreezePosY(y);
+                    UI::SameLine();
+                    if(UI::Checkbox("Z##ZPosConstraints",&z))
+                        _rigidBody.FreezePosZ(z);
+                }
+                {
+                    bool x = _rigidBody.IsFreezeRotX();
+                    bool y = _rigidBody.IsFreezeRotY();
+                    bool z = _rigidBody.IsFreezeRotZ();
+                    UI::Text("Freeze rotation : ");
+                    if(UI::Checkbox("X##XRotConstraints",&x))
+                        _rigidBody.FreezeRotX(x);
+                    UI::SameLine();
+                    if(UI::Checkbox("Y##YRotConstraints",&y))
+                        _rigidBody.FreezeRotY(y);
+                    UI::SameLine();
+                    if(UI::Checkbox("Z##ZRotConstraints",&z))
+                        _rigidBody.FreezeRotZ(z);
+                }
+                UI::TreePop();
+            }
+
+            if(UI::TreeNode("More Info"))
+            {
+                {
+                    Vec3 vel = _rigidBody.GetLinearVelocity();
+                    UI::Text("Linear velocity");
+                    UI::SameLine();
+                    UI::InputFloat3("##LinearVelocity",&vel.x,"%.3f",ImGuiInputTextFlags_ReadOnly);
+                }
+                {
+                    Vec3 vel = _rigidBody.GetAngularVelocity();
+                    UI::Text("Angular velocity");
+                    UI::SameLine();
+                    UI::InputFloat3("##AngularVelocity",&vel.x,"%.3f",ImGuiInputTextFlags_ReadOnly);
+                }
+                UI::TreePop();
+            }
+
+        }
+        UI::Separator();
+    }
+
+    void InspectorInterface::EditBoxCollider(BoxCollider& _boxCollider)
+    {
+        if(UI::CollapsingHeader("Box collider", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+
+        }
+        UI::Separator();
+    }
+
+    void InspectorInterface::EditSphereCollider(SphereCollider& _sphereCollider)
+    {
+        if(UI::CollapsingHeader("Sphere collider", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+
+        }
+        UI::Separator();
+    }
+
+    void InspectorInterface::EditCapsuleCollider(CapsuleCollider& _capsuleCollider)
+    {
+        if(UI::CollapsingHeader("Capsule collider", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+
         }
         UI::Separator();
     }
