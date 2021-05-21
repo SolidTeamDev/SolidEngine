@@ -1,6 +1,6 @@
 #pragma once
 
-#include "effect.hpp"
+#include "particleEffect.hpp"
 #include <memory>
 #include "particleData.hpp"
 #include "particleGenerator.hpp"

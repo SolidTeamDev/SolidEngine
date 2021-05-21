@@ -106,19 +106,6 @@ void FountainEffect::ShowUI()
 		if (ImGui::ColorEdit4("maxEndColor", maxEndCol))
 			colGenerator->maxEndCol = { maxEndCol[0], maxEndCol[1], maxEndCol[2], maxEndCol[3] };
 	}
-	//ImGui::ColorEdit4("maxStartColor", &colGenerator->maxStartCol.x);
-
-	//ImGui::ColorEdit4("minEndColor", &colGenerator->minEndCol.x);
-	//ImGui::ColorEdit4("maxEndColor", &colGenerator->maxEndCol.x);
-	
-	/*
-	ui::AddTweakColor4f("start col min", &m_colGenerator->m_minStartCol.x, "group=effect");
-	ui::AddTweakColor4f("start col max", &m_colGenerator->m_maxStartCol.x, "group=effect");
-	ui::AddTweakColor4f("end col min", &m_colGenerator->m_minEndCol.x, "group=effect");
-	ui::AddTweakColor4f("end col max", &m_colGenerator->m_maxEndCol.x, "group=effect");
-	ui::AddTweak("gravity", &m_eulerUpdater->m_globalAcceleration.y, "group=effect min=-20 max=0 step=0.05");
-	ui::AddTweak("bounce", &m_floorUpdater->m_bounceFactor, "group=effect min=0 max=1 step=0.05");
-	*/
 }
 
 void FountainEffect::Update(double dt)

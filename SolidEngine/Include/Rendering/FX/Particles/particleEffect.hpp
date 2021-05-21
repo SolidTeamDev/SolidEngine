@@ -8,7 +8,8 @@ namespace Solid
 	{
 	public:
 		static const size_t DEFAULT_PARTICLE_NUM_FLAG = 0;
-		//enum Name { };
+
+		size_t ID = 0;
 	public:
 		IEffect()
 		{}

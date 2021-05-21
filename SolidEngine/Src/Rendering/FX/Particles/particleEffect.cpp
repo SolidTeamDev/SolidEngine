@@ -1,4 +1,4 @@
-#include "Rendering/FX/Particles/effect.hpp"
+#include "Rendering/FX/Particles/particleEffect.hpp"
 
 #include <string>
 #include "Rendering/FX/Particles/fountainEffect.hpp"
