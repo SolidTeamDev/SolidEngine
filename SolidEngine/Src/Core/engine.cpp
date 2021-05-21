@@ -31,7 +31,7 @@ namespace Solid
             ecsManager(),
             graphicsResourceMgr()
     {
-    	Log::Send("Engine Creation", Log::ELogSeverity::ERROR);
+    	Log::Send("Engine Creation");
 	    Compiler = GameCompiler::GetInstance();
         InitEcs();
     }
@@ -52,8 +52,7 @@ namespace Solid
         ecsManager.RegisterComponent<Transform>();
         ecsManager.RegisterComponent<MeshRenderer>();
         ecsManager.RegisterComponent<Camera>();
-	    // ecsManager.RegisterComponent<Script*>();
-	     ecsManager.RegisterComponent<ScriptList>();
+	    ecsManager.RegisterComponent<ScriptList>();
         ecsManager.RegisterComponent<AudioSource>();
         ecsManager.RegisterComponent<RigidBody>();
         ecsManager.RegisterComponent<BoxCollider>();
@@ -142,10 +141,13 @@ namespace Solid
     void Engine::FixedUpdate()
     {
         physicsSystem->Update(physics, (float)Time::DeltaTime());
+        scriptSystem->FixedUpdate();
     }
 
     void Engine::LateUpdate()
     {
+        scriptSystem->LateUpdate();
+
 
     }
 
@@ -422,6 +424,7 @@ namespace Solid
 						}
 						else if (ns != nullptr && myClass->isSubclassOf(*ns->getClass("Script")))
 						{
+
 							if(!ecsManager.GotComponent<ScriptList>(go->GetEntity()))
 							{
 								ecsManager.AddComponent(go, ScriptList());

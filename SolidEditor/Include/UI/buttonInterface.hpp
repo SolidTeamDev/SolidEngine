@@ -10,6 +10,7 @@
 #include <unordered_map>
 #include "Resources/resourceType.hpp"
 #include "Resources/graphicalResource.hpp"
+#include "ImGuizmo.h"
 
 namespace Solid
 {
@@ -17,11 +18,13 @@ namespace Solid
 	{
 	public:
 		//public members
-
-	protected:
-		//protected members
 		std::unordered_map<std::string, ImageResource*> editorImage;
 		std::unordered_map<std::string, std::shared_ptr<GL::Texture>> editorTex;
+		static ImGuizmo::OPERATION gizmoMode ;
+		static ImGuizmo::MODE      gizmoReferential ;
+	protected:
+		//protected members
+
 		bool compile = false;
 		bool compileResult = false;
 		bool popOpen = false;

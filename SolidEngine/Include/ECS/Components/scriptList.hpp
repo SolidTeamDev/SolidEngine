@@ -45,6 +45,8 @@ namespace Solid SLDNamespace()
 		void RemoveScript(const char* _scriptName);
 		void RemoveScript(Script* _script);
 		void Update();
+		void FixedUpdate();
+		void LateUpdate();
 
 		virtual void Init()override {} ;
 		virtual void Release()override

@@ -1,7 +1,7 @@
 #include "ECS/Components/camera.hpp"
-#include "editor.hpp"
 
-#include "Inputs/editorInputs.hpp"
+#include "Core/engine.hpp"
+
 namespace Solid
 {
     Camera::Camera()
@@ -12,6 +12,15 @@ namespace Solid
         fov  = 45.f;
         _near = 0.01f;
         _far  = 100.f;
+    }
+
+    void Camera::Release()
+    {
+        Components::Release();
+        if(isActiveCamera)
+            Engine::GetInstance()->activeCamera = nullptr;
+
+        isActiveCamera = false;
     }
 
     Mat4<float> Camera::GetView() const
@@ -70,4 +79,10 @@ namespace Solid
 
          return mat;
      }
+
+    void Camera::SetActiveCamera()
+    {
+        Engine::GetInstance()->activeCamera = this;
+        isActiveCamera = true;
+    }
 } //!namespace

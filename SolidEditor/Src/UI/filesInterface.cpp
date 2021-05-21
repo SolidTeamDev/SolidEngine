@@ -23,6 +23,8 @@ namespace Solid
         if(counter <= 0.0)
         {
         	counter = 2.0;
+			std::string currentfolderName = currentFolder->folderName;
+
         	root.childPaths.clear();
         	root.fileNames.clear();
 	        for(auto& elt : data)
@@ -86,7 +88,7 @@ namespace Solid
 		        }
 	        	if(elt.rPath.size() == 1)
 		        {
-			        root.fileNames.push_back(file{.fileNames=elt.RName, .ftype=type});
+			        root.fileNames.push_back(file{.fileNames=elt.RName, .ftype=type, .RPtr=elt.RPtr});
 			        continue;
 		        }
 		        if(elt.rPath.empty())
@@ -107,8 +109,30 @@ namespace Solid
 
 			        }
 		        }
-		        node->fileNames.push_back(file{.fileNames=elt.RName, .ftype=type});
+		        node->fileNames.push_back(file{.fileNames=elt.RName, .ftype=type, .RPtr=elt.RPtr});
 	        }
+	        std::function<bool(filePathData*)> f = [&](filePathData* node)->bool
+	        {
+		        if(node->folderName == currentfolderName)
+		        {
+			        currentFolder = node;
+		        	return true;
+		        }
+		        if(node->childPaths.contains(currentfolderName))
+		        {
+		        	currentFolder = &node->childPaths[currentfolderName];
+		        	return true;
+		        }
+		        for(auto& elt : node->childPaths)
+		        {
+		        	return f(&elt.second);
+
+		        }
+		        return false;
+	        };
+	        bool b =f(&root);
+	        if(!b)
+	        	currentFolder = &root;
         }
 	    {
 	    	if(UI::Button("Import Resource"))
@@ -173,16 +197,156 @@ namespace Solid
 	    	UI::Separator();
 
 	        int imgSize = 32;
-	    	if(currentFolder->parent != nullptr && UI::Button("..##previous"))
+
+	    	if(currentFolder->parent != nullptr )
 		    {
-	    		currentFolder = currentFolder->parent;
+	    		UI::PushID("previousF");
+	    		if(UI::ImageButton((ImTextureID)editorTex["Folder"]->texId,ImVec2(imgSize,imgSize),ImVec2(0,1),ImVec2(1,0)))
+			    {
+				    currentFolder = currentFolder->parent;
+			    }
+	    		UI::PopID();
+			    if(UI::BeginDragDropTarget())
+			    {
+
+				    const ImGuiPayload* drop=UI::AcceptDragDropPayload(nullptr);
+
+				    if(drop != nullptr )
+				    {
+				    	filePathData* newFolder = currentFolder->parent;
+
+					    Resource* r = *((Resource**)drop->Data);
+					    fs::path oldp = ResourcesLoader::SolidPath;
+					    for (int i = 1; i < r->path.size(); ++i)
+					    {
+						    oldp.append(r->path[i]);
+					    }
+					    r->path.clear();
+					    for (  ; newFolder != nullptr ; )
+					    {
+					    	r->path.push_front(newFolder->folderName);
+
+						    newFolder = newFolder->parent;
+					    }
+					    fs::path newp = ResourcesLoader::SolidPath;
+					    for (int i = 1; i < r->path.size(); ++i)
+					    {
+						    newp.append(r->path[i]);
+					    }
+					    fs::path pArray[2];
+					    fs::path newpArray[2]{newp,newp};
+					    int i = 0;
+					    for(auto& elt : fs::directory_iterator(oldp))
+					    {
+					        if(elt.path().filename().string().find(r->name) != std::string::npos)
+					        {
+
+						        if(fs::is_directory(elt))
+						        {
+							        fs::path create = newp;
+							        create.append(elt.path().filename().string());
+							        fs::create_directory(create);
+							        fs::copy(elt.path(), create);
+						        }
+						        else
+						        {
+							        fs::copy(elt.path(), newp);
+						        }
+						        pArray[i] = elt.path();
+					        	++i;
+					        }
+					    }
+					    for (int j = 0; j < i; ++j)
+					    {
+					    	if(fs::is_directory(pArray[j]))
+					    		fs::remove_all(pArray[j]);
+					    	else
+					    	    fs::remove(pArray[j]);
+					    }
+					    
+
+					    counter = -1;
+				    }
+				    UI::EndDragDropTarget();
+			    }
+			    UI::SameLine();
+			    UI::SetCursorPosY(UI::GetCursorPosY()+imgSize/2);
+			    UI::Text("..");
+			    UI::SetCursorPosY(UI::GetCursorPosY()-imgSize/2);
+
 		    }
 		    for(auto& elt : currentFolder->childPaths)
 		    {
+		    	UI::PushID(elt.first.c_str());
 		        if(UI::ImageButton((ImTextureID)editorTex["Folder"]->texId,ImVec2(imgSize,imgSize),ImVec2(0,1),ImVec2(1,0)))
 		        {
-		        	currentFolder = &elt.second;
+		        	currentFolder = &(currentFolder->childPaths[elt.first]);
+
 		        }
+			    UI::PopID();
+			    if(UI::BeginDragDropTarget())
+			    {
+
+				    const ImGuiPayload* drop=UI::AcceptDragDropPayload(nullptr);
+
+				    if(drop != nullptr )
+				    {
+					    filePathData* newFolder = &currentFolder->childPaths[elt.first];
+
+					    Resource* r = *((Resource**)drop->Data);
+					    fs::path oldp = ResourcesLoader::SolidPath;
+					    for (int i = 1; i < r->path.size(); ++i)
+					    {
+						    oldp.append(r->path[i]);
+					    }
+					    r->path.clear();
+					    for (  ; newFolder != nullptr ; )
+					    {
+						    r->path.push_front(newFolder->folderName);
+
+						    newFolder = newFolder->parent;
+					    }
+					    fs::path newp = ResourcesLoader::SolidPath;
+					    for (int i = 1; i < r->path.size(); ++i)
+					    {
+						    newp.append(r->path[i]);
+					    }
+					    fs::path pArray[2];
+					    fs::path newpArray[2]{newp,newp};
+					    int i = 0;
+					    for(auto& eltpath : fs::directory_iterator(oldp))
+					    {
+						    if(eltpath.path().filename().string().find(r->name) != std::string::npos)
+						    {
+								if(fs::is_directory(eltpath))
+								{
+									fs::path create = newp;
+									create.append(eltpath.path().filename().string());
+									fs::create_directory(create);
+									fs::copy(eltpath.path(), create);
+								}
+								else
+								{
+									fs::copy(eltpath.path(), newp);
+								}
+
+							    pArray[i] = eltpath.path();
+							    ++i;
+						    }
+					    }
+					    for (int j = 0; j < i; ++j)
+					    {
+					    	if(!fs::is_directory(pArray[j]))
+						        fs::remove(pArray[j]);
+					    	else
+					    		fs::remove_all(pArray[j]);
+					    }
+					    ResourcesLoader loader;
+					    //loader.ReLoadRessource(r);
+					    counter = -1;
+				    }
+				    UI::EndDragDropTarget();
+			    }
                 UI::SameLine();
                 UI::SetCursorPosY(UI::GetCursorPosY()+imgSize/2);
                 UI::Text(elt.first.c_str());
@@ -199,12 +363,19 @@ namespace Solid
 		            img = "SoundFile";
                 else if(elt.ftype == "Shader" )
                     img = "ShaderFile";
-
+                else if(elt.ftype == "Mesh")
+                    img = "ObjFile";
+                else if(elt.ftype == "Prefab")
+                    img = "PrefabFile";
+                else if(elt.ftype == "Material")
+                    img = "MatFile";
+			    UI::PushID(elt.fileNames.c_str());
                 UI::ImageButton((ImTextureID)editorTex[img]->texId,ImVec2(imgSize,imgSize),ImVec2(0,1),ImVec2(1,0));
+                UI::PopID();
                 if(UI::BeginDragDropSource())
 			    {
 			    	UI::Text(elt.fileNames.c_str());
-			    	UI::SetDragDropPayload(elt.ftype.c_str(), elt.fileNames.data(), elt.fileNames.size());
+			    	UI::SetDragDropPayload(elt.ftype.c_str(), &(elt.RPtr), sizeof(Resource**));
 
 
 				    UI::EndDragDropSource();
@@ -221,6 +392,7 @@ namespace Solid
 
         DrawCreateFile();
 	    DrawMatNamePopup();
+	    DrawFolderPopup();
 	    UI::End();
 
 
@@ -248,6 +420,14 @@ namespace Solid
 
 
 	            }
+	            if (UI::MenuItem("Create Folder"))
+	            {
+
+		            folderPopup = true;
+		            folderstr = "";
+
+
+	            }
                 UI::EndMenu();
             }
 
@@ -272,7 +452,10 @@ namespace Solid
 					//error
 		        }
 		        else
+		        {
 		        	Compiler->CreateScript(fName);
+		            UI::CloseCurrentPopup();
+		        }
 	        }
         	UI::EndPopup();
         }
@@ -303,11 +486,34 @@ namespace Solid
 		}
 
 	}
+	void FilesInterface::DrawFolderPopup()
+	{
+		if(folderPopup)
+		{
+			UI::OpenPopup("FolderPopUp");
+			folderstr = "";
+			folderPopup = false;
+		}
+
+		if (UI::BeginPopup("FolderPopUp"))
+		{
+			UI::Text("Folder Name :");
+			UI::SameLine();
+			UI::InputText("##Folder", &folderstr);
+			if(UI::Button("Create new Folder"))
+			{
+				currentFolder->childPaths.emplace(folderstr, filePathData{.folderName=folderstr, .parent=currentFolder});
+				UI::CloseCurrentPopup();
+			}
+			UI::EndPopup();
+		}
+
+	}
 
 	FilesInterface::FilesInterface()
 	{
 		root.folderName = "\\Assets\\";
-
+		currentFolder =&root;
         fs::path EditorAssets = fs::current_path();
         EditorAssets.append("EditorAssets");
         ResourcesLoader loader;
@@ -376,5 +582,48 @@ namespace Solid
                 }
             }
         }
+        {
+            ResourcePtrWrapper wrap;
+            loader.LoadRessourceNoAdd( EditorAssets.string() + "/ObjFile.png", wrap);
+            if(wrap.r != nullptr && wrap.r->GetType() == EResourceType::Image)
+            {
+                editorImage.emplace("ObjFile", (ImageResource*)wrap.r);
+                std::shared_ptr<GL::Texture> Tex = std::make_shared<GL::Texture>((ImageResource*)wrap.r);
+                if(Tex != nullptr)
+                {
+                    editorTex.emplace("ObjFile", Tex);
+                }
+            }
+        }
+        {
+            ResourcePtrWrapper wrap;
+            loader.LoadRessourceNoAdd( EditorAssets.string() + "/MatFile.png", wrap);
+            if(wrap.r != nullptr && wrap.r->GetType() == EResourceType::Image)
+            {
+                editorImage.emplace("MatFile", (ImageResource*)wrap.r);
+                std::shared_ptr<GL::Texture> Tex = std::make_shared<GL::Texture>((ImageResource*)wrap.r);
+                if(Tex != nullptr)
+                {
+                    editorTex.emplace("MatFile", Tex);
+                }
+            }
+        }
+        {
+            ResourcePtrWrapper wrap;
+            loader.LoadRessourceNoAdd( EditorAssets.string() + "/PrefabFile.png", wrap);
+            if(wrap.r != nullptr && wrap.r->GetType() == EResourceType::Image)
+            {
+                editorImage.emplace("PrefabFile", (ImageResource*)wrap.r);
+                std::shared_ptr<GL::Texture> Tex = std::make_shared<GL::Texture>((ImageResource*)wrap.r);
+                if(Tex != nullptr)
+                {
+                    editorTex.emplace("PrefabFile", Tex);
+                }
+            }
+        }
+	}
+
+	FilesInterface::~FilesInterface()
+	{
 	}
 }
