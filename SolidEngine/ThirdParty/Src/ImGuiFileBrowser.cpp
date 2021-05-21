@@ -175,6 +175,7 @@ namespace imgui_addons
                     ImGui::OpenPopup(invfile_modal_id.c_str());
                     selected_fn.clear();
                     selected_path.clear();
+
                 }
 
                 else if(!check && dialog_mode == DialogMode::SAVE)

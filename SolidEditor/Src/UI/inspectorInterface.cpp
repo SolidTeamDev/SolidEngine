@@ -1,11 +1,20 @@
 #include "UI/inspectorInterface.hpp"
 #include "UI/editorInterface.hpp"
 #include "Core/engine.hpp"
+#include "editor.hpp"
+#include "ECS/Components/script.hpp"
 #include <imgui.h>
 #include <imgui_stdlib.h>
+#include "ECS/Components/scriptList.hpp"
 
 namespace Solid
 {
+
+    InspectorInterface::InspectorInterface()
+    {
+        engine = Engine::GetInstance();
+    }
+
     void InspectorInterface::Draw()
     {
         if(!p_open)
@@ -29,23 +38,15 @@ namespace Solid
         if (openCreateScript)
             CreateScriptWindow();
 
-	    DrawUniformNamePopup();
         UI::End();
     }
 
     void InspectorInterface::DrawComponents()
     {
-        Engine*     engine = Engine::GetInstance();
         GameObject* gameObject = EditorInterface::selectedGO;
 
         UI::Text("Name: ");
         EditText(gameObject->name, "##name");
-
-        //TODO: enable for custom scripts
-        /*for(auto& comp : gameObject->compsList)
-        {
-            EditComp(comp);
-        }*/
 
 	    if(engine->ecsManager.GotComponent<Transform>(gameObject->GetEntity()))
 	    {
@@ -61,15 +62,35 @@ namespace Solid
         {
             EditAudioSource(engine->ecsManager.GetComponent<AudioSource>(gameObject->GetEntity()));
         }
+
+        if(engine->ecsManager.GotComponent<Light>(gameObject->GetEntity()))
+        {
+            EditLight(engine->ecsManager.GetComponent<Light>(gameObject->GetEntity()));
+        }
+
+        if(engine->ecsManager.GotComponent<Camera>(gameObject->GetEntity()))
+        {
+            EditCamera(engine->ecsManager.GetComponent<Camera>(gameObject->GetEntity()));
+        }
+
+        if(engine->ecsManager.GotComponent<ScriptList>(gameObject->GetEntity()))
+        {
+	        ScriptList& sl = engine->ecsManager.GetComponent<ScriptList>(gameObject->GetEntity());
+	        for(Script* elt : sl.GetAllScripts())
+	        {
+		        EditComp(elt);
+	        }
+	    }
     }
 
     void InspectorInterface::AddComponents()
     {
-        Engine*     engine = Engine::GetInstance();
         GameObject* gameObject = EditorInterface::selectedGO;
 
         if(UI::Button("Add Component",ImVec2(-1, 0)))
             UI::OpenPopup("AddComponent");
+	    if(UI::Button("Remove Component",ImVec2(-1, 0)))
+		    UI::OpenPopup("RemoveComponent");
         if(UI::BeginPopup("AddComponent"))
         {
             if (UI::Button("Create Custom Script"))
@@ -130,9 +151,163 @@ namespace Solid
                     UI::CloseCurrentPopup();
                 }
             }
+            if(!engine->ecsManager.GotComponent<Light>(gameObject->GetEntity()))
+            {
+                if(UI::Button("Light"))
+                {
+                    engine->ecsManager.AddComponent<Light>(gameObject,Light());
+                    UI::CloseCurrentPopup();
+                }
+            }
+            if(!engine->ecsManager.GotComponent<Camera>(gameObject->GetEntity()))
+            {
+                if(UI::Button("Camera"))
+                {
+                    engine->ecsManager.AddComponent<Camera>(gameObject,Camera());
+                    UI::CloseCurrentPopup();
+                }
+            }
+	        if(!engine->ecsManager.GotComponent<ScriptList>(gameObject->GetEntity()))
+	        {
+	        	const rfk::Namespace* n = GameCompiler::GetInstance()->GetNamespace("Solid");
+	        	if(n!= nullptr)
+		        {
+			        for(auto& elt : n->archetypes)
+			        {
+				        const rfk::Class* c = n->getClass(elt->name);
+				        if(c->isSubclassOf(*n->getClass("Script")))
+				        {
+					        if(UI::Button(elt->name.c_str()))
+					        {
+						        ScriptList* sl =engine->ecsManager.AddComponent<ScriptList>(gameObject, ScriptList());
+						        sl->AddScript(c->makeInstance<Script>());
+						        UI::CloseCurrentPopup();
+					        }
+				        }
+
+			        }
+		        }
+	        }
+	        else
+	        {
+		        const rfk::Namespace* n = GameCompiler::GetInstance()->GetNamespace("Solid");
+		        if(n != nullptr)
+		        {
+			        ScriptList& sl =engine->ecsManager.GetComponent<ScriptList>(gameObject->GetEntity());
+
+			        for(auto& elt : n->archetypes)
+			        {
+				        if(!sl.HasScript(elt->name.c_str()))
+				        {
+					        const rfk::Class* c = n->getClass(elt->name);
+					        if(c->isSubclassOf(*n->getClass("Script")))
+					        {
+						        if(UI::Button(elt->name.c_str()))
+						        {
+							        sl.AddScript(c->makeInstance<Script>());
+							        UI::CloseCurrentPopup();
+						        }
+					        }
+				        }
+
+
+			        }
+		        }
+
+	        }
             UI::EndPopup();
         }
+	    if(UI::BeginPopup("RemoveComponent"))
+	    {
+		    if(engine->ecsManager.GotComponent<Transform>(gameObject->GetEntity()))
+		    {
+			    if(UI::Button("Transform"))
+			    {
+				    engine->ecsManager.RemoveComponent<Transform>(gameObject);
+				    UI::CloseCurrentPopup();
+			    }
+		    }
+		    if(engine->ecsManager.GotComponent<MeshRenderer>(gameObject->GetEntity()))
+		    {
+			    if(UI::Button("Mesh renderer"))
+			    {
+				    engine->ecsManager.RemoveComponent<MeshRenderer>(gameObject);
 
+				    UI::CloseCurrentPopup();
+			    }
+		    }
+		    if(engine->ecsManager.GotComponent<AudioSource>(gameObject->GetEntity()))
+		    {
+			    if(UI::Button("Audio source"))
+			    {
+				    engine->ecsManager.RemoveComponent<AudioSource>(gameObject);
+				    UI::CloseCurrentPopup();
+			    }
+		    }
+		    if(engine->ecsManager.GotComponent<RigidBody>(gameObject->GetEntity()))
+		    {
+			    if(UI::Button("RigidBody"))
+			    {
+				    engine->ecsManager.RemoveComponent<RigidBody>(gameObject);
+				    UI::CloseCurrentPopup();
+			    }
+		    }
+		    if(engine->ecsManager.GotComponent<BoxCollider>(gameObject->GetEntity()))
+		    {
+			    if(UI::Button("Box collider"))
+			    {
+				    engine->ecsManager.RemoveComponent<BoxCollider>(gameObject);
+				    UI::CloseCurrentPopup();
+			    }
+		    }
+		    if(engine->ecsManager.GotComponent<SphereCollider>(gameObject->GetEntity()))
+		    {
+			    if(UI::Button("Sphere collider"))
+			    {
+				    engine->ecsManager.RemoveComponent<SphereCollider>(gameObject);
+				    UI::CloseCurrentPopup();
+			    }
+		    }
+		    if(engine->ecsManager.GotComponent<CapsuleCollider>(gameObject->GetEntity()))
+		    {
+			    if(UI::Button("Capsule collider"))
+			    {
+				    engine->ecsManager.RemoveComponent<CapsuleCollider>(gameObject);
+				    UI::CloseCurrentPopup();
+			    }
+		    }
+            if(engine->ecsManager.GotComponent<Light>(gameObject->GetEntity()))
+            {
+                if(UI::Button("Light"))
+                {
+                    engine->ecsManager.RemoveComponent<Light>(gameObject);
+                    UI::CloseCurrentPopup();
+                }
+            }
+            if(engine->ecsManager.GotComponent<Camera>(gameObject->GetEntity()))
+            {
+                if(UI::Button("Camera"))
+                {
+                    engine->ecsManager.RemoveComponent<Camera>(gameObject);
+                    UI::CloseCurrentPopup();
+                }
+            }
+		    if(engine->ecsManager.GotComponent<ScriptList>(gameObject->GetEntity()))
+		    {
+		    	ScriptList& sl = engine->ecsManager.GetComponent<ScriptList>(gameObject->GetEntity());
+		    	std::vector<Script*>& sv = sl.GetAllScripts();
+			    for(Script* elt : sv)
+			    {
+				    if(UI::Button(elt->getArchetype().name.c_str()))
+				    {
+					    sl.RemoveScript(elt);
+					    UI::CloseCurrentPopup();
+				    }
+			    }
+		    }
+
+		    UI::EndPopup();
+	    }
     }
 
     void InspectorInterface::EditComp(Components* _comp)
@@ -156,8 +331,8 @@ namespace Solid
                     EditVec3(*((Vec3*)f.getDataAddress(_comp)),fieldName,0.01f);
                 else if(typeName == "Vec4")
                     EditVec4(*((Vec4*)f.getDataAddress(_comp)),fieldName,0.01f);
-                else if(typeName == "EditText")
-                    EditText(*((std::string*)f.getDataAddress(_comp)),fieldName);
+                else if(typeName == "String")
+                    EditText(*((String*)f.getDataAddress(_comp)),fieldName);
             }
         }
         UI::Separator();
@@ -195,12 +370,25 @@ namespace Solid
     {
         if(UI::CollapsingHeader("MeshRenderer",ImGuiTreeNodeFlags_DefaultOpen))
         {
-            Engine* engine = Engine::GetInstance();
             auto mesh = _meshRenderer.GetMesh();
             const char* meshName = mesh == nullptr ? "" : mesh->name.c_str();
 
             UI::Text("Mesh  ");UI::SameLine();
-            if(UI::BeginCombo("##Mesh", meshName))
+
+			bool combo =UI::BeginCombo("##Mesh", meshName);
+	        if(UI::BeginDragDropTarget())
+	        {
+
+		        const ImGuiPayload* drop=UI::AcceptDragDropPayload("Mesh");
+		        if(drop != nullptr)
+		        {
+			        Resource* r = *((Resource**)drop->Data);
+			        _meshRenderer.SetMesh(engine->graphicsResourceMgr.GetMesh(r->name.c_str()));
+
+		        }
+		        UI::EndDragDropTarget();
+	        }
+            if(combo)
             {
                 auto* meshList = engine->resourceManager.GetResourcesVecByType<MeshResource>();
 
@@ -218,164 +406,260 @@ namespace Solid
 
                 UI::EndCombo();
             }
-            int i = 0;
-            const MaterialResource* DefaultMat = engine->resourceManager.GetDefaultMat();
-            auto Lambda = [&](auto elt){
 
-            };
-			UI::Indent();
- 			if(UI::TreeNode("Materials"))
- 			{
-			for(MaterialResource* elt : _meshRenderer.GetMaterials())
-			{
-				const char* matName = elt == nullptr ? "DEFAULT MATERIAL" :  elt->name.c_str();
-				UI::Text("Material  ");UI::SameLine();
-				if(UI::BeginCombo(("##Mat" + std::to_string(i)).c_str(), matName))
-				{
-					auto* matList = engine->resourceManager.GetResourcesVecByType<MaterialResource>();
-					{
-						bool selected = (matName == "DEFAULT MATERIAL");
-						if(UI::Selectable("DEFAULT MATERIAL", selected))
-						{
+            if(UI::TreeNode("Used Materials"))
+            {
+                UI::Indent();
 
-							_meshRenderer.SetMaterialAt(i, nullptr);
-						}
-						if(selected)
-							UI::SetItemDefaultFocus();
-					}
-					for(auto mat : *matList)
-					{
-						bool selected = (matName == mat.second->name);
-						if(UI::Selectable(mat.second->name.c_str(), selected))
-						{
-							_meshRenderer.SetMaterialAt(i, (MaterialResource*)mat.second);
-						}
-						if(selected)
-							UI::SetItemDefaultFocus();
-					}
+                int id = 0;
+                for (auto* mat : _meshRenderer.GetMaterials())
+                {
+                    std::string matName = mat == nullptr ? "Default Material" : mat->name;
+                    std::string matId = std::to_string(id);
 
-					UI::EndCombo();
-				}
-				++i;
-			}
-			UI::TreePop();
-			}
-			i = 0;
+                    // Choose Material
+                    UI::Text(("Mat "+matId).c_str());UI::SameLine();
+					bool combo =UI::BeginCombo(std::string("##Mat"+matId).c_str(),matName.c_str());
+	                if(UI::BeginDragDropTarget())
+	                {
 
-			for(MaterialResource* elt : _meshRenderer.GetMaterialSet())
-	        {
-		        std::string matName = elt == nullptr ? "DEFAULT Name" :  elt->name;
-	        	if(UI::TreeNode((matName + "##" + std::to_string(i)).c_str()))
-		        {
+		                const ImGuiPayload* drop=UI::AcceptDragDropPayload("Material");
+		                if(drop != nullptr)
+		                {
+			                Resource* r = *((Resource**)drop->Data);
+			                _meshRenderer.SetMaterialAt(id, (MaterialResource*)r);
 
-	        		if(elt == nullptr)
-			        {
-	        			/// const view / no modifying possible
-			        }
-	        		else
-			        {
-				        {
-				        	///shader modifying
+		                }
+		                UI::EndDragDropTarget();
+	                }
+                    if(combo)
+                    {
+                        auto* matList = engine->resourceManager.GetResourcesVecByType<MaterialResource>();
+                        {
+                            bool selected = (matName == "DEFAULT MATERIAL");
+                            if(UI::Selectable("DEFAULT MATERIAL", selected))
+                            {
+                                _meshRenderer.SetMaterialAt(id, nullptr);
+                            }
+                            if(selected)
+                                UI::SetItemDefaultFocus();
+                        }
+                        for(auto mat : *matList)
+                        {
+                            bool selected = (matName == mat.second->name);
+                            if(UI::Selectable(mat.second->name.c_str(), selected))
+                            {
+                                _meshRenderer.SetMaterialAt(id, (MaterialResource*)mat.second);
+                            }
+                            if(selected)
+                                UI::SetItemDefaultFocus();
+                        }
 
-				        	const char* shaderName = elt->shader == nullptr ? "" : elt->shader->name.c_str();
-					        if(UI::BeginCombo(("Used Shader##ChooseShader" +  std::to_string(i)).c_str(),shaderName))
-					        {
-						        auto* shaderList = engine->resourceManager.GetResourcesVecByType<ShaderResource>();
-						        for(auto shader : *shaderList)
-						        {
-							        bool selected = (meshName == shader.second->name);
-							        if(UI::Selectable(shader.second->name.c_str(), selected))
-							        {
-								        elt->shader = engine->graphicsResourceMgr.GetShader(shader.second->name.c_str());
-							        }
-							        if(selected)
-								        UI::SetItemDefaultFocus();
-						        }
-						        UI::EndCombo();
-					        }
-
-
-				        }
-				        int ii = 0;
-				        for(auto& tex : elt->TexturesProperties)
-				        {
-				        	const char* texName = tex.second == nullptr ? "" : tex.second->name.c_str();
-					        if(UI::BeginCombo((tex.first +"##ChooseTex"+ std::to_string(i)+"_" + std::to_string(ii)).c_str(),texName))
-					        {
-						        auto* ImageList = engine->resourceManager.GetResourcesVecByType<ImageResource>();
-						        for(auto& image : *ImageList)
-						        {
-							        bool selected = (meshName == image.second->name);
-							        if(UI::Selectable(image.second->name.c_str(), selected))
-							        {
-								        tex.second = engine->graphicsResourceMgr.GetTexture(image.second->name.c_str());
-							        }
-							        if(selected)
-								        UI::SetItemDefaultFocus();
-						        }
-						        UI::EndCombo();
-					        }
-							++ii;
-				        }
-				        ii = 0;
-				        for(auto& fv : elt->ValuesProperties)
-				        {
-					        switch (fv.second.type)
-					        {
-					        	case MaterialResource::EFieldType::BOOL:
-							        EditBool(fv.second.b, fv.first);
-							        break;
-						        case  MaterialResource::EFieldType::INT:
-							        EditInt(fv.second.i, fv.first, 1);
-							        break;
-						        case  MaterialResource::EFieldType::FLOAT:
-							        EditFloat(fv.second.f, fv.first, 0.01f);
-							        break;
-						        case  MaterialResource::EFieldType::VEC2:
-							        EditVec2(fv.second.v2, fv.first,0.01f);
-							        break;
-						        case  MaterialResource::EFieldType::VEC3:
-							        EditVec3(fv.second.v3, fv.first,0.01f);
-							        break;
-						        case  MaterialResource::EFieldType::VEC4:
-							        EditVec4(fv.second.v4, fv.first,0.01f);
-							        break;
-						        default:
-							        break;
-					        }
-							++ii;
-				        }
-
-				        if(UI::Button(("Add Texture##"+std::to_string(i)).c_str()))
-				        {
-					        textureAdd = true;
-					        namePopup = true;
-					        matToModify = elt;
-				        }
-				        if(UI::Button(("Add FieldValue##"+std::to_string(i)).c_str()))
-				        {
-					        fvAdd = true;
-					        namePopup = true;
-					        matToModify = elt;
-				        }
-			        }
-                    UI::TreePop();
+                        UI::EndCombo();
+                    }
+                    ++id;
                 }
-		        ++i;
-	        }
-	        UI::Unindent();
+
+                UI::Unindent();
+                UI::TreePop();
+            }
+
+            // Edit Material
+            if(UI::TreeNode("Edit Materials"))
+            {
+                UI::Indent();
+
+                int Id = 0;
+                auto matSet = _meshRenderer.GetMaterialSet();
+                for(auto* mat : matSet)
+                {
+                    if(mat == nullptr)
+                        continue;
+
+                    std::string matId = std::to_string(Id);
+
+                    if(UI::TreeNode(mat->name.c_str()))
+                    {
+                        if(UI::Button("Edit vertex shader"))
+                        {
+                            codeEditor.isCodeEditorOpen = true;
+                            codeEditor.imCodeEditor.SetText(mat->GetShader()->GetVertSource());
+                            codeEditor.codeType = CodeEditor::ECodeType::VERTEX;
+                        }
+                        if(UI::Button("Edit fragment shader"))
+                        {
+                            codeEditor.isCodeEditorOpen = true;
+                            codeEditor.imCodeEditor.SetText(mat->GetShader()->GetFragSource());
+                            codeEditor.codeType = CodeEditor::ECodeType::FRAGMENT;
+                        }
+
+                        //Open window to edit shader
+                        if(codeEditor.isCodeEditorOpen)
+                        {
+                            auto cpos = codeEditor.imCodeEditor.GetCursorPosition();
+                            UI::SetNextWindowSize(ImVec2(800,600),ImGuiCond_Once);
+                            UI::Begin("Edit shader##Window", &codeEditor.isCodeEditorOpen,ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking);
+                            if (ImGui::BeginMenuBar())
+                            {
+                                if (ImGui::BeginMenu("File"))
+                                {
+                                    if (ImGui::MenuItem("Save","Ctrl-S"))
+                                    {
+                                        if(codeEditor.codeType == CodeEditor::ECodeType::FRAGMENT)
+                                            mat->GetShader()->SetFragSource(codeEditor.imCodeEditor.GetText());
+                                        else if(codeEditor.codeType == CodeEditor::ECodeType::VERTEX)
+                                            mat->GetShader()->SetVertSource(codeEditor.imCodeEditor.GetText());
+
+                                        mat->GetShader()->ReloadShader();
+                                        mat->LoadShaderFields();
+                                    }
+                                    if (ImGui::MenuItem("Quit", "Alt-F4"))
+                                        codeEditor.isCodeEditorOpen = false;
+                                    ImGui::EndMenu();
+                                }
+                                if (ImGui::BeginMenu("Edit"))
+                                {
+                                    if (ImGui::MenuItem("Undo", "ALT-Backspace", nullptr, codeEditor.imCodeEditor.CanUndo()))
+                                        codeEditor.imCodeEditor.Undo();
+                                    if (ImGui::MenuItem("Redo", "Ctrl-Y", nullptr, codeEditor.imCodeEditor.CanRedo()))
+                                        codeEditor.imCodeEditor.Redo();
+
+                                    ImGui::Separator();
+
+                                    if (ImGui::MenuItem("Copy", "Ctrl-C", nullptr, codeEditor.imCodeEditor.HasSelection()))
+                                        codeEditor.imCodeEditor.Copy();
+                                    if (ImGui::MenuItem("Cut", "Ctrl-X", nullptr, codeEditor.imCodeEditor.HasSelection()))
+                                        codeEditor.imCodeEditor.Cut();
+                                    if (ImGui::MenuItem("Delete", "Del", nullptr, codeEditor.imCodeEditor.HasSelection()))
+                                        codeEditor.imCodeEditor.Delete();
+                                    if (ImGui::MenuItem("Paste", "Ctrl-V", nullptr, ImGui::GetClipboardText() != nullptr))
+                                        codeEditor.imCodeEditor.Paste();
+
+                                    ImGui::Separator();
+
+                                    if (ImGui::MenuItem("Select all", nullptr, nullptr))
+                                        codeEditor.imCodeEditor.SelectAll();
+
+                                    ImGui::EndMenu();
+                                }
+
+                                if (ImGui::BeginMenu("View"))
+                                {
+                                    if (ImGui::MenuItem("Dark palette"))
+                                        codeEditor.imCodeEditor.SetPalette(TextEditor::GetDarkPalette());
+                                    if (ImGui::MenuItem("Light palette"))
+                                        codeEditor.imCodeEditor.SetPalette(TextEditor::GetLightPalette());
+                                    ImGui::EndMenu();
+                                }
+                                ImGui::EndMenuBar();
+                            }
+
+                            ImGui::Text("%6d/%-6d %6d lines  | %s | %s | %s | %s", cpos.mLine + 1, cpos.mColumn + 1, codeEditor.imCodeEditor.GetTotalLines(),
+                                        codeEditor.imCodeEditor.IsOverwrite() ? "Ovr" : "Ins",
+                                        codeEditor.imCodeEditor.CanUndo() ? "*" : " ",
+                                        codeEditor.imCodeEditor.GetLanguageDefinition().mName.c_str(), mat->GetShader()->name.c_str());
+
+                            codeEditor.imCodeEditor.Render("Edit shader",UI::GetContentRegionAvail(), false);
+                            UI::End();
+                        }
+
+                        // Choose Shader
+                        const char* shaderName = mat->GetShader()->name.c_str();
+                        bool combo =UI::BeginCombo(std::string("Shader##"+matId).c_str(),shaderName);
+	                    if(UI::BeginDragDropTarget())
+	                    {
+
+		                    const ImGuiPayload* drop=UI::AcceptDragDropPayload("Shader");
+		                    if(drop != nullptr)
+		                    {
+			                    Resource* r = *((Resource**)drop->Data);
+			                    mat->SetShader(engine->graphicsResourceMgr.GetShader(r->name.c_str()));
+
+		                    }
+		                    UI::EndDragDropTarget();
+	                    }
+                        if(combo)
+                        {
+                            auto* shaderList = engine->resourceManager.GetResourcesVecByType<ShaderResource>();
+                            for(auto shader : *shaderList)
+                            {
+                                bool selected = (shaderName == shader.second->name);
+                                if(UI::Selectable(shader.second->name.c_str(), selected))
+                                {
+                                    mat->SetShader(engine->graphicsResourceMgr.GetShader(shader.second->name.c_str()));
+                                }
+                                if(selected)
+                                    UI::SetItemDefaultFocus();
+                            }
+                            UI::EndCombo();
+                        }
+
+                        // Edit Shader
+                        if(UI::TreeNode(std::string("Edit "+std::string(shaderName) + "##" + matId).c_str()))
+                        {
+                            for(auto& field : mat->fields)
+                            {
+                                switch(field.type)
+                                {
+                                    case MaterialResource::EShaderFieldType::BOOL:
+                                        EditBool(field.b,field.name);
+                                        break;
+                                    case MaterialResource::EShaderFieldType::INT:
+                                        EditInt(field.i,field.name,1);
+                                        break;
+                                    case MaterialResource::EShaderFieldType::FLOAT:
+                                        EditFloat(field.f,field.name,0.01f);
+                                        break;
+                                    case MaterialResource::EShaderFieldType::VEC2:
+                                        EditVec2(field.v2,field.name,0.01f);
+                                        break;
+                                    case MaterialResource::EShaderFieldType::VEC3:
+                                        EditVec3(field.v3,field.name,0.01f);
+                                        break;
+                                    case MaterialResource::EShaderFieldType::VEC4:
+                                        EditVec4(field.v4,field.name,0.01f);
+                                        break;
+                                    case MaterialResource::EShaderFieldType::TEXT:
+                                        EditTexture(field.text,field.name);
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                            UI::TreePop();
+                        }
+                        UI::TreePop();
+                    }
+                    ++Id;
+                }
+
+                UI::Unindent();
+                UI::TreePop();
+            }
         }
         UI::Separator();
     }
 
     void InspectorInterface::EditAudioSource(AudioSource &_audioSource)
     {
-        Engine* engine = Engine::GetInstance();
         std::string audioName = _audioSource.GetName();
 
         if(UI::CollapsingHeader("Audio Source",ImGuiTreeNodeFlags_DefaultOpen))
         {
-            if(UI::BeginCombo("##Audio", audioName.c_str()))
+        	bool combo = UI::BeginCombo("##Audio", audioName.c_str());
+	        if(UI::BeginDragDropTarget())
+	        {
+
+		        const ImGuiPayload* drop=UI::AcceptDragDropPayload("Audio");
+		        if(drop != nullptr)
+		        {
+			        Resource* r = *((Resource**)drop->Data);
+			        _audioSource.SetAudio((AudioResource*)r);
+
+		        }
+		        UI::EndDragDropTarget();
+	        }
+            if(combo)
             {
                 auto* audioList = engine->resourceManager.GetResourcesVecByType<AudioResource>();
 
@@ -392,6 +676,8 @@ namespace Solid
 
                 UI::EndCombo();
             }
+
+
             
             {
                 float volume = _audioSource.GetVolume();
@@ -429,6 +715,32 @@ namespace Solid
                 _audioSource.Stop();
         }
 
+        UI::Separator();
+    }
+
+    void InspectorInterface::EditLight(Light& _light)
+    {
+        if(UI::CollapsingHeader("Light",ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            UI::ColorEdit3("Color",&_light.color.x);
+            EditFloat(_light.intensity,"Intensity",0.01f);
+        }
+
+        UI::Separator();
+
+    }
+
+    void InspectorInterface::EditCamera(Camera& _camera)
+    {
+        if(UI::CollapsingHeader("Camera",ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            if(UI::Button("Set active camera"))
+                _camera.SetActiveCamera();
+
+            EditFloat(_camera.fov,"Fov",0.01f);
+            EditFloat(_camera._near,"Near",0.01f);
+            EditFloat(_camera._far,"Far",0.01f);
+        }
         UI::Separator();
     }
 
@@ -479,80 +791,6 @@ namespace Solid
         UI::End();
     }
 
-	void InspectorInterface::DrawUniformNamePopup()
-	{
-		if(namePopup)
-		{
-			UI::OpenPopup("ValueNamePopUp");
-			namePopup = false;
-			nameStr = "";
-			beginField = "NONE";
-			chosenType =(int)MaterialResource::EFieldType::NONE;
-		}
-		if(!UI::IsPopupOpen("ValueNamePopUp"))
-		{
-			textureAdd = false;
-			fvAdd = false;
-		}
-		if (UI::BeginPopup("ValueNamePopUp"))
-		{
-			UI::Text("Value Name :");
-			UI::SameLine();
-			UI::InputText("##ValueName", &nameStr);
-			if(textureAdd)
-			{
-
-				if (UI::Button("Add Texture"))
-				{
-					matToModify->TexturesProperties.emplace(nameStr, nullptr);
-					textureAdd = false;
-					matToModify = nullptr;
-					UI::CloseCurrentPopup();
-				}
-
-
-			}
-			else
-			{
-				const char* fieldType[(int)MaterialResource::EFieldType::NONE] = {"Bool", "Int", "Float", "Vec2", "Vec3", "Vec4", "NONE"};
-
-				if(UI::BeginCombo("Wanted Field ##ChooseField",beginField))
-				{
-
-					for(int i = 0; i < (int)MaterialResource::EFieldType::NONE; ++i)
-					{
-						bool selected = (fieldType[i] == beginField);
-						if(UI::Selectable(fieldType[i], selected))
-						{
-							beginField = fieldType[i];
-							chosenType = i+1;
-						}
-						if(selected)
-							UI::SetItemDefaultFocus();
-					}
-					UI::EndCombo();
-				}
-
-				if(UI::Button("Add Field"))
-				{
-
-
-						matToModify->ValuesProperties.emplace(nameStr, (MaterialResource::EFieldType)chosenType);
-						fvAdd = false;
-						matToModify = nullptr;
-
-					UI::CloseCurrentPopup();
-
-				}
-
-			}
-			UI::EndPopup();
-		}
-
-
-
-	}
-
 	void InspectorInterface::EditBool(bool &_num, const std::string &_label)
 	{
 		if(UI::Checkbox(_label.c_str(), &_num))
@@ -600,5 +838,57 @@ namespace Solid
     void InspectorInterface::EditText(std::string &_str, const std::string& _label)
     {
         UI::InputText(_label.c_str(), &_str);
+	    if(UI::BeginDragDropTarget())
+	    {
+
+		    const ImGuiPayload *drop = UI::GetDragDropPayload();
+		    if (drop != nullptr)
+		    {
+
+			    Resource* r = *((Resource**)drop->Data);
+
+			    _str = r->name;
+
+
+		    }
+		    UI::EndDragDropTarget();
+	    }
     }
-}
+
+    void InspectorInterface::EditTexture(std::shared_ptr<ITexture>& _texture, const std::string &_label)
+    {
+        std::string textName = _texture == nullptr ? "None" : _texture->name;
+
+	    bool combo = UI::BeginCombo(_label.c_str(),textName.c_str());
+	    if(UI::BeginDragDropTarget())
+	    {
+
+		    const ImGuiPayload* drop=UI::AcceptDragDropPayload("Image");
+		    if(drop != nullptr)
+		    {
+			    Resource* r = *((Resource**)drop->Data);
+			    _texture = engine->graphicsResourceMgr.GetTexture(r->name.c_str());
+
+		    }
+		    UI::EndDragDropTarget();
+	    }
+        if (combo)
+        {
+            auto *textures = engine->resourceManager.GetResourcesVecByType<ImageResource>();
+            for (auto text : *textures)
+            {
+                bool selected = (textName == text.second->name);
+                if(UI::Selectable(text.second->name.c_str(), selected))
+                {
+                    _texture = engine->graphicsResourceMgr.GetTexture(text.second->name.c_str());
+                }
+                if(selected)
+                    UI::SetItemDefaultFocus();
+            }
+
+            UI::EndCombo();
+        }
+        //UI::Image(engine->graphicsResourceMgr.GetTexture(_texture->name))
+    }
+
+} //namespace

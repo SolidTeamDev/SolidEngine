@@ -4,6 +4,7 @@
 #include <glad/glad.h>
 #include "Resources/resourceType.hpp"
 #include "Resources/graphicalResource.hpp"
+#include "ECS/Components/light.hpp"
 
 #include <editor.hpp>
 
@@ -102,56 +103,61 @@ void GL::Mesh::DrawMesh(const std::vector<MaterialResource *>& _list, Transform&
 
 	for (int i = 0; i < Meshes.size(); ++i)
 	{
+	    uint textID = 0;
 		SubMesh& subMesh = Meshes.at(i);
 		const MaterialResource* mat = _list.at(i);
-
+        std::shared_ptr<IShader> shader = nullptr;
 		if(mat == nullptr)
 		{
 			mat = Engine::GetInstance()->resourceManager.GetDefaultMat();
-			mat->defaultshader->SetMVP(_tr, _cam);
+			mat->GetDefaultshader()->SetMVP(_tr, _cam);
 		}
 		else
 		{
-			if(mat->shader == nullptr)
-				mat->defaultshader->SetMVP(_tr, _cam);
+            shader = mat->GetShader();
+            if(shader == nullptr)
+				mat->GetDefaultshader()->SetMVP(_tr, _cam);
 			else
 			{
-				for(auto& value : mat->ValuesProperties)
+				for(auto& value : mat->fields)
 				{
-					switch (value.second.type)
+					switch (value.type)
 					{
-						case MaterialResource::EFieldType::BOOL:
-							mat->shader->SetBool(value.first.c_str(), value.second.b);
+						case MaterialResource::EShaderFieldType::BOOL:
+							shader->SetBool(value.name.c_str(), value.b);
 							break;
-						case  MaterialResource::EFieldType::INT:
-							mat->shader->SetInt(value.first.c_str(), value.second.i);
+						case  MaterialResource::EShaderFieldType::INT:
+							shader->SetInt(value.name.c_str(), value.i);
 							break;
-						case  MaterialResource::EFieldType::FLOAT:
-							mat->shader->SetFloat(value.first.c_str(), value.second.f);
+						case  MaterialResource::EShaderFieldType::FLOAT:
+							shader->SetFloat(value.name.c_str(), value.f);
 							break;
-						case  MaterialResource::EFieldType::VEC2:
-							mat->shader->SetVec2(value.first.c_str(), value.second.v2);
+						case  MaterialResource::EShaderFieldType::VEC2:
+							shader->SetVec2(value.name.c_str(), value.v2);
 							break;
-						case  MaterialResource::EFieldType::VEC3:
-							mat->shader->SetVec3(value.first.c_str(), value.second.v3);
+						case  MaterialResource::EShaderFieldType::VEC3:
+							shader->SetVec3(value.name.c_str(), value.v3);
 							break;
-						case  MaterialResource::EFieldType::VEC4:
-							mat->shader->SetVec4(value.first.c_str(), value.second.v4);
+						case  MaterialResource::EShaderFieldType::VEC4:
+							shader->SetVec4(value.name.c_str(), value.v4);
 							break;
+                        case MaterialResource::EShaderFieldType::TEXT:
+                            {
+                                if(value.text == nullptr)
+                                    continue;
+
+                                shader->SetInt(value.name.c_str(), textID);
+                                value.text->BindTexture(textID);
+                                ++textID;
+                                break;
+                            }
 						default:
 							break;
 					}
 				}
 
-				for(auto& value : mat->TexturesProperties)
-				{
-					if(value.second == nullptr)
-						continue;
-					int TexUnit = 0;
-					mat->shader->GetInt(value.first.c_str(), &TexUnit);
-					value.second->BindTexture(TexUnit);
-				}
-				mat->shader->SetMVP(_tr, _cam);
+				shader->SetMVP(_tr, _cam);
+				shader->SetLights(_cam);
 			}
 		}
 
@@ -161,19 +167,21 @@ void GL::Mesh::DrawMesh(const std::vector<MaterialResource *>& _list, Transform&
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,subMesh.EBO);
 		glDrawElements(GL_TRIANGLES, subMesh.numOfIndices,GL_UNSIGNED_INT, nullptr);
 
-		if(mat->shader != nullptr)
+		if(shader != nullptr)
 		{
-			for(auto& value : mat->TexturesProperties)
-			{
-				if(value.second == nullptr)
-					continue;
-				int TexUnit = 0;
-				mat->shader->GetInt(value.first.c_str(), &TexUnit);
-				value.second->UnBindTexture(TexUnit);
+            for(auto& value : mat->fields)
+            {
+                if(value.type == MaterialResource::EShaderFieldType::TEXT)
+                {
+                    if(value.text == nullptr)
+                        continue;
 
-			}
+                    int TexUnit = 0;
+                    shader->GetInt(value.name.c_str(), &TexUnit);
+                    value.text->UnBindTexture(TexUnit);
+                }
+            }
 		}
-
 	}
 	glBindVertexArray(0);
 }
@@ -186,7 +194,7 @@ void GL::Mesh::DrawMesh(const std::vector<MaterialResource *>& _list, Transform&
 GL::Shader::Shader(ShaderResource *_s) :IShader(EResourceType::Shader)
 {
     name = _s->name;
-
+    source = _s;
     std::vector<char*> tab;
 	tab.push_back(_s->VertexSource.data());
 	ShaderWrapper vShader = CreateShader(GL_VERTEX_SHADER, 1, tab);
@@ -203,6 +211,8 @@ GL::Shader::Shader(ShaderResource *_s) :IShader(EResourceType::Shader)
 	glLinkProgram(ProgID);
 	GLint linkStatus;
 	glGetProgramiv(ProgID, GL_LINK_STATUS, &linkStatus);
+    vert = vShader.id;
+    frag = fShader.id;
 	if (linkStatus == GL_FALSE)
 	{
 		GLchar infoLog[1024];
@@ -210,6 +220,8 @@ GL::Shader::Shader(ShaderResource *_s) :IShader(EResourceType::Shader)
 		printf("Program link error: %s", infoLog);
 		//TODO : cleanup at return
 	}
+
+	LoadShaderFields();
 }
 
 GL::ComputeShader::ComputeShader(ComputeShaderResource *_cs) :Shader(EResourceType::Compute)
@@ -263,6 +275,39 @@ GL::Shader::ShaderWrapper GL::Shader::CreateShader(GLenum _type, int _sourceCoun
 	return compute;
 }
 
+void GL::Shader::ReloadShader()
+{
+    std::vector<char*> fragS;
+    std::vector<char*> vertS;
+    fragS.push_back(source->FragSource.data());
+    vertS.push_back(source->VertexSource.data());
+    glShaderSource(frag,1,fragS.data(), nullptr);
+    glShaderSource(vert,1,vertS.data(), nullptr);
+    glCompileShader(frag);
+    glCompileShader(vert);
+    GLint success = 0;
+    glGetShaderiv(frag, GL_COMPILE_STATUS, &success);
+    if (success == GL_FALSE)
+    {
+        GLchar infoLog[1024];
+        glGetShaderInfoLog(frag, 1024, nullptr, infoLog);
+        printf("Shader compilation error: %s", infoLog);
+    }
+    success = 0;
+    glGetShaderiv(vert, GL_COMPILE_STATUS, &success);
+    if (success == GL_FALSE)
+    {
+        GLchar infoLog[1024];
+        glGetShaderInfoLog(vert, 1024, nullptr, infoLog);
+        printf("Shader compilation error: %s", infoLog);
+    }
+    if (success > 0)
+    {
+        glLinkProgram(ProgID);
+        LoadShaderFields();
+    }
+}
+
 void GL::Shader::SetFloat(const char *_name, float _value)
 {
 	glUseProgram(ProgID);
@@ -276,8 +321,29 @@ void GL::Shader::SetMVP(Transform& _model, Camera& _camera)const
 
 	glUniformMatrix4fv(glGetUniformLocation(ProgID,"proj"),1,GL_FALSE,_camera.GetProjection().elements.data());
 	glUniformMatrix4fv(glGetUniformLocation(ProgID,"view"),1,GL_FALSE,_camera.GetView().elements.data());
-	glUniformMatrix4fv(glGetUniformLocation(ProgID,"model"),1,GL_FALSE,_model.GetMatrix().elements.data());
+	Mat4<float> modelM =  (_model.GetMatrix()*_model.GetParentMatrix()) ;
+	glUniformMatrix4fv(glGetUniformLocation(ProgID,"model"),1,GL_FALSE,modelM.elements.data());
 
+}
+
+void GL::Shader::SetLights(Camera& _camera) const
+{
+    glUseProgram(ProgID);
+
+    std::vector<Light*> lights = Light::GetLightList();
+    int i = 0;
+    for(const auto& light : lights)
+    {
+        std::string id = std::to_string(i);
+        Vec3 pos = light->gameObject->transform->GetPosition();
+        glUniform3fv(glGetUniformLocation(ProgID,std::string("_lights[" + id + "].pos").c_str()),1,&pos.x);
+        glUniform3fv(glGetUniformLocation(ProgID,std::string("_lights[" + id + "].color").c_str()),1,&light->color.x);
+        glUniform1f(glGetUniformLocation(ProgID,std::string("_lights[" + id + "].intensity").c_str()),light->intensity);
+
+        ++i;
+    }
+    glUniform1i(glGetUniformLocation(ProgID,"_nbLights"),lights.size());
+    glUniform3fv(glGetUniformLocation(ProgID,"_camPos"),1,&_camera.position.x);
 }
 
 void GL::Shader::SetMaterial(const char *_name)
@@ -359,11 +425,74 @@ void GL::Shader::GetInt(const char *_name, int *_value)
 	if(loc == -1)
 		return;
 	glGetUniformiv(ProgID, loc, _value);
+	GLenum error = glGetError();
+    while (error != GL_NO_ERROR)
+    {
+        std::cout << glGetString(error) << "\n";
+        error = glGetError();
+    }
+}
+
+void GL::Shader::LoadShaderFields()
+{
+    uniforms.clear();
+    int count = -1;
+    glGetProgramiv(ProgID, GL_ACTIVE_UNIFORMS,&count);
+
+    for (int i = 0; i < count; ++i)
+    {
+        ShaderUniform shaderUniform;
+        int name_len=-1, num=-1;
+        GLenum type = GL_ZERO;
+        char name[100];
+        glGetActiveUniform(ProgID, GLuint(i), sizeof(name)-1,
+                            &name_len, &num, &type, name );
+        name[name_len] = 0;
+        //GLuint location = glGetUniformLocation(ProgID, name );
+        if(name[0] == '_')
+            continue;
+
+        shaderUniform.name = name;
+        switch (type)
+        {
+            case GL_BOOL:
+                shaderUniform.type = MaterialResource::EShaderFieldType::BOOL;
+                break;
+            case GL_INT:
+                shaderUniform.type = MaterialResource::EShaderFieldType::INT;
+                break;
+            case GL_FLOAT:
+                shaderUniform.type = MaterialResource::EShaderFieldType::FLOAT;
+                break;
+            case GL_FLOAT_VEC2:
+                shaderUniform.type = MaterialResource::EShaderFieldType::VEC2;
+                break;
+            case GL_FLOAT_VEC3:
+                shaderUniform.type = MaterialResource::EShaderFieldType::VEC3;
+                break;
+            case GL_FLOAT_VEC4:
+                shaderUniform.type = MaterialResource::EShaderFieldType::VEC4;
+                break;
+            case GL_SAMPLER_2D:
+                shaderUniform.type = MaterialResource::EShaderFieldType::TEXT;
+                break;
+            default:
+                shaderUniform.type = MaterialResource::EShaderFieldType::NONE;
+                break;
+        }
+
+        uniforms.push_back(shaderUniform);
+    }
+}
+
+std::vector<ShaderUniform> &GL::Shader::GetUniformList()
+{
+    return uniforms;
 }
 
 GL::Texture::Texture(ImageResource *_image)
 {
-	Log::Send("IMAGE CHAN NUM = " + std::to_string(_image->ChannelsNum));
+	//Log::Send("IMAGE CHAN NUM = " + std::to_string(_image->ChannelsNum));
 	name = _image->name;
 	glGenTextures(1, &texId);
 	glBindTexture(GL_TEXTURE_2D, texId);
@@ -378,6 +507,26 @@ GL::Texture::Texture(ImageResource *_image)
 	//	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, _image->x, _image->y, 0, GL_RGB, GL_UNSIGNED_BYTE, _image->image.data());
 	glGenerateMipmap(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+std::string& GL::Shader::GetFragSource()
+{
+    return source->FragSource;
+}
+
+std::string& GL::Shader::GetVertSource()
+{
+    return source->VertexSource;
+}
+
+void GL::Shader::SetFragSource(const std::string& _src)
+{
+    source->FragSource = _src;
+}
+
+void GL::Shader::SetVertSource(const std::string& _src)
+{
+    source->VertexSource = _src;
 }
 
 void GL::Texture::BindTexture(uint _texUnit)

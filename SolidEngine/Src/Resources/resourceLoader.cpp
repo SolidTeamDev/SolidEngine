@@ -23,6 +23,7 @@
 
 #include "glad/glad.h"
 #include "Core/engine.hpp"
+#undef LoadImage
 using namespace Solid;
 
 __declspec(dllexport) fs::path ResourcesLoader::SolidPath ="";
@@ -39,7 +40,7 @@ struct IDWrapper
     std::string Name;
     int i;
 };
-
+const char* rootFolder = "\\Assets\\";
 ///
 /// ResourcesLoader Base
 ///
@@ -84,6 +85,8 @@ void  ResourcesLoader::LoadRessourceNoAdd(const fs::path &Rpath, ResourcePtrWrap
         r=LoadSolidComputeShader(Rpath);
     else if(extension == ".svertfrag")
         r=LoadSolidShader(Rpath);
+    else if(extension == ".solidprefab")
+	    r=LoadSolidPrefab(Rpath);
     else if(extension == ".sanim")
         ;
     else if(extension == ".sskel")
@@ -155,6 +158,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 			        || name.find(".sanim") != std::string::npos
 			        || name.find(".sskel") != std::string::npos
 			        || name.find(".smaterial") != std::string::npos
+			        || name.find(".solidprefab") != std::string::npos
 			        || name.find(".saudio") != std::string::npos);
 
 		    }
@@ -172,24 +176,41 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 		    }
 		    else
 		    {
-			    std::string name = item.filename().string();
+			    std::string name = item.extension().string();
 			    std::transform(name.begin(), name.end(), name.begin(),
 			                   [](unsigned char c){ return std::tolower(c); });
 			    return (name.find(".bmp") != std::string::npos
-			    || name.find(".png") != std::string::npos
-			    || name.find(".jpg") != std::string::npos
-			    || name.find(".jpeg") != std::string::npos
-			    || name.find(".obj") != std::string::npos
-			    || name.find(".fbx") != std::string::npos
-			    || name.find(".wav") != std::string::npos
-			    || name.find(".ogg") != std::string::npos);
+			            || name.find(".png") != std::string::npos
+			            || name.find(".jpg") != std::string::npos
+			            || name.find(".jpeg") != std::string::npos
+			            || name.find(".obj") != std::string::npos
+			            || name.find(".fbx") != std::string::npos
+			            || name.find(".wav") != std::string::npos
+			            || name.find(".ogg") != std::string::npos);
 
+		    }
+		    return false;
+	    };
+	    auto FoldersFind = [](const fs::path&item)
+	    {
+		    if(fs::is_directory(item))
+		    {
+			    std::string name = item.filename().string();
+			    std::transform(name.begin(), name.end(), name.begin(),
+			                   [](unsigned char c){ return std::tolower(c); });
+			    return (name.find("shader") == std::string::npos && name.find("compute") == std::string::npos);
+
+		    }
+		    else
+		    {
+			    return false;
 		    }
 		    return false;
 	    };
 	    std::vector<fs::path> normal;
 	    std::vector<fs::path> Solid;
 	    std::vector<fs::path> ToLoad;
+	    std::vector<fs::path> othersFolders;
 
         for(auto& item : fs::directory_iterator(Rpath))
         {
@@ -201,24 +222,134 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 			{
 				Solid.push_back(item);
 			}
+			else if(FoldersFind(item))
+			{
+				othersFolders.push_back(item);
+			}
         }
+        int counting = 0;
+        for(auto it = othersFolders.begin(); it != othersFolders.end(); ++it)
+        {
+        	bool newFolders = false;
+	        for(auto& item : fs::directory_iterator(*it))
+	        {
+		        if(NormalFind(item))
+		        {
+			        normal.push_back(item);
+		        }
+		        else if(SolidFind(item))
+		        {
+			        Solid.push_back(item);
+		        }
+		        else if(FoldersFind(item))
+		        {
+			        othersFolders.push_back(item);
+			        newFolders = true;
+		        }
+	        }
+	        ++counting;
+	        if(newFolders)
+	        	it = othersFolders.begin()+counting;
+        }
+	    for(auto& elt : normal)
+	    {
+		    int i = 0;
+		    for(auto it = normal.begin(); it!= normal.end() ; ++it)
+		    {
+			    fs::path& elt2 = *it;
+			    if(elt == elt2)
+				    continue;
+			    if(elt.filename() == elt2.filename())
+			    {
+				    int count = 0;
+				    for(auto& elt3 : Solid)
+				    {
+					    if(elt3.filename().string().find(elt2.filename().string()) != std::string::npos)
+					    {
+						    fs::remove(elt3);
+						    Solid.erase(Solid.begin()+count);
+						    break;
+					    }
+					    count++;
+				    }
+				    fs::remove(elt2);
+				    Log::Send(elt2.filename().string() + " AT " + elt2.string() + " Was Removed Because a Duplicate File was Found ", Log::ELogSeverity::WARNING);
+				    normal.erase(it);
+				    it = normal.begin()+i;
+				    continue;
+			    }
+			    i++;
+		    }
+
+	    }
+
+	    for(auto& elt : Solid)
+	    {
+		    int index = 0;
+		    for(auto it = Solid.begin(); it!= Solid.end() ; ++it)
+		    {
+			    fs::path& elt2 = *it;
+			    if(elt == elt2)
+				    continue;
+			    if(elt.filename() == elt2.filename())
+			    {
+				    fs::remove(elt2);
+				    Log::Send(elt2.filename().string() + " AT " + elt2.string() + " Was Removed Because a Duplicate File was Found ", Log::ELogSeverity::WARNING);
+				    Solid.erase(it);
+				    it = Solid.begin()+index;
+				    continue;
+			    }
+			    index++;
+		    }
+
+	    }
+	    for(auto& elt : normal)
+	    {
+		    int index = 0;
+		    for(auto it = Solid.begin(); it!= Solid.end() ; ++it)
+		    {
+			    fs::path& elt2 = *it;
+			    if(elt == elt2)
+				    continue;
+			    if(elt2.filename().string().find(elt.filename().string()) != std::string::npos)
+			    {
+			    	if(elt.parent_path() == elt2.parent_path())
+					    continue;
+				    fs::remove(elt2);
+				    Log::Send(elt2.filename().string() + " AT " + elt2.string() + " Was Removed Because a Duplicate File was Found ", Log::ELogSeverity::WARNING);
+				    Solid.erase(it);
+				    it = Solid.begin()+index;
+				    continue;
+			    }
+			    index++;
+		    }
+	    }
+
 		for(auto& elt : normal)
 		{
 			bool found = false;
+			int count = 0;
 			for(auto& elt2 : Solid)
 		    {
 		        if(elt2.filename().string().find(elt.filename().string()) != std::string::npos)
 		        {
 		        	ToLoad.push_back(elt2);
+		        	Solid.erase(Solid.begin()+count);
 		        	found = true;
 			        break;
 		        }
+		        count++;
 		    }
 			if(!found)
 			{
 				ToLoad.push_back(elt);
 			}
 		}
+
+	    for(auto& elt : Solid)
+	    {
+		    ToLoad.push_back(elt);
+	    }
 
 
 
@@ -444,9 +575,13 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 	MeshResource *Mesh = new MeshResource;
 	bool hasFoundSkeleton = false;
 	SkeletonResource* Skeleton = new SkeletonResource;
+	Skeleton->name ="SKELETON_"+Rpath.filename().string();
 	Assimp::Importer importer;
 	std::string str = Rpath.string();
 	Mesh->name = Rpath.filename().string();
+
+	Mesh->path.push_front(rootFolder) ;
+	SetPath(Mesh->path, Rpath);
 	importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_ANIMATIONS, true);
 	importer.SetPropertyBool(AI_CONFIG_IMPORT_REMOVE_EMPTY_BONES, false);
 
@@ -556,6 +691,7 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 	for (int i = 0; i < scene->mNumAnimations; ++i)
 	{
 		AnimResource* anim = new AnimResource;
+		anim->name = "ANIM_"+Rpath.filename().string();
 		anim->numTicks = scene->mAnimations[i]->mDuration;
 		anim->ticksPerSeconds = scene->mAnimations[i]->mTicksPerSecond;
 		if(hasFoundSkeleton)
@@ -704,6 +840,7 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 		fbx->mesh = Mesh;
 		fbx->Skeleton = Skeleton;
 
+
 	}
 }
 
@@ -711,6 +848,8 @@ Resource * ResourcesLoader::LoadImage(const fs::path &Rpath)
 {
     ImageResource* Image = new ImageResource();
     Image->name = Rpath.filename().string();
+	Image->path.push_front(rootFolder);
+	SetPath(Image->path, Rpath);
 	stbi_set_flip_vertically_on_load(true);
 	unsigned char* img =stbi_load(Rpath.string().c_str(), &Image->x, &Image->y, &Image->ChannelsNum, STBI_rgb_alpha);
     //test convert to const char*
@@ -743,8 +882,11 @@ Resource * ResourcesLoader::LoadMesh(const fs::path &Rpath)
     MeshResource* Mesh = new MeshResource;
     Assimp::Importer importer;
     std::string str = Rpath.string();
-    Mesh->name = Rpath.filename().string();
 
+
+    Mesh->name = Rpath.filename().string();
+	Mesh->path.push_front(rootFolder) ;
+	SetPath(Mesh->path, Rpath);
     const aiScene* scene = importer.ReadFile(str,  aiProcess_JoinIdenticalVertices | aiProcess_OptimizeMeshes| aiProcess_SplitLargeMeshes| aiProcess_Triangulate  | aiProcess_SortByPType | aiProcess_PreTransformVertices );
     if(!scene) {
         printf("Unable to load mesh: %s\n", importer.GetErrorString());
@@ -846,6 +988,9 @@ Resource * ResourcesLoader::LoadShader(const fs::path &Rpath)
 
         ComputeShaderResource* Compute = new ComputeShaderResource(ComputeSources[0]);
         Compute->name = Rpath.filename().string();
+	    Compute->path.push_front(rootFolder) ;
+	    SetPath(Compute->path, Rpath);
+
 
 #if SASSET_GEN
         printf("generate .SCompute\n");
@@ -920,6 +1065,8 @@ Resource * ResourcesLoader::LoadShader(const fs::path &Rpath)
 
         ShaderResource* Shader = new ShaderResource(VertexSources[0], fragSources[0]);
         Shader->name = Rpath.filename().string();
+	    Shader->path.push_front(rootFolder) ;
+	    SetPath(Shader->path, Rpath);
 
 #if SASSET_GEN
         printf("generate .SVertFrag\n");
@@ -960,6 +1107,9 @@ Resource *ResourcesLoader::LoadAudio(const fs::path &Rpath)
 
 	ALsizei numBytes;
 	audio->name = Rpath.filename().string();
+	audio->path.push_front(rootFolder);
+	SetPath(audio->path, Rpath);
+
 	sndfile = sf_open(filename, SFM_READ, &sfinfo);
 	if (!sndfile)
 	{
@@ -1035,7 +1185,6 @@ Resource *ResourcesLoader::LoadAudio(const fs::path &Rpath)
 
 	if(cacheFile.is_open())
 	{
-		std::cout << "" << "\n";
 		cacheFile.write(Data.data(), Data.size());
 	}
 #endif
@@ -1089,6 +1238,9 @@ Resource * ResourcesLoader::LoadSolidImage(const fs::path &Rpath)
     ifs.seekg(0, std::ios::beg);
     ifs.read(&buffer[0], pos);
     Image->FromDataBuffer(buffer.data(), buffer.size());
+	Image->path.clear();
+	Image->path.push_front(rootFolder);
+	SetPath(Image->path, Rpath);
     if(Image->name == "")
     {
         Image->name = "NoName" + std::to_string(Resource::NoNameNum);
@@ -1111,6 +1263,9 @@ Resource * ResourcesLoader::LoadSolidMesh(const fs::path &Rpath)
     ifs.read(&buffer[0], pos);
 
     Mesh->FromDataBuffer(buffer.data(), buffer.size());
+	Mesh->path.clear();
+	Mesh->path.push_front(rootFolder);
+	SetPath(Mesh->path, Rpath);
     if(Mesh->name == "")
     {
         Mesh->name = "NoName" + std::to_string(Resource::NoNameNum);
@@ -1133,6 +1288,9 @@ Resource * ResourcesLoader::LoadSolidComputeShader(const fs::path &Rpath)
     ifs.read(&buffer[0], pos);
 
     cs->FromDataBuffer(buffer.data(), buffer.size());
+	cs->path.clear();
+	cs->path.push_front(rootFolder);
+	SetPath(cs->path, Rpath);
     if(cs->name == "")
     {
         cs->name = "NoName" + std::to_string(Resource::NoNameNum);
@@ -1154,6 +1312,9 @@ Resource * ResourcesLoader::LoadSolidShader(const fs::path &Rpath)
     ifs.read(&buffer[0], pos);
 
     s->FromDataBuffer(buffer.data(), buffer.size());
+	s->path.clear();
+	s->path.push_front(rootFolder);
+	SetPath(s->path, Rpath);
     if(s->name == "")
     {
         s->name = "NoName" + std::to_string(Resource::NoNameNum);
@@ -1165,14 +1326,24 @@ Resource * ResourcesLoader::LoadSolidShader(const fs::path &Rpath)
 
 void ResourcesLoader::SaveMaterialToFile(MaterialResource *_mat)
 {
-	printf("generate .SMaterial\n");
+	//rintf("generate .SMaterial\n");
 	std::vector<char> Data;
 	_mat->ToDataBuffer(Data);
 
 
 
 
-	fs::path cachePath =SolidPath;
+	fs::path cachePath =SolidPath.parent_path() ;
+	for(std::string& elt : _mat->path)
+	{
+		if(elt == rootFolder)
+		{
+			cachePath.append("Assets");
+			continue;
+		}
+
+		cachePath.append(elt);
+	}
 	cachePath.append(_mat->name + ".SMaterial");
 	std::ofstream cacheFile(cachePath, std::fstream::binary | std::fstream::trunc);
 
@@ -1181,6 +1352,7 @@ void ResourcesLoader::SaveMaterialToFile(MaterialResource *_mat)
 	{
 		std::cout << "" << "\n";
 		cacheFile.write(Data.data(), Data.size());
+		cacheFile.close();
 	}
 }
 
@@ -1196,6 +1368,10 @@ Resource *ResourcesLoader::LoadSolidMaterial(const fs::path &Rpath)
 	ifs.read(&buffer[0], pos);
 
 	mat->FromDataBuffer(buffer.data(), buffer.size());
+
+	mat->path.clear();
+	mat->path.push_front(rootFolder);
+	SetPath(mat->path, Rpath);
 	if(mat->name == "")
 	{
 		mat->name = "NoName" + std::to_string(Resource::NoNameNum);
@@ -1217,7 +1393,7 @@ Resource *ResourcesLoader::LoadSolidAudio(const fs::path &Rpath)
 	ifs.read(&buffer[0], pos);
 
 
-
+	audio->FromDataBuffer(buffer.data(),buffer.size());
 
 
 	ALsizei numBytes = (ALsizei)(audio->numFrames * audio->info.channels) * (ALsizei)sizeof(short);
@@ -1230,9 +1406,160 @@ Resource *ResourcesLoader::LoadSolidAudio(const fs::path &Rpath)
 		audio->name = "NoName" + std::to_string(Resource::NoNameNum);
 		Resource::NoNameNum++;
 	}
+	audio->path.clear();
+	audio->path.push_front(rootFolder);
+	SetPath(audio->path, Rpath);
 	audio->audioRawBinary.clear();
 	audio->audioRawBinary.reserve(0);
 	return audio;
+}
+
+void ResourcesLoader::SetPath(std::deque<std::string> &resPath, const fs::path& Rpath)
+{
+	fs::path copy =Rpath;
+	copy =copy.parent_path();
+	std::deque<std::string> invPaths;
+
+	std::function<bool(fs::path&)> pathFind = [&](fs::path& p)->bool
+	{
+		bool toRet = false;
+		if(p.filename().string() != "Assets")
+		{
+			invPaths.push_front(p.filename().string());
+
+			p =p.parent_path();
+			if(!p.filename().empty())
+				return pathFind(p);
+			else
+			{
+				return false;
+			}
+		}
+		else
+			return true;
+	};
+	if(!pathFind(copy))
+		return;
+	resPath.insert(resPath.end(), invPaths.begin(),invPaths.end());
+
+}
+
+Resource *ResourcesLoader::LoadSolidPrefab(const fs::path &Rpath)
+{
+	PrefabResource* prefab = new PrefabResource();
+
+	std::ifstream ifs(Rpath, std::ios::binary|std::ios::ate);
+	std::ifstream::pos_type pos = ifs.tellg();
+
+	std::vector<char>  buffer(pos);
+
+	ifs.seekg(0, std::ios::beg);
+	ifs.read(&buffer[0], pos);
+
+	prefab->FromDataBuffer(buffer.data(),buffer.size());
+	prefab->path.clear();
+	prefab->path.push_front(rootFolder);
+	SetPath(prefab->path, Rpath);
+	return prefab;
+}
+
+void ResourcesLoader::ReLoadRessource(Resource *_resource)
+{
+	std::vector<char>b;
+	_resource->ToDataBuffer(b);
+	fs::path Rpath = SolidPath;
+	for (int i = 1; i < _resource->path.size(); ++i)
+	{
+		Rpath.append(_resource->path[i]);
+	}
+
+	switch (_resource->GetType())
+	{
+		case EResourceType::Mesh:
+		{
+			Rpath.append(_resource->name+".SMesh");
+			break;
+		}
+		case EResourceType::Shader:
+		{
+			Rpath.append(_resource->name+".SVertFrag");
+			break;
+		}
+		case EResourceType::Material:
+		{
+			SaveMaterialToFile((MaterialResource*)_resource);
+			return;
+		}
+		case EResourceType::Compute:
+		{
+			Rpath.append(_resource->name+".SCompute");
+			break;
+		}
+		case EResourceType::Image:
+		{
+			Rpath.append(_resource->name+".SImage");
+			break;
+		}
+		case EResourceType::Anim:
+		{
+			Rpath.append(_resource->name+".SAnim");
+			break;
+		}
+		case EResourceType::Audio:
+		{
+			Rpath.append(_resource->name);
+			Resource* r = LoadAudio(Rpath);
+			delete r;
+			return;
+		}
+		case EResourceType::Skeleton:
+		{
+			Rpath.append(_resource->name);
+			break;
+		}
+		case EResourceType::Scene:
+		{
+			Rpath.append(_resource->name+ ".SolidScene");
+			break;
+		}
+		case EResourceType::Prefab:
+		{
+			SavePrefabToFile((PrefabResource *) _resource);
+			return;
+		}
+		default:
+			ThrowError("Type Not Stored", ESolidErrorCode::S_INIT_ERROR);
+			break;
+	}
+
+	std::ofstream cacheFile(Rpath, std::fstream::binary | std::fstream::trunc);
+	if(cacheFile.is_open())
+	{
+		cacheFile.write(b.data(),b.size());
+		cacheFile.close();
+	}
+
+
+}
+
+void ResourcesLoader::SavePrefabToFile(PrefabResource *_prefab)
+{
+	fs::path p = ResourcesLoader::SolidPath.parent_path();
+	for(std::string& elt : _prefab->path)
+	{
+		if(elt == "\\Assets\\")
+		{
+			p.append("Assets");
+		}
+		else
+			p.append(elt);
+	}
+	p.append(_prefab->name +".SolidPrefab");
+	std::vector<char>buf;
+	_prefab->ToDataBuffer(buf);
+	std::ofstream file(p, std::ifstream::binary | std::ofstream::trunc);
+	file.write(buf.data(), buf.size());
+	file.close();
 }
 
 

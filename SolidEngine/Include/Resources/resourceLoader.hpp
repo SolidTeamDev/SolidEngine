@@ -1,16 +1,13 @@
-//
-// Created by ryan1 on 26/02/2021.
-//
+#pragma once
 
-#ifndef SOLIDEDITOR_RESOURCELOADER_HPP
-#define SOLIDEDITOR_RESOURCELOADER_HPP
 namespace fs = std::filesystem;
+
 namespace Solid
 {
 	struct SOLID_API FBXWrapper
 	{
-		MeshResource* mesh;
-		SkeletonResource* Skeleton;
+		MeshResource* mesh = nullptr;
+		SkeletonResource* Skeleton = nullptr;
 		std::vector<AnimResource*> anims;
 
 	};
@@ -39,13 +36,16 @@ namespace Solid
 	    Resource * LoadSolidMaterial(const fs::path& Rpath);
 	    Resource * LoadSolidAnim(const fs::path& Rpath);
 	    Resource * LoadSolidAudio(const fs::path& Rpath);
+	    Resource * LoadSolidPrefab(const fs::path& Rpath);
 	    void LoadFBX(const fs::path& Rpath, FBXWrapper* fbx);
+	    void SetPath(std::deque<std::string> &resPath, const fs::path& Rpath);
     public:
 
 
 
 
 	    static fs::path SolidPath ;
+
 
         ResourcesLoader()
         {
@@ -54,16 +54,13 @@ namespace Solid
 	    ~ResourcesLoader() = default;
 	    void SetManager(ResourceManager* m);
 	    void LoadRessource(const fs::path& Rpath);
+	    void ReLoadRessource(Resource* _resource);
         void LoadRessourceNoAdd(const fs::path &Rpath, ResourcePtrWrapper &wrapper);
         void LoadResourcesFromFolder(const fs::path& Rpath);
         static void Append(std::vector<char>& DataBuffer, void* Data, std::uint64_t sizeInByte);
         void SaveMaterialToFile(MaterialResource* _mat);
+	    void SavePrefabToFile(PrefabResource* _prefab);
         //inline static void ReadFromBuffer(std::vector<char>& DataBuffer, void* Data, std::uint64_t sizeInByte, std::uint64_t& ReadPos);
         static void ReadFromBuffer(char* DataBuffer, void* Data, std::uint64_t sizeInByte, std::uint64_t& ReadPos);
     };
-
-
-
 }
-
-#endif //SOLIDEDITOR_RESOURCELOADER_HPP

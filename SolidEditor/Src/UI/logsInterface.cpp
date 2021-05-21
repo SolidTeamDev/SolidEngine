@@ -44,8 +44,22 @@ namespace Solid
                     break;
 
             }
+			std::string log = currMsg;
+	        std::transform(log.begin(), log.end(), log.begin(),
+	                       [](unsigned char c){ return std::tolower(c); });
+	        int pop = 0;
+	        if(log.find("warn") != std::string::npos)
+	        {
+		        UI::PushStyleColor(ImGuiCol_Text, ImVec4(1.0, 0.9, 0.0, 1.0));
+		        pop++;
+	        }
+	        if(log.find("error") != std::string::npos)
+	        {
+		        UI::PushStyleColor(ImGuiCol_Text, ImVec4(1.0, 0.1, 0.1, 1.0));
+		        pop++;
+	        }
             UI::TextWrapped("%s", currMsg.c_str());
-            UI::PopStyleColor(1);
+            UI::PopStyleColor(1+pop);
         }
         UI::End();
 

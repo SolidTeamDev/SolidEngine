@@ -5,6 +5,11 @@
 
 namespace Solid
 {
+    PlayInterface::PlayInterface()
+    {
+        engine = Engine::GetInstance();
+    }
+
     void PlayInterface::Draw()
     {
         if(!p_open)
@@ -13,22 +18,26 @@ namespace Solid
         UI::SetNextWindowSize(ImVec2(250,250));
         UI::Begin("Play", &p_open,
                   ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
-        if (UI::IsWindowFocused() && UI::IsMouseDoubleClicked(ImGuiMouseButton_Left))
-            cursorInv = true;
 
-        if (cursorInv)
-        {
-            ImVec2 pos = UI::GetWindowSize();
-            SetCursorPos(pos.x, pos.y);
-            UI::SetMouseCursor(ImGuiMouseCursor_None);
-        }
-        if (UI::IsKeyPressed(UI::GetKeyIndex(ImGuiKey_Enter)))
-        {
-            cursorInv = false;
-            UI::SetMouseCursor(ImGuiMouseCursor_Arrow);
-        }
+        ImVec2 windowSize = UI::GetContentRegionAvail();
 
-        UI::TextWrapped("Welcome on the Solid Play Scene!");
+        DrawScene();
+        UI::Image((ImTextureID)(size_t)playFramebuffer.texture,windowSize,ImVec2{0,1},ImVec2{1,0});
+
         UI::End();
+    }
+
+    void PlayInterface::DrawScene()
+    {
+        Camera* camera = engine->activeCamera;
+
+        if(camera != nullptr)
+            camera->UpdateCamera(playFramebuffer.size);
+        engine->renderer->BeginFramebuffer(playFramebuffer);
+        engine->renderer->ClearColor({0.f,0.f,0.f,1});
+        engine->renderer->Clear(playFramebuffer.size);
+        if(engine->activeCamera != nullptr)
+            engine->rendererSystem->Update(engine->renderer,*engine->activeCamera);
+        engine->renderer->EndFramebuffer();
     }
 }

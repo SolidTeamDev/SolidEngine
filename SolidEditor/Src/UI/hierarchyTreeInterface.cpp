@@ -16,13 +16,28 @@ namespace Solid
         UI::Begin("Hierarchy", &p_open,
                   ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
 
+        UI::BeginChild("##HierarchyChild", UI::GetContentRegionAvail(), false, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar);
+
+
         if (UI::IsWindowHovered() && UI::IsAnyMouseDown())
             EditorInterface::selectedGO = nullptr;
 
         DrawEntities();
 
         DrawCreateObject();
+		UI::EndChild();
+	    if(UI::BeginDragDropTarget())
+	    {
 
+		    const ImGuiPayload* drop=UI::AcceptDragDropPayload("Prefab");
+		    if(drop != nullptr)
+		    {
+			    Resource* r = *((Resource**)drop->Data);
+			    Engine::GetInstance()->ecsManager.Instantiate(r->name, nullptr);
+
+		    }
+		    UI::EndDragDropTarget();
+	    }
         UI::End();
     }
 }
@@ -48,7 +63,6 @@ void Solid::HierarchyTreeInterface::DrawCreateObject()
                 else
                     tmp = engine->ecsManager.CreateEntity();
 
-                engine->ecsManager.AddComponent(tmp,Transform());
                 EditorInterface::selectedGO = tmp;
 
             }
@@ -62,7 +76,6 @@ void Solid::HierarchyTreeInterface::DrawCreateObject()
                 else
                     tmp = engine->ecsManager.CreateEntity();
 
-                engine->ecsManager.AddComponent(tmp,Transform());
                 engine->ecsManager.AddComponent(tmp,MeshRenderer(
                 		engine->graphicsResourceMgr.GetMesh("cube.obj"))
                 );
@@ -71,11 +84,27 @@ void Solid::HierarchyTreeInterface::DrawCreateObject()
             }
             if(UI::MenuItem("Sphere"))
             {
+                GameObject* tmp = nullptr;
+
+                if (EditorInterface::selectedGO != nullptr)
+                    tmp = engine->ecsManager.CreateEntity(EditorInterface::selectedGO->GetEntity());
+                else
+                    tmp = engine->ecsManager.CreateEntity();
+
+                engine->ecsManager.AddComponent(tmp,MeshRenderer(
+                        engine->graphicsResourceMgr.GetMesh("sphere.obj"))
+                );
+                EditorInterface::selectedGO = tmp;
             }
             if(UI::MenuItem("Solid"))
             {
-                GameObject* tmp = engine->ecsManager.CreateEntity();
-                engine->ecsManager.AddComponent(tmp,Transform());
+                GameObject* tmp = nullptr;
+
+                if (EditorInterface::selectedGO != nullptr)
+                    tmp = engine->ecsManager.CreateEntity(EditorInterface::selectedGO->GetEntity());
+                else
+                    tmp = engine->ecsManager.CreateEntity();
+
                 engine->ecsManager.AddComponent(tmp,MeshRenderer(
 		                engine->graphicsResourceMgr.GetMesh("solid.obj"))
                 );
@@ -83,7 +112,56 @@ void Solid::HierarchyTreeInterface::DrawCreateObject()
             }
             UI::EndMenu();
         }
+	    if(EditorInterface::selectedGO != nullptr)
+	    {
+            UI::Separator();
+		    if(UI::MenuItem("Remove GameObject"))
+		    {
+			    if (EditorInterface::selectedGO != nullptr)
+			    {
+			    	engine->ecsManager.DestroyEntity(EditorInterface::selectedGO->GetEntity());
+				    EditorInterface::selectedGO = nullptr;
+			    }
 
+		    }
+	    }
+	    if(UI::BeginMenu("Prefab"))
+	    {
+		    if(UI::MenuItem("Create Prefab"))
+		    {
+				if(EditorInterface::selectedGO != nullptr)
+				{
+					PrefabResource* prefab = engine->resourceManager.GetPrefabByName(EditorInterface::selectedGO->name.c_str());
+					if(prefab != nullptr)
+					{
+						prefab->UpdatePrefab(EditorInterface::selectedGO);
+					}
+					else
+					{
+						engine->resourceManager.CreatePrefab(EditorInterface::selectedGO);
+					}
+				}
+		    }
+		    if(UI::MenuItem("Update Prefab"))
+		    {
+			    if(EditorInterface::selectedGO != nullptr)
+			    {
+				    PrefabResource* prefab = engine->resourceManager.GetPrefabByName(EditorInterface::selectedGO->name.c_str());
+				    if(prefab != nullptr)
+				    {
+				    	prefab->UpdatePrefab(EditorInterface::selectedGO);
+				    }
+			    }
+		    }
+		    if(UI::MenuItem("Instantiate Prefab"))
+		    {
+
+		    	engine->ecsManager.Instantiate("Prefab1", nullptr, "InstantiatedPrefab");
+
+
+		    }
+		    UI::EndMenu();
+	    }
         UI::EndPopup();
     }
 }

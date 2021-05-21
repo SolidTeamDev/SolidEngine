@@ -1,3 +1,4 @@
+//TODO: Remove field only for camera editor
 #pragma once
 
 
@@ -18,13 +19,14 @@ namespace Solid SLDNamespace()
         Mat4<float> projection;
         Mat4<float> view;
 
+        bool isActiveCamera = false;
     public:
 	    SLDField()
 	    float fov;
 	    SLDField()
-	    float near;
+	    float _near;
 	    SLDField()
-	    float far;
+	    float _far;
 	    SLDField()
  		Vec3 Right = Vec3::Zero;
         SLDField()
@@ -41,11 +43,16 @@ namespace Solid SLDNamespace()
         bool MouseInCenterScreen = false;
         Camera();
 
+        void Release() override;
+
         Mat4<float> GetView() const;
         Mat4<float> GetProjection() const;
 
         void UpdateCamera(const Vec2i _spaceScreen);
         Mat4<float> lookAt(const Vec3& eye, const Vec3& center, const Vec3& up);
+
+        void SetActiveCamera();
+
         Camera_GENERATED
     };
 } //!namespace

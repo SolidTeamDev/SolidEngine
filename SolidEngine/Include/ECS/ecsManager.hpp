@@ -28,24 +28,30 @@ namespace Solid
             sceneGraphManager = std::make_unique<SceneGraphManager>();
         }
 
+
+
         GameObject* CreateEntity()
         {
             Entity temp = entityManager->CreateEntity();
-
-            return sceneGraphManager->GetWorld()->AddToCurrent(temp);
+            GameObject* go = sceneGraphManager->GetWorld()->AddToCurrent(temp);
+            go->transform = AddComponent<Transform>(go,Transform());
+            return go;
         }
 
 	    GameObject* CreateEntity(Entity _parent)
         {
             Entity temp = entityManager->CreateEntity();
-            return sceneGraphManager->GetNodeFromEntity(_parent)->AddToCurrent(temp);
+            GameObject* go = sceneGraphManager->GetNodeFromEntity(_parent)->AddToCurrent(temp);
+            go->transform = AddComponent<Transform>(go,Transform());
+            return go;
         }
 	    GameObject* CreateEntity(std::string _name)
 	    {
 		    Entity temp = entityManager->CreateEntity();
-		    GameObject* obj =sceneGraphManager->GetWorld()->AddToCurrent(temp);
-		    obj->name = _name;
-		    return obj;
+		    GameObject* go =sceneGraphManager->GetWorld()->AddToCurrent(temp);
+		    go->name = _name;
+		    go->transform = AddComponent<Transform>(go,Transform());
+		    return go;
 	    }
 	    GameObject* CreateEntity(std::string _name,Entity _parent)
 	    {
@@ -53,6 +59,11 @@ namespace Solid
 		    GameObject* obj = sceneGraphManager->GetNodeFromEntity(_parent)->AddToCurrent(temp);
 		    obj->name = _name;
 		    return obj;
+	    }
+
+	    GameObject* Instantiate(std::string _prefabName, GameObject* parent, std::string _name ="" )
+	    {
+        	return sceneGraphManager->Instantiate(_prefabName, parent, _name);
 	    }
 
         void DestroyEntity(Entity _entity)
@@ -105,11 +116,31 @@ namespace Solid
             c->Init();
             return (T*)c;
         }
+	    template<>
+	    Script** AddComponent(GameObject* _entity, Script* _component)
+	    {
+		    //HERE
+		    Components* c =componentManager->AddComponent<Script*>(_entity->GetEntity(),_component);
+		    c->gameObject = _entity;
+		    _entity->compsList.push_back(c);
+		    auto signature = entityManager->GetSignature(_entity->GetEntity());
+		    signature.set(componentManager->GetComponentType<Script*>(), true);
+		    entityManager->SetSignature(_entity->GetEntity(),signature);
 
+		    systemManager->EntitySignatureChanged(_entity->GetEntity(),signature);
+		    c->Init();
+		    return (Script**)c;
+	    }
+	    template<typename T>
+	    std::shared_ptr<ComponentArray<T>> GetCompArray()
+	    {
+
+		    return componentManager->GetComponentArray<T>();
+	    }
         template<typename T>
         void RemoveComponent(GameObject* _entity)
         {
-            Components* c = componentManager->RemoveComponent<T>(_entity);
+            Components* c = componentManager->RemoveComponent<T>(_entity->GetEntity());
             c->Release();
 	        for (auto it= _entity->compsList.begin(); it != _entity->compsList.end(); ++it)
 	        {

@@ -15,8 +15,7 @@
 namespace Solid
 {
     //TODO: Replace static
-    static ImGuizmo::OPERATION gizmoMode = ImGuizmo::OPERATION::TRANSLATE;
-    static ImGuizmo::MODE      gizmoReferential = ImGuizmo::MODE::LOCAL;
+
 
     float SceneInterface::camSpeed = 2.f;
 
@@ -25,6 +24,8 @@ namespace Solid
         engine = Engine::GetInstance();
         sceneFramebuffer = engine->renderer->CreateFramebuffer(engine->window->GetWindowSize());
         sceneCam.MouseSensitivity = 35.f;
+
+
     }
 
     void SceneInterface::Draw()
@@ -66,18 +67,18 @@ namespace Solid
         GameObject* go = EditorInterface::selectedGO;
         if (go != nullptr && engine->ecsManager.GotComponent<Transform>(go->GetEntity()))
         {
-            Mat4<float> transMat = engine->ecsManager.GetComponent<Transform>(go->GetEntity()).GetMatrix();
-
+	        Mat4<float> transMat = engine->ecsManager.GetComponent<Transform>(go->GetEntity()).GetMatrix();
+	        Mat4<float> Parent = engine->ecsManager.GetComponent<Transform>(go->GetEntity()).GetParentMatrix();
+			transMat = (transMat*Parent );
             ImGuizmo::Manipulate(viewMat.elements.data(), projMat.elements.data(),
-                                 gizmoMode, gizmoReferential,
-                                 transMat.elements.data());
+                                 ButtonInterface::gizmoMode, ButtonInterface::gizmoReferential,
+                                 transMat.elements.data() );
             if (ImGuizmo::IsUsing())
             {
+            	transMat =   transMat *Parent.GetInversed();
                 engine->ecsManager.GetComponent<Transform>(go->GetEntity()).SetTransformMatrix(transMat);
             }
         }
-        //Show grid
-        //::DrawGrid(viewMat.elements.data(),projMat.elements.data(),Mat4<float>::Identity.elements.data(),10);
 
         UI::End();
     }
@@ -113,20 +114,13 @@ namespace Solid
         float speed = camSpeed/10;
         if (speed < 0.01f)
             speed = 0.01f;
-        UI::SliderFloat("Camera Speed", &camSpeed, 0.1f, 1000.f);
+        UI::Text("Camera Speed");
+        UI::SameLine();
+        UI::SetNextItemWidth(100.f);
+        UI::DragFloat("##CameraSpeed", &camSpeed, 0.1f, 1000.f);
         camSpeed = std::clamp(camSpeed, 0.f, 50000.f);
 
-        if(UI::Button("Local"))
-            gizmoReferential = ImGuizmo::MODE::LOCAL;
-        if(UI::Button("Global"))
-            gizmoReferential =  ImGuizmo::MODE::WORLD;
 
-        if(UI::Button("Translation"))
-            gizmoMode = ImGuizmo::OPERATION::TRANSLATE;
-        if(UI::Button("Rotation"))
-            gizmoMode = ImGuizmo::OPERATION::ROTATE;
-        if(UI::Button("Scale"))
-            gizmoMode = ImGuizmo::OPERATION::SCALE; //TODO: Force Local
 
         UI::EndMenuBar();
     }

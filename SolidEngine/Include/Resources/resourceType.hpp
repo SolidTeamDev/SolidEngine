@@ -1,11 +1,8 @@
-//
-// Created by ryan1 on 26/02/2021.
-//
+#pragma once
 
-#ifndef SOLIDEDITOR_RESOURCETYPE_HPP
-#define SOLIDEDITOR_RESOURCETYPE_HPP
 #include <filesystem>
 #include <sndfile.h>
+#include <deque>
 
 #include "Core/Maths/solidVector.hpp"
 #include "Core/Maths/Matrix/matrix4.hpp"
@@ -39,6 +36,7 @@ namespace Solid {
         Scene,
         Audio,
         Skeleton,
+        Prefab,
         NONE,
     };
 
@@ -57,12 +55,14 @@ namespace Solid {
         static int NoNameNum;
     protected:
         EResourceType type;
-        fs::path path;
-        fs::path assetProjectPath;
     public:
-        std::string name;
+	    std::deque<std::string> path;
+	    std::string name;
 
         EResourceType GetType() { return type; }
+	    virtual void ToDataBuffer(std::vector<char> &buffer);
+
+	    virtual int FromDataBuffer(char *buffer, int bSize);
 
     };
 
@@ -80,10 +80,9 @@ namespace Solid {
 
         ~ImageResource();
 
-        void ToDataBuffer(std::vector<char> &buffer);
+	    virtual void ToDataBuffer(std::vector<char> &buffer) override;
 
-//        void FromDataBuffer(std::vector<char>& buffer);
-        void FromDataBuffer(char *buffer, int bSize);
+	    virtual int FromDataBuffer(char *buffer, int bSize) override;
 
     };
 
@@ -127,9 +126,9 @@ namespace Solid {
 
         }
 
-        void ToDataBuffer(std::vector<char> &buffer);
+	    virtual void ToDataBuffer(std::vector<char> &buffer) override;
 
-        void FromDataBuffer(char *buffer, int bSize);
+	    virtual int FromDataBuffer(char *buffer, int bSize) override;
     };
 
 	class SOLID_API SkeletonResource : public Resource
@@ -232,9 +231,9 @@ namespace Solid {
 
         }
 
-        void ToDataBuffer(std::vector<char> &buffer);
+	    virtual void ToDataBuffer(std::vector<char> &buffer) override;
 
-        void FromDataBuffer(char *buffer, int bSize);
+	    virtual int FromDataBuffer(char *buffer, int bSize) override;
     };
 
     class SOLID_API ComputeShaderResource : public Resource
@@ -261,50 +260,56 @@ namespace Solid {
 
         }
 
-        void ToDataBuffer(std::vector<char> &buffer);
+	    virtual void ToDataBuffer(std::vector<char> &buffer) override;
 
-        void FromDataBuffer(char *buffer, int bSize);
+	    virtual int FromDataBuffer(char *buffer, int bSize) override;
     };
 
     class SOLID_API MaterialResource : public Resource
     {
-
+    private:
+        std::shared_ptr<IShader> shader;
+        std::shared_ptr<const IShader> defaultshader;
     public:
-	    enum class EFieldType : int
-	    {
-	    	BOOL = 1,
-	    	INT,
-	    	FLOAT,
-	    	VEC2,
-	    	VEC3,
-	    	VEC4,
-	    	NONE
-	    };
-		class SOLID_API FieldValue
-		{
-		public:
-			EFieldType type;
-			union
-			{
-				bool   b;
-				int    i;
-				float  f;
-				Vec2   v2;
-				Vec3   v3;
-				Vec4   v4;
-			};
+        enum class EShaderFieldType : int
+        {
+            BOOL,
+            INT,
+            FLOAT,
+            VEC2,
+            VEC3,
+            VEC4,
+            TEXT,
+            NONE
+        };
+        class SOLID_API ShaderField
+        {
+        public:
+            std::string name;
+            EShaderFieldType type;
+            union
+            {
+                bool   b;
+                int    i;
+                float  f;
+                Vec2   v2;
+                Vec3   v3;
+                Vec4   v4;
 
-			FieldValue(EFieldType _type);
-			FieldValue(const FieldValue& copy);
-		};
+            };
+            std::shared_ptr<ITexture> text;
+	        ShaderField();
 
-    	std::shared_ptr<IShader> shader;
+            ShaderField(EShaderFieldType _type);
+            ShaderField(const struct ShaderUniform& _uniform);
+            ShaderField(const ShaderField& _copy);
+            ~ShaderField(){};
+            ShaderField& operator=(const ShaderField& _copy);
+        };
+
 	    bool shouldGenerateFileAtDestroy = true;
 
-	    std::shared_ptr<const IShader> defaultshader;
-	    std::unordered_map<std::string, std::shared_ptr<ITexture>> TexturesProperties;
-	    std::unordered_map<std::string, FieldValue> ValuesProperties;
-
+	    std::vector<ShaderField> fields;
 
         MaterialResource();
 	    MaterialResource(const char* _name, bool _genfile = true);
@@ -312,9 +317,14 @@ namespace Solid {
 
         ~MaterialResource();
 
-	    void ToDataBuffer(std::vector<char> &buffer);
+	    virtual void ToDataBuffer(std::vector<char> &buffer) override;
+	    virtual int FromDataBuffer(char *buffer, int bSize) override;
 
-	    void FromDataBuffer(char *buffer, int bSize);
+        const std::shared_ptr<IShader> GetShader() const;
+        const std::shared_ptr<const IShader> GetDefaultshader() const;
+
+        void SetShader(const std::shared_ptr<IShader> _shader);
+        void LoadShaderFields();
 
     };
 
@@ -346,12 +356,34 @@ namespace Solid {
 		}
 
 		~AudioResource();
-		void ToDataBuffer(std::vector<char> &buffer);
+		virtual void ToDataBuffer(std::vector<char> &buffer) override;
 
-		void FromDataBuffer(char *buffer, int bSize);
+		virtual int FromDataBuffer(char *buffer, int bSize) override;
+
+	};
+	class SOLID_API PrefabResource : public Resource
+	{
+	public:
+	//public members
+	std::vector<char> PrefabBinary;
+
+	protected:
+		//protected members
+
+	public:
+	//public func
+	    PrefabResource()
+		{
+			type =EResourceType::Prefab;
+		}
+	    ~PrefabResource() = default;
+
+		void UpdatePrefab(GameObject* _gameObject);
+
+
+		virtual void ToDataBuffer(std::vector<char> &buffer) override;
+
+		virtual int FromDataBuffer(char *buffer, int bSize) override;
 
 	};
 }
-
-
-#endif //SOLIDEDITOR_RESOURCETYPE_HPP

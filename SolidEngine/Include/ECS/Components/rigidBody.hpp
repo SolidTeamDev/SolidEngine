@@ -25,9 +25,12 @@ namespace Solid SLDNamespace()
         ~RigidBody() override = default ;
 
         void Init() override;
+        void Release() override;
 
         RigidBody_GENERATED
     };
 } //!namespace
 
 File_GENERATED
+
+

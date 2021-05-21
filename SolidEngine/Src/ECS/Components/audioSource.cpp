@@ -12,8 +12,7 @@ namespace Solid
 {
     AudioSource::~AudioSource()
     {
-        if(isInit)
-            alDeleteSources(1, &sourceID);
+
     }
 
     void AudioSource::Init()
@@ -173,4 +172,14 @@ namespace Solid
     {
         return loop;
     }
+
+	void AudioSource::Release()
+	{
+		if(!isInit)
+			return;
+		Components::Release();
+		isInit = false;
+		audioResource = nullptr;
+		alDeleteSources(1, &sourceID);
+	}
 } //!namespace

@@ -1,7 +1,7 @@
 #include "ECS/Components/camera.hpp"
-#include "editor.hpp"
 
-#include "Inputs/editorInputs.hpp"
+#include "Core/engine.hpp"
+
 namespace Solid
 {
     Camera::Camera()
@@ -10,8 +10,17 @@ namespace Solid
         view = Mat4<>::Identity;
 
         fov  = 45.f;
-        near = 0.01f;
-        far  = 100.f;
+        _near = 0.01f;
+        _far  = 100.f;
+    }
+
+    void Camera::Release()
+    {
+        Components::Release();
+        if(isActiveCamera)
+            Engine::GetInstance()->activeCamera = nullptr;
+
+        isActiveCamera = false;
     }
 
     Mat4<float> Camera::GetView() const
@@ -29,7 +38,7 @@ namespace Solid
 
 
         view       = lookAt(position, position + Front, Up);
-        projection = Mat4<>::Perspective(fov,(float)_spaceScreen.x / (float)_spaceScreen.y,near,far);
+        projection = Mat4<>::Perspective(fov,(float)_spaceScreen.x / (float)_spaceScreen.y,_near,_far);
     }
 
      Mat4<float> Camera::lookAt(const Vec3& eye, const Vec3& center, const Vec3& up)
@@ -70,4 +79,10 @@ namespace Solid
 
          return mat;
      }
+
+    void Camera::SetActiveCamera()
+    {
+        Engine::GetInstance()->activeCamera = this;
+        isActiveCamera = true;
+    }
 } //!namespace

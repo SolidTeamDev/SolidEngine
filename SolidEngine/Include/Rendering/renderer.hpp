@@ -39,26 +39,6 @@ namespace Solid
 
         static Renderer* GetInstance() ;
 
-        struct CShader
-        {
-            bool error = false;
-            uint sID = 0;
-            uint pID = 0;
-        };
-        struct VFShader
-        {
-            bool error = false;
-            uint vID = 0;
-            uint fID = 0;
-            uint pID = 0;
-        };
-        /*struct ShaderBinary
-        {
-            uint size = 0;
-            GLenum format;
-            char* b = nullptr;
-        };*/
-
         virtual void Clear(const Vec2i& _windowSize) const = 0;
         virtual void ClearColor(const Vec4& _clearColor) const = 0;
         virtual Framebuffer CreateFramebuffer(const Vec2i& _size) const = 0;
@@ -67,7 +47,6 @@ namespace Solid
         virtual void EndFramebuffer() const = 0;
         virtual void DrawSolidGrid(const Camera& _camera, float _gridSize, Vec3 _color, float _thickness) const = 0;
         virtual void DrawSkybox(const Camera& _camera) const = 0;
-
 
         virtual ShaderBinary GetShaderBinary(uint _PID) const = 0;
         virtual uint CreateShaderFromBinary(ShaderBinary _binary) const = 0;
