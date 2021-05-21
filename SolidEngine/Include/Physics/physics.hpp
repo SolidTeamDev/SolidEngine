@@ -25,6 +25,9 @@ namespace Solid
         physx::PxPhysics*    pxPhysics    = nullptr;
         physx::PxScene*      pxScene      = nullptr;
 
+        physx::PxPvd* pxPvd = nullptr;
+        physx::PxPvdTransport* pxTransport = nullptr;
+
         physx::PxMaterial* pxMaterial = nullptr;
     public:
 

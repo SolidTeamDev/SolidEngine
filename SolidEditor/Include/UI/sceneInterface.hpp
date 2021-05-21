@@ -24,7 +24,7 @@ namespace Solid
         static float camSpeed;
         Camera sceneCam;
         Framebuffer sceneFramebuffer;
-        Engine* engine;
+        Engine* engine = nullptr;
 
         void DrawScene();
         bool MouseInSceneInterface(const Vec2d& mousePos);
