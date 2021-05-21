@@ -8,7 +8,7 @@
 
 namespace Solid
 {
-	class ParticleSystem
+	class SOLID_API ParticleSystem
 	{
 	public:
 		ParticleData particles;
@@ -19,7 +19,6 @@ namespace Solid
 		std::vector<std::shared_ptr<ParticleEmitter>> emitters;
 		std::vector<std::shared_ptr<ParticleUpdater>> updaters;
 
-	public:
 		explicit ParticleSystem(size_t maxCount);
 
 		virtual ~ParticleSystem()

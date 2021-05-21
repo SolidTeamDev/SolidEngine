@@ -6,7 +6,7 @@ namespace Solid
 {
 	class ParticleSystem;
 
-	class IParticleRenderer
+	class SOLID_API IParticleRenderer
 	{
 	public:
 		IParticleRenderer()
@@ -24,7 +24,7 @@ namespace Solid
 		virtual void Render() = 0;
 	};
 
-	class RendererFactory
+	class SOLID_API RendererFactory
 	{
 	public:
 		static std::shared_ptr<IParticleRenderer> Create(const char *name);

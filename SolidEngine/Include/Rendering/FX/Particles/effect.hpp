@@ -4,7 +4,7 @@
 
 namespace Solid
 {
-	class IEffect
+	class SOLID_API IEffect
 	{
 	public:
 		static const size_t DEFAULT_PARTICLE_NUM_FLAG = 0;
@@ -40,7 +40,7 @@ namespace Solid
 		virtual int NumAliveParticles() = 0;
 	};
 
-	class EffectFactory
+	class SOLID_API EffectFactory
 	{
 	public:
 		static std::shared_ptr<IEffect> Create(const char *name);

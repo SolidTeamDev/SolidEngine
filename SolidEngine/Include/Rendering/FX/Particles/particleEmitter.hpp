@@ -8,7 +8,7 @@
 
 namespace Solid
 {
-	class ParticleEmitter
+	class SOLID_API ParticleEmitter
 	{
 	protected:
 		std::vector<std::shared_ptr<ParticleGenerator>> m_generators;

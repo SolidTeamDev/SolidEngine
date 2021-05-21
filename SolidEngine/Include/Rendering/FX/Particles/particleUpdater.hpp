@@ -3,10 +3,11 @@
 #include <algorithm>
 
 #include "Rendering/FX/Particles/particleGenerator.hpp"
+#include "Build/solidAPI.hpp"
 
 namespace Solid
 {
-	class ParticleUpdater
+	class SOLID_API ParticleUpdater
 	{
 	public:
 		ParticleUpdater()
@@ -18,7 +19,7 @@ namespace Solid
 		virtual void Update(float dt, ParticleData *p) = 0;
 	};
 
-	class EulerUpdater : public ParticleUpdater
+	class SOLID_API EulerUpdater : public ParticleUpdater
 	{
 	public:
 		Vec4 globalAcceleration;
@@ -29,7 +30,7 @@ namespace Solid
 		virtual void Update(float dt, ParticleData *p) override;
 	};
 
-	class FloorUpdater : public ParticleUpdater
+	class SOLID_API FloorUpdater : public ParticleUpdater
 	{
 	public:
 		float floorY;
@@ -41,7 +42,7 @@ namespace Solid
 		virtual void Update(float dt, ParticleData *p) override;
 	};
 
-	class AttractorUpdater : public ParticleUpdater
+	class SOLID_API AttractorUpdater : public ParticleUpdater
 	{
 	protected:
 		std::vector<Vec4> attractors; // .w is force
@@ -58,13 +59,13 @@ namespace Solid
 		{ return attractors[id]; }
 	};
 
-	class BasicColorUpdater : public ParticleUpdater
+	class SOLID_API BasicColorUpdater : public ParticleUpdater
 	{
 	public:
 		virtual void Update(float dt, ParticleData *p) override;
 	};
 
-	class PosColorUpdater : public ParticleUpdater
+	class SOLID_API PosColorUpdater : public ParticleUpdater
 	{
 	public:
 		Vec4 minPos;
@@ -76,7 +77,7 @@ namespace Solid
 		virtual void Update(float dt, ParticleData *p) override;
 	};
 
-	class VelColorUpdater : public ParticleUpdater
+	class SOLID_API VelColorUpdater : public ParticleUpdater
 	{
 	public:
 		Vec4 minVel;
@@ -88,7 +89,7 @@ namespace Solid
 		virtual void Update(float dt, ParticleData *p) override;
 	};
 
-	class BasicTimeUpdater : public ParticleUpdater
+	class SOLID_API BasicTimeUpdater : public ParticleUpdater
 	{
 	public:
 		virtual void Update(float dt, ParticleData *p) override;

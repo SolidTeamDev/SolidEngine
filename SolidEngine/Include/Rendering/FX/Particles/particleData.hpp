@@ -3,11 +3,11 @@
 #include <memory>
 
 #include "Core/Maths/solidVector.hpp"
-
+#include "Build/solidAPI.hpp"
 
 namespace Solid
 {
-	class ParticleData
+	class SOLID_API ParticleData
 	{
 	public:
 		std::unique_ptr<Vec4[]> startCol;

@@ -10,7 +10,7 @@
 
 namespace Solid
 {
-	class FountainEffect : public IEffect
+	class SOLID_API FountainEffect : public IEffect
 	{
 	private:
 		std::shared_ptr<IParticleRenderer> renderer;

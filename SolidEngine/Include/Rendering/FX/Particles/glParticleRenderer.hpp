@@ -4,7 +4,7 @@
 
 namespace Solid
 {
-	class GLParticleRenderer : public IParticleRenderer
+	class SOLID_API GLParticleRenderer : public IParticleRenderer
 	{
 	protected:
 		ParticleSystem *system{nullptr};
