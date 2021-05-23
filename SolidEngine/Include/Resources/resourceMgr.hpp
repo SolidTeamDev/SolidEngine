@@ -129,6 +129,8 @@ namespace Solid
 
 	        if(type_value == PrefabList.type_value)
 		        return  &(PrefabList.List);
+            if(type_value == SkeletonList.type_value)
+                return  &(SkeletonList.List);
 
             return nullptr;
         }

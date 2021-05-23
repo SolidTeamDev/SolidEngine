@@ -19,6 +19,7 @@
 #include "ECS/Components/light.hpp"
 #include "ECS/Components/scriptList.hpp"
 
+#include "ECS/Components/animation.hpp"
 #include "Refureku/Refureku.h"
 
 namespace Solid
@@ -59,6 +60,8 @@ namespace Solid
         ecsManager.RegisterComponent<SphereCollider>();
         ecsManager.RegisterComponent<CapsuleCollider>();
         ecsManager.RegisterComponent<Light>();
+        ecsManager.RegisterComponent<Animation>();
+
 
         //Register Signature
 	    transformSystem = ecsManager.RegisterSystem<TransformSystem>();

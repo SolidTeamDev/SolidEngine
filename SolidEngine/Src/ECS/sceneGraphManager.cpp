@@ -191,7 +191,7 @@ Solid::SceneGraphManager::Instantiate(std::string _prefabName, Solid::GameObject
 
 
 				rfk::Class const *myClass = n->getClass(className);
-				rfk::Namespace const* ns = Compiler->getNamespace("Solid");
+				rfk::Namespace const* ns = Compiler->GetNamespace("Solid");
 				if(myClass == nullptr && ns != nullptr)
 					myClass = ns->getClass(className);
 				//COMPCUSTO

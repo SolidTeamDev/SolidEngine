@@ -168,6 +168,8 @@ namespace Solid SLDNamespace()
 		SLDMethod()
 		constexpr Vec4 operator-() noexcept;
 
+        float& operator[](unsigned int index);
+        float  operator[](unsigned int index) const;
 #pragma endregion
 		Vec4_GENERATED
     };
