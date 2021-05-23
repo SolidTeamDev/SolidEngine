@@ -73,6 +73,11 @@ namespace Solid
             EditCamera(engine->ecsManager.GetComponent<Camera>(gameObject->GetEntity()));
         }
 
+        if(engine->ecsManager.GotComponent<Animation>(gameObject->GetEntity()))
+        {
+            EditAnimation(engine->ecsManager.GetComponent<Animation>(gameObject->GetEntity()));
+        }
+
         if(engine->ecsManager.GotComponent<ScriptList>(gameObject->GetEntity()))
         {
 	        ScriptList& sl = engine->ecsManager.GetComponent<ScriptList>(gameObject->GetEntity());
@@ -215,6 +220,15 @@ namespace Solid
 		        }
 
 	        }
+
+            if(!engine->ecsManager.GotComponent<Animation>(gameObject->GetEntity()))
+            {
+                if(UI::Button("Animation"))
+                {
+                    engine->ecsManager.AddComponent<Animation>(gameObject,Animation());
+                    UI::CloseCurrentPopup();
+                }
+            }
             UI::EndPopup();
         }
 	    if(UI::BeginPopup("RemoveComponent"))
@@ -410,7 +424,14 @@ namespace Solid
             if(UI::TreeNode("Used Materials"))
             {
                 UI::Indent();
-
+				if(UI::Button("Apply Mat0 to all mat"))
+				{
+					auto& mats =_meshRenderer.GetMaterials();
+					for (int i = 1; i < mats.size(); ++i)
+					{
+						_meshRenderer.SetMaterialAt(i, mats[0]);
+					}
+				}
                 int id = 0;
                 for (auto* mat : _meshRenderer.GetMaterials())
                 {
@@ -727,6 +748,33 @@ namespace Solid
         }
 
         UI::Separator();
+	}
+    void InspectorInterface::EditAnimation(Animation& _anim)
+    {
+        Engine* engine = Engine::GetInstance();
+
+        if(UI::CollapsingHeader("Animation",ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            const char* SKName = _anim.GetAnim() == nullptr ? "NO ANIM" : _anim.GetAnim()->name.c_str();
+            if(UI::BeginCombo("##ANIMATION", SKName))
+            {
+                auto* animList = engine->resourceManager.GetResourcesVecByType<AnimResource>();
+
+                for(auto anim : *animList)
+                {
+                    bool selected = (SKName == anim.second->name);
+                    if(UI::Selectable(anim.second->name.c_str(), selected))
+                    {
+                        _anim.SetAnim((AnimResource *) anim.second);
+
+                    }
+                    if(selected)
+                        UI::SetItemDefaultFocus();
+                }
+
+                UI::EndCombo();
+            }
+        }
 
     }
 
@@ -841,7 +889,7 @@ namespace Solid
 	    if(UI::BeginDragDropTarget())
 	    {
 
-		    const ImGuiPayload *drop = UI::GetDragDropPayload();
+		    const ImGuiPayload *drop = UI::AcceptDragDropPayload(nullptr);
 		    if (drop != nullptr)
 		    {
 

@@ -16,7 +16,13 @@ namespace Solid
         if(!pxFoundation)
             throw ThrowError("Physx initialization failed ! (PxCreateFoundation)",ESolidErrorCode::S_INIT_ERROR);
 
-        pxPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *pxFoundation, PxTolerancesScale(), true, nullptr);
+        ///PVD
+        pxPvd       = PxCreatePvd(*pxFoundation);
+        pxTransport = PxDefaultPvdSocketTransportCreate("127.0.0.1",5425,10);
+        pxPvd->connect(*pxTransport,PxPvdInstrumentationFlag::eDEBUG);
+        ///
+
+        pxPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *pxFoundation, PxTolerancesScale(), true, pxPvd);
         if(!pxPhysics)
             throw ThrowError("Physx initialization failed ! (PxCreatePhysics)",ESolidErrorCode::S_INIT_ERROR);
 
@@ -42,6 +48,8 @@ namespace Solid
     Physics::~Physics()
     {
         pxPhysics->release();
+        pxPvd->release();
+        pxTransport->release();
         pxFoundation->release();
     }
 
@@ -60,13 +68,13 @@ namespace Solid
         }
 
         return Transform(Vec3(pxT.p.x,pxT.p.y,pxT.p.z),
-                         Quat(pxT.q.x,pxT.q.y,pxT.q.z,pxT.q.w),Vec3(1));
+                         Quat(pxT.q.x,pxT.q.y,pxT.q.z,pxT.q.w).GetInversed(),Vec3(1));
     }
 
     void Physics::SetTransform(physx::PxActor* _actor, const Transform& _transform) const
     {
         Vec3 pos = _transform.GetPosition();
-        Quat rot = _transform.GetRotation();
+        Quat rot = _transform.GetRotation().GetInversed();
         PxTransform pxT = PxTransform(PxVec3(pos.x,pos.y,pos.z),PxQuat(rot.x,rot.y,rot.z,rot.w));
 
         switch(_actor->getType())

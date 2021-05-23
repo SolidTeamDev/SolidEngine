@@ -330,6 +330,50 @@ namespace Solid
         return Vec4(-x,-y, -z, -w);
     }
 
+    float& Vec4::operator[](unsigned int index)
+    {
+        assert(index < 4);
+        switch (index)
+        {
+            case 0:
+                return x;
+                break;
+            case 1:
+                return y;
+                break;
+
+            case 2:
+                return z;
+                break;
+
+            default: //the only left index is 3
+                return w;
+                break;
+        }
+    }
+
+    float Vec4::operator[](unsigned int index) const
+    {
+        assert(index < 4);
+        switch (index)
+        {
+            case 0:
+                return x;
+                break;
+            case 1:
+                return y;
+                break;
+
+            case 2:
+                return z;
+                break;
+
+            default: //the only left index is 3
+                return w;
+                break;
+        }
+    }
+
     constexpr Vec4 operator * (float _value, const Vec4& _vec) noexcept
     {
         return _vec.GetScaled(_value);

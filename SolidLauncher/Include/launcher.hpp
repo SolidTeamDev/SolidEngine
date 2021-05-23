@@ -27,6 +27,9 @@ namespace Solid
 		}Clean;
 		std::string ProjName;
 		std::string ErrorStr;
+		std::string ProjPath;
+		fs::path root;
+
 	public:
 		bool needClose = false;
 		imgui_addons::ImGuiFileBrowser fileBrowser;

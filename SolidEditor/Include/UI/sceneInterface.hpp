@@ -26,6 +26,8 @@ namespace Solid
         Framebuffer sceneFramebuffer;
         Engine* engine = nullptr;
 
+        bool ShowGrid = true;
+        bool ShowSkeleton = false;
         void DrawScene();
         bool MouseInSceneInterface(const Vec2d& mousePos);
         void MovementAndRotationCam(float xpos, float ypos);

@@ -138,14 +138,38 @@ namespace Solid {
 		{
 			bool isPtr = false;
 		public:
+
+            struct KeyFrame
+            {
+
+                double time;
+                bool usePos= false;
+                Vec3 pos;
+                bool useRot= false;
+                Quat Rot;
+                bool useScale = false;
+                Vec3 Scale;
+            };
+            struct BoneChannel
+            {
+                SkeletonResource::Bone* BoneToMod = nullptr;
+                std::vector<KeyFrame> Frames;
+                std::size_t currentFrame = 0;
+            };
+		    BoneChannel channel;
 			std::string name;
 			Bone* Parent = nullptr;
 			std::vector<Bone*> Childrens;
 			std::vector<float> Weights;
 			bool WeightInit = false;
-			Mat4<float> transfo;
-			Mat4<float> offset;
-			Mat4<float> FinalTrans;
+
+            Mat4f T_pos;
+            Mat4f LocalTrans;
+            Mat4f GlobalTrans;
+            Mat4f offset; // inverse bind pose
+			Mat4f FinalTrans;
+			int id = -1;
+			bool isAnimated = false;
 			Bone() = default;
 			~Bone();
 			Bone& operator=(const Bone& b);
@@ -156,9 +180,11 @@ namespace Solid {
 			//find Bone Anywhere on the tree below used node
 			Bone* FindBoneByName(const char* name);
 		}rootBone;
+
+		uint numOfBone = 0;
 		SkeletonResource()
 		{
-			type = EResourceType::Anim;
+			type = EResourceType::Skeleton;
 		}
 
 		~SkeletonResource()
@@ -170,25 +196,10 @@ namespace Solid {
     class SOLID_API AnimResource : public Resource
     {
     public:
-	    struct KeyFrame
-	    {
 
-			double time;
-			bool usePos= false;
-	    	Vec3 pos;
-		    bool useRot= false;
-	    	Quat Rot;
-		    bool useScale = false;
-	    	Vec3 Scale;
-	    };
-	    struct BoneChannel
-	    {
-	    	SkeletonResource::Bone* BoneToMod = nullptr;
-	    	std::vector<KeyFrame> Frames;
-	    	std::size_t currentFrame = 0;
-	    };
-	    std::vector<BoneChannel> Channels;
+	    //std::vector<BoneChannel> Channels;
 	    SkeletonResource::Bone* Root = nullptr;
+	    uint numOfBones = 0;
     	double numTicks;
 	    double ticksPerSeconds;
 

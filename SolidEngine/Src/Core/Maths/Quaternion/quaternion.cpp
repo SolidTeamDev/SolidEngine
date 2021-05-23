@@ -237,14 +237,14 @@ namespace Solid
     {
         if(IsNormalized() || _quat.IsNormalized())
         {
-            Log::Send("Rotate function: Quaternion must be normalized");
+            Log::Send("Rotate function: Quaternion must be normalized",Log::ELogSeverity::WARNING);
             return *this;
         }
 
-        return Quat(w * _quat.w - x * _quat.x - y * _quat.y - z * _quat.z,
-                    w * _quat.x + x * _quat.w + y * _quat.z - z * _quat.y,
+        return Quat(w * _quat.x + x * _quat.w + y * _quat.z - z * _quat.y,
                     w * _quat.y - x * _quat.z + y * _quat.w + z * _quat.x,
-                    w * _quat.z + x * _quat.y - y * _quat.x + z * _quat.w);
+                    w * _quat.z + x * _quat.y - y * _quat.x + z * _quat.w,
+                    w * _quat.w - x * _quat.x - y * _quat.y - z * _quat.z);
     }
 
     constexpr Vec3 Quat::Unrotate(const Vec3 &_vec) const
