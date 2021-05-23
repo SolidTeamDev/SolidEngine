@@ -138,6 +138,25 @@ namespace Solid {
 		{
 			bool isPtr = false;
 		public:
+
+            struct KeyFrame
+            {
+
+                double time;
+                bool usePos= false;
+                Vec3 pos;
+                bool useRot= false;
+                Quat Rot;
+                bool useScale = false;
+                Vec3 Scale;
+            };
+            struct BoneChannel
+            {
+                SkeletonResource::Bone* BoneToMod = nullptr;
+                std::vector<KeyFrame> Frames;
+                std::size_t currentFrame = 0;
+            };
+		    BoneChannel channel;
 			std::string name;
 			Bone* Parent = nullptr;
 			std::vector<Bone*> Childrens;
@@ -177,24 +196,8 @@ namespace Solid {
     class SOLID_API AnimResource : public Resource
     {
     public:
-	    struct KeyFrame
-	    {
 
-			double time;
-			bool usePos= false;
-	    	Vec3 pos;
-		    bool useRot= false;
-	    	Quat Rot;
-		    bool useScale = false;
-	    	Vec3 Scale;
-	    };
-	    struct BoneChannel
-	    {
-	    	SkeletonResource::Bone* BoneToMod = nullptr;
-	    	std::vector<KeyFrame> Frames;
-	    	std::size_t currentFrame = 0;
-	    };
-	    std::vector<BoneChannel> Channels;
+	    //std::vector<BoneChannel> Channels;
 	    SkeletonResource::Bone* Root = nullptr;
 	    uint numOfBones = 0;
     	double numTicks;

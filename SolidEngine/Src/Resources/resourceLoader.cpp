@@ -663,7 +663,7 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 							            _aiBone->mOffsetMatrix.b1, _aiBone->mOffsetMatrix.b2, _aiBone->mOffsetMatrix.b3, _aiBone->mOffsetMatrix.b4,
 							            _aiBone->mOffsetMatrix.c1, _aiBone->mOffsetMatrix.c2, _aiBone->mOffsetMatrix.c3, _aiBone->mOffsetMatrix.c4,
 							            _aiBone->mOffsetMatrix.d1, _aiBone->mOffsetMatrix.d2, _aiBone->mOffsetMatrix.d3, _aiBone->mOffsetMatrix.d4);
-					_bone->offset = offset.GetInversed();
+					_bone->offset = offset.GetTransposed();
 					_bone->WeightInit = true;
 					_bone->FinalTrans =  _bone->LocalTrans * offset;
 					///WARN : trasfo matrix of aiBone and ai node *=-1 ?
@@ -714,11 +714,12 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
             anim->numOfBones = Skeleton->numOfBone;
         }
 		fbx->anims.push_back(anim);
-		anim->Channels.resize(scene->mAnimations[i]->mNumChannels);
-		for(int j = 0; j < anim->Channels.size(); ++j)
+		//anim->Channels.resize(scene->mAnimations[i]->mNumChannels);
+		for(int j = 0; j < scene->mAnimations[i]->mNumChannels; ++j)
 		{
-			AnimResource::BoneChannel& channel = anim->Channels[j];
-		    channel.BoneToMod = anim->Root->FindBoneByName(scene->mAnimations[i]->mChannels[j]->mNodeName.C_Str());
+
+			SkeletonResource::Bone::BoneChannel& channel = anim->Root->FindBoneByName(scene->mAnimations[i]->mChannels[j]->mNodeName.C_Str())->channel;
+		    //channel.BoneToMod = anim->Root->FindBoneByName(scene->mAnimations[i]->mChannels[j]->mNodeName.C_Str());
 		    std::size_t maxNumFrames =scene->mAnimations[i]->mChannels[j]->mNumPositionKeys ;
 
 		    if(maxNumFrames < scene->mAnimations[i]->mChannels[j]->mNumRotationKeys)
@@ -797,10 +798,10 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 						hasScale = true;
 					}
 				}
-				auto frame =AnimResource::KeyFrame();
+				auto frame =SkeletonResource::Bone::KeyFrame();
 				if(channel.Frames.size() != 0)
 				{
-					frame = AnimResource::KeyFrame(channel.Frames.back());
+					frame = SkeletonResource::Bone::KeyFrame(channel.Frames.back());
 					frame.time = time;
 				}
 
@@ -813,7 +814,7 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 				if (hasRot)
 				{
 					frame.useRot = true;
-					frame.Rot = Quat(rotKeys[l].mValue.x,rotKeys[l].mValue.y,rotKeys[l].mValue.z,rotKeys[l].mValue.w);
+					frame.Rot = Quat(rotKeys[l].mValue.x,rotKeys[l].mValue.y,rotKeys[l].mValue.z,rotKeys[l].mValue.w).GetInversed();
 					l++;
 				}
 				if (hasScale)

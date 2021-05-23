@@ -65,7 +65,7 @@ namespace Solid
 
         if (newBone)
         {
-           //UpdateBone(CurrentTime, newBone);
+           UpdateBone(CurrentTime, newBone);
             nodeTransform = newBone->LocalTrans;
         }
 
@@ -74,7 +74,7 @@ namespace Solid
         //auto boneInfoMap = m_CurrentAnimation->GetBoneIDMap();
         //if (boneInfoMap.find(nodeName) != boneInfoMap.end())
         {
-            newBone->FinalTrans =  (InverseRootMat  * newBone->GlobalTrans * newBone->offset);
+            newBone->FinalTrans =  ( newBone->GlobalTrans * newBone->offset );
         }
 
         for (auto child : newBone->Childrens)
@@ -86,14 +86,7 @@ namespace Solid
         anim = _anim;
         CurrentTime = 0;
         InverseRootMat = (anim->Root->LocalTrans ) ;
-        for (auto& boneChannel : anim->Channels)
-        {
-            SkeletonResource::Bone* bonetoMod = boneChannel.BoneToMod;
-            Mat4f newTF = Mat4f::Transform(boneChannel.Frames[0].pos, boneChannel.Frames[0].Rot,
-                                           boneChannel.Frames[0].Scale);
-            bonetoMod->LocalTrans = newTF;
 
-        }
         CalculateBoneTransform(anim->Root, Mat4f::Identity);
 
     }
@@ -103,40 +96,41 @@ namespace Solid
         {
             CurrentTime += anim->ticksPerSeconds * dt;
             CurrentTime = fmod(CurrentTime, anim->numTicks);
-            //CalculateBoneTransform(anim->Root, Mat4f::Identity);
+            CalculateBoneTransform(anim->Root, Mat4f::Identity);
         }
     }
 
     void Animation::UpdateBone(float currTime, SkeletonResource::Bone* bone)
     {
-        for (auto& boneChannel : anim->Channels)
+        //for (auto& boneChannel : anim->Channels)
         {
             SkeletonResource::Bone* newBone = anim->Root->FindBoneByName(bone->name.c_str());
-            if(bone == boneChannel.BoneToMod)
+            if(bone->channel.Frames.size() != 0)
             {
                 int index = 0;
-                if(currTime <= boneChannel.Frames.size())
+                if(currTime <= bone->channel.Frames.size())
                     index = (int)currTime;
                 else
-                    index = (int)boneChannel.Frames.size()-1;
+                    index = (int)bone->channel.Frames.size()-1;
 
-                SkeletonResource::Bone* bonetoMod = boneChannel.BoneToMod;
+                //SkeletonResource::Bone* bonetoMod = boneChannel.BoneToMod;
                 Vec3 translation = Vec3::Zero;
                 Quat rotation = Quat::Identity;
                 Vec3 scale = Vec3::Zero;
 
-                if(boneChannel.Frames[index].usePos)
-                    translation = boneChannel.Frames[index].pos;
+                if(bone->channel.Frames[index].usePos)
+                    translation = bone->channel.Frames[index].pos;
 
-                if(boneChannel.Frames[index].useRot)
-                    rotation = boneChannel.Frames[index].Rot;
+                if(bone->channel.Frames[index].useRot)
+                    rotation = bone->channel.Frames[index].Rot;
 
-                if(boneChannel.Frames[index].useScale)
-                    scale = boneChannel.Frames[index].Scale;
+                if(bone->channel.Frames[index].useScale)
+                    scale = bone->channel.Frames[index].Scale;
 
                 Mat4f newTF = Mat4f::Transform(translation, rotation,scale);
 
-                bonetoMod->LocalTrans = newTF;
+                bone->LocalTrans = newTF.GetTransposed();
+                return;
             }
 
         }

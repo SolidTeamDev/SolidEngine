@@ -73,6 +73,11 @@ namespace Solid
             EditCamera(engine->ecsManager.GetComponent<Camera>(gameObject->GetEntity()));
         }
 
+        if(engine->ecsManager.GotComponent<Animation>(gameObject->GetEntity()))
+        {
+            EditAnimation(engine->ecsManager.GetComponent<Animation>(gameObject->GetEntity()));
+        }
+
         if(engine->ecsManager.GotComponent<ScriptList>(gameObject->GetEntity()))
         {
 	        ScriptList& sl = engine->ecsManager.GetComponent<ScriptList>(gameObject->GetEntity());
