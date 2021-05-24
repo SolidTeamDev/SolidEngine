@@ -7,7 +7,7 @@ namespace Solid
     void RigidBody::Init()
     {
         Physics& physics = Engine::GetInstance()->physics;
-        physics.ConvertActor(gameObject->physicsActor,PhysicsActorType::DYNAMIC);
+        physics.ConvertActor(gameObject,PhysicsActorType::DYNAMIC);
 
         EnableGravity(gravity);
         SetKinematic(isKinematic);
@@ -26,7 +26,7 @@ namespace Solid
 	void Solid::RigidBody::Release()
 	{
         Physics& physics = Engine::GetInstance()->physics;
-        physics.ConvertActor(gameObject->physicsActor,PhysicsActorType::STATIC);
+        physics.ConvertActor(gameObject,PhysicsActorType::STATIC);
 
 		Components::Release();
 	}

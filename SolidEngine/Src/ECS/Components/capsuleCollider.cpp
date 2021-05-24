@@ -8,7 +8,7 @@ namespace Solid
     {
         Physics& physics = Engine::GetInstance()->physics;
         physicMaterial = physics.CreateMaterial(staticFriction,dynamicFriction,restitution);
-        capsuleCollider = physics.CreateShape(gameObject->physicsActor,physx::PxCapsuleGeometry(radius,height),physicMaterial);
+        capsuleCollider = physics.CreateShape(gameObject,physx::PxCapsuleGeometry(radius,height),physicMaterial);
         SetCapsuleDirection(direction);
     }
 

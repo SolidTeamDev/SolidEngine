@@ -1,6 +1,8 @@
 #include "Physics/physics.hpp"
 
 #include "Core/Debug/throwError.hpp"
+#include "ECS/sceneGraphManager.hpp"
+#include "Physics/physicsEventCallback.hpp"
 
 using namespace physx;
 
@@ -9,6 +11,20 @@ namespace Solid
     physx::PxDefaultErrorCallback Physics::gDefaultErrorCallback = PxDefaultErrorCallback();
     physx::PxDefaultAllocator     Physics::gDefaultAllocatorCallback = PxDefaultAllocator();
     physx::PxCudaContextManager* Physics::gCudaContextManager = nullptr;
+
+    physx::PxFilterFlags
+    Physics::filterShader(physx::PxFilterObjectAttributes attributes0, physx::PxFilterData filterData0,
+                          physx::PxFilterObjectAttributes attributes1, physx::PxFilterData filterData1,
+                          PxPairFlags &pairFlags, const void *constantBlock, physx::PxU32 constantBlockSize)
+    {
+        pairFlags = PxPairFlag::eSOLVE_CONTACT | PxPairFlag::eDETECT_DISCRETE_CONTACT
+                    | PxPairFlag::eNOTIFY_TOUCH_FOUND
+                    | PxPairFlag::eNOTIFY_CONTACT_POINTS
+                    | PxPairFlag::eNOTIFY_TOUCH_LOST
+                    | PxPairFlag::eTRIGGER_DEFAULT;
+
+        return PxFilterFlag::eDEFAULT;
+    }
 
     Physics::Physics()
     {
@@ -32,7 +48,10 @@ namespace Solid
 
         sceneDesc.gravity = PxVec3(0,-9.81f,0);
         sceneDesc.cpuDispatcher = PxDefaultCpuDispatcherCreate(4);
-        sceneDesc.filterShader  = PxDefaultSimulationFilterShader;
+        //sceneDesc.kineKineFilteringMode = physx::PxPairFilteringMode::eKEEP;
+        //sceneDesc.staticKineFilteringMode = physx::PxPairFilteringMode::eKEEP;
+        sceneDesc.simulationEventCallback = new PhysicsEventCallback();
+        sceneDesc.filterShader = filterShader;
 
         pxScene = pxPhysics->createScene(sceneDesc);
         if(!pxScene)
@@ -92,40 +111,43 @@ namespace Solid
         pxScene->fetchResults(true);
     }
 
-    physx::PxRigidDynamic* Physics::CreateDynamic(const Transform& _transform)
+    physx::PxRigidDynamic* Physics::CreateDynamic(GameObject* _go, const Transform& _transform)
     {
         Vec3 pos = _transform.GetPosition();
-        Quat rot = _transform.GetRotation();
+        Quat rot = _transform.GetRotation().GetInversed();
         PxTransform pxT = PxTransform(PxVec3(pos.x,pos.y,pos.z),PxQuat(rot.x,rot.y,rot.z,rot.w));
         PxRigidDynamic* dynamicActor = pxPhysics->createRigidDynamic(pxT);
+        dynamicActor->userData = _go;
         pxScene->addActor(*dynamicActor);
 
         return dynamicActor;
     }
 
-    physx::PxRigidStatic* Physics::CreateStatic(const Transform& _transform)
+    physx::PxRigidStatic* Physics::CreateStatic(GameObject* _go, const Transform& _transform)
     {
         Vec3 pos = _transform.GetPosition();
-        Quat rot = _transform.GetRotation();
+        Quat rot = _transform.GetRotation().GetInversed();
         PxTransform pxT = PxTransform(PxVec3(pos.x,pos.y,pos.z),PxQuat(rot.x,rot.y,rot.z,rot.w));
         PxRigidStatic* staticActor = pxPhysics->createRigidStatic(pxT);
+        staticActor->userData = _go;
         pxScene->addActor(*staticActor);
 
         return staticActor;
     }
 
-    void Physics::ConvertActor(PxActor*& _actor, PhysicsActorType _actorType)
+    void Physics::ConvertActor(GameObject* _go, PhysicsActorType _actorType)
     {
+        physx::PxActor*& _actor = _go->physicsActor;
         //Check if actor exist
         if(!_actor)
         {
             switch (_actorType)
             {
                 case PhysicsActorType::STATIC:
-                    _actor = CreateStatic();
+                    _actor = CreateStatic(_go);
                     break;
                 case PhysicsActorType::DYNAMIC:
-                    _actor = CreateDynamic();
+                    _actor = CreateDynamic(_go);
                     break;
             }
             return;
@@ -153,7 +175,7 @@ namespace Solid
                     // Restore
                     for (size_t i = 0; i < nbShape; ++i)
                         dynamicActor->attachShape(*shapeList[i]);
-
+                    dynamicActor->userData = _go;
                     _actor = dynamicActor;
 
                     break;
@@ -180,6 +202,7 @@ namespace Solid
 
                     for (size_t i = 0; i < nbShape; ++i)
                         staticActor->attachShape(*shapeList[i]);
+                    staticActor->userData = _go;
 
                     _actor = staticActor;
 
@@ -193,10 +216,11 @@ namespace Solid
         pxScene->addActor(*_actor);
     }
 
-    physx::PxShape *Physics::CreateShape(physx::PxActor*& _actor, const PxGeometry& _geometry, const physx::PxMaterial* _physicsMaterials)
+    physx::PxShape *Physics::CreateShape(GameObject* _go, const PxGeometry& _geometry, const physx::PxMaterial* _physicsMaterials)
     {
+        physx::PxActor*& _actor = _go->physicsActor;
         if(_actor == nullptr)
-            _actor = CreateStatic(Transform());
+            _actor = CreateStatic(_go,Transform());
 
         PxShape* shape = pxPhysics->createShape(_geometry,*_physicsMaterials,true);
 

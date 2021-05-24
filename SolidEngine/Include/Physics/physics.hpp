@@ -5,6 +5,7 @@
 #include "ECS/Components/transform.hpp"
 #include <PxPhysicsAPI.h>
 
+class GameObject;
 namespace Solid
 {
     enum class PhysicsActorType
@@ -28,7 +29,13 @@ namespace Solid
         physx::PxPvd* pxPvd = nullptr;
         physx::PxPvdTransport* pxTransport = nullptr;
 
-        //physx::PxMaterial* pxMaterial = nullptr;
+        static physx::PxFilterFlags filterShader(physx::PxFilterObjectAttributes attributes0,
+                                                 physx::PxFilterData filterData0,
+                                                 physx::PxFilterObjectAttributes attributes1,
+                                                 physx::PxFilterData filterData1,
+                                                 physx::PxPairFlags& pairFlags,
+                                                 const void* constantBlock,
+                                                 physx::PxU32 constantBlockSize);
     public:
 
         Physics();
@@ -39,11 +46,11 @@ namespace Solid
 
         void Update(float _deltaTime) const;
 
-        physx::PxRigidDynamic* CreateDynamic(const Transform& _transform = Transform());
-        physx::PxRigidStatic* CreateStatic(const Transform& _transform   = Transform());
-        void ConvertActor(physx::PxActor*& _actor, PhysicsActorType _actorType);
+        physx::PxRigidDynamic* CreateDynamic(GameObject* _go, const Transform& _transform = Transform());
+        physx::PxRigidStatic* CreateStatic(GameObject* _go, const Transform& _transform   = Transform());
+        void ConvertActor(GameObject* _go, PhysicsActorType _actorType);
 
-        physx::PxShape* CreateShape(physx::PxActor*& _actor, const physx::PxGeometry& _geometry, const physx::PxMaterial* _physicsMaterials);
+        physx::PxShape* CreateShape(GameObject* _go, const physx::PxGeometry& _geometry, const physx::PxMaterial* _physicsMaterials);
         void DeleteShape(physx::PxActor* _actor, physx::PxShape* _shape);
 
         physx::PxMaterial* CreateMaterial(float _staticFriction, float _dynamicFriction, float _restitution);
