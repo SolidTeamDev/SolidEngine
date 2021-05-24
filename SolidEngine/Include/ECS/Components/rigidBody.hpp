@@ -47,6 +47,8 @@ namespace Solid SLDNamespace()
         void AddForce(const Vec3& _force);
         void AddImpulse(const Vec3& _force);
 
+        void ResetVelocity();
+
         Vec3 GetLinearVelocity();
         Vec3 GetAngularVelocity();
 

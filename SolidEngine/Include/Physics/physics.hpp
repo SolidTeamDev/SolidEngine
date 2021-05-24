@@ -28,7 +28,7 @@ namespace Solid
         physx::PxPvd* pxPvd = nullptr;
         physx::PxPvdTransport* pxTransport = nullptr;
 
-        physx::PxMaterial* pxMaterial = nullptr;
+        //physx::PxMaterial* pxMaterial = nullptr;
     public:
 
         Physics();
@@ -42,9 +42,11 @@ namespace Solid
         physx::PxRigidDynamic* CreateDynamic(const Transform& _transform = Transform());
         physx::PxRigidStatic* CreateStatic(const Transform& _transform   = Transform());
         void ConvertActor(physx::PxActor*& _actor, PhysicsActorType _actorType);
-        physx::PxShape* CreateShape(physx::PxActor*& _actor, const physx::PxGeometry& _geometry);
 
+        physx::PxShape* CreateShape(physx::PxActor*& _actor, const physx::PxGeometry& _geometry, const physx::PxMaterial* _physicsMaterials);
         void DeleteShape(physx::PxActor* _actor, physx::PxShape* _shape);
+
+        physx::PxMaterial* CreateMaterial(float _staticFriction, float _dynamicFriction, float _restitution);
 
         void AddForce(const physx::PxActor* _actor, const Vec3& _force, const physx::PxForceMode::Enum& _forceMode);
 

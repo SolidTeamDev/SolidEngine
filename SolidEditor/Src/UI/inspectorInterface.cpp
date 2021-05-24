@@ -769,10 +769,8 @@ namespace Solid
         if(UI::CollapsingHeader("RigidBody", ImGuiTreeNodeFlags_DefaultOpen))
         {
             if(UI::Button("Reset velocity"))
-            {
-                _rigidBody.SetLinearVelocity(Vec3(0));
-                _rigidBody.SetAngularVelocity(Vec3(0));
-            }
+                _rigidBody.ResetVelocity();
+
             {
                 bool gravity = _rigidBody.IsGravityEnabled();
                 if(UI::Checkbox("Enable gravity", &gravity))
@@ -857,7 +855,9 @@ namespace Solid
     {
         if(UI::CollapsingHeader("Box collider", ImGuiTreeNodeFlags_DefaultOpen))
         {
-
+            Vec3 size = _boxCollider.GetSize();
+            if(EditVec3(size,"Size##Box",0.01f))
+                _boxCollider.SetSize(size);
         }
         UI::Separator();
     }
@@ -866,7 +866,9 @@ namespace Solid
     {
         if(UI::CollapsingHeader("Sphere collider", ImGuiTreeNodeFlags_DefaultOpen))
         {
-
+            float radius = _sphereCollider.GetRadius();
+            if(EditFloat(radius,"Radius##Sphere",0.01f))
+                _sphereCollider.SetRadius(radius);
         }
         UI::Separator();
     }
@@ -875,7 +877,51 @@ namespace Solid
     {
         if(UI::CollapsingHeader("Capsule collider", ImGuiTreeNodeFlags_DefaultOpen))
         {
-
+            {
+                float radius = _capsuleCollider.GetRadius();
+                if(EditFloat(radius,"Radius##Capsule",0.01f))
+                    _capsuleCollider.SetRadius(radius);
+            }
+            {
+                float height = _capsuleCollider.GetHeight();
+                if(EditFloat(height,"height##Capsule",0.01f))
+                    _capsuleCollider.SetHeight(height);
+            }
+            {
+                CapsuleCollider::ECapsuleDirection capsDir = _capsuleCollider.GetDirection();
+                std::string dirName = "";
+                switch (capsDir)
+                {
+                    case CapsuleCollider::ECapsuleDirection::X_AXIS:
+                        dirName = "X-AXIS";
+                        break;
+                    case CapsuleCollider::ECapsuleDirection::Y_AXIS:
+                        dirName = "Y-AXIS";
+                        break;
+                    case CapsuleCollider::ECapsuleDirection::Z_AXIS:
+                        dirName = "Z-AXIS";
+                        break;
+                }
+                if(UI::BeginCombo("Direction##Capsule",dirName.c_str()))
+                {
+                    bool selected = dirName == "X-AXIS";
+                    if(UI::Selectable("X-AXIS",selected))
+                        _capsuleCollider.SetCapsuleDirection(CapsuleCollider::ECapsuleDirection::X_AXIS);
+                    if(selected)
+                        UI::SetItemDefaultFocus();
+                    selected = dirName == "Y-AXIS";
+                    if(UI::Selectable("Y-AXIS",selected))
+                        _capsuleCollider.SetCapsuleDirection(CapsuleCollider::ECapsuleDirection::Y_AXIS);
+                    if(selected)
+                        UI::SetItemDefaultFocus();
+                    selected = dirName == "Z-AXIS";
+                    if(UI::Selectable("Z-AXIS",selected))
+                        _capsuleCollider.SetCapsuleDirection(CapsuleCollider::ECapsuleDirection::Z_AXIS);
+                    if(selected)
+                        UI::SetItemDefaultFocus();
+                    UI::EndCombo();
+                }
+            }
         }
         UI::Separator();
     }
@@ -927,27 +973,24 @@ namespace Solid
         UI::End();
     }
 
-	void InspectorInterface::EditBool(bool &_num, const std::string &_label)
+    bool InspectorInterface::EditBool(bool &_num, const std::string &_label)
 	{
-		if(UI::Checkbox(_label.c_str(), &_num))
-		{
-
-		}
+		return UI::Checkbox(_label.c_str(), &_num);
 	}
 
-    void InspectorInterface::EditInt(int& _num, const std::string& _label, float _step)
+    bool InspectorInterface::EditInt(int& _num, const std::string& _label, float _step)
     {
-        UI::DragInt(_label.c_str(), &_num, _step);
+        return UI::DragInt(_label.c_str(), &_num, _step);
     }
 
-    void InspectorInterface::EditFloat(float &_num, const std::string& _label, float _step)
+    bool InspectorInterface::EditFloat(float &_num, const std::string& _label, float _step)
     {
-        UI::DragFloat(_label.c_str(), &_num, _step);
+        return UI::DragFloat(_label.c_str(), &_num, _step);
     }
 
-    void InspectorInterface::EditVec2(Vec2& _vec, const std::string& _label, float _step)
+    bool InspectorInterface::EditVec2(Vec2& _vec, const std::string& _label, float _step)
     {
-        UI::DragFloat2(_label.c_str(), &_vec.x, _step);
+        return UI::DragFloat2(_label.c_str(), &_vec.x, _step);
     }
 
 	bool InspectorInterface::EditVec3(Vec3 &_vec, const std::string &_label, float _step)

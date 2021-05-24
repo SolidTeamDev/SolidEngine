@@ -18,7 +18,15 @@ namespace Solid SLDNamespace()
         SLDField()
         float radius = 1.f;
 
+        SLDField()
+        float staticFriction = 0.5f;
+        SLDField()
+        float dynamicFriction = 0.5f;
+        SLDField()
+        float restitution = 0.6f;
+
         physx::PxShape* sphereCollider = nullptr;
+        physx::PxMaterial* physicMaterial = nullptr;
     public:
 
         SphereCollider() = default;
@@ -26,6 +34,12 @@ namespace Solid SLDNamespace()
 
         void Init() override;
         void Release() override;
+
+        Vec3 GetCenter();
+        void SetCenter(const Vec3& _center);
+
+        float GetRadius();
+        void SetRadius(float _radius);
 
         SphereCollider_GENERATED
     };

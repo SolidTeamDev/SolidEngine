@@ -45,6 +45,12 @@ namespace Solid
         physics.AddForce(gameObject->physicsActor,_force,physx::PxForceMode::Enum::eIMPULSE);
     }
 
+    void RigidBody::ResetVelocity()
+    {
+        SetLinearVelocity(Vec3(0));
+        SetAngularVelocity(Vec3(0));
+    }
+
     Vec3 RigidBody::GetLinearVelocity()
     {
         Physics& physics = Engine::GetInstance()->physics;

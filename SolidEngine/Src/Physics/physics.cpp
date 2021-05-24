@@ -38,11 +38,6 @@ namespace Solid
         if(!pxScene)
             throw ThrowError("Physx create scene failed !",ESolidErrorCode::S_INIT_ERROR);
         ///
-
-        pxMaterial = pxPhysics->createMaterial(.5f,.5f,.6f);
-
-        PxRigidStatic* groundPlane = PxCreatePlane(*pxPhysics,PxPlane(0,1,0,0), *pxMaterial);
-        pxScene->addActor(*groundPlane);
     }
 
     Physics::~Physics()
@@ -119,7 +114,6 @@ namespace Solid
         return staticActor;
     }
 
-    //TODO: TEST THIS
     void Physics::ConvertActor(PxActor*& _actor, PhysicsActorType _actorType)
     {
         //Check if actor exist
@@ -199,12 +193,12 @@ namespace Solid
         pxScene->addActor(*_actor);
     }
 
-    physx::PxShape *Physics::CreateShape(physx::PxActor*& _actor, const PxGeometry& _geometry)
+    physx::PxShape *Physics::CreateShape(physx::PxActor*& _actor, const PxGeometry& _geometry, const physx::PxMaterial* _physicsMaterials)
     {
         if(_actor == nullptr)
             _actor = CreateStatic(Transform());
 
-        PxShape* shape = pxPhysics->createShape(_geometry,*pxMaterial);
+        PxShape* shape = pxPhysics->createShape(_geometry,*_physicsMaterials,true);
 
         ((PxRigidActor*) _actor)->attachShape(*shape);
 
@@ -215,6 +209,11 @@ namespace Solid
     {
         ((PxRigidActor*) _actor)->detachShape(*_shape);
         _shape->release();
+    }
+
+    physx::PxMaterial *Physics::CreateMaterial(float _staticFriction, float _dynamicFriction, float _restitution)
+    {
+        return pxPhysics->createMaterial(_staticFriction,_dynamicFriction,_restitution);
     }
 
     void Physics::AddForce(const physx::PxActor *_actor, const Vec3 &_force, const physx::PxForceMode::Enum& _forceMode)

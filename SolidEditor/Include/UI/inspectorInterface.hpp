@@ -58,13 +58,13 @@ namespace Solid
 
         void EditComp(Components* _comp);
 
-        void EditBool(bool &_num, const std::string &_label);
-        void EditInt(int &_num, const std::string &_label, float _step);
+        bool EditBool(bool &_num, const std::string &_label);
+        bool EditInt(int &_num, const std::string &_label, float _step);
+        bool EditFloat(float& _num, const std::string& _label, float _step);
         bool EditVec3(Vec3 &_vec, const std::string &_label, float _step);
         bool EditVec4(Vec4 &_vec, const std::string &_label, float _step);
-        void EditVec2(Vec2 &_vec, const std::string &_label, float _step);
+        bool EditVec2(Vec2 &_vec, const std::string &_label, float _step);
         void EditText(std::string& _str, const std::string& _label);
-        void EditFloat(float&      _num, const std::string& _label, float _step);
         void EditTexture(std::shared_ptr<ITexture>& _texture, const std::string& _label);
 
         bool p_open = true;

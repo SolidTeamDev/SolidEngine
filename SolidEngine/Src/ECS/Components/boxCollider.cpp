@@ -7,14 +7,40 @@ namespace Solid
     void BoxCollider::Init()
     {
         Physics& physics = Engine::GetInstance()->physics;
-        boxCollider = physics.CreateShape(gameObject->physicsActor,physx::PxBoxGeometry(size.x,size.y,size.z));
+        physicMaterial = physics.CreateMaterial(staticFriction,dynamicFriction,restitution);
+        boxCollider = physics.CreateShape(gameObject->physicsActor,physx::PxBoxGeometry(size.x,size.y,size.z),physicMaterial);
     }
 
     void BoxCollider::Release()
     {
-	    Components::Release();
 	    Physics& physics = Engine::GetInstance()->physics;
         physics.DeleteShape(gameObject->physicsActor,boxCollider);
+        physicMaterial->release();
+        physicMaterial = nullptr;
         boxCollider = nullptr;
+
+        Components::Release();
     }
+
+    Vec3 BoxCollider::GetCenter()
+    {
+        return center;
+    }
+
+    void BoxCollider::SetCenter(const Vec3& _center)
+    {
+        center = _center;
+    }
+
+    Vec3 BoxCollider::GetSize()
+    {
+        return size;
+    }
+
+    void BoxCollider::SetSize(const Vec3& _size)
+    {
+        size = _size;
+        boxCollider->setGeometry(physx::PxBoxGeometry(size.x,size.y,size.z));
+    }
+
 } //!namespace
