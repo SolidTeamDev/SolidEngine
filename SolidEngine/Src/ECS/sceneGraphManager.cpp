@@ -25,8 +25,10 @@ Solid::GameObject::GameObject(Solid::GameObject *_parent, Solid::Entity _entity)
 
 Solid::GameObject::~GameObject()
 {
+
 	for (GameObject* child : childs)
 	{
+		Engine::GetInstance()->ecsManager.DestroyEntity(child->entity,FromSceneGraphMgr{});
 		delete child;
 	}
 }
@@ -62,7 +64,6 @@ void Solid::GameObject::RemoveCurrent()
 			if (parent->childs.at(i) == this)
 			{
 				parent->childs.erase(parent->childs.begin() + i);
-				Engine::GetInstance()->ecsManager.DestroyEntity(entity,FromSceneGraphMgr{});
 				delete this;
 				break;
 			}
@@ -191,7 +192,7 @@ Solid::SceneGraphManager::Instantiate(std::string _prefabName, Solid::GameObject
 
 
 				rfk::Class const *myClass = n->getClass(className);
-				rfk::Namespace const* ns = Compiler->getNamespace("Solid");
+				rfk::Namespace const* ns = Compiler->GetNamespace("Solid");
 				if(myClass == nullptr && ns != nullptr)
 					myClass = ns->getClass(className);
 				//COMPCUSTO

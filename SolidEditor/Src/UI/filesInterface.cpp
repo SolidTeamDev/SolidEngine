@@ -28,7 +28,29 @@ namespace Solid
 
         	root.childPaths.clear();
         	root.fileNames.clear();
-	        for(auto& elt : data)
+        	std::function<void(fs::path, filePathData*)> init = [&](fs::path _path, filePathData* node)
+        	{
+        		for(auto& item : fs::directory_iterator(_path))
+        		{
+        			if(fs::is_directory(item))
+			        {
+				        std::string name = item.path().filename().string();
+				        std::transform(name.begin(), name.end(), name.begin(),
+				                       [](unsigned char c){ return std::tolower(c); });
+				        bool isShader = (name.find("shader") != std::string::npos || name.find("compute") != std::string::npos);
+				        if(isShader)
+					        continue;
+				        else
+				        {
+					        name = item.path().filename().string();
+					        filePathData* child = &node->childPaths.emplace(name, filePathData{.folderName=name, .parent=node}).first->second;
+					        init(item.path(), child);
+				        }
+			        }
+        		}
+        	};
+        	init(ResourcesLoader::SolidPath, &root);
+        	for(auto& elt : data)
 	        {
 		        std::string type = "NONE";
 		        switch (elt.RType)
@@ -538,6 +560,23 @@ namespace Solid
 			UI::InputText("##Folder", &folderstr);
 			if(UI::Button("Create new Folder"))
 			{
+				fs::path p = ResourcesLoader::SolidPath;
+				std::deque<std::string> pathList;
+				if(currentFolder != &root)
+				{
+					filePathData* node = currentFolder;
+					while(node->parent != nullptr)
+					{
+						pathList.push_front(node->folderName);
+						node = node->parent;
+					}
+					for(auto& elt : pathList)
+					{
+						p.append(elt);
+					}
+				}
+				p.append(folderstr);
+				fs::create_directory(p);
 				currentFolder->childPaths.emplace(folderstr, filePathData{.folderName=folderstr, .parent=currentFolder});
 				UI::CloseCurrentPopup();
 			}

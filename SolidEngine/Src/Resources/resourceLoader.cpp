@@ -87,6 +87,8 @@ void  ResourcesLoader::LoadRessourceNoAdd(const fs::path &Rpath, ResourcePtrWrap
         r=LoadSolidShader(Rpath);
     else if(extension == ".solidprefab")
 	    r=LoadSolidPrefab(Rpath);
+    else if(extension == ".solidscene")
+	    r=LoadSolidScene(Rpath);
     else if(extension == ".sanim")
         ;
     else if(extension == ".sskel")
@@ -159,6 +161,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 			        || name.find(".sskel") != std::string::npos
 			        || name.find(".smaterial") != std::string::npos
 			        || name.find(".solidprefab") != std::string::npos
+			        || name.find(".solidscene") != std::string::npos
 			        || name.find(".saudio") != std::string::npos);
 
 		    }
@@ -584,7 +587,7 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 	SetPath(Mesh->path, Rpath);
 	importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_ANIMATIONS, true);
 	importer.SetPropertyBool(AI_CONFIG_IMPORT_REMOVE_EMPTY_BONES, false);
-
+	const char* name = Mesh->name.data();
 
 	const aiScene *scene = importer.ReadFile(str, aiProcess_JoinIdenticalVertices | aiProcess_OptimizeMeshes |
 	                                              aiProcess_SplitLargeMeshes | aiProcess_Triangulate |
@@ -1560,6 +1563,25 @@ void ResourcesLoader::SavePrefabToFile(PrefabResource *_prefab)
 	std::ofstream file(p, std::ifstream::binary | std::ofstream::trunc);
 	file.write(buf.data(), buf.size());
 	file.close();
+}
+
+Resource *ResourcesLoader::LoadSolidScene(const fs::path &Rpath)
+{
+	SceneResource* scene = new SceneResource();
+
+	std::ifstream ifs(Rpath, std::ios::binary|std::ios::ate);
+	std::ifstream::pos_type pos = ifs.tellg();
+
+	std::vector<char>  buffer(pos);
+
+	ifs.seekg(0, std::ios::beg);
+	ifs.read(&buffer[0], pos);
+
+	scene->FromDataBuffer(buffer.data(),buffer.size());
+	scene->path.clear();
+	scene->path.push_front(rootFolder);
+	SetPath(scene->path, Rpath);
+	return scene;
 }
 
 

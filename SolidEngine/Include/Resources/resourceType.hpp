@@ -341,6 +341,9 @@ namespace Solid {
 		{
 
 		}
+		virtual void ToDataBuffer(std::vector<char> &buffer) override;
+
+		virtual int FromDataBuffer(char *buffer, int bSize) override;
 	};
 	class SOLID_API AudioResource : public Resource
 	{

@@ -119,7 +119,7 @@ namespace Solid
             if(entityToIndexMap.find(_entity) != entityToIndexMap.end())
             {
                 Components* c =RemoveData(_entity);
-                c->Release();
+
             }
         }
 

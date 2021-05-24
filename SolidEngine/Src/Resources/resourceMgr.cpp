@@ -361,4 +361,55 @@ bool ResourceManager::IsResourceExist(Resource *r)
 	}
 }
 
+SceneResource * ResourceManager::GetSceneByName(const char *name)
+{
+	auto list = SceneList.List;
+	auto it = list.find(name);
+	if(it == list.end())
+		return nullptr;
+	return (SceneResource*)it->second;
+	return nullptr;
+}
+
+std::unordered_map<std::string, Resource *> *ResourceManager::GetResourcesVecByType(EResourceType _type)
+{
+	switch (_type)
+	{
+		case EResourceType::Mesh:
+			return &MeshList.List;
+			break;
+		case EResourceType::Shader:
+			return &ShaderList.List;
+			break;
+		case EResourceType::Material:
+			return &MaterialList.List;
+			break;
+		case EResourceType::Compute:
+			return &ComputeList.List;
+			break;
+		case EResourceType::Image:
+			return &ImageList.List;
+			break;
+		case EResourceType::Anim:
+			return &AnimList.List;
+			break;
+		case EResourceType::Audio:
+			return &AudioList.List;
+			break;
+		case EResourceType::Skeleton:
+			return &SkeletonList.List;
+			break;
+		case EResourceType::Scene:
+			return &SceneList.List;
+			break;
+		case EResourceType::Prefab:
+			return &PrefabList.List;
+			break;
+		default:
+			ThrowError("Type Not Stored", ESolidErrorCode::S_INIT_ERROR);
+			return nullptr;
+			break;
+	}
+}
+
 

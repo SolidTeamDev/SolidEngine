@@ -1149,3 +1149,23 @@ int PrefabResource::FromDataBuffer(char *buffer, int bSize)
 	ResourcesLoader::ReadFromBuffer(buffer, PrefabBinary.data(), size*sizeof(char), ReadPos);
 	return ReadPos;
 }
+
+void SceneResource::ToDataBuffer(std::vector<char> &buffer)
+{
+	Resource::ToDataBuffer(buffer);
+	std::uint32_t size = this->rawScene.size();
+
+	ResourcesLoader::Append(buffer, &(size), sizeof(size));
+	ResourcesLoader::Append(buffer, this->rawScene.data(), size *sizeof(char));
+}
+
+int SceneResource::FromDataBuffer(char *buffer, int bSize)
+{
+	std::uint64_t ReadPos =  Resource::FromDataBuffer(buffer, bSize);
+	std::uint32_t size =0;
+	//asset type
+	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
+	rawScene.resize(size);
+	ResourcesLoader::ReadFromBuffer(buffer, rawScene.data(), size*sizeof(char), ReadPos);
+	return ReadPos;
+}
