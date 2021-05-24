@@ -41,6 +41,9 @@ namespace Solid SLDNamespace()
         float GetRadius();
         void SetRadius(float _radius);
 
+        bool IsTrigger();
+        void SetTrigger(bool _trigger);
+
         SphereCollider_GENERATED
     };
 } //!namespace

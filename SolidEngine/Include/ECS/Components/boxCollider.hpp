@@ -41,6 +41,9 @@ namespace Solid SLDNamespace()
         Vec3 GetSize();
         void SetSize(const Vec3& _size);
 
+        bool IsTrigger();
+        void SetTrigger(bool _trigger);
+
         BoxCollider_GENERATED
     };
 } //!namespace

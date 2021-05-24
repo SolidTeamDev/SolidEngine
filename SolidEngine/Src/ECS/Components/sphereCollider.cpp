@@ -42,4 +42,25 @@ namespace Solid
         radius = _radius;
         sphereCollider->setGeometry(physx::PxSphereGeometry(radius));
     }
+
+    bool SphereCollider::IsTrigger()
+    {
+        return isTrigger;
+    }
+
+    void SphereCollider::SetTrigger(bool _trigger)
+    {
+        isTrigger = _trigger;
+
+        if(isTrigger)
+        {
+            sphereCollider->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, !isTrigger);
+            sphereCollider->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, isTrigger);
+        }
+        else
+        {
+            sphereCollider->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, isTrigger);
+            sphereCollider->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, !isTrigger);
+        }
+    }
 } //!namespace

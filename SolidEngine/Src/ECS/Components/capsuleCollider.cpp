@@ -95,4 +95,25 @@ namespace Solid
 
         capsuleCollider->setLocalPose(transform);
     }
+
+    bool CapsuleCollider::IsTrigger()
+    {
+        return isTrigger;
+    }
+
+    void CapsuleCollider::SetTrigger(bool _trigger)
+    {
+        isTrigger = _trigger;
+
+        if(isTrigger)
+        {
+            capsuleCollider->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, !isTrigger);
+            capsuleCollider->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, isTrigger);
+        }
+        else
+        {
+            capsuleCollider->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, isTrigger);
+            capsuleCollider->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, !isTrigger);
+        }
+    }
 } //!namespace

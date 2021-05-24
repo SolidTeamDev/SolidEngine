@@ -855,9 +855,16 @@ namespace Solid
     {
         if(UI::CollapsingHeader("Box collider", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            Vec3 size = _boxCollider.GetSize();
-            if(EditVec3(size,"Size##Box",0.01f))
-                _boxCollider.SetSize(size);
+            {
+                Vec3 size = _boxCollider.GetSize();
+                if(EditVec3(size,"Size##Box",0.01f))
+                    _boxCollider.SetSize(size);
+            }
+            {
+                bool isTrigger = _boxCollider.IsTrigger();
+                if(EditBool(isTrigger,"Trigger##Box"))
+                    _boxCollider.SetTrigger(isTrigger);
+            }
         }
         UI::Separator();
     }
@@ -866,9 +873,16 @@ namespace Solid
     {
         if(UI::CollapsingHeader("Sphere collider", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            float radius = _sphereCollider.GetRadius();
-            if(EditFloat(radius,"Radius##Sphere",0.01f))
-                _sphereCollider.SetRadius(radius);
+            {
+                float radius = _sphereCollider.GetRadius();
+                if(EditFloat(radius,"Radius##Sphere",0.01f))
+                    _sphereCollider.SetRadius(radius);
+            }
+            {
+                bool isTrigger = _sphereCollider.IsTrigger();
+                if(EditBool(isTrigger,"Trigger##Sphere"))
+                    _sphereCollider.SetTrigger(isTrigger);
+            }
         }
         UI::Separator();
     }
@@ -886,6 +900,11 @@ namespace Solid
                 float height = _capsuleCollider.GetHeight();
                 if(EditFloat(height,"height##Capsule",0.01f))
                     _capsuleCollider.SetHeight(height);
+            }
+            {
+                bool isTrigger = _capsuleCollider.IsTrigger();
+                if(EditBool(isTrigger,"Trigger##Capsule"))
+                    _capsuleCollider.SetTrigger(isTrigger);
             }
             {
                 CapsuleCollider::ECapsuleDirection capsDir = _capsuleCollider.GetDirection();

@@ -43,4 +43,25 @@ namespace Solid
         boxCollider->setGeometry(physx::PxBoxGeometry(size.x,size.y,size.z));
     }
 
+    bool BoxCollider::IsTrigger()
+    {
+        return isTrigger;
+    }
+
+    void BoxCollider::SetTrigger(bool _trigger)
+    {
+        isTrigger = _trigger;
+
+        if(isTrigger)
+        {
+            boxCollider->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, !isTrigger);
+            boxCollider->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, isTrigger);
+        }
+        else
+        {
+            boxCollider->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, isTrigger);
+            boxCollider->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, !isTrigger);
+        }
+    }
+
 } //!namespace

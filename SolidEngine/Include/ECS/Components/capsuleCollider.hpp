@@ -61,6 +61,9 @@ namespace Solid SLDNamespace()
         ECapsuleDirection GetDirection();
         void SetCapsuleDirection(const ECapsuleDirection& _capsuleDirection);
 
+        bool IsTrigger();
+        void SetTrigger(bool _trigger);
+
         CapsuleCollider_GENERATED
     };
 } //!namespace
