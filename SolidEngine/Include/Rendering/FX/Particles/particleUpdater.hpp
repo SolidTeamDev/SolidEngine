@@ -10,11 +10,8 @@ namespace Solid
 	class SOLID_API ParticleUpdater
 	{
 	public:
-		ParticleUpdater()
-		{}
-
-		virtual ~ParticleUpdater()
-		{}
+		ParticleUpdater() = default;
+		virtual ~ParticleUpdater() = default;
 
 		virtual void Update(float dt, ParticleData *p) = 0;
 	};
@@ -23,7 +20,6 @@ namespace Solid
 	{
 	public:
 		Vec4 globalAcceleration;
-	public:
 		EulerUpdater() : globalAcceleration(0.f, 0.f, 0.f, 0.f)
 		{}
 

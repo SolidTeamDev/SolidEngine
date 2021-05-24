@@ -4,6 +4,7 @@
 #include <cmath>
 #include <iostream>
 #include "Core/Maths/solidVector.hpp"
+#include "Time/time.hpp"
 
 using namespace Solid;
 
@@ -12,14 +13,14 @@ bool FountainEffect::Initialize(size_t numParticles)
 	//
 	// particles
 	//
-	const size_t NUM_PARTICLES = numParticles == 0 ? 100000 : numParticles;
-	system = std::make_shared<ParticleSystem>(NUM_PARTICLES);
+	const size_t numP = numParticles == 0 ? 100000 : numParticles;
+	system = std::make_shared<ParticleSystem>(numP);
 
 	//
 	// emitter:
 	//
 	auto particleEmitter = std::make_shared<ParticleEmitter>();
-	particleEmitter->emitRate = (float)NUM_PARTICLES * 0.25f;
+	particleEmitter->emitRate = (float)numP * 0.25f;
 
 	// pos:
 	posGenerator = std::make_shared<BoxPosGen>();
@@ -110,13 +111,8 @@ void FountainEffect::ShowUI()
 
 void FountainEffect::Update(double dt)
 {
-	
-
-	static double time = 0.0;
-	time += dt;
-
-	posGenerator->pos.x = 0.9f * sin((float)time * 2.5f);
-	posGenerator->pos.z = 0.9f * cos((float)time * 2.5f);
+	posGenerator->pos.x = 0.9f * sin(Time::DeltaTime() * 2.5f);
+	posGenerator->pos.z = 0.9f * cos(Time::DeltaTime() * 2.5f);
 }
 
 void FountainEffect::CpuUpdate(double dt)
