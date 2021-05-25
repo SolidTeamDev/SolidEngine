@@ -24,6 +24,8 @@ namespace Solid
 
 			std::shared_ptr<ParticleSystem> system = nullptr;
 
+			std::shared_ptr<ITexture> ParticleTex = nullptr;
+
 			std::shared_ptr<VelFromPosGen> velFromPosGen = nullptr;
 			std::shared_ptr<BasicColorGen> colGen = nullptr;
 			std::shared_ptr<CirclePosGen> circlePosGen = nullptr;
@@ -60,7 +62,7 @@ namespace Solid
 			void CpuUpdate();
 			void GpuUpdate();
 			void Render();
-
+			void SetTex(const std::shared_ptr<ITexture> _tex);
 			int NumAllParticles();
 			int NumAliveParticles();
 		};

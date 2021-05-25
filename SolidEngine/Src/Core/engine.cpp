@@ -119,6 +119,7 @@ namespace Solid
         if(window != nullptr && renderer != nullptr)
             engineContextInit = true;
 	    graphicsResourceMgr.Init(&resourceManager, renderer);
+	    particleEffectSystem->InitShaderForGL();
 
     }
 

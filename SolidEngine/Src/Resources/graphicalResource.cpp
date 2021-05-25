@@ -529,6 +529,18 @@ void GL::Shader::SetVertSource(const std::string& _src)
     source->VertexSource = _src;
 }
 
+void GL::Shader::UnbindShader()
+{
+	glUseProgram(LastShader);
+	LastShader = 0;
+}
+
+void GL::Shader::BindShader()
+{
+	glGetIntegerv(GL_CURRENT_PROGRAM, (GLint*)&LastShader);
+	glUseProgram(ProgID);
+}
+
 void GL::Texture::BindTexture(uint _texUnit)
 {
 	glActiveTexture(GL_TEXTURE0+ _texUnit);

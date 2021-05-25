@@ -1,6 +1,7 @@
+#include "Resources/graphicalResource.hpp"
 #include "ECS/Components/particleEffect.hpp"
-#include "Time/time.hpp"
 
+#include "Time/time.hpp"
 #include <string>
 
 using namespace Solid;
@@ -9,6 +10,7 @@ using namespace Solid::Particles;
 void ParticleEffect::Init()
 {
 	Components::Init();
+
 }
 
 bool ParticleEffect::InitializeRenderer()
@@ -52,4 +54,9 @@ void ParticleEffect::GpuUpdate()
 void ParticleEffect::Render()
 {
 	renderer->Render();
+}
+
+void ParticleEffect::SetTex(const std::shared_ptr<ITexture> _tex)
+{
+	ParticleTex = _tex;
 }
