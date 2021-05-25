@@ -203,7 +203,22 @@ GL::Shader::Shader(ShaderResource *_s) :IShader(EResourceType::Shader)
 	ShaderWrapper fShader = CreateShader(GL_FRAGMENT_SHADER, 1, tab);
 
 	if(vShader.error || fShader.error)
+	{
+		if(vShader.error)
+		{
+			GLchar infoLog[1024];
+			glGetShaderInfoLog(vShader.id, ARRAYSIZE(infoLog), nullptr, infoLog);
+			printf("SHADER error: %s\n", infoLog);
+		}
+		if(fShader.error)
+		{
+			GLchar infoLog[1024];
+			glGetShaderInfoLog(fShader.id, ARRAYSIZE(infoLog), nullptr, infoLog);
+			printf("SHADER link error: %s\n", infoLog);
+		}
 		return;
+	}
+
 
 	ProgID = glCreateProgram();
 	glAttachShader(ProgID, vShader.id);
@@ -529,6 +544,18 @@ void GL::Shader::SetFragSource(const std::string& _src)
 void GL::Shader::SetVertSource(const std::string& _src)
 {
     source->VertexSource = _src;
+}
+
+void GL::Shader::UnbindShader()
+{
+	glUseProgram(LastShader);
+	LastShader = 0;
+}
+
+void GL::Shader::BindShader()
+{
+	glGetIntegerv(GL_CURRENT_PROGRAM, (GLint*)&LastShader);
+	glUseProgram(ProgID);
 }
 
 void GL::Texture::BindTexture(uint _texUnit)

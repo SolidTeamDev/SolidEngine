@@ -73,6 +73,10 @@ namespace Solid
             EditCamera(engine->ecsManager.GetComponent<Camera>(gameObject->GetEntity()));
         }
 
+	    if(engine->ecsManager.GotComponent<Particles::ParticleEffect>(gameObject->GetEntity()))
+	    {
+		    EditParticleEffect(engine->ecsManager.GetComponent<Particles::ParticleEffect>(gameObject->GetEntity()));
+	    }
         if(engine->ecsManager.GotComponent<Animation>(gameObject->GetEntity()))
         {
             EditAnimation(engine->ecsManager.GetComponent<Animation>(gameObject->GetEntity()));
@@ -192,6 +196,14 @@ namespace Solid
                     UI::CloseCurrentPopup();
                 }
             }
+	        if(!engine->ecsManager.GotComponent<Particles::ParticleEffect>(gameObject->GetEntity()))
+	        {
+		        if(UI::Button("ParticleEffect"))
+		        {
+			        engine->ecsManager.AddComponent<Particles::ParticleEffect>(gameObject, Particles::ParticleEffect());
+			        UI::CloseCurrentPopup();
+		        }
+	        }
 	        if(!engine->ecsManager.GotComponent<ScriptList>(gameObject->GetEntity()))
 	        {
 	        	const rfk::Namespace* n = GameCompiler::GetInstance()->GetNamespace("Solid");
@@ -326,6 +338,14 @@ namespace Solid
                     UI::CloseCurrentPopup();
                 }
             }
+		    if(engine->ecsManager.GotComponent<Particles::ParticleEffect>(gameObject->GetEntity()))
+		    {
+			    if(UI::Button("ParticleEffect"))
+			    {
+				    engine->ecsManager.RemoveComponent<Particles::ParticleEffect>(gameObject);
+				    UI::CloseCurrentPopup();
+			    }
+		    }
 		    if(engine->ecsManager.GotComponent<ScriptList>(gameObject->GetEntity()))
 		    {
 		    	ScriptList& sl = engine->ecsManager.GetComponent<ScriptList>(gameObject->GetEntity());
@@ -993,7 +1013,50 @@ namespace Solid
         UI::Separator();
     }
 
-    void InspectorInterface::CreateScriptWindow()
+	void InspectorInterface::EditParticleEffect(Particles::ParticleEffect& _particle)
+	{
+		if(UI::CollapsingHeader("ParticleEffect",ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			auto tex = _particle.GetTex();
+			const char *texName = tex == nullptr ? "" : tex->name.c_str();
+
+			UI::Text("Texture  ");
+			UI::SameLine();
+
+			bool combo = UI::BeginCombo("##ParticleTexture", texName);
+			if (UI::BeginDragDropTarget())
+			{
+
+				const ImGuiPayload *drop = UI::AcceptDragDropPayload("Texture");
+				if (drop != nullptr)
+				{
+					Resource *r = *((Resource **) drop->Data);
+					_particle.SetTex(engine->graphicsResourceMgr.GetTexture(r->name.c_str()));
+
+				}
+				UI::EndDragDropTarget();
+			}
+			if (combo)
+			{
+				auto *texList = engine->resourceManager.GetResourcesVecByType<ImageResource>();
+
+				for (auto tex : *texList)
+				{
+					bool selected = (texName == tex.second->name);
+					if (UI::Selectable(tex.second->name.c_str(), selected))
+					{
+						_particle.SetTex(engine->graphicsResourceMgr.GetTexture(tex.second->name.c_str()));
+					}
+					if (selected)
+						UI::SetItemDefaultFocus();
+				}
+
+				UI::EndCombo();
+			}
+		}
+	}
+
+	void InspectorInterface::CreateScriptWindow()
     {
         UI::SetNextWindowBgAlpha(0.9);
         UI::SetNextWindowSize(ImVec2(325, 100));

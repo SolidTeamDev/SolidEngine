@@ -14,6 +14,7 @@
 #include "ECS/System/audioSystem.hpp"
 #include "ECS/System/physicsSystem.hpp"
 #include "ECS/System/scriptSystem.hpp"
+#include "ECS/System/particleEffectSystem.hpp"
 #include "ECS/System/transformSystem.hpp"
 #include "Resources/graphicalResourceMgr.hpp"
 
@@ -62,6 +63,7 @@ namespace Solid
         std::shared_ptr<AudioSystem> audioSystem;
 	    std::shared_ptr<PhysicsSystem> physicsSystem;
 	    std::shared_ptr<ScriptSystem> scriptSystem;
+	    std::shared_ptr<Particles::ParticleEffectSystem> particleEffectSystem;
 	    std::shared_ptr<TransformSystem> transformSystem;
         ResourceManager resourceManager;
         TaskManager taskManager;

@@ -18,6 +18,7 @@
 #include "ECS/Components/capsuleCollider.hpp"
 #include "ECS/Components/light.hpp"
 #include "ECS/Components/scriptList.hpp"
+#include "ECS/Components/particleEffect.hpp"
 
 #include "ECS/Components/animation.hpp"
 #include "Refureku/Refureku.h"
@@ -59,7 +60,8 @@ namespace Solid
         ecsManager.RegisterComponent<BoxCollider>();
         ecsManager.RegisterComponent<SphereCollider>();
         ecsManager.RegisterComponent<CapsuleCollider>();
-        ecsManager.RegisterComponent<Light>();
+	    ecsManager.RegisterComponent<Light>();
+	    ecsManager.RegisterComponent<Particles::ParticleEffect>();
         ecsManager.RegisterComponent<Animation>();
 
 
@@ -99,6 +101,14 @@ namespace Solid
 		    signature.set(ecsManager.GetComponentType<ScriptList>());
 		    ecsManager.SetSystemSignature<ScriptSystem>(signature);
 	    }
+
+	    particleEffectSystem = ecsManager.RegisterSystem<Particles::ParticleEffectSystem>();
+	    {
+	    	Signature signature;
+		    signature.set(ecsManager.GetComponentType<Transform>());
+		    signature.set(ecsManager.GetComponentType<Particles::ParticleEffect>());
+		    ecsManager.SetSystemSignature<Particles::ParticleEffectSystem>(signature);
+	    }
     }
 
     void Engine::InitEngineContext(const WindowParams& _windowParams, const RendererParams& _rendererParams)
@@ -118,6 +128,7 @@ namespace Solid
         if(window != nullptr && renderer != nullptr)
             engineContextInit = true;
 	    graphicsResourceMgr.Init(&resourceManager, renderer);
+	    particleEffectSystem->InitShaderForGL();
 
     }
 
