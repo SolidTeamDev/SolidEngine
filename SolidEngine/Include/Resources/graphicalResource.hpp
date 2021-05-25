@@ -17,6 +17,7 @@ namespace Solid
 			public:
 				uint VAO;
 				uint VBO;
+				uint animVBO;
 				uint EBO;
 				std::size_t numOfIndices;
 			};
@@ -65,7 +66,9 @@ namespace Solid
 
 			void SetLights(Camera& _camera) const override;
 
-			void SetMaterial(const char *_name) override;
+            void SetAnim(SkeletonResource::Bone* _root) const override;
+
+            void SetMaterial(const char *_name) override;
 
 			void SetVec2(const char *_name, Vec2 _value) override;
 

@@ -75,6 +75,7 @@ namespace Solid
 
 		virtual void SetMVP(Transform& _model, Camera& _camera) const = 0;
 		virtual void SetLights(Camera& _camera) const = 0;
+		virtual void SetAnim(SkeletonResource::Bone* _root) const = 0;
 		virtual void SetMaterial(const char* _name) = 0;
 
         virtual std::string& GetFragSource() = 0;

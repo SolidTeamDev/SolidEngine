@@ -32,14 +32,24 @@ IMesh(_raw->Meshes.size())
 		glEnableVertexAttribArray(1);
 		glEnableVertexAttribArray(2);
 
-
-
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sub.EBO);
 
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER,  rawSub.indices.size()*sizeof(unsigned int), rawSub.indices.data(), GL_STATIC_DRAW);
 		sub.numOfIndices = rawSub.indices.size();
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        //ANIM
+        if(_raw->hadAnim)
+        {
+            size_t bufferSize = 4*sizeof(GLint) + 4*sizeof(GLfloat);
+            glBindBuffer(GL_ARRAY_BUFFER, sub.animVBO);
+            glBufferData(GL_ARRAY_BUFFER, _raw->animData.size() * bufferSize, _raw->animData.data(), GL_STATIC_DRAW);
+            glVertexAttribPointer(3,4,GL_INT,GL_FALSE, bufferSize, (void*)0);
+            glVertexAttribPointer(4,4,GL_FLOAT,GL_FALSE, bufferSize, (void*)(4*sizeof(GLint)));
+            glEnableVertexAttribArray(3);
+            glEnableVertexAttribArray(4);
+        }
 	}
 	glBindVertexArray(0);
 	bIsInit = true;
@@ -78,7 +88,19 @@ void GL::Mesh::Init(MeshResource *_raw)
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER,  rawSub.indices.size()*sizeof(unsigned int), rawSub.indices.data(), GL_STATIC_DRAW);
 		sub.numOfIndices = rawSub.indices.size();
 
+        //ANIM
+        if(_raw->hadAnim)
+        {
+            size_t bufferSize = 4*sizeof(GLint) + 4*sizeof(GLfloat);
+            glBindBuffer(GL_ARRAY_BUFFER, sub.animVBO);
+            glBufferData(GL_ARRAY_BUFFER, _raw->animData.size() * bufferSize, _raw->animData.data(), GL_STATIC_DRAW);
+            glVertexAttribPointer(3,4,GL_INT,GL_FALSE, bufferSize, (void*)0);
+            glVertexAttribPointer(4,4,GL_FLOAT,GL_FALSE, bufferSize, (void*)(4*sizeof(GLint)));
+            glEnableVertexAttribArray(3);
+            glEnableVertexAttribArray(4);
+        }
 	}
+    glBindVertexArray(0);
 	bIsInit = true;
 }
 
@@ -344,6 +366,16 @@ void GL::Shader::SetLights(Camera& _camera) const
     }
     glUniform1i(glGetUniformLocation(ProgID,"_nbLights"),lights.size());
     glUniform3fv(glGetUniformLocation(ProgID,"_camPos"),1,&_camera.position.x);
+}
+
+void GL::Shader::SetAnim(SkeletonResource::Bone* _root) const
+{
+    glUseProgram(ProgID);
+
+    _root.
+    //for(int)
+
+    glUniformMatrix4fv(glGetUniformLocation(ProgID,"finalBonesMatrices["+  +"]"),1,GL_FALSE,);
 }
 
 void GL::Shader::SetMaterial(const char *_name)

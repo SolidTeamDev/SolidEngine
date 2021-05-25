@@ -9,6 +9,21 @@ namespace Solid SLDNamespace()
 
     class Vec3;
 
+    class SOLID_API SLDClass() Vec4i
+    {
+    public:
+        SLDField()
+        int x = 0;
+        SLDField()
+        int y = 0;
+        SLDField()
+        int z = 0;
+        SLDField()
+        int w = 0;
+
+        Vec4i_GENERATED
+    };
+
     class SOLID_API SLDClass() Vec4
     {
     public:

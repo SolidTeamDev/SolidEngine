@@ -4,6 +4,8 @@
 
 #include "Resources/ressources.hpp"
 
+#define ARRAY_SIZE_IN_ELEMENTS(a) (sizeof(a) / sizeof(a[0]))
+
 #define STB_IMAGE_IMPLEMENTATION 1
 #include "stb_image.h"
 #include "OBJ_Loader.h"
@@ -605,6 +607,10 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 	}
 	if(!hasFoundSkeleton)
 	{
+	    for(size_t i = 0 ; i < scene->mMeshes[0]->mNumVertices ; i++)
+        {
+	        Mesh->animData.emplace_back();
+        }
 		aiNode* boneNode = nullptr;
 		if(scene->HasAnimations())
 		{
@@ -620,6 +626,7 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 		if(boneNode != nullptr)
 		{
 			hasFoundSkeleton=true;
+            Mesh->hadAnim = true;
 
 			auto skelRoot = boneNode;
             uint boneCount = 0;
@@ -670,7 +677,17 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 					for (int j = 0; j < _aiBone->mNumWeights; ++j)
 					{
 						_bone->Weights.push_back(_aiBone->mWeights[j].mWeight);
+                        for (uint i = 0 ; i < 4 ; i++)
+                        {
+                            if (Mesh->animData[_aiBone->mWeights[j].mVertexId].weights[i] == 0.0)
+                            {
+                                Mesh->animData[_aiBone->mWeights[j].mVertexId].weights[i] = _aiBone->mWeights[j].mWeight;
+                                Mesh->animData[_aiBone->mWeights[j].mVertexId].boneIds[i] = _aiBone->mWeights[j].mVertexId;
+                                break;
+                            }
+                        }
 					}
+
 					return true;
 				}
 
@@ -712,6 +729,8 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
         {
             anim->Root = new SkeletonResource::Bone(Skeleton->rootBone);
             anim->numOfBones = Skeleton->numOfBone;
+
+            Mesh->root = anim->Root;
         }
 		fbx->anims.push_back(anim);
 		//anim->Channels.resize(scene->mAnimations[i]->mNumChannels);
@@ -861,8 +880,6 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 		}
 		fbx->mesh = Mesh;
 		fbx->Skeleton = Skeleton;
-
-
 	}
 }
 
