@@ -858,6 +858,10 @@ namespace imgui_addons
                 //Create a vector of each directory in the file path for the filepath bar. Not Necessary for linux as starting directory is "/"
                 parsePathTabs(current_path);
             }
+            if(current_dirlist.empty())
+            {
+	            parsePathTabs(current_path);
+            }
             #endif // OSWIN
 
             // store all the files and directories within directory and clear previous entries
@@ -1232,7 +1236,16 @@ namespace imgui_addons
         delete[] drives;
         return true;
     }
-    #endif
+
+	void ImGuiFileBrowser::SetCurrentPath(const std::string &str)
+	{
+    	if(is_appearing)
+		    return;
+		current_path = str;
+		std::replace(current_path.begin(), current_path.end(), '\\', '/');
+	}
+
+#endif
 
     //Unix only
     #ifndef OSWIN

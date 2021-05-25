@@ -72,7 +72,7 @@ namespace Solid
             editorInputManager->Update();
 
             //TODO: Update engine task in engine
-
+			engine->ForceUpdate();
             if(play && !paused)
             {
 	            engine->Update();

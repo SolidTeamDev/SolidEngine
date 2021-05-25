@@ -8,6 +8,7 @@
 #include "ECS/Components/boxCollider.hpp"
 #include "ECS/Components/sphereCollider.hpp"
 #include "ECS/Components/capsuleCollider.hpp"
+#include "ECS/Components/animation.hpp"
 #include "ECS/Components/light.hpp"
 
 #include <TextEditor.h>
@@ -49,6 +50,8 @@ namespace Solid
         void EditTransform(Transform& _trs);
         void EditMeshRenderer(MeshRenderer& _meshRenderer);
         void EditAudioSource(AudioSource& _audioSource);
+        void EditAnimation(Animation& _anim);
+
         void EditLight(Light& _light);
         void EditCamera(Camera& _camera);
         void EditRigidBody(RigidBody& _rigidBody);

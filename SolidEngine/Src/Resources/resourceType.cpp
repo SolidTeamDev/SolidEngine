@@ -754,17 +754,21 @@ SkeletonResource::Bone &SkeletonResource::Bone::operator=(const SkeletonResource
 		name = b.name;
 		Parent = nullptr;
 		Weights = b.Weights;
-		transfo = b.transfo;
+        LocalTrans = b.LocalTrans;
 		offset =b.offset;
 		FinalTrans= b.FinalTrans;
+        id = b.id;
+        isAnimated = b.isAnimated;
 		std::function<void(Bone*, Bone*,Bone*)> lambda = [&](Bone* child,Bone* Parent, Bone* childToCopy){
 			child->Childrens.reserve(childToCopy->Childrens.size());
 			child->name = childToCopy->name;
 			child->Parent = Parent;
 			child->Weights = childToCopy->Weights;
-			child->transfo = childToCopy->transfo;
+			child->LocalTrans = childToCopy->LocalTrans;
 			child->offset =childToCopy->offset;
 			child->FinalTrans= childToCopy->FinalTrans;
+            child->id = childToCopy->id;
+            child->isAnimated = childToCopy->isAnimated;
 
 			for (int i = 0; i < childToCopy->Childrens.size(); ++i)
 			{
@@ -803,18 +807,22 @@ SkeletonResource::Bone::Bone(const SkeletonResource::Bone &b)
 		name = b.name;
 		Parent = nullptr;
 		Weights = b.Weights;
-		transfo = b.transfo;
+        LocalTrans = b.LocalTrans;
 		offset =b.offset;
 		FinalTrans= b.FinalTrans;
+		id = b.id;
+		isAnimated = b.isAnimated;
 		std::function<void(Bone*, Bone*,Bone*)> lambda = [&](Bone* child,Bone* Parent, Bone* childToCopy){
 			Parent->Childrens.push_back(child);
 			child->Childrens.reserve(childToCopy->Childrens.size());
 			child->name = childToCopy->name;
 			child->Parent = Parent;
 			child->Weights = childToCopy->Weights;
-			child->transfo = childToCopy->transfo;
+			child->LocalTrans = childToCopy->LocalTrans;
 			child->offset =childToCopy->offset;
 			child->FinalTrans= childToCopy->FinalTrans;
+            child->id = childToCopy->id;
+            child->isAnimated = childToCopy->isAnimated;
 
 			for (int i = 0; i < childToCopy->Childrens.size(); ++i)
 			{
@@ -853,17 +861,21 @@ SkeletonResource::Bone::Bone(const SkeletonResource::Bone &b, SkeletonResource::
 	name = b.name;
 	Parent = nullptr;
 	Weights = b.Weights;
-	transfo = b.transfo;
+    LocalTrans = b.LocalTrans;
 	offset =b.offset;
 	FinalTrans= b.FinalTrans;
+    id = b.id;
+    isAnimated = b.isAnimated;
 	std::function<void(Bone*, Bone*,Bone*)> lambda = [&](Bone* child,Bone* Parent, Bone* childToCopy){
 		child->Childrens.reserve(childToCopy->Childrens.size());
 		child->name = childToCopy->name;
 		child->Parent = Parent;
 		child->Weights = childToCopy->Weights;
-		child->transfo = childToCopy->transfo;
+		child->LocalTrans = childToCopy->LocalTrans;
 		child->offset =childToCopy->offset;
 		child->FinalTrans= childToCopy->FinalTrans;
+        child->id = childToCopy->id;
+        child->isAnimated = childToCopy->isAnimated;
 
 		for (int i = 0; i < childToCopy->Childrens.size(); ++i)
 		{
@@ -901,7 +913,7 @@ void *SkeletonResource::Bone::operator new(std::size_t size)
 
 void SkeletonResource::Bone::operator delete(void* p)
 {
-	free(p);
+	::operator delete (p);
 }
 
 SkeletonResource::Bone *SkeletonResource::Bone::FindBoneByName(const char *_name)
