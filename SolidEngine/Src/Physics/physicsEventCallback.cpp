@@ -4,7 +4,6 @@
 #include "ECS/sceneGraphManager.hpp"
 #include "ECS/Components/scriptList.hpp"
 #include "Core/engine.hpp"
-#include "Core/Debug/log.hpp"
 
 namespace Solid
 {
@@ -13,7 +12,6 @@ namespace Solid
         Engine* engine = Engine::GetInstance();
         for(size_t i = 0 ; i < nbPairs; i++)
         {
-            Log::Send("On contact : " + std::to_string(nbPairs), Log::ELogSeverity::DEBUG);
             GameObject* go1 = (GameObject*)pairHeader.actors[0]->userData;
             GameObject* go2 = (GameObject*)pairHeader.actors[1]->userData;
 
@@ -54,7 +52,6 @@ namespace Solid
 
         for(size_t i = 0 ; i < count; i++)
         {
-            Log::Send("On trigger : " + std::to_string(count), Log::ELogSeverity::DEBUG);
             GameObject *go1 = (GameObject *) pairs[i].triggerActor->userData;
             GameObject *go2 = (GameObject *) pairs[i].otherActor->userData;
 
