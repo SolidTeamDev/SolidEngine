@@ -313,6 +313,11 @@ int ShaderResource::FromDataBuffer(char *buffer, int bSize)
 	return ReadPos;
 }
 
+void ShaderResource::operator delete(void* _ptr)
+{
+	::operator delete(_ptr);
+}
+
 void MaterialResource::ToDataBuffer(std::vector<char> &buffer)
 {
 	std::string pString ;
@@ -562,7 +567,7 @@ MaterialResource::MaterialResource(const char *_name, bool _genfile)
 	defaultshader = Engine::GetInstance()->graphicsResourceMgr.GetDefaultShader();
 	name = _name;
 	shouldGenerateFileAtDestroy = _genfile;
-	path.push_front("\\Assets\\");
+	//path.push_front("Assets\\");
 }
 
 const std::shared_ptr<IShader> MaterialResource::GetShader() const

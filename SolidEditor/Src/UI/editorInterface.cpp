@@ -151,6 +151,7 @@ namespace Solid {
 				    while (node->parent != nullptr)
 				    {
 					    path.push_front(node->folderName);
+					    node = node->parent;
 				    }
 				    for (auto &elt : path)
 				    {

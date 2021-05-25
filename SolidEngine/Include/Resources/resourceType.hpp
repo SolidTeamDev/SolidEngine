@@ -158,7 +158,7 @@ namespace Solid {
 		}rootBone;
 		SkeletonResource()
 		{
-			type = EResourceType::Anim;
+			type = EResourceType::Skeleton;
 		}
 
 		~SkeletonResource()
@@ -230,7 +230,7 @@ namespace Solid {
         {
 
         }
-
+		void operator delete(void* _ptr);
 	    virtual void ToDataBuffer(std::vector<char> &buffer) override;
 
 	    virtual int FromDataBuffer(char *buffer, int bSize) override;

@@ -587,7 +587,7 @@ namespace Solid
 
 	FilesInterface::FilesInterface()
 	{
-		root.folderName = "\\Assets\\";
+		root.folderName = "Assets\\";
 		currentFolder =&root;
         fs::path EditorAssets = fs::current_path();
         EditorAssets.append("EditorAssets");

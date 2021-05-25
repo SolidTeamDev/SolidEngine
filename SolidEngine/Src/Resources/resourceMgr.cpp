@@ -230,7 +230,7 @@ MaterialResource *ResourceManager::CreateMaterial(const char *name)
 {
 	MaterialResource* mat = new MaterialResource();
 	mat->name = name;
-	mat->path.emplace_back("\\Assets\\");
+	mat->path.emplace_back("Assets\\");
 
 	AddResource(mat);
 	ResourcesLoader loader;
@@ -264,7 +264,7 @@ void ResourceManager::CreatePrefab(GameObject* _gameObject)
 {
 	PrefabResource* prefab = new PrefabResource();
 	prefab->name = _gameObject->name;
-	prefab->path.emplace_back("\\Assets\\");
+	prefab->path.emplace_back("Assets\\");
 	prefab->UpdatePrefab(_gameObject);
 	AddResource(prefab);
 }

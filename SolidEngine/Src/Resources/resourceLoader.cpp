@@ -40,7 +40,7 @@ struct IDWrapper
     std::string Name;
     int i;
 };
-const char* rootFolder = "\\Assets\\";
+const char* rootFolder = "Assets\\";
 ///
 /// ResourcesLoader Base
 ///
@@ -250,9 +250,10 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 			        newFolders = true;
 		        }
 	        }
-	        ++counting;
+
 	        if(newFolders)
 	        	it = othersFolders.begin()+counting;
+	        ++counting;
         }
 	    for(auto& elt : normal)
 	    {
@@ -369,6 +370,14 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
                 return (name.find("shader") != std::string::npos || name.find("compute") != std::string::npos);
 
             }
+            else
+            {
+	            std::string name = item.extension().string();
+	            std::transform(name.begin(), name.end(), name.begin(),
+	                           [](unsigned char c){ return std::tolower(c); });
+	            return name.find(".scompute") != std::string::npos
+	               || name.find(".svertfrag") != std::string::npos;
+            }
             return false;
         };
 	    auto matFind = [](const fs::path&item)
@@ -449,27 +458,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
             }
 
         }
-        for(auto& s : Shaders) {
-            LoadRessourceNoAdd(s.p, RessourceArray[s.i]);
-            Manager->AddResource(RessourceArray[s.i].r);
-        }
-	    for(auto& elt : soundPaths)
-	    {
-		    std::string name = elt.extension().string();
-		    std::transform(name.begin(), name.end(), name.begin(),
-		                   [](unsigned char c){ return std::tolower(c); });
-		    if(name.find(".saudio") != std::string::npos)
-		    {
-			    Resource* sound = LoadSolidAudio(elt);
-			    Manager->AddResource(sound);
-		    }
-		    else
-		    {
-			    Resource* sound = LoadAudio(elt);
-			    Manager->AddResource(sound);
-		    }
 
-	    }
 
         bool b = true;
         while(b)
@@ -502,6 +491,28 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
                 }
             }
         }
+
+	    for(auto& s : Shaders) {
+		    LoadRessourceNoAdd(s.p, RessourceArray[s.i]);
+		    Manager->AddResource(RessourceArray[s.i].r);
+	    }
+	    for(auto& elt : soundPaths)
+	    {
+		    std::string name = elt.extension().string();
+		    std::transform(name.begin(), name.end(), name.begin(),
+		                   [](unsigned char c){ return std::tolower(c); });
+		    if(name.find(".saudio") != std::string::npos)
+		    {
+			    Resource* sound = LoadSolidAudio(elt);
+			    Manager->AddResource(sound);
+		    }
+		    else
+		    {
+			    Resource* sound = LoadAudio(elt);
+			    Manager->AddResource(sound);
+		    }
+
+	    }
 		Manager->InitDefaultMat();
 	    for(auto& elt : matPaths)
 	    {
@@ -583,7 +594,6 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 	std::string str = Rpath.string();
 	Mesh->name = Rpath.filename().string();
 
-	Mesh->path.push_front(rootFolder) ;
 	SetPath(Mesh->path, Rpath);
 	importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_ANIMATIONS, true);
 	importer.SetPropertyBool(AI_CONFIG_IMPORT_REMOVE_EMPTY_BONES, false);
@@ -851,7 +861,6 @@ Resource * ResourcesLoader::LoadImage(const fs::path &Rpath)
 {
     ImageResource* Image = new ImageResource();
     Image->name = Rpath.filename().string();
-	Image->path.push_front(rootFolder);
 	SetPath(Image->path, Rpath);
 	stbi_set_flip_vertically_on_load(true);
 	unsigned char* img =stbi_load(Rpath.string().c_str(), &Image->x, &Image->y, &Image->ChannelsNum, STBI_rgb_alpha);
@@ -888,7 +897,6 @@ Resource * ResourcesLoader::LoadMesh(const fs::path &Rpath)
 
 
     Mesh->name = Rpath.filename().string();
-	Mesh->path.push_front(rootFolder) ;
 	SetPath(Mesh->path, Rpath);
     const aiScene* scene = importer.ReadFile(str,  aiProcess_JoinIdenticalVertices | aiProcess_OptimizeMeshes| aiProcess_SplitLargeMeshes| aiProcess_Triangulate  | aiProcess_SortByPType | aiProcess_PreTransformVertices );
     if(!scene) {
@@ -991,7 +999,6 @@ Resource * ResourcesLoader::LoadShader(const fs::path &Rpath)
 
         ComputeShaderResource* Compute = new ComputeShaderResource(ComputeSources[0]);
         Compute->name = Rpath.filename().string();
-	    Compute->path.push_front(rootFolder) ;
 	    SetPath(Compute->path, Rpath);
 
 
@@ -1068,7 +1075,6 @@ Resource * ResourcesLoader::LoadShader(const fs::path &Rpath)
 
         ShaderResource* Shader = new ShaderResource(VertexSources[0], fragSources[0]);
         Shader->name = Rpath.filename().string();
-	    Shader->path.push_front(rootFolder) ;
 	    SetPath(Shader->path, Rpath);
 
 #if SASSET_GEN
@@ -1110,7 +1116,6 @@ Resource *ResourcesLoader::LoadAudio(const fs::path &Rpath)
 
 	ALsizei numBytes;
 	audio->name = Rpath.filename().string();
-	audio->path.push_front(rootFolder);
 	SetPath(audio->path, Rpath);
 
 	sndfile = sf_open(filename, SFM_READ, &sfinfo);
@@ -1242,7 +1247,6 @@ Resource * ResourcesLoader::LoadSolidImage(const fs::path &Rpath)
     ifs.read(&buffer[0], pos);
     Image->FromDataBuffer(buffer.data(), buffer.size());
 	Image->path.clear();
-	Image->path.push_front(rootFolder);
 	SetPath(Image->path, Rpath);
     if(Image->name == "")
     {
@@ -1267,7 +1271,6 @@ Resource * ResourcesLoader::LoadSolidMesh(const fs::path &Rpath)
 
     Mesh->FromDataBuffer(buffer.data(), buffer.size());
 	Mesh->path.clear();
-	Mesh->path.push_front(rootFolder);
 	SetPath(Mesh->path, Rpath);
     if(Mesh->name == "")
     {
@@ -1292,7 +1295,6 @@ Resource * ResourcesLoader::LoadSolidComputeShader(const fs::path &Rpath)
 
     cs->FromDataBuffer(buffer.data(), buffer.size());
 	cs->path.clear();
-	cs->path.push_front(rootFolder);
 	SetPath(cs->path, Rpath);
     if(cs->name == "")
     {
@@ -1316,7 +1318,6 @@ Resource * ResourcesLoader::LoadSolidShader(const fs::path &Rpath)
 
     s->FromDataBuffer(buffer.data(), buffer.size());
 	s->path.clear();
-	s->path.push_front(rootFolder);
 	SetPath(s->path, Rpath);
     if(s->name == "")
     {
@@ -1373,7 +1374,6 @@ Resource *ResourcesLoader::LoadSolidMaterial(const fs::path &Rpath)
 	mat->FromDataBuffer(buffer.data(), buffer.size());
 
 	mat->path.clear();
-	mat->path.push_front(rootFolder);
 	SetPath(mat->path, Rpath);
 	if(mat->name == "")
 	{
@@ -1410,7 +1410,6 @@ Resource *ResourcesLoader::LoadSolidAudio(const fs::path &Rpath)
 		Resource::NoNameNum++;
 	}
 	audio->path.clear();
-	audio->path.push_front(rootFolder);
 	SetPath(audio->path, Rpath);
 	audio->audioRawBinary.clear();
 	audio->audioRawBinary.reserve(0);
@@ -1439,7 +1438,10 @@ void ResourcesLoader::SetPath(std::deque<std::string> &resPath, const fs::path& 
 			}
 		}
 		else
+		{
+			invPaths.push_front("Assets\\");
 			return true;
+		}
 	};
 	if(!pathFind(copy))
 		return;
@@ -1461,7 +1463,6 @@ Resource *ResourcesLoader::LoadSolidPrefab(const fs::path &Rpath)
 
 	prefab->FromDataBuffer(buffer.data(),buffer.size());
 	prefab->path.clear();
-	prefab->path.push_front(rootFolder);
 	SetPath(prefab->path, Rpath);
 	return prefab;
 }
@@ -1550,12 +1551,12 @@ void ResourcesLoader::SavePrefabToFile(PrefabResource *_prefab)
 	fs::path p = ResourcesLoader::SolidPath.parent_path();
 	for(std::string& elt : _prefab->path)
 	{
-		if(elt == "\\Assets\\")
+		/*if(elt == "\\Assets\\")
 		{
 			p.append("Assets");
 		}
 		else
-			p.append(elt);
+*/			p.append(elt);
 	}
 	p.append(_prefab->name +".SolidPrefab");
 	std::vector<char>buf;
@@ -1579,7 +1580,6 @@ Resource *ResourcesLoader::LoadSolidScene(const fs::path &Rpath)
 
 	scene->FromDataBuffer(buffer.data(),buffer.size());
 	scene->path.clear();
-	scene->path.push_front(rootFolder);
 	SetPath(scene->path, Rpath);
 	return scene;
 }
