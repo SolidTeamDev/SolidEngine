@@ -55,7 +55,7 @@ namespace Solid
 
         void EditLight(Light& _light);
         void EditCamera(Camera& _camera);
-		void EditParticleEffect(Particles::ParticleEffect);
+		void EditParticleEffect(Particles::ParticleEffect&);
         void EditRigidBody(RigidBody& _rigidBody);
         void EditBoxCollider(BoxCollider& _boxCollider);
         void EditSphereCollider(SphereCollider& _sphereCollider);

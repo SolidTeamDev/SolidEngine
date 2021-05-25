@@ -1,6 +1,7 @@
 #include "Rendering/FX/Particles/glParticleRenderer.hpp"
 #include "Rendering/FX/Particles/particleData.hpp"
 #include "Rendering/FX/Particles/particleSystem.hpp"
+#include "Core/Maths/Matrix/matrix4.hpp"
 
 #include <assert.h>
 #include <iostream>
@@ -76,6 +77,14 @@ void GLParticleRenderer::Update()
 
 void GLParticleRenderer::Render()
 {
+
+	glEnable(GL_DEPTH_TEST);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+	glEnable(GL_PROGRAM_POINT_SIZE);
+
+
+	glActiveTexture(GL_TEXTURE0);
 	glBindVertexArray(vao);
 
 	const size_t count = system->NumAliveParticles();

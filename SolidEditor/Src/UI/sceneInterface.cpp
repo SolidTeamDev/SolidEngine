@@ -122,6 +122,7 @@ namespace Solid
             engine->renderer->DrawSolidGrid(sceneCam, 50, Vec3(.3,.3,.3), 1);
 
         engine->rendererSystem->Update(engine->renderer,sceneCam);
+        engine->particleEffectSystem->Update(sceneCam);
         engine->renderer->EndFramebuffer();
 
         engine->audioSystem->Update(sceneCam);

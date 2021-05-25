@@ -18,7 +18,7 @@ namespace Solid
 
 			ParticleEffectSystem(ECSManager& _ecsManager);
 			void InitShaderForGL();
-			void Update();
+			void Update(Camera& _cam);
 
 		};
 	}

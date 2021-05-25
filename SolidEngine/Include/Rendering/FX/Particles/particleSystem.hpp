@@ -49,6 +49,16 @@ namespace Solid
 			ParticleData *FinalData()
 			{ return &particles; }
 
+			void SetCount(unsigned int _count)
+			{
+				count = _count;
+				particles.Generate(count);
+				aliveParticles.Generate(count);
+
+				for (size_t i = 0; i < count; ++i)
+					particles.alive[i] = false;
+			}
+
 			static size_t ComputeMemoryUsage(const ParticleSystem &p);
 		};
 	}

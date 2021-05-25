@@ -1013,10 +1013,47 @@ namespace Solid
         UI::Separator();
     }
 
-	void InspectorInterface::EditParticleEffect(Particles::ParticleEffect)
+	void InspectorInterface::EditParticleEffect(Particles::ParticleEffect& _particle)
 	{
-		UI::Text("ParticleEffect");
-		UI::Separator();
+		if(UI::CollapsingHeader("ParticleEffect",ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			auto tex = _particle.GetTex();
+			const char *texName = tex == nullptr ? "" : tex->name.c_str();
+
+			UI::Text("Texture  ");
+			UI::SameLine();
+
+			bool combo = UI::BeginCombo("##ParticleTexture", texName);
+			if (UI::BeginDragDropTarget())
+			{
+
+				const ImGuiPayload *drop = UI::AcceptDragDropPayload("Texture");
+				if (drop != nullptr)
+				{
+					Resource *r = *((Resource **) drop->Data);
+					_particle.SetTex(engine->graphicsResourceMgr.GetTexture(r->name.c_str()));
+
+				}
+				UI::EndDragDropTarget();
+			}
+			if (combo)
+			{
+				auto *texList = engine->resourceManager.GetResourcesVecByType<ImageResource>();
+
+				for (auto tex : *texList)
+				{
+					bool selected = (texName == tex.second->name);
+					if (UI::Selectable(tex.second->name.c_str(), selected))
+					{
+						_particle.SetTex(engine->graphicsResourceMgr.GetTexture(tex.second->name.c_str()));
+					}
+					if (selected)
+						UI::SetItemDefaultFocus();
+				}
+
+				UI::EndCombo();
+			}
+		}
 	}
 
 	void InspectorInterface::CreateScriptWindow()

@@ -203,7 +203,22 @@ GL::Shader::Shader(ShaderResource *_s) :IShader(EResourceType::Shader)
 	ShaderWrapper fShader = CreateShader(GL_FRAGMENT_SHADER, 1, tab);
 
 	if(vShader.error || fShader.error)
+	{
+		if(vShader.error)
+		{
+			GLchar infoLog[1024];
+			glGetShaderInfoLog(vShader.id, ARRAYSIZE(infoLog), nullptr, infoLog);
+			printf("SHADER error: %s\n", infoLog);
+		}
+		if(fShader.error)
+		{
+			GLchar infoLog[1024];
+			glGetShaderInfoLog(fShader.id, ARRAYSIZE(infoLog), nullptr, infoLog);
+			printf("SHADER link error: %s\n", infoLog);
+		}
 		return;
+	}
+
 
 	ProgID = glCreateProgram();
 	glAttachShader(ProgID, vShader.id);

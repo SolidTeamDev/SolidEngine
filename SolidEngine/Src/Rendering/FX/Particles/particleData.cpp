@@ -11,14 +11,14 @@ void ParticleData::Generate(size_t maxSize)
 {
 	count      = maxSize;
 	countAlive = 0;
-	pos.reset(new Vec4[maxSize]);
-	col.reset(new Vec4[maxSize]);
-	vel.reset(new Vec4[maxSize]);
-	acc.reset(new Vec4[maxSize]);
-	alive.reset(new bool[maxSize]);
-	time.reset(new Vec4[maxSize]);
-	endCol.reset(new Vec4[maxSize]);
-	startCol.reset(new Vec4[maxSize]);
+	pos =std::make_unique<Vec4[]>(maxSize);
+	col=std::make_unique<Vec4[]>(maxSize);
+	vel=std::make_unique<Vec4[]>(maxSize);
+	acc=std::make_unique<Vec4[]>(maxSize);
+	alive=std::make_unique<bool[]>(maxSize);
+	time=std::make_unique<Vec4[]>(maxSize);
+	endCol=std::make_unique<Vec4[]>(maxSize);
+	startCol=std::make_unique<Vec4[]>(maxSize);
 }
 
 void ParticleData::Kill(size_t ID)

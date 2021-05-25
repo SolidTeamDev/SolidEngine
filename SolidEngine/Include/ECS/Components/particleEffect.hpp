@@ -63,6 +63,12 @@ namespace Solid
 			void GpuUpdate();
 			void Render();
 			void SetTex(const std::shared_ptr<ITexture> _tex);
+			void SetCount(size_t _count)
+			{
+				numParticles = _count;
+				system->SetCount(_count);
+			}
+			std::shared_ptr<ITexture> GetTex();
 			int NumAllParticles();
 			int NumAliveParticles();
 		};
