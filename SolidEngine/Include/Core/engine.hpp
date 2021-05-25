@@ -73,6 +73,8 @@ namespace Solid
 
         Camera* activeCamera = nullptr;
 
+        InputManager* inputManager = nullptr;
+
         static Engine* GetInstance();
         bool MultiThreadEnabled()const {return mtEnabled;}
         void EnableMultiThread(bool _b);
