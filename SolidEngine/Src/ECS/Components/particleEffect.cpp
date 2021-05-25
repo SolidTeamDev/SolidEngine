@@ -19,38 +19,44 @@ void ParticleEffect::Init()
 	particleEmitter->emitRate = (float)NUM_PARTICLES * 0.25f;
 
 	// pos:
-	boxPosGen = std::make_shared<BoxPosGen>();
+	std::shared_ptr<BoxPosGen> boxPosGen = std::make_shared<BoxPosGen>();
 	boxPosGen->pos = Vec4( 0.0f, 0.0f, 0.0f, 0.0f );
 	boxPosGen->maxStartPosOffset = Vec4( 0.0f, 0.0f, 0.0f, 0.0f);
 	particleEmitter->AddGenerator(boxPosGen);
 
-	colGen = std::make_shared<BasicColorGen>();
+	std::shared_ptr<BasicColorGen> colGen = std::make_shared<BasicColorGen>();
 	colGen->minStartCol = Vec4( 0.7, 0.7, 0.7, 1.0 );
 	colGen->maxStartCol = Vec4( 1.0, 1.0, 1.0, 1.0 );
 	colGen->minEndCol   = Vec4( 0.5, 0.0, 0.6, 0.0 );
 	colGen->maxEndCol   = Vec4( 0.7, 0.5, 1.0, 0.0 );
 	particleEmitter->AddGenerator(colGen);
 
-	velGen = std::make_shared<BasicVelGen>();
+	std::shared_ptr<BasicVelGen> velGen = std::make_shared<BasicVelGen>();
 	velGen->minStartVel = Vec4( -0.2f, -0.2f, -0.2f, 0.0f );
 	velGen->maxStartVel = Vec4( 0.2f, 0.2f, 0.2f, 0.0f );
 	particleEmitter->AddGenerator(velGen);
 
-	timeGen = std::make_shared<BasicTimeGen>();
+	std::shared_ptr<BasicTimeGen> timeGen = std::make_shared<BasicTimeGen>();
 	timeGen->minTime = 5.0f;
 	timeGen->maxTime = 7.0f;
 	particleEmitter->AddGenerator(timeGen);
 	system->AddEmitter(particleEmitter);
 
-	timeUpdater = std::make_shared<BasicTimeUpdater>();
+	std::shared_ptr<BasicTimeUpdater> timeUpdater = std::make_shared<BasicTimeUpdater>();
 	system->AddUpdater(timeUpdater);
 
-	colorUpdater = std::make_shared<BasicColorUpdater>();
+	std::shared_ptr<BasicColorUpdater> colorUpdater = std::make_shared<BasicColorUpdater>();
 	system->AddUpdater(colorUpdater);
 
-	eulerUpdater = std::make_shared<EulerUpdater>();
+	std::shared_ptr<EulerUpdater> eulerUpdater = std::make_shared<EulerUpdater>();
 	eulerUpdater->globalAcceleration = Vec4(0.0, 0.0, 0.0, 0.0) ;
 	system->AddUpdater(eulerUpdater);
+
+	generators.push_back(boxPosGen);
+	generators.push_back(colGen);
+	generators.push_back(velGen);
+	generators.push_back(timeGen);
+
 }
 
 bool ParticleEffect::InitializeRenderer()
