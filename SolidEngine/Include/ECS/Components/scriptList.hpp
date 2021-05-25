@@ -48,7 +48,14 @@ namespace Solid SLDNamespace()
 		void FixedUpdate();
 		void LateUpdate();
 
-		virtual void Init()override {} ;
+		virtual void Init()override
+		{
+            for (int i = 0; i < Scripts.size(); ++i)
+            {
+                Script* elt = Scripts[i];
+                elt->Init();
+            }
+		} ;
 		virtual void Release()override
 		{
 			Components::Release();

@@ -142,6 +142,11 @@ namespace Solid
 		else{threadPool.PauseAllThreads();}
 	}
 
+    void Engine::Init()
+    {
+        scriptSystem->Init();
+    }
+
     void Engine::Update()
     {
 		scriptSystem->Update();

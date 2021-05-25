@@ -16,6 +16,7 @@ namespace Solid SLDNamespace()
         Script(GameObject* _go) {gameObject = _go;}
         virtual ~Script() = default;
 
+        virtual void Init() = 0;
         virtual void Update() = 0;
         virtual void FixedUpdate() = 0;
         virtual void LateUpdate() = 0;

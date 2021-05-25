@@ -91,6 +91,8 @@ namespace Solid
 
 	    void SaveScene(const fs::path& p);
 
+	    void Init();
+
         void Update();
 
         void FixedUpdate();
