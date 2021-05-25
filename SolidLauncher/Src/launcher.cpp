@@ -6,7 +6,9 @@
 #include "editor.hpp"
 #include "launcher.hpp"
 #include "imgui_stdlib.h"
-
+#include "UI/winUI.hpp"
+#include <shlobj_core.h>
+#include <string.h>
 
 using namespace Solid;
 
@@ -29,6 +31,7 @@ Solid::Launcher::Launcher()
 	if(!engine->IsEngineContextInitialized())
 		throw ThrowError("Engine not correctly initialized !",ESolidErrorCode::S_INIT_ERROR);
 
+	root = fs::current_path();
 	const Window* window = engine->window;
 
 }
@@ -98,19 +101,113 @@ void Solid::Launcher::UpdateInterface()
 					buttonPos.y- (size.y/2.0f)});
 		if(UI::Button("New Project", {size.x,size.y}))
 		{
-			ImGui::OpenPopup("Create New Project");
+			//ImGui::OpenPopup("Create New Project");
+
+
+			ImGui::OpenPopup("CreatWin");
+
 		}
 		UI::SetCursorPos({s.x - buttonPos.x  - ((size.x)/2.0f),
 		                  buttonPos.y- (size.y/2.0f)});
+
 		if(UI::Button("Open Project", {size.x,size.y}))
 		{
-			ImGui::OpenPopup("Open Project##2");
+
+
+			HasChosen hc =WinOpenFile("SolidProject (.SolidProject)\0*.SolidProject\0All\0*.*\0");
+			fs::current_path(root);
+			if(hc.b)
+			{
+				// use ofn.lpstrFile here
+				std::cout << "open project at : "<< hc.vstr[0] << std::endl ;
+
+				std::string launch = "start SolidEditor.exe -Project=" + hc.vstr[0];
+				std::system(launch.c_str());
+				needClose = true;
+			}
 		}
-		if(fileBrowser.showFileDialog("Create New Project", imgui_addons::ImGuiFileBrowser::DialogMode::SELECT))
+
+		if (UI::BeginPopup("CreatWin"))
 		{
-			std::cout << "create project at : "<< fileBrowser.selected_path << std::endl ;
-			UI::OpenPopup("ProjectName");
-			ProjName.clear();
+			UI::Text("Project Location :");
+			UI::SameLine();
+			UI::InputText("##INT", &ProjPath);
+			UI::SameLine();
+			if(UI::Button("..."))
+			{
+				HasChosen hc =WinSelectFolder();
+				if(hc.b)
+					ProjPath = hc.vstr[0];
+			}
+			UI::Text("Project Name :");
+			UI::SameLine();
+			UI::InputText("##INTNAME", &ProjName);
+			fs::current_path(root);
+			if(UI::Button("Create Project##BUTTON"))
+			{
+				if(!ProjName.empty())
+				{
+					std::filesystem::path p = ProjPath;
+					std::filesystem::path p2 = ProjPath;
+					p= p.append(ProjName);
+					p2= p2.append(ProjName);
+					if(std::filesystem::exists(p))
+					{
+						ErrorStr = "Error : Project with this name already exist";
+
+						UI::OpenPopup("ERROR");
+					}
+					else
+					{
+						std::filesystem::create_directory(p);
+						p = p.append("ProjectSettings.SolidProject");
+						json j;
+						j["Project"]["Name"] = ProjName;
+						j["Project"]["Path"] = p2.string();
+						j["Project"]["AssetFolder"] = "Assets";
+						j["Project"]["SourcesFolder"] = "Code";
+						j["Project"]["EngineIncludeFolder"] = "EngineInclude";
+						std::ofstream file(p);
+						auto p3 = p;
+						p = p2;
+						p.append("Assets");
+						std::filesystem::create_directory(p);
+						p = p2;
+						p.append("Code");
+						std::filesystem::create_directory(p);
+						p.append("Src");
+						std::filesystem::create_directory(p);
+						p.append("Include");
+						std::filesystem::create_directory(p);
+						p = p2;
+						p.append("EngineInclude");
+						std::filesystem::create_directory(p);
+						file << std::setw(4) << j;
+						file.close();
+
+						std::string launch = "start SolidEditor.exe -Project=\"" + p3.string()+"\"";
+						std::system(launch.c_str());
+						needClose = true;
+						UI::CloseCurrentPopup();
+					}
+
+				}
+				else
+				{
+					ErrorStr = "Error : Project Name Is Empty";
+					UI::OpenPopup("ERROR");
+				}
+				if(UI::BeginPopupModal("ERROR", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_AlwaysAutoResize))
+				{
+					UI::Text(ErrorStr.c_str());
+					if(UI::Button("Understood"))
+					{
+						UI::CloseCurrentPopup();
+					}
+					UI::EndPopup();
+				}
+			}
+			UI::EndPopup();
 		}
 		if(UI::BeginPopup("ProjectName"))
 		{
@@ -185,15 +282,6 @@ void Solid::Launcher::UpdateInterface()
 				UI::EndPopup();
 			}
 			UI::EndPopup();
-		}
-
-		if(fileBrowser.showFileDialog("Open Project##2", imgui_addons::ImGuiFileBrowser::DialogMode::OPEN, {0,0},".SolidProject") )
-		{
-			std::cout << "open project at : "<< fileBrowser.selected_path << std::endl ;
-			std::cout << "named : "<< fileBrowser.selected_fn << std::endl ;
-			std::string launch = "start SolidEditor.exe -Project=" + fileBrowser.selected_path;
-			std::system(launch.c_str());
-			needClose = true;
 		}
 
 	}

@@ -72,7 +72,7 @@ namespace Solid
             editorInputManager->Update();
 
             //TODO: Update engine task in engine
-
+			engine->ForceUpdate();
             if(play && !paused)
             {
 	            engine->Update();
@@ -394,6 +394,7 @@ namespace Solid
 			for(auto& elt : rbSave)
 			{
 				*((RigidBody*)elt.TID) = elt.comp;
+                ((RigidBody*)elt.TID)->ResetVelocity();
 			}
 			for(auto& elt : boxSave)
 			{

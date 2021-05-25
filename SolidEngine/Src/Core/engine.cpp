@@ -20,6 +20,7 @@
 #include "ECS/Components/scriptList.hpp"
 #include "ECS/Components/particleEffect.hpp"
 
+#include "ECS/Components/animation.hpp"
 #include "Refureku/Refureku.h"
 
 namespace Solid
@@ -61,8 +62,16 @@ namespace Solid
         ecsManager.RegisterComponent<CapsuleCollider>();
 	    ecsManager.RegisterComponent<Light>();
 	    ecsManager.RegisterComponent<Particles::ParticleEffect>();
+        ecsManager.RegisterComponent<Animation>();
+
 
         //Register Signature
+	    transformSystem = ecsManager.RegisterSystem<TransformSystem>();
+	    {
+		    Signature signature;
+		    signature.set(ecsManager.GetComponentType<Transform>());
+		    ecsManager.SetSystemSignature<TransformSystem>(signature);
+	    }
         rendererSystem = ecsManager.RegisterSystem<RendererSystem>();
         {
             Signature signature;
@@ -162,40 +171,43 @@ namespace Solid
 
     }
 
-	void Engine::LoadScene(const fs::path &p)
+	void Engine::ForceUpdate()
+	{
+		transformSystem->Update();
+
+
+	}
+
+	void Engine::LoadScene(const char *name)
 	{
 		json j;
-		std::ifstream file(p,std::ifstream::binary | std::ifstream::ate);
-
-
+		SceneResource* scene = resourceManager.GetSceneByName(name);
 
 		//SCENE : implement load function here
-		if(!file.is_open())
+		if(scene == nullptr)
 		{
-			abort();
+			return;
 		}
 		rfk::Namespace const* n = rfk::Database::getNamespace("Solid");
 		std::uint64_t readPos = 0;
 		std::size_t cmpNameSize = 0;
-		std::ifstream::pos_type pos = file.tellg()  ;
 
-		std::vector<char>  buffer(pos);
 
-		file.seekg(0, std::ios::beg);
-		file.read(&buffer[0], pos);
+
 
 		std::size_t jsonSize = 0;
-		ResourcesLoader::ReadFromBuffer(buffer.data(), &jsonSize, sizeof(std::size_t),readPos);
+		ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), &jsonSize, sizeof(std::size_t),readPos);
 		std::string jsonStr;
 		jsonStr.resize(jsonSize / sizeof(std::string::value_type));
-		ResourcesLoader::ReadFromBuffer(buffer.data(), jsonStr.data(), jsonSize,readPos);
+		ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), jsonStr.data(), jsonSize,readPos);
 		j = j.parse(jsonStr) ;
 
 		Engine* engine = instance;
 		GameObject* world = engine->ecsManager.GetWorld();
 		for (auto it = world->childs.begin() ; it != world->childs.end();)
 		{
-			(*it)->RemoveCurrent();
+			engine->ecsManager.DestroyEntity((*it)->GetEntity());
+			//(*it)->RemoveCurrent();
 			it = world->childs.begin();
 			if(it == world->childs.end())
 			{
@@ -228,7 +240,7 @@ namespace Solid
 		{
 			//get num of Childs
 			std::size_t childNum = 0;
-			ResourcesLoader::ReadFromBuffer(buffer.data(), &childNum, sizeof(std::size_t), readPos);
+			ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), &childNum, sizeof(std::size_t), readPos);
 
 			for (int games = 0; games < childNum; ++games)
 			{
@@ -236,20 +248,20 @@ namespace Solid
 
 				//get num of comps
 				std::size_t cmpNum = 0;
-				ResourcesLoader::ReadFromBuffer(buffer.data(), &cmpNum, sizeof(std::size_t), readPos);
+				ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), &cmpNum, sizeof(std::size_t), readPos);
 
 
 				for (int j = 0; j < cmpNum; ++j)
 				{
 					//get Comp Class / str
-					ResourcesLoader::ReadFromBuffer(buffer.data(), &cmpNameSize, sizeof(std::size_t), readPos);
+					ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), &cmpNameSize, sizeof(std::size_t), readPos);
 					std::string className;
 					className.resize(cmpNameSize / sizeof(std::string::value_type));
-					ResourcesLoader::ReadFromBuffer(buffer.data(), className.data(), cmpNameSize, readPos);
+					ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), className.data(), cmpNameSize, readPos);
 
 					//get Field Num
 					std::size_t FieldNum = 0;
-					ResourcesLoader::ReadFromBuffer(buffer.data(), &FieldNum, sizeof(std::size_t), readPos);
+					ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), &FieldNum, sizeof(std::size_t), readPos);
 
 
 					rfk::Class const *myClass = n->getClass(className);
@@ -271,23 +283,23 @@ namespace Solid
 								short isNull = -1;
 
 								//Get Comp FieldName
-								ResourcesLoader::ReadFromBuffer(buffer.data(), &cmpNameSize, sizeof(std::size_t),
+								ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), &cmpNameSize, sizeof(std::size_t),
 								                                readPos);
 								std::string Name;
 								Name.resize(cmpNameSize / sizeof(std::string::value_type));
-								ResourcesLoader::ReadFromBuffer(buffer.data(), Name.data(), cmpNameSize, readPos);
+								ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), Name.data(), cmpNameSize, readPos);
 
 								//Get is Null
-								ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(short), readPos);
+								ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), &isNull, sizeof(short), readPos);
 								std::size_t memSize = 0;
 								//Get Field Data
-								ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t), readPos);
+								ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), &memSize, sizeof(std::size_t), readPos);
 								if (isNull == 256)
 								{}
 								else
 								{}
 								char *buf = new char[memSize]();
-								ResourcesLoader::ReadFromBuffer(buffer.data(), buf, memSize, readPos);
+								ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), buf, memSize, readPos);
 								const rfk::Field *f = t->getArchetype().getField(Name);
 								f->setData(t, ((void *) buf), memSize);
 								delete[] buf;
@@ -311,33 +323,33 @@ namespace Solid
 								short isNull = -1;
 
 								//Get Comp FieldName
-								ResourcesLoader::ReadFromBuffer(buffer.data(), &cmpNameSize, sizeof(std::size_t),
+								ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), &cmpNameSize, sizeof(std::size_t),
 								                                readPos);
 								std::string Name;
 								Name.resize(cmpNameSize / sizeof(std::string::value_type));
-								ResourcesLoader::ReadFromBuffer(buffer.data(), Name.data(), cmpNameSize, readPos);
+								ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), Name.data(), cmpNameSize, readPos);
 
 								//Get IsNull
-								ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(short), readPos);
+								ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), &isNull, sizeof(short), readPos);
 								std::size_t memSize = 0;
 								//get Field Data
 								const rfk::Field *f = t->getArchetype().getField(Name);
 								if (f->type.archetype->name == "String")
 								{
-									ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t),
+									ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), &memSize, sizeof(std::size_t),
 									                                readPos);
 									String *str = (String *) f->getDataAddress(t);
 									str->resize(memSize / sizeof(std::string::value_type));
 
-									ResourcesLoader::ReadFromBuffer(buffer.data(), str->data(), memSize, readPos);
+									ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), str->data(), memSize, readPos);
 								}
 								else
 								{
 
-									ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t),
+									ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), &memSize, sizeof(std::size_t),
 									                                readPos);
 									char *buf = new char[memSize]();
-									ResourcesLoader::ReadFromBuffer(buffer.data(), buf, memSize, readPos);
+									ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), buf, memSize, readPos);
 
 									if (isNull == 256)
 									{
@@ -368,40 +380,40 @@ namespace Solid
 								short isNull = -1;
 
 								//Get Comp FieldName
-								ResourcesLoader::ReadFromBuffer(buffer.data(), &cmpNameSize, sizeof(std::size_t),
+								ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), &cmpNameSize, sizeof(std::size_t),
 								                                readPos);
 								std::string Name;
 								Name.resize(cmpNameSize / sizeof(std::string::value_type));
-								ResourcesLoader::ReadFromBuffer(buffer.data(), Name.data(), cmpNameSize, readPos);
+								ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), Name.data(), cmpNameSize, readPos);
 
 								//Get IsNull
-								ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(short), readPos);
+								ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), &isNull, sizeof(short), readPos);
 								std::size_t memSize = 0;
 								//get Field Data
 								const rfk::Field *f = t->getArchetype().getField(Name);
 								if (f->type.archetype->name == "String")
 								{
-									ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t),
+									ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), &memSize, sizeof(std::size_t),
 									                                readPos);
 									String *str = (String *) f->getDataAddress(t);
 									str->resize(memSize / sizeof(std::string::value_type));
 
-									ResourcesLoader::ReadFromBuffer(buffer.data(), str->data(), memSize, readPos);
+									ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), str->data(), memSize, readPos);
 								}
 								else if (f->type.archetype->name == "vectorStr")
 								{
 									std::size_t vecSize = 0;
-									ResourcesLoader::ReadFromBuffer(buffer.data(), &vecSize, sizeof(std::size_t),
+									ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), &vecSize, sizeof(std::size_t),
 									                                readPos);
 									vectorStr *vstr = (vectorStr *) f->getDataAddress(t);
 
 									for (int k = 0; k < vecSize; ++k)
 									{
 										String str;
-										ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t),
+										ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), &memSize, sizeof(std::size_t),
 										                                readPos);
 										str.resize(memSize);
-										ResourcesLoader::ReadFromBuffer(buffer.data(), str.data(), memSize, readPos);
+										ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), str.data(), memSize, readPos);
 
 										vstr->push_back(std::move(str));
 									}
@@ -409,10 +421,10 @@ namespace Solid
 								else
 								{
 
-									ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t),
+									ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), &memSize, sizeof(std::size_t),
 									                                readPos);
 									char *buf = new char[memSize]();
-									ResourcesLoader::ReadFromBuffer(buffer.data(), buf, memSize, readPos);
+									ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), buf, memSize, readPos);
 
 									if (isNull == 256)
 									{
@@ -433,6 +445,40 @@ namespace Solid
 							t->Init();
 							delete cmp;
 						}
+						else if (className == "Light")
+						{
+							Light *t = Engine::GetInstance()->ecsManager.AddComponent(go, *(Light *) cmp);
+
+							for (int i = 0; i < FieldNum; ++i)
+							{
+								short isNull = -1;
+
+								//Get Comp FieldName
+								ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), &cmpNameSize, sizeof(std::size_t),
+								                                readPos);
+								std::string Name;
+								Name.resize(cmpNameSize / sizeof(std::string::value_type));
+								ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), Name.data(), cmpNameSize, readPos);
+
+								//Get is Null
+								ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), &isNull, sizeof(short), readPos);
+								std::size_t memSize = 0;
+								//Get Field Data
+								ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), &memSize, sizeof(std::size_t), readPos);
+								if (isNull == 256)
+								{}
+								else
+								{}
+								char *buf = new char[memSize]();
+								ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), buf, memSize, readPos);
+								const rfk::Field *f = t->getArchetype().getField(Name);
+								f->setData(t, ((void *) buf), memSize);
+								delete[] buf;
+
+							}
+
+							delete cmp;
+						}
 						else if (ns != nullptr && myClass->isSubclassOf(*ns->getClass("Script")))
 						{
 
@@ -446,14 +492,14 @@ namespace Solid
 								short isNull = -1;
 
 								//Get Comp FieldName
-								ResourcesLoader::ReadFromBuffer(buffer.data(), &cmpNameSize, sizeof(std::size_t),
+								ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), &cmpNameSize, sizeof(std::size_t),
 								                                readPos);
 								std::string Name;
 								Name.resize(cmpNameSize / sizeof(std::string::value_type));
-								ResourcesLoader::ReadFromBuffer(buffer.data(), Name.data(), cmpNameSize, readPos);
+								ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), Name.data(), cmpNameSize, readPos);
 
 								//Get is Null
-								ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(short), readPos);
+								ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), &isNull, sizeof(short), readPos);
 								std::size_t memSize = 0;
 								//Get Field Data
 
@@ -461,40 +507,40 @@ namespace Solid
 
 								if (f->type.archetype->name == "String")
 								{
-									ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t),
+									ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), &memSize, sizeof(std::size_t),
 									                                readPos);
 									String *str = (String *) f->getDataAddress(s);
 									str->resize(memSize / sizeof(std::string::value_type));
 
-									ResourcesLoader::ReadFromBuffer(buffer.data(), str->data(), memSize, readPos);
+									ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), str->data(), memSize, readPos);
 								}
 								else if (f->type.archetype->name == "vectorStr")
 								{
 									std::size_t vecSize = 0;
-									ResourcesLoader::ReadFromBuffer(buffer.data(), &vecSize, sizeof(std::size_t),
+									ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), &vecSize, sizeof(std::size_t),
 									                                readPos);
 									vectorStr *vstr = (vectorStr *) f->getDataAddress(s);
 
 									for (int k = 0; k < vecSize; ++k)
 									{
 										String str;
-										ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t),
+										ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), &memSize, sizeof(std::size_t),
 										                                readPos);
 										str.resize(memSize);
-										ResourcesLoader::ReadFromBuffer(buffer.data(), str.data(), memSize, readPos);
+										ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), str.data(), memSize, readPos);
 
 										vstr->push_back(std::move(str));
 									}
 								}
 								else
 								{
-									ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t), readPos);
+									ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), &memSize, sizeof(std::size_t), readPos);
 									if (isNull == 256)
 									{}
 									else
 									{}
 									char *buf = new char[memSize]();
-									ResourcesLoader::ReadFromBuffer(buffer.data(), buf, memSize, readPos);
+									ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), buf, memSize, readPos);
 
 									f->setData(s, ((void *) buf), memSize);
 									delete[] buf;
@@ -515,11 +561,23 @@ namespace Solid
 		};
 		AddAllComps(world);
 
+		for(auto& elt : LoadedSceneCallbacks)
+		{
+		    elt(scene);
+		}
 
 	}
 
 	void Engine::SaveScene(const fs::path &p)
 	{
+		bool isNew = false;
+    	SceneResource* scene = resourceManager.GetSceneByName(p.filename().string().c_str());
+    	if(scene == nullptr)
+	    {
+		    isNew = true;
+    		scene = new SceneResource();
+	    }
+    	scene->rawScene.clear();
 		json j;
 		j["Scene"].array();
 		j = j.flatten();
@@ -538,7 +596,7 @@ namespace Solid
 		Lambda(std::ref(j), world, std::ref(elt));
 		j = j.unflatten();
 
-		std::ofstream file(p, std::ifstream::binary);
+		std::ofstream file(p, std::ifstream::binary | std::ifstream::trunc);
 		std::vector<char> buffer;
 		std::stringstream sstr;
 		sstr << std::setw(4) << j << std::endl;
@@ -708,11 +766,23 @@ namespace Solid
 
 		};
 		LambdaCmp(world);
-		file.write(buffer.data(), buffer.size());
-		SceneResource* scene = new SceneResource();
 		scene->rawScene = buffer;
 		scene->name = p.filename().string();
-		resourceManager.AddResource(scene);
+		ResourcesLoader loader;
+		scene->path.clear();
+		loader.SetPath(scene->path, p);
+		buffer.clear();
+
+		scene->ToDataBuffer(buffer);
+		file.write(buffer.data(), buffer.size());
+		file.close();
+		if(isNew)
+			resourceManager.AddResource(scene);
+	}
+
+	void Engine::AddLoadedSceneCallback(const std::function<void(Resource*)>& _func)
+	{
+		LoadedSceneCallbacks.push_back(_func);
 	}
 
 

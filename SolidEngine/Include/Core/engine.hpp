@@ -15,6 +15,7 @@
 #include "ECS/System/physicsSystem.hpp"
 #include "ECS/System/scriptSystem.hpp"
 #include "ECS/System/particleEffectSystem.hpp"
+#include "ECS/System/transformSystem.hpp"
 #include "Resources/graphicalResourceMgr.hpp"
 
 #include "Physics/physics.hpp"
@@ -50,6 +51,7 @@ namespace Solid
 	    	delete instance;
 	    };
 	    friend class EngineCleanerInterface;
+	    std::vector<std::function<void(Resource*)>> LoadedSceneCallbacks;
     public:
     	//Engine** test = &instance;
         Window* window;
@@ -62,6 +64,7 @@ namespace Solid
 	    std::shared_ptr<PhysicsSystem> physicsSystem;
 	    std::shared_ptr<ScriptSystem> scriptSystem;
 	    std::shared_ptr<Particles::ParticleEffectSystem> particleEffectSystem;
+	    std::shared_ptr<TransformSystem> transformSystem;
         ResourceManager resourceManager;
         TaskManager taskManager;
         ThreadManager threadPool;
@@ -87,7 +90,7 @@ namespace Solid
          */
         bool IsEngineContextInitialized() const;
 
-	    void LoadScene(const fs::path& p);
+	    void LoadScene(const char *name);
 
 	    void SaveScene(const fs::path& p);
 
@@ -95,7 +98,12 @@ namespace Solid
 
         void FixedUpdate();
 
-        void LateUpdate();
+	    void LateUpdate();
+
+
+	    void ForceUpdate();
+
+	    void AddLoadedSceneCallback(const std::function<void(Resource*)>& _func);
 
     };
 

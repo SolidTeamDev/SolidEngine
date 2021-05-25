@@ -7,7 +7,7 @@ void ScriptSystem::Update()
 {
 	for (auto entity : entities)
 	{
-		ScriptList scriptL = ecsManager.GetComponent<ScriptList>(entity);
+		ScriptList& scriptL = ecsManager.GetComponent<ScriptList>(entity);
 
 
 		scriptL.Update();
@@ -20,7 +20,7 @@ void ScriptSystem::FixedUpdate()
 {
     for (auto entity : entities)
     {
-        ScriptList scriptL = ecsManager.GetComponent<ScriptList>(entity);
+        ScriptList& scriptL = ecsManager.GetComponent<ScriptList>(entity);
 
 
         scriptL.FixedUpdate();
@@ -32,7 +32,7 @@ void ScriptSystem::LateUpdate()
 {
     for (auto entity : entities)
     {
-        ScriptList scriptL = ecsManager.GetComponent<ScriptList>(entity);
+        ScriptList& scriptL = ecsManager.GetComponent<ScriptList>(entity);
 
 
         scriptL.LateUpdate();

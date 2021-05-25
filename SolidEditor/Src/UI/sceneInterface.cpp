@@ -97,10 +97,30 @@ namespace Solid
                                   Time::DeltaTime()  * ((int)(engine->window->GetWindowSize().y/2) - (int)mousePos.y ));
         }
 
+
         engine->renderer->BeginFramebuffer(sceneFramebuffer);
         engine->renderer->ClearColor({0.f,0.f,0.f,1});
         engine->renderer->Clear(sceneFramebuffer.size);
-        engine->renderer->DrawSolidGrid(sceneCam, 50, Vec3(.3,.3,.3), 1);
+
+        if(ShowSkeleton)
+        {
+            for(GameObject* gameObject : engine->ecsManager.GetWorld()->childs)
+            {
+                if(engine->ecsManager.GotComponent<Animation>(gameObject->GetEntity()))
+                {
+                    std::vector<Vec3> points;
+                    std::vector<uint> indices;
+                    Animation& anim = engine->ecsManager.GetComponent<Animation>(gameObject->GetEntity());
+                    anim.UpdateAnim(Time::DeltaTime());
+                    anim.DrawSkeleton(points,indices);
+                    engine->renderer->DrawLines(sceneCam, points, indices);
+                }
+            }
+        }
+
+        if(ShowGrid)
+            engine->renderer->DrawSolidGrid(sceneCam, 50, Vec3(.3,.3,.3), 1);
+
         engine->rendererSystem->Update(engine->renderer,sceneCam);
         engine->renderer->EndFramebuffer();
 
@@ -122,6 +142,13 @@ namespace Solid
 
 
 
+        if(UI::BeginMenu("Debug"))
+        {
+            UI::Checkbox("Grid", &ShowGrid);
+            UI::Checkbox("Skeleton", &ShowSkeleton);
+
+            UI::EndMenu();
+        }
         UI::EndMenuBar();
     }
 

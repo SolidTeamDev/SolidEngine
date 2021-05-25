@@ -313,6 +313,11 @@ int ShaderResource::FromDataBuffer(char *buffer, int bSize)
 	return ReadPos;
 }
 
+void ShaderResource::operator delete(void* _ptr)
+{
+	::operator delete(_ptr);
+}
+
 void MaterialResource::ToDataBuffer(std::vector<char> &buffer)
 {
 	std::string pString ;
@@ -562,7 +567,7 @@ MaterialResource::MaterialResource(const char *_name, bool _genfile)
 	defaultshader = Engine::GetInstance()->graphicsResourceMgr.GetDefaultShader();
 	name = _name;
 	shouldGenerateFileAtDestroy = _genfile;
-	path.push_front("\\Assets\\");
+	//path.push_front("Assets\\");
 }
 
 const std::shared_ptr<IShader> MaterialResource::GetShader() const
@@ -754,17 +759,21 @@ SkeletonResource::Bone &SkeletonResource::Bone::operator=(const SkeletonResource
 		name = b.name;
 		Parent = nullptr;
 		Weights = b.Weights;
-		transfo = b.transfo;
+        LocalTrans = b.LocalTrans;
 		offset =b.offset;
 		FinalTrans= b.FinalTrans;
+        id = b.id;
+        isAnimated = b.isAnimated;
 		std::function<void(Bone*, Bone*,Bone*)> lambda = [&](Bone* child,Bone* Parent, Bone* childToCopy){
 			child->Childrens.reserve(childToCopy->Childrens.size());
 			child->name = childToCopy->name;
 			child->Parent = Parent;
 			child->Weights = childToCopy->Weights;
-			child->transfo = childToCopy->transfo;
+			child->LocalTrans = childToCopy->LocalTrans;
 			child->offset =childToCopy->offset;
 			child->FinalTrans= childToCopy->FinalTrans;
+            child->id = childToCopy->id;
+            child->isAnimated = childToCopy->isAnimated;
 
 			for (int i = 0; i < childToCopy->Childrens.size(); ++i)
 			{
@@ -803,18 +812,22 @@ SkeletonResource::Bone::Bone(const SkeletonResource::Bone &b)
 		name = b.name;
 		Parent = nullptr;
 		Weights = b.Weights;
-		transfo = b.transfo;
+        LocalTrans = b.LocalTrans;
 		offset =b.offset;
 		FinalTrans= b.FinalTrans;
+		id = b.id;
+		isAnimated = b.isAnimated;
 		std::function<void(Bone*, Bone*,Bone*)> lambda = [&](Bone* child,Bone* Parent, Bone* childToCopy){
 			Parent->Childrens.push_back(child);
 			child->Childrens.reserve(childToCopy->Childrens.size());
 			child->name = childToCopy->name;
 			child->Parent = Parent;
 			child->Weights = childToCopy->Weights;
-			child->transfo = childToCopy->transfo;
+			child->LocalTrans = childToCopy->LocalTrans;
 			child->offset =childToCopy->offset;
 			child->FinalTrans= childToCopy->FinalTrans;
+            child->id = childToCopy->id;
+            child->isAnimated = childToCopy->isAnimated;
 
 			for (int i = 0; i < childToCopy->Childrens.size(); ++i)
 			{
@@ -853,17 +866,21 @@ SkeletonResource::Bone::Bone(const SkeletonResource::Bone &b, SkeletonResource::
 	name = b.name;
 	Parent = nullptr;
 	Weights = b.Weights;
-	transfo = b.transfo;
+    LocalTrans = b.LocalTrans;
 	offset =b.offset;
 	FinalTrans= b.FinalTrans;
+    id = b.id;
+    isAnimated = b.isAnimated;
 	std::function<void(Bone*, Bone*,Bone*)> lambda = [&](Bone* child,Bone* Parent, Bone* childToCopy){
 		child->Childrens.reserve(childToCopy->Childrens.size());
 		child->name = childToCopy->name;
 		child->Parent = Parent;
 		child->Weights = childToCopy->Weights;
-		child->transfo = childToCopy->transfo;
+		child->LocalTrans = childToCopy->LocalTrans;
 		child->offset =childToCopy->offset;
 		child->FinalTrans= childToCopy->FinalTrans;
+        child->id = childToCopy->id;
+        child->isAnimated = childToCopy->isAnimated;
 
 		for (int i = 0; i < childToCopy->Childrens.size(); ++i)
 		{
@@ -901,7 +918,7 @@ void *SkeletonResource::Bone::operator new(std::size_t size)
 
 void SkeletonResource::Bone::operator delete(void* p)
 {
-	free(p);
+	::operator delete (p);
 }
 
 SkeletonResource::Bone *SkeletonResource::Bone::FindBoneByName(const char *_name)
@@ -1147,5 +1164,25 @@ int PrefabResource::FromDataBuffer(char *buffer, int bSize)
 	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
 	PrefabBinary.resize(size);
 	ResourcesLoader::ReadFromBuffer(buffer, PrefabBinary.data(), size*sizeof(char), ReadPos);
+	return ReadPos;
+}
+
+void SceneResource::ToDataBuffer(std::vector<char> &buffer)
+{
+	Resource::ToDataBuffer(buffer);
+	std::uint32_t size = this->rawScene.size();
+
+	ResourcesLoader::Append(buffer, &(size), sizeof(size));
+	ResourcesLoader::Append(buffer, this->rawScene.data(), size *sizeof(char));
+}
+
+int SceneResource::FromDataBuffer(char *buffer, int bSize)
+{
+	std::uint64_t ReadPos =  Resource::FromDataBuffer(buffer, bSize);
+	std::uint32_t size =0;
+	//asset type
+	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
+	rawScene.resize(size);
+	ResourcesLoader::ReadFromBuffer(buffer, rawScene.data(), size*sizeof(char), ReadPos);
 	return ReadPos;
 }

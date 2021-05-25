@@ -58,6 +58,7 @@ namespace Solid
 		    Entity temp = entityManager->CreateEntity();
 		    GameObject* obj = sceneGraphManager->GetNodeFromEntity(_parent)->AddToCurrent(temp);
 		    obj->name = _name;
+		    obj->transform = AddComponent<Transform>(obj,Transform());
 		    return obj;
 	    }
 
@@ -141,7 +142,7 @@ namespace Solid
         void RemoveComponent(GameObject* _entity)
         {
             Components* c = componentManager->RemoveComponent<T>(_entity->GetEntity());
-            c->Release();
+
 	        for (auto it= _entity->compsList.begin(); it != _entity->compsList.end(); ++it)
 	        {
 		        if(*it == c)

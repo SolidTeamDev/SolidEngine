@@ -40,7 +40,7 @@ struct IDWrapper
     std::string Name;
     int i;
 };
-const char* rootFolder = "\\Assets\\";
+const char* rootFolder = "Assets\\";
 ///
 /// ResourcesLoader Base
 ///
@@ -87,6 +87,8 @@ void  ResourcesLoader::LoadRessourceNoAdd(const fs::path &Rpath, ResourcePtrWrap
         r=LoadSolidShader(Rpath);
     else if(extension == ".solidprefab")
 	    r=LoadSolidPrefab(Rpath);
+    else if(extension == ".solidscene")
+	    r=LoadSolidScene(Rpath);
     else if(extension == ".sanim")
         ;
     else if(extension == ".sskel")
@@ -159,6 +161,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 			        || name.find(".sskel") != std::string::npos
 			        || name.find(".smaterial") != std::string::npos
 			        || name.find(".solidprefab") != std::string::npos
+			        || name.find(".solidscene") != std::string::npos
 			        || name.find(".saudio") != std::string::npos);
 
 		    }
@@ -247,9 +250,10 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 			        newFolders = true;
 		        }
 	        }
-	        ++counting;
+
 	        if(newFolders)
 	        	it = othersFolders.begin()+counting;
+	        ++counting;
         }
 	    for(auto& elt : normal)
 	    {
@@ -366,6 +370,14 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
                 return (name.find("shader") != std::string::npos || name.find("compute") != std::string::npos);
 
             }
+            else
+            {
+	            std::string name = item.extension().string();
+	            std::transform(name.begin(), name.end(), name.begin(),
+	                           [](unsigned char c){ return std::tolower(c); });
+	            return name.find(".scompute") != std::string::npos
+	               || name.find(".svertfrag") != std::string::npos;
+            }
             return false;
         };
 	    auto matFind = [](const fs::path&item)
@@ -446,27 +458,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
             }
 
         }
-        for(auto& s : Shaders) {
-            LoadRessourceNoAdd(s.p, RessourceArray[s.i]);
-            Manager->AddResource(RessourceArray[s.i].r);
-        }
-	    for(auto& elt : soundPaths)
-	    {
-		    std::string name = elt.extension().string();
-		    std::transform(name.begin(), name.end(), name.begin(),
-		                   [](unsigned char c){ return std::tolower(c); });
-		    if(name.find(".saudio") != std::string::npos)
-		    {
-			    Resource* sound = LoadSolidAudio(elt);
-			    Manager->AddResource(sound);
-		    }
-		    else
-		    {
-			    Resource* sound = LoadAudio(elt);
-			    Manager->AddResource(sound);
-		    }
 
-	    }
 
         bool b = true;
         while(b)
@@ -499,6 +491,28 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
                 }
             }
         }
+
+	    for(auto& s : Shaders) {
+		    LoadRessourceNoAdd(s.p, RessourceArray[s.i]);
+		    Manager->AddResource(RessourceArray[s.i].r);
+	    }
+	    for(auto& elt : soundPaths)
+	    {
+		    std::string name = elt.extension().string();
+		    std::transform(name.begin(), name.end(), name.begin(),
+		                   [](unsigned char c){ return std::tolower(c); });
+		    if(name.find(".saudio") != std::string::npos)
+		    {
+			    Resource* sound = LoadSolidAudio(elt);
+			    Manager->AddResource(sound);
+		    }
+		    else
+		    {
+			    Resource* sound = LoadAudio(elt);
+			    Manager->AddResource(sound);
+		    }
+
+	    }
 		Manager->InitDefaultMat();
 	    for(auto& elt : matPaths)
 	    {
@@ -580,20 +594,21 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 	std::string str = Rpath.string();
 	Mesh->name = Rpath.filename().string();
 
-	Mesh->path.push_front(rootFolder) ;
 	SetPath(Mesh->path, Rpath);
 	importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_ANIMATIONS, true);
-	importer.SetPropertyBool(AI_CONFIG_IMPORT_REMOVE_EMPTY_BONES, false);
+    importer.SetPropertyBool(AI_CONFIG_IMPORT_REMOVE_EMPTY_BONES, true);
+    importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
+
 
 
 	const aiScene *scene = importer.ReadFile(str, aiProcess_JoinIdenticalVertices | aiProcess_OptimizeMeshes |
 	                                              aiProcess_SplitLargeMeshes | aiProcess_Triangulate |
-	                                              aiProcess_SortByPType | aiProcess_LimitBoneWeights   );
+	                                              aiProcess_SortByPType | aiProcess_LimitBoneWeights | aiProcess_GlobalScale  );
 
 
 
 	aiBone* b;
-
+    Skeleton->name = "New Skeleton";
 
 	if (!scene)
 	{
@@ -620,40 +635,50 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 			hasFoundSkeleton=true;
 
 			auto skelRoot = boneNode;
+            uint boneCount = 0;
 
-
-			std::function<void(SkeletonResource::Bone*, aiNode*)> lambda = [&](SkeletonResource::Bone* _bone, aiNode* _aiNode){
-
+			std::function<void(SkeletonResource::Bone*, aiNode*)> lambda = [&](SkeletonResource::Bone* _bone, aiNode* _aiNode)
+			{
 				_bone->name = _aiNode->mName.C_Str();
+                _bone->id = boneCount;
+                boneCount++;
+                ///HERE TODO REMOVE TAG _$AssimpFbx$_ from Bone Name
+                std::size_t pos = _bone->name.find("_$AssimpFbx$_");
+                if(pos != std::string::npos)
+                    _bone->name.erase(_bone->name.begin()+pos, _bone->name.end());
+                _bone->LocalTrans =
+                        Mat4<float>(_aiNode->mTransformation.a1, _aiNode->mTransformation.a2, _aiNode->mTransformation.a3, _aiNode->mTransformation.a4,
+                                    _aiNode->mTransformation.b1, _aiNode->mTransformation.b2, _aiNode->mTransformation.b3, _aiNode->mTransformation.b4,
+                                    _aiNode->mTransformation.c1, _aiNode->mTransformation.c2, _aiNode->mTransformation.c3, _aiNode->mTransformation.c4,
+                                    _aiNode->mTransformation.d1, _aiNode->mTransformation.d2, _aiNode->mTransformation.d3, _aiNode->mTransformation.d4);
 
 				_bone->Childrens.reserve(_aiNode->mNumChildren);
 				for (int j = 0; j < _aiNode->mNumChildren; ++j)
 				{
 					SkeletonResource::Bone* cBone = new SkeletonResource::Bone;
 					_bone->Childrens.push_back(cBone);
-					_bone->transfo =
-							Mat4<float>(_aiNode->mTransformation.a1, _aiNode->mTransformation.a2, _aiNode->mTransformation.a3, _aiNode->mTransformation.a4,
-							            _aiNode->mTransformation.b1, _aiNode->mTransformation.b2, _aiNode->mTransformation.b3, _aiNode->mTransformation.b4,
-							            _aiNode->mTransformation.c1, _aiNode->mTransformation.c2, _aiNode->mTransformation.c3, _aiNode->mTransformation.c4,
-							            _aiNode->mTransformation.d1, _aiNode->mTransformation.d2, _aiNode->mTransformation.d3, _aiNode->mTransformation.d4);
+
 					cBone->Parent = _bone;
+					//_bone->FinalTrans = _bone->Parent->FinalTrans * _bone->transfo;
 					lambda(cBone, _aiNode->mChildren[j]);
 
 				}
 			};
-			std::function<bool(SkeletonResource::Bone*, aiBone*)> setWeights = [&](SkeletonResource::Bone* _bone, aiBone* _aiBone)-> bool{
+			std::function<bool(SkeletonResource::Bone*, aiBone*, uint)> setWeights = [&](SkeletonResource::Bone* _bone, aiBone* _aiBone, uint id)-> bool
+			{
 
 				if(_bone->name == _aiBone->mName.C_Str())
 				{
+				    _bone->isAnimated = true;
 					_bone->Weights.reserve(_aiBone->mNumWeights);
 					Mat4<float> offset =
 							Mat4<float>(_aiBone->mOffsetMatrix.a1, _aiBone->mOffsetMatrix.a2, _aiBone->mOffsetMatrix.a3, _aiBone->mOffsetMatrix.a4,
 							            _aiBone->mOffsetMatrix.b1, _aiBone->mOffsetMatrix.b2, _aiBone->mOffsetMatrix.b3, _aiBone->mOffsetMatrix.b4,
 							            _aiBone->mOffsetMatrix.c1, _aiBone->mOffsetMatrix.c2, _aiBone->mOffsetMatrix.c3, _aiBone->mOffsetMatrix.c4,
 							            _aiBone->mOffsetMatrix.d1, _aiBone->mOffsetMatrix.d2, _aiBone->mOffsetMatrix.d3, _aiBone->mOffsetMatrix.d4);
-					_bone->offset = offset;
+					_bone->offset = offset.GetTransposed();
 					_bone->WeightInit = true;
-					_bone->FinalTrans = offset * _bone->transfo;
+					_bone->FinalTrans =  _bone->LocalTrans * offset;
 					///WARN : trasfo matrix of aiBone and ai node *=-1 ?
 					for (int j = 0; j < _aiBone->mNumWeights; ++j)
 					{
@@ -665,7 +690,7 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 				for (auto & Children : _bone->Childrens)
 				{
 
-					if(setWeights(Children, _aiBone))
+					if(setWeights(Children, _aiBone, id))
 					{
 						return true;
 					}
@@ -680,9 +705,11 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 				for (int l = 0; l < scene->mMeshes[0]->mNumBones; ++l)
 				{
 					aiBone* bone = scene->mMeshes[0]->mBones[l];
-					setWeights(&Skeleton->rootBone, bone);
+					Log::Send(bone->mName.C_Str(), Log::ELogSeverity::ERROR);
+					setWeights(&Skeleton->rootBone, bone, l);
 				}
 			}
+			Skeleton->numOfBone = boneCount;
 			///load bones
 		}
 	}
@@ -695,13 +722,17 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 		anim->numTicks = scene->mAnimations[i]->mDuration;
 		anim->ticksPerSeconds = scene->mAnimations[i]->mTicksPerSecond;
 		if(hasFoundSkeleton)
-			anim->Root = new SkeletonResource::Bone(Skeleton->rootBone);
+        {
+            anim->Root = new SkeletonResource::Bone(Skeleton->rootBone);
+            anim->numOfBones = Skeleton->numOfBone;
+        }
 		fbx->anims.push_back(anim);
-		anim->Channels.resize(scene->mAnimations[i]->mNumChannels);
-		for(int j = 0; j < anim->Channels.size(); ++j)
+		//anim->Channels.resize(scene->mAnimations[i]->mNumChannels);
+		for(int j = 0; j < scene->mAnimations[i]->mNumChannels; ++j)
 		{
-			AnimResource::BoneChannel& channel = anim->Channels[j];
-		    channel.BoneToMod = anim->Root->FindBoneByName(scene->mAnimations[i]->mChannels[j]->mNodeName.C_Str());
+
+			SkeletonResource::Bone::BoneChannel& channel = anim->Root->FindBoneByName(scene->mAnimations[i]->mChannels[j]->mNodeName.C_Str())->channel;
+		    //channel.BoneToMod = anim->Root->FindBoneByName(scene->mAnimations[i]->mChannels[j]->mNodeName.C_Str());
 		    std::size_t maxNumFrames =scene->mAnimations[i]->mChannels[j]->mNumPositionKeys ;
 
 		    if(maxNumFrames < scene->mAnimations[i]->mChannels[j]->mNumRotationKeys)
@@ -717,6 +748,10 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 			aiQuatKey* rotKeys =scene->mAnimations[i]->mChannels[j]->mRotationKeys;
 			int rotKeysNum =scene->mAnimations[i]->mChannels[j]->mNumRotationKeys;
 			aiVectorKey* scaleKeys =scene->mAnimations[i]->mChannels[j]->mScalingKeys;
+            //aiVector3t<ai_real> v = scene->mAnimations[i]->mChannels[j]->mPositionKeys[0].mValue;
+            //aiVector3t<ai_real> v2 = scene->mAnimations[i]->mChannels[j]->mPositionKeys[220].mValue;
+            //printf("x: %f, y: %f,z: %f\n", v.x, v.y, v.z);
+            //printf("x: %f, y: %f,z: %f\n", v2.x, v2.y, v2.z);
 			int scaleKeysNum =scene->mAnimations[i]->mChannels[j]->mNumScalingKeys;
 			int k = 0;
 			int l = 0;
@@ -776,10 +811,10 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 						hasScale = true;
 					}
 				}
-				auto frame =AnimResource::KeyFrame();
+				auto frame =SkeletonResource::Bone::KeyFrame();
 				if(channel.Frames.size() != 0)
 				{
-					frame = AnimResource::KeyFrame(channel.Frames.back());
+					frame = SkeletonResource::Bone::KeyFrame(channel.Frames.back());
 					frame.time = time;
 				}
 
@@ -792,13 +827,13 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 				if (hasRot)
 				{
 					frame.useRot = true;
-					frame.Rot = Quat(rotKeys[k].mValue.x,rotKeys[k].mValue.y,rotKeys[k].mValue.z,rotKeys[k].mValue.w);
+					frame.Rot = Quat(rotKeys[l].mValue.x,rotKeys[l].mValue.y,rotKeys[l].mValue.z,rotKeys[l].mValue.w).GetInversed();
 					l++;
 				}
 				if (hasScale)
 				{
 					frame.useScale = true;
-					frame.Scale = Vec3(scaleKeys[k].mValue.x,scaleKeys[k].mValue.y,scaleKeys[k].mValue.z);
+					frame.Scale = Vec3(scaleKeys[m].mValue.x,scaleKeys[m].mValue.y,scaleKeys[m].mValue.z);
 					m++;
 				}
 
@@ -848,7 +883,6 @@ Resource * ResourcesLoader::LoadImage(const fs::path &Rpath)
 {
     ImageResource* Image = new ImageResource();
     Image->name = Rpath.filename().string();
-	Image->path.push_front(rootFolder);
 	SetPath(Image->path, Rpath);
 	stbi_set_flip_vertically_on_load(true);
 	unsigned char* img =stbi_load(Rpath.string().c_str(), &Image->x, &Image->y, &Image->ChannelsNum, STBI_rgb_alpha);
@@ -885,7 +919,6 @@ Resource * ResourcesLoader::LoadMesh(const fs::path &Rpath)
 
 
     Mesh->name = Rpath.filename().string();
-	Mesh->path.push_front(rootFolder) ;
 	SetPath(Mesh->path, Rpath);
     const aiScene* scene = importer.ReadFile(str,  aiProcess_JoinIdenticalVertices | aiProcess_OptimizeMeshes| aiProcess_SplitLargeMeshes| aiProcess_Triangulate  | aiProcess_SortByPType | aiProcess_PreTransformVertices );
     if(!scene) {
@@ -988,7 +1021,6 @@ Resource * ResourcesLoader::LoadShader(const fs::path &Rpath)
 
         ComputeShaderResource* Compute = new ComputeShaderResource(ComputeSources[0]);
         Compute->name = Rpath.filename().string();
-	    Compute->path.push_front(rootFolder) ;
 	    SetPath(Compute->path, Rpath);
 
 
@@ -1065,7 +1097,6 @@ Resource * ResourcesLoader::LoadShader(const fs::path &Rpath)
 
         ShaderResource* Shader = new ShaderResource(VertexSources[0], fragSources[0]);
         Shader->name = Rpath.filename().string();
-	    Shader->path.push_front(rootFolder) ;
 	    SetPath(Shader->path, Rpath);
 
 #if SASSET_GEN
@@ -1107,7 +1138,6 @@ Resource *ResourcesLoader::LoadAudio(const fs::path &Rpath)
 
 	ALsizei numBytes;
 	audio->name = Rpath.filename().string();
-	audio->path.push_front(rootFolder);
 	SetPath(audio->path, Rpath);
 
 	sndfile = sf_open(filename, SFM_READ, &sfinfo);
@@ -1162,7 +1192,7 @@ Resource *ResourcesLoader::LoadAudio(const fs::path &Rpath)
 	err = alGetError();
 	if (err != AL_NO_ERROR)
 	{
-	    if(alGetString(err))
+	    if(err != AL_INVALID_OPERATION)
 		    std::cout << "OpenAL Error : " << alGetString(err) << std::endl;
 		if (buff && alIsBuffer(buff))
 			alDeleteBuffers(1, &buff);
@@ -1239,7 +1269,6 @@ Resource * ResourcesLoader::LoadSolidImage(const fs::path &Rpath)
     ifs.read(&buffer[0], pos);
     Image->FromDataBuffer(buffer.data(), buffer.size());
 	Image->path.clear();
-	Image->path.push_front(rootFolder);
 	SetPath(Image->path, Rpath);
     if(Image->name == "")
     {
@@ -1264,7 +1293,6 @@ Resource * ResourcesLoader::LoadSolidMesh(const fs::path &Rpath)
 
     Mesh->FromDataBuffer(buffer.data(), buffer.size());
 	Mesh->path.clear();
-	Mesh->path.push_front(rootFolder);
 	SetPath(Mesh->path, Rpath);
     if(Mesh->name == "")
     {
@@ -1289,7 +1317,6 @@ Resource * ResourcesLoader::LoadSolidComputeShader(const fs::path &Rpath)
 
     cs->FromDataBuffer(buffer.data(), buffer.size());
 	cs->path.clear();
-	cs->path.push_front(rootFolder);
 	SetPath(cs->path, Rpath);
     if(cs->name == "")
     {
@@ -1313,7 +1340,6 @@ Resource * ResourcesLoader::LoadSolidShader(const fs::path &Rpath)
 
     s->FromDataBuffer(buffer.data(), buffer.size());
 	s->path.clear();
-	s->path.push_front(rootFolder);
 	SetPath(s->path, Rpath);
     if(s->name == "")
     {
@@ -1370,7 +1396,6 @@ Resource *ResourcesLoader::LoadSolidMaterial(const fs::path &Rpath)
 	mat->FromDataBuffer(buffer.data(), buffer.size());
 
 	mat->path.clear();
-	mat->path.push_front(rootFolder);
 	SetPath(mat->path, Rpath);
 	if(mat->name == "")
 	{
@@ -1407,7 +1432,6 @@ Resource *ResourcesLoader::LoadSolidAudio(const fs::path &Rpath)
 		Resource::NoNameNum++;
 	}
 	audio->path.clear();
-	audio->path.push_front(rootFolder);
 	SetPath(audio->path, Rpath);
 	audio->audioRawBinary.clear();
 	audio->audioRawBinary.reserve(0);
@@ -1436,7 +1460,10 @@ void ResourcesLoader::SetPath(std::deque<std::string> &resPath, const fs::path& 
 			}
 		}
 		else
+		{
+			invPaths.push_front("Assets\\");
 			return true;
+		}
 	};
 	if(!pathFind(copy))
 		return;
@@ -1458,7 +1485,6 @@ Resource *ResourcesLoader::LoadSolidPrefab(const fs::path &Rpath)
 
 	prefab->FromDataBuffer(buffer.data(),buffer.size());
 	prefab->path.clear();
-	prefab->path.push_front(rootFolder);
 	SetPath(prefab->path, Rpath);
 	return prefab;
 }
@@ -1547,12 +1573,12 @@ void ResourcesLoader::SavePrefabToFile(PrefabResource *_prefab)
 	fs::path p = ResourcesLoader::SolidPath.parent_path();
 	for(std::string& elt : _prefab->path)
 	{
-		if(elt == "\\Assets\\")
+		/*if(elt == "\\Assets\\")
 		{
 			p.append("Assets");
 		}
 		else
-			p.append(elt);
+*/			p.append(elt);
 	}
 	p.append(_prefab->name +".SolidPrefab");
 	std::vector<char>buf;
@@ -1560,6 +1586,24 @@ void ResourcesLoader::SavePrefabToFile(PrefabResource *_prefab)
 	std::ofstream file(p, std::ifstream::binary | std::ofstream::trunc);
 	file.write(buf.data(), buf.size());
 	file.close();
+}
+
+Resource *ResourcesLoader::LoadSolidScene(const fs::path &Rpath)
+{
+	SceneResource* scene = new SceneResource();
+
+	std::ifstream ifs(Rpath, std::ios::binary|std::ios::ate);
+	std::ifstream::pos_type pos = ifs.tellg();
+
+	std::vector<char>  buffer(pos);
+
+	ifs.seekg(0, std::ios::beg);
+	ifs.read(&buffer[0], pos);
+
+	scene->FromDataBuffer(buffer.data(),buffer.size());
+	scene->path.clear();
+	SetPath(scene->path, Rpath);
+	return scene;
 }
 
 

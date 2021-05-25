@@ -17,8 +17,10 @@
 #include <imgui_internal.h>
 #include <string>
 #include <sstream>
+#include "UI/winUI.hpp"
 #include "ECS/Components/script.hpp"
 #include "ECS/Components/scriptList.hpp"
+#include "imgui_stdlib.h"
 
 
 
@@ -35,6 +37,8 @@ namespace Solid {
         window = nullptr;
         renderer = nullptr;
         DarkTheme();
+        std::function<void(Resource*)> callback = std::bind(&EditorInterface::LoadSceneCall, this, std::placeholders::_1);
+        Engine::GetInstance()->AddLoadedSceneCallback(callback);
     }
 
     EditorInterface::EditorInterface(Window *_window, Renderer* _renderer) :
@@ -43,6 +47,8 @@ namespace Solid {
         window = _window;
         renderer = _renderer;
         DarkTheme();
+	    std::function<void(Resource*)> callback = std::bind(&EditorInterface::LoadSceneCall, this, std::placeholders::_1);
+	    Engine::GetInstance()->AddLoadedSceneCallback(callback);
     }
 
     void EditorInterface::Update()
@@ -50,6 +56,116 @@ namespace Solid {
         UIContext::BeginFrame();
 
         DrawMainFrame();
+	    if(openScenePopup)
+	    {
+		    openScenePopup =false;
+		    UI::OpenPopup("OpenScene");
+		    choice = currentScenePtr;
+	    }
+	    if(saveScenePopup)
+	    {
+		    saveScenePopup =false;
+		    str = "";
+		    UI::OpenPopup("SaveScene");
+	    }
+	    if(UI::BeginPopup("OpenScene"))
+	    {
+		    {
+
+			    const char* sceneName = choice == nullptr ? "UNTITLED" : choice->name.c_str();
+
+			    UI::Text("Scene  ");UI::SameLine();
+
+			    bool combo =UI::BeginCombo("##Scene", sceneName);
+			    if(UI::BeginDragDropTarget())
+			    {
+
+				    const ImGuiPayload* drop=UI::AcceptDragDropPayload("Scene");
+				    if(drop != nullptr)
+				    {
+					    Resource* r = *((Resource**)drop->Data);
+					    currentScenePtr = (SceneResource*)r;
+					    currentOpenedScene = r->name;
+					    currentScenePath = ResourcesLoader::SolidPath;
+					    for (int i = 1; i < r->path.size(); ++i)
+					    {
+						    currentScenePath.append(r->path[i]);
+					    }
+					    Engine::GetInstance()->LoadScene(r->name.c_str());
+						UI::CloseCurrentPopup();
+				    }
+				    UI::EndDragDropTarget();
+			    }
+			    if(combo)
+			    {
+				    auto sceneList = Engine::GetInstance()->resourceManager.GetResourcesVecByType(EResourceType::Scene);
+
+				    for(auto scenes : *sceneList)
+				    {
+					    bool selected = (sceneName == scenes.second->name);
+					    if(UI::Selectable(scenes.second->name.c_str(), selected))
+					    {
+						   choice = (SceneResource*)scenes.second;
+					    }
+					    if(selected)
+						    UI::SetItemDefaultFocus();
+				    }
+
+				    UI::EndCombo();
+			    }
+				if(UI::Button("Load"))
+				{
+					currentScenePtr = Engine::GetInstance()->resourceManager.GetSceneByName(choice->name.c_str());
+					currentOpenedScene = currentScenePtr->name;
+					currentScenePath = ResourcesLoader::SolidPath;
+					for (int i = 1; i < currentScenePtr->path.size(); ++i)
+					{
+						currentScenePath.append(currentScenePtr->path[i]);
+					}
+					Engine::GetInstance()->LoadScene(choice->name.c_str());
+
+					UI::CloseCurrentPopup();
+				}
+		    }
+		    UI::EndPopup();
+	    }
+	    if(UI::BeginPopup("SaveScene"))
+	    {
+
+		    UI::Text("Scene Name");
+		    UI::SameLine();
+		    UI::InputText("##sceneName", &str);
+		    if(UI::Button("Save"))
+		    {
+		    	if(!str.empty())
+			    {
+				    std::size_t dotIndex = str.find_last_of('.');
+				    if (dotIndex != std::string::npos)
+				    {
+					    str.erase(dotIndex);
+				    }
+				    str += ".SolidScene";
+				    fs::path p = ResourcesLoader::SolidPath;
+				    std::deque<std::string> path;
+				    filePathData *node = filesInterface.currentFolder;
+				    while (node->parent != nullptr)
+				    {
+					    path.push_front(node->folderName);
+					    node = node->parent;
+				    }
+				    for (auto &elt : path)
+				    {
+					    p.append(elt);
+				    }
+				    p.append(str);
+				    Engine::GetInstance()->SaveScene(p);
+				    currentOpenedScene = p.filename().string();
+				    currentScenePath = p;
+				    UI::CloseCurrentPopup();
+			    }
+		    }
+		    UI::EndPopup();
+	    }
 
 
         filesInterface.Draw();
@@ -93,21 +209,33 @@ namespace Solid {
     {
         if (UI::BeginMenu("Files"))
         {
+	        if (UI::MenuItem("Save Project"))
+	        {
 
+	        }
             if (UI::MenuItem("Save Scene"))
             {
+				if(currentOpenedScene == "Untitled")
+				{
+					saveScenePopup =true;
+				}
+				else
+				{
+					fs::path p = currentScenePath;
+					Engine::GetInstance()->SaveScene(p);
+				}
 
-	            fs::path p = fs::current_path();
-	            p.append("test.SolidScene");
-	            Engine::GetInstance()->SaveScene(p);
 
             }
+	        if (UI::MenuItem("Save Scene At"))
+	        {
+
+		        saveScenePopup = true;
+	        }
             if (UI::MenuItem("Load Scene"))
             {
 	            EditorInterface::selectedGO = nullptr;
-	            fs::path p = fs::current_path();
-	            p.append("test.SolidScene");
-            	Engine::GetInstance()->LoadScene(p);
+	            openScenePopup = true;
 
             }
 	        if (UI::BeginMenu("Build"))
@@ -139,6 +267,7 @@ namespace Solid {
 
             UI::EndMenu();
         }
+
     }
 
     void EditorInterface::DrawMenuWindows()
@@ -384,6 +513,17 @@ namespace Solid {
         editorStyle.Colors[ImGuiCol_SliderGrab] = ImVec4(0.45f, 0.45f, 0.45f, 1.f);
         editorStyle.Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.35f, 0.35f, 0.35f, 1.f);
     }
+
+	void EditorInterface::LoadSceneCall(Resource* scene)
+	{
+		currentScenePtr = (SceneResource*)scene;
+		currentOpenedScene = currentScenePtr->name;
+		currentScenePath = ResourcesLoader::SolidPath;
+		for (int i = 1; i < currentScenePtr->path.size(); ++i)
+		{
+			currentScenePath.append(currentScenePtr->path[i]);
+		}
+	}
 }
 
 #pragma endregion
