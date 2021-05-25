@@ -4,63 +4,65 @@
 
 #include "ECS/types.hpp"
 #include "Build/solidAPI.hpp"
+#include "ECS/Components/Transform.hpp"
 
 #include "Rendering/FX/Particles/particleData.hpp"
 #include "Rendering/FX/Particles/particleGenerator.hpp"
-#include "Rendering/FX/Particles/particleRenderer.hpp"
 #include "Rendering/FX/Particles/particleUpdater.hpp"
 #include "Rendering/FX/Particles/particleSystem.hpp"
 
+#include "Rendering/FX/Particles/glParticleRenderer.hpp"
+
 namespace Solid
 {
-	class SOLID_API SLDClass() ParticleEffect : public Components
+	namespace Particles
 	{
-		SLDField()
-		size_t numParticles;
+		class SOLID_API SLDClass() ParticleEffect : public Components
+		{
+			SLDField()
+			size_t numParticles;
 
-		std::shared_ptr<ParticleSystem>    system = nullptr;
+			std::shared_ptr<ParticleSystem> system = nullptr;
 
-		std::shared_ptr<VelFromPosGen>   velFromPosGen = nullptr;
-		std::shared_ptr<BasicColorGen>   colGen        = nullptr;
-		std::shared_ptr<CirclePosGen>    circlePosGen  = nullptr;
-		std::shared_ptr<SphereVelGen>    sphereVelGen  = nullptr;
-		std::shared_ptr<BasicTimeGen>    timeGen       = nullptr;
-		std::shared_ptr<BasicVelGen>     velGen        = nullptr;
-		std::shared_ptr<BoxPosGen>       boxPosGen     = nullptr;
+			std::shared_ptr<VelFromPosGen> velFromPosGen = nullptr;
+			std::shared_ptr<BasicColorGen> colGen = nullptr;
+			std::shared_ptr<CirclePosGen> circlePosGen = nullptr;
+			std::shared_ptr<SphereVelGen> sphereVelGen = nullptr;
+			std::shared_ptr<BasicTimeGen> timeGen = nullptr;
+			std::shared_ptr<BasicVelGen> velGen = nullptr;
+			std::shared_ptr<BoxPosGen> boxPosGen = nullptr;
 
-		std::shared_ptr<AttractorUpdater>   attractorUpdater = nullptr;
-		std::shared_ptr<VelColorUpdater>    velColUpdater    = nullptr;
-		std::shared_ptr<PosColorUpdater>    posColUpdater    = nullptr;
-		std::shared_ptr<BasicColorUpdater>  colorUpdater     = nullptr;
-		std::shared_ptr<EulerUpdater>       eulerUpdater     = nullptr;
-		std::shared_ptr<FloorUpdater>       floorUpdater     = nullptr;
-		std::shared_ptr<BasicTimeUpdater>   timeUpdater      = nullptr;
+			std::shared_ptr<AttractorUpdater> attractorUpdater = nullptr;
+			std::shared_ptr<VelColorUpdater> velColUpdater = nullptr;
+			std::shared_ptr<PosColorUpdater> posColUpdater = nullptr;
+			std::shared_ptr<BasicColorUpdater> colorUpdater = nullptr;
+			std::shared_ptr<EulerUpdater> eulerUpdater = nullptr;
+			std::shared_ptr<FloorUpdater> floorUpdater = nullptr;
+			std::shared_ptr<BasicTimeUpdater> timeUpdater = nullptr;
 
-		std::shared_ptr<IParticleRenderer> renderer = nullptr;
+			std::shared_ptr<GLParticleRenderer> renderer = nullptr;
 
-	public:
-		const size_t DEFAULT_PARTICLE_NUM_FLAG = 0;
+		public:
+			uint defaultParticleNb = 0;
 
-		ParticleEffect() = default;
-		~ParticleEffect() override = default;
+			ParticleEffect() = default;
+			~ParticleEffect() override = default;
 
 
-		void Init() override;
-		void Release() override;
+			void Init() override;
+			void Release() override;
 
-		// creates the effect with desired num of particles, (0 means default for the effect)
-		bool Initialize(size_t numParticles);
-		bool InitializeRenderer();
-		void Reset();
-		void Clean();
-		void ShowUI();
+			// creates the effect with desired num of particles, (0 means default for the effect)
+			bool Initialize(size_t numParticles);
+			bool InitializeRenderer();
 
-		void Update(double dt);
-		void CpuUpdate(double dt);
-		void GpuUpdate(double dt);
+			void Update(const Transform& trsf);
+			void CpuUpdate();
+			void GpuUpdate();
+			void Render();
 
-		void Render();
-		int NumAllParticles();
-		int NumAliveParticles();
-	};
+			int NumAllParticles();
+			int NumAliveParticles();
+		};
+	}
 }

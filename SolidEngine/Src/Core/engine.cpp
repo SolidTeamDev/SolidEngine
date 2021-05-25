@@ -18,6 +18,7 @@
 #include "ECS/Components/capsuleCollider.hpp"
 #include "ECS/Components/light.hpp"
 #include "ECS/Components/scriptList.hpp"
+#include "ECS/Components/particleEffect.hpp"
 
 #include "Refureku/Refureku.h"
 
@@ -58,7 +59,8 @@ namespace Solid
         ecsManager.RegisterComponent<BoxCollider>();
         ecsManager.RegisterComponent<SphereCollider>();
         ecsManager.RegisterComponent<CapsuleCollider>();
-        ecsManager.RegisterComponent<Light>();
+	    ecsManager.RegisterComponent<Light>();
+	    ecsManager.RegisterComponent<Particles::ParticleEffect>();
 
         //Register Signature
         rendererSystem = ecsManager.RegisterSystem<RendererSystem>();
@@ -89,6 +91,14 @@ namespace Solid
 		    Signature signature;
 		    signature.set(ecsManager.GetComponentType<ScriptList>());
 		    ecsManager.SetSystemSignature<ScriptSystem>(signature);
+	    }
+
+	    particleEffectSystem = ecsManager.RegisterSystem<Particles::ParticleEffectSystem>();
+	    {
+	    	Signature signature;
+		    signature.set(ecsManager.GetComponentType<Transform>());
+		    signature.set(ecsManager.GetComponentType<Particles::ParticleEffect>());
+		    ecsManager.SetSystemSignature<Particles::ParticleEffectSystem>(signature);
 	    }
     }
 

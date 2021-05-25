@@ -1,6 +1,6 @@
 #include "Rendering/FX/Particles/particleData.hpp"
 
-using namespace Solid;
+using namespace Solid::Particles;
 
 ParticleData::ParticleData(size_t maxCount)
 {

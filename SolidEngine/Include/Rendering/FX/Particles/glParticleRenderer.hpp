@@ -1,32 +1,35 @@
 #pragma once
 
-#include "particleRenderer.hpp"
+#include "particleSystem.hpp"
 
 namespace Solid
 {
-	class SOLID_API GLParticleRenderer : public IParticleRenderer
+	namespace Particles
 	{
-	protected:
-		ParticleSystem *system{nullptr};
-
-		unsigned int bufPos{0};
-		unsigned int bufCol{0};
-		unsigned int vao{0};
-	public:
-		GLParticleRenderer()
-		{}
-
-		~GLParticleRenderer()
+		class SOLID_API GLParticleRenderer
 		{
-			Destroy();
-		}
+		protected:
+			ParticleSystem *system{nullptr};
 
-		void Generate(ParticleSystem *sys, bool useQuads) override;
+			unsigned int bufPos{0};
+			unsigned int bufCol{0};
+			unsigned int vao{0};
+		public:
+			GLParticleRenderer()
+			{}
 
-		void Destroy() override;
+			~GLParticleRenderer()
+			{
+				Destroy();
+			}
 
-		void Update() override;
+			void Generate(ParticleSystem *sys, bool useQuads);
 
-		void Render() override;
-	};
+			void Destroy();
+
+			void Update();
+
+			void Render();
+		};
+	}
 }

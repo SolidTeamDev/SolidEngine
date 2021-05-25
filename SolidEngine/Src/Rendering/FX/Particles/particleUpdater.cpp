@@ -1,6 +1,7 @@
 #include "Rendering/FX/Particles/ParticleUpdater.hpp"
 
 using namespace Solid;
+using namespace Solid::Particles;
 
 float Mix(float x, float y, float a)
 {

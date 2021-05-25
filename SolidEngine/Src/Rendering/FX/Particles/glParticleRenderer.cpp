@@ -8,7 +8,7 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
-using namespace Solid;
+using namespace Solid::Particles;
 
 void GLParticleRenderer::Generate(ParticleSystem* sys, bool)
 {

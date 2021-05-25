@@ -7,87 +7,92 @@
 
 namespace Solid
 {
-	class SOLID_API ParticleUpdater
+	namespace Particles
 	{
-	public:
-		ParticleUpdater() = default;
-		virtual ~ParticleUpdater() = default;
+		class SOLID_API ParticleUpdater
+		{
+		public:
+			ParticleUpdater() = default;
 
-		virtual void Update(float dt, ParticleData *p) = 0;
-	};
+			virtual ~ParticleUpdater() = default;
 
-	class SOLID_API EulerUpdater : public ParticleUpdater
-	{
-	public:
-		Vec4 globalAcceleration;
-		EulerUpdater() : globalAcceleration(0.f, 0.f, 0.f, 0.f)
-		{}
+			virtual void Update(float dt, ParticleData *p) = 0;
+		};
 
-		virtual void Update(float dt, ParticleData *p) override;
-	};
+		class SOLID_API EulerUpdater : public ParticleUpdater
+		{
+		public:
+			Vec4 globalAcceleration;
 
-	class SOLID_API FloorUpdater : public ParticleUpdater
-	{
-	public:
-		float floorY;
-		float bounceFactor;
-	public:
-		FloorUpdater() : floorY(0.0), bounceFactor(0.5f)
-		{}
+			EulerUpdater() : globalAcceleration(0.f, 0.f, 0.f, 0.f)
+			{}
 
-		virtual void Update(float dt, ParticleData *p) override;
-	};
+			virtual void Update(float dt, ParticleData *p) override;
+		};
 
-	class SOLID_API AttractorUpdater : public ParticleUpdater
-	{
-	protected:
-		std::vector<Vec4> attractors; // .w is force
-	public:
-		virtual void Update(float dt, ParticleData *p) override;
+		class SOLID_API FloorUpdater : public ParticleUpdater
+		{
+		public:
+			float floorY;
+			float bounceFactor;
+		public:
+			FloorUpdater() : floorY(0.0), bounceFactor(0.5f)
+			{}
 
-		size_t CollectionSize() const
-		{ return attractors.size(); }
+			virtual void Update(float dt, ParticleData *p) override;
+		};
 
-		void Add(const Vec4 &attr)
-		{ attractors.push_back(attr); }
+		class SOLID_API AttractorUpdater : public ParticleUpdater
+		{
+		protected:
+			std::vector<Vec4> attractors; // .w is force
+		public:
+			virtual void Update(float dt, ParticleData *p) override;
 
-		Vec4 &Get(size_t id)
-		{ return attractors[id]; }
-	};
+			size_t CollectionSize() const
+			{ return attractors.size(); }
 
-	class SOLID_API BasicColorUpdater : public ParticleUpdater
-	{
-	public:
-		virtual void Update(float dt, ParticleData *p) override;
-	};
+			void Add(const Vec4 &attr)
+			{ attractors.push_back(attr); }
 
-	class SOLID_API PosColorUpdater : public ParticleUpdater
-	{
-	public:
-		Vec4 minPos;
-		Vec4 maxPos;
-	public:
-		PosColorUpdater() : minPos(0.f, 0.f, 0.f, 0.f), maxPos(1.f, 1.f, 1.f, 1.f)
-		{}
+			Vec4 &Get(size_t id)
+			{ return attractors[id]; }
+		};
 
-		virtual void Update(float dt, ParticleData *p) override;
-	};
+		class SOLID_API BasicColorUpdater : public ParticleUpdater
+		{
+		public:
+			virtual void Update(float dt, ParticleData *p) override;
+		};
 
-	class SOLID_API VelColorUpdater : public ParticleUpdater
-	{
-	public:
-		Vec4 minVel;
-		Vec4 maxVel;
-	public:
-		VelColorUpdater() : minVel(0.f, 0.f, 0.f, 0.f), maxVel(1.f, 1.f, 1.f, 1.f)
-		{}
+		class SOLID_API PosColorUpdater : public ParticleUpdater
+		{
+		public:
+			Vec4 minPos;
+			Vec4 maxPos;
+		public:
+			PosColorUpdater() : minPos(0.f, 0.f, 0.f, 0.f), maxPos(1.f, 1.f, 1.f, 1.f)
+			{}
 
-		virtual void Update(float dt, ParticleData *p) override;
-	};
+			virtual void Update(float dt, ParticleData *p) override;
+		};
 
-	class SOLID_API BasicTimeUpdater : public ParticleUpdater
-	{
-	public:
-		virtual void Update(float dt, ParticleData *p) override;
-	};
+		class SOLID_API VelColorUpdater : public ParticleUpdater
+		{
+		public:
+			Vec4 minVel;
+			Vec4 maxVel;
+		public:
+			VelColorUpdater() : minVel(0.f, 0.f, 0.f, 0.f), maxVel(1.f, 1.f, 1.f, 1.f)
+			{}
+
+			virtual void Update(float dt, ParticleData *p) override;
+		};
+
+		class SOLID_API BasicTimeUpdater : public ParticleUpdater
+		{
+		public:
+			virtual void Update(float dt, ParticleData *p) override;
+		};
+	}
 }

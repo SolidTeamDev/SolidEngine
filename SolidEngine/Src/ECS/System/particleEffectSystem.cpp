@@ -1,12 +1,15 @@
 #include "ECS/System/particleEffectSystem.hpp"
 
 using namespace Solid;
-
-void ParticleEffectSystem::Update(double dt, ParticleEffect& eff)
+using namespace Solid::Particles;
+void ParticleEffectSystem::Update()
 {
-	eff.Update(dt);
-	eff.CpuUpdate(dt);
-	eff.GpuUpdate(dt);
+	for (auto& entity : entities)
+	{
+		const Transform& trsf = ecsManager.GetComponent<Transform>(entity);
+		ParticleEffect& particleEffect = ecsManager.GetComponent<ParticleEffect>(entity);
+		particleEffect.Update(trsf);
+	}
 }
 
 

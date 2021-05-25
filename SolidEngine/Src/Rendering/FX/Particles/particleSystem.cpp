@@ -1,7 +1,7 @@
 #include "Rendering/FX/Particles/particleSystem.hpp"
 
 
-using namespace Solid;
+using namespace Solid::Particles;
 
 ParticleSystem::ParticleSystem(size_t maxCount)
 {

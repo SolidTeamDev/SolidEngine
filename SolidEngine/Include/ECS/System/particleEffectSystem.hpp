@@ -7,12 +7,16 @@
 
 namespace Solid
 {
-	class SOLID_API ParticleEffectSystem : public System
+	namespace Particles
 	{
-	public:
-		ParticleEffectSystem(ECSManager& _ecsManager): System(_ecsManager){};
+		class SOLID_API ParticleEffectSystem : public System
+		{
+		public:
+			ParticleEffectSystem(ECSManager &_ecsManager) : System(_ecsManager)
+			{};
 
-		void Update(double dt, ParticleEffect& eff);
+			void Update();
 
-	};
+		};
+	}
 }
