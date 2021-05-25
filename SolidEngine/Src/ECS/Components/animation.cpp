@@ -6,6 +6,9 @@ namespace Solid
     Animation::Animation(AnimResource* _anim):
     anim{_anim}
     {
+        FinalsTrans.reserve(anim->numOfBones);
+        for(int i = 0; i < anim->numOfBones; i++)
+            FinalsTrans.push_back(Mat4f::Identity);
     }
 
     /// don't forget const bone*
@@ -31,14 +34,14 @@ namespace Solid
 
             if(bone->Parent == nullptr)
             {
-                parentPos = bone->FinalTrans * Vec4::Zero;
+                parentPos = FinalsTrans[bone->id] * Vec4::Zero;
                 points[bone->id] = parentPos ;
             }
             else
             {
 
-                parentPos = bone->Parent->FinalTrans * Vec4::Zero;
-                childPos = bone->FinalTrans * Vec4::Zero;
+                parentPos = FinalsTrans[bone->Parent->id] * Vec4::Zero;
+                childPos = FinalsTrans[bone->id] * Vec4::Zero;
                 if(bone->isAnimated)
                 {
                     points[bone->id] = childPos;
@@ -69,16 +72,16 @@ namespace Solid
             nodeTransform = newBone->LocalTrans;
         }
 
-        newBone->GlobalTrans = _parentTRS * nodeTransform;
+        Mat4f GlobalTrans = _parentTRS * nodeTransform;
 
         //auto boneInfoMap = m_CurrentAnimation->GetBoneIDMap();
         //if (boneInfoMap.find(nodeName) != boneInfoMap.end())
         {
-            newBone->FinalTrans =  ( newBone->GlobalTrans * newBone->offset );
+            FinalsTrans[bone->id] =  ( GlobalTrans * newBone->offset );
         }
 
         for (auto child : newBone->Childrens)
-            CalculateBoneTransform(child, newBone->GlobalTrans);
+            CalculateBoneTransform(child, GlobalTrans);
     }
 
     void Animation::SetAnim(AnimResource* _anim)
@@ -86,6 +89,10 @@ namespace Solid
         anim = _anim;
         CurrentTime = 0;
         InverseRootMat = (anim->Root->LocalTrans ) ;
+        FinalsTrans.clear();
+        FinalsTrans.reserve(anim->numOfBones);
+        for(int i = 0; i < anim->numOfBones; i++)
+            FinalsTrans.push_back(Mat4f::Identity);
 
         CalculateBoneTransform(anim->Root, Mat4f::Identity);
 
@@ -141,4 +148,9 @@ namespace Solid
         return anim;
     }
 
+   const std::vector<Mat4f> Animation::GetFinalTrans()
+   {
+        return  FinalsTrans;
+   }
 }
+

@@ -756,7 +756,6 @@ SkeletonResource::Bone &SkeletonResource::Bone::operator=(const SkeletonResource
 		Weights = b.Weights;
         LocalTrans = b.LocalTrans;
 		offset =b.offset;
-		FinalTrans= b.FinalTrans;
         id = b.id;
         isAnimated = b.isAnimated;
 		std::function<void(Bone*, Bone*,Bone*)> lambda = [&](Bone* child,Bone* Parent, Bone* childToCopy){
@@ -766,7 +765,6 @@ SkeletonResource::Bone &SkeletonResource::Bone::operator=(const SkeletonResource
 			child->Weights = childToCopy->Weights;
 			child->LocalTrans = childToCopy->LocalTrans;
 			child->offset =childToCopy->offset;
-			child->FinalTrans= childToCopy->FinalTrans;
             child->id = childToCopy->id;
             child->isAnimated = childToCopy->isAnimated;
 
@@ -809,7 +807,6 @@ SkeletonResource::Bone::Bone(const SkeletonResource::Bone &b)
 		Weights = b.Weights;
         LocalTrans = b.LocalTrans;
 		offset =b.offset;
-		FinalTrans= b.FinalTrans;
 		id = b.id;
 		isAnimated = b.isAnimated;
 		std::function<void(Bone*, Bone*,Bone*)> lambda = [&](Bone* child,Bone* Parent, Bone* childToCopy){
@@ -820,7 +817,6 @@ SkeletonResource::Bone::Bone(const SkeletonResource::Bone &b)
 			child->Weights = childToCopy->Weights;
 			child->LocalTrans = childToCopy->LocalTrans;
 			child->offset =childToCopy->offset;
-			child->FinalTrans= childToCopy->FinalTrans;
             child->id = childToCopy->id;
             child->isAnimated = childToCopy->isAnimated;
 
@@ -863,7 +859,6 @@ SkeletonResource::Bone::Bone(const SkeletonResource::Bone &b, SkeletonResource::
 	Weights = b.Weights;
     LocalTrans = b.LocalTrans;
 	offset =b.offset;
-	FinalTrans= b.FinalTrans;
     id = b.id;
     isAnimated = b.isAnimated;
 	std::function<void(Bone*, Bone*,Bone*)> lambda = [&](Bone* child,Bone* Parent, Bone* childToCopy){
@@ -873,7 +868,6 @@ SkeletonResource::Bone::Bone(const SkeletonResource::Bone &b, SkeletonResource::
 		child->Weights = childToCopy->Weights;
 		child->LocalTrans = childToCopy->LocalTrans;
 		child->offset =childToCopy->offset;
-		child->FinalTrans= childToCopy->FinalTrans;
         child->id = childToCopy->id;
         child->isAnimated = childToCopy->isAnimated;
 

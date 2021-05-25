@@ -36,7 +36,7 @@ namespace Solid
 
 			virtual void DrawMesh() override;
 
-			virtual void DrawMesh(const std::vector<MaterialResource *>& _list, Transform &_tr, Camera &_cam) override;
+			virtual void DrawMesh(const std::vector<MaterialResource *>& _list, Transform &_tr, Camera &_cam, Animation* _anim = nullptr) override;
 
 		};
 		class SOLID_API Shader : public IShader
@@ -66,7 +66,7 @@ namespace Solid
 
 			void SetLights(Camera& _camera) const override;
 
-            void SetAnim(SkeletonResource::Bone* _root) const override;
+            void SetAnim(Animation* _anim) const override;
 
             void SetMaterial(const char *_name) override;
 

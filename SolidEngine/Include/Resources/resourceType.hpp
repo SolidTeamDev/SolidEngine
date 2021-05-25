@@ -86,6 +86,56 @@ namespace Solid {
 
     };
 
+    struct SOLID_API Vertex
+    {
+        Vec3 Pos;
+        Vec3 Normal;
+        Vec2 TexCoords;
+    };
+
+    struct SOLID_API AnimData
+    {
+        uint boneIds[4] {0};
+        float  weights[4] {0.0f};
+    };
+
+
+    class SOLID_API MeshResource : public Resource
+    {
+    public:
+
+
+        class SubMesh
+        {
+        public:
+
+            std::vector<Vertex> vertices;
+            std::vector<uint> indices;
+        };
+
+        bool hadAnim = false;
+        std::vector<AnimData> animData;
+
+        std::vector<SubMesh> Meshes;
+
+
+        bool isInit = false;
+
+        MeshResource()
+        {
+            type = EResourceType::Mesh;
+        }
+
+        ~MeshResource()
+        {
+
+        }
+
+        virtual void ToDataBuffer(std::vector<char> &buffer) override;
+
+        virtual int FromDataBuffer(char *buffer, int bSize) override;
+    };
+
 	class SOLID_API SkeletonResource : public Resource
 	{
 	public:
@@ -118,11 +168,8 @@ namespace Solid {
 			std::vector<float> Weights;
 			bool WeightInit = false;
 
-            Mat4f T_pos;
             Mat4f LocalTrans;
-            Mat4f GlobalTrans;
-            Mat4f offset; // inverse bind pose
-			Mat4f FinalTrans;
+            Mat4f offset;
 			int id = -1;
 			bool isAnimated = false;
 			Bone() = default;
@@ -169,56 +216,7 @@ namespace Solid {
 
         }
     };
-    struct SOLID_API Vertex
-    {
-        Vec3 Pos;
-        Vec3 Normal;
-        Vec2 TexCoords;
-    };
 
-    struct SOLID_API AnimData
-    {
-        uint boneIds[4] {0};
-        float  weights[4] {0.0f};
-    };
-
-
-    class SOLID_API MeshResource : public Resource
-    {
-    public:
-
-
-        class SubMesh
-        {
-        public:
-
-            std::vector<Vertex> vertices;
-            std::vector<uint> indices;
-        };
-
-        bool hadAnim = false;
-        SkeletonResource::Bone* root;
-        std::vector<AnimData> animData;
-
-        std::vector<SubMesh> Meshes;
-
-
-        bool isInit = false;
-
-        MeshResource()
-        {
-            type = EResourceType::Mesh;
-        }
-
-        ~MeshResource()
-        {
-
-        }
-
-        virtual void ToDataBuffer(std::vector<char> &buffer) override;
-
-        virtual int FromDataBuffer(char *buffer, int bSize) override;
-    };
 
     class SOLID_API ShaderResource : public Resource
     {

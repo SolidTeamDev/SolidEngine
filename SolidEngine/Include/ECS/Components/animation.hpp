@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Resources/ressources.hpp"
-#include "Resources/graphicalResource.hpp"
 #include "ECS/types.hpp"
 #include "Build/solidAPI.hpp"
 #include "EngineGenerated/animation.sld.hpp"
@@ -23,7 +22,7 @@ namespace Solid SLDNamespace()
         void UpdateAnim(float dt);
         void UpdateBone(float currTime, SkeletonResource::Bone* bone = nullptr);
         const AnimResource * GetAnim();
-
+        const std::vector<Mat4f> GetFinalTrans();
 
 
     private:
@@ -31,6 +30,7 @@ namespace Solid SLDNamespace()
         AnimResource* anim = nullptr;
         float CurrentTime;
         Mat4f InverseRootMat = Mat4f::Identity;
+        std::vector<Mat4f> FinalsTrans;
 
     };
 }

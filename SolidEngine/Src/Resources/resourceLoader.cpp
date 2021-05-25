@@ -672,17 +672,16 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 							            _aiBone->mOffsetMatrix.d1, _aiBone->mOffsetMatrix.d2, _aiBone->mOffsetMatrix.d3, _aiBone->mOffsetMatrix.d4);
 					_bone->offset = offset.GetTransposed();
 					_bone->WeightInit = true;
-					_bone->FinalTrans =  _bone->LocalTrans * offset;
 					///WARN : trasfo matrix of aiBone and ai node *=-1 ?
 					for (int j = 0; j < _aiBone->mNumWeights; ++j)
 					{
 						_bone->Weights.push_back(_aiBone->mWeights[j].mWeight);
-                        for (uint i = 0 ; i < 4 ; i++)
+                        for (uint k = 0 ; k < 4 ; k++)
                         {
-                            if (Mesh->animData[_aiBone->mWeights[j].mVertexId].weights[i] == 0.0)
+                            if (Mesh->animData[_aiBone->mWeights[j].mVertexId].weights[k] == 0.0)
                             {
-                                Mesh->animData[_aiBone->mWeights[j].mVertexId].weights[i] = _aiBone->mWeights[j].mWeight;
-                                Mesh->animData[_aiBone->mWeights[j].mVertexId].boneIds[i] = _aiBone->mWeights[j].mVertexId;
+                                Mesh->animData[_aiBone->mWeights[j].mVertexId].weights[k] = _aiBone->mWeights[j].mWeight;
+                                Mesh->animData[_aiBone->mWeights[j].mVertexId].boneIds[k] = _aiBone->mWeights[j].mVertexId;
                                 break;
                             }
                         }
@@ -730,7 +729,6 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
             anim->Root = new SkeletonResource::Bone(Skeleton->rootBone);
             anim->numOfBones = Skeleton->numOfBone;
 
-            Mesh->root = anim->Root;
         }
 		fbx->anims.push_back(anim);
 		//anim->Channels.resize(scene->mAnimations[i]->mNumChannels);

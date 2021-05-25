@@ -25,7 +25,13 @@ namespace Solid
 
 			    auto& transform = ecsManager.GetComponent<Transform>(child->GetEntity());
 			    transform.SetParentMatrix(trans);
-			    mesh->DrawMesh(meshRenderer.GetMaterials(), transform, _camera);
+			    if(ecsManager.GotComponent<Animation>(child->GetEntity()))
+                {
+			        auto& anim = ecsManager.GetComponent<Animation>(child->GetEntity());
+                    mesh->DrawMesh(meshRenderer.GetMaterials(), transform, _camera, &anim);
+                }
+                else
+			        mesh->DrawMesh(meshRenderer.GetMaterials(), transform, _camera);
 			    update(child,transform.GetMatrix()*trans );
 	    	}
 	    };
