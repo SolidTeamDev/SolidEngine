@@ -9,6 +9,10 @@ namespace Solid
         Physics& physics = Engine::GetInstance()->physics;
         physicMaterial = physics.CreateMaterial(staticFriction,dynamicFriction,restitution);
         capsuleCollider = physics.CreateShape(gameObject,physx::PxCapsuleGeometry(radius,height),physicMaterial);
+        SetCenter(center);
+        SetHeight(height);
+        SetRadius(radius);
+        SetTrigger(isTrigger);
         SetCapsuleDirection(direction);
     }
 

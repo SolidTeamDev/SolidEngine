@@ -9,6 +9,9 @@ namespace Solid
         Physics& physics = Engine::GetInstance()->physics;
         physicMaterial = physics.CreateMaterial(staticFriction,dynamicFriction,restitution);
         boxCollider = physics.CreateShape(gameObject,physx::PxBoxGeometry(size.x,size.y,size.z),physicMaterial);
+        SetCenter(center);
+        SetSize(size);
+        SetTrigger(isTrigger);
     }
 
     void BoxCollider::Release()
