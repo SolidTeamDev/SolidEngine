@@ -11,7 +11,7 @@ namespace Solid
     /**
      * @enum ImEnumDetectionType
      * @brief Different type of detection.
-     */ 
+     */
 
     enum class ImEnumDetectionType
     {
@@ -21,15 +21,12 @@ namespace Solid
     };
 
     /**
-     * @brief Input manager for easyer use of input
-     * 
-     * @tparam T is the type of id key
+     * @brief Input manager
+     *
      */
-    template <typename T = int>
     class InputManager
     {
     private:
-
         enum class InputType
         {
             KEY,
@@ -46,37 +43,27 @@ namespace Solid
             bool isPressed;
             bool isReleased;
         };
-        GLFWwindow* window;
-        std::unordered_map<T,Input> inputList;
-
+        GLFWwindow* _window;
+        std::unordered_multimap<std::string,Input> _inputList;
 
         static void joystickCallBack(int jid, int event)
         {
             if(event == GLFW_CONNECTED)
-            {
-                /*if(glfwJoystickIsGamepad(jid))
-                    _isJoystickXbox.insert({jid,true});
-                else
-                    _isJoystickXbox.insert({jid,false});*/
-                Log::Send("Controller " + std::to_string(jid) + " connected",Log::ELogSeverity::INFO);
-            }
+                std::cout << "Controller " << jid << " connected" << std::endl;
             else if(event == GLFW_DISCONNECTED)
-            {
-                //_isJoystickXbox.erase(jid);
-                Log::Send("Controller " + std::to_string(jid) + " disconnected",Log::ELogSeverity::INFO);
-            }
+                std::cout << "Controller " << jid << " disconnected" << std::endl;
         }
 
         bool getInputPressed(const Input& input)
         {
             if(input.inputType == InputType::KEY)
             {
-                if(glfwGetKey(window,input.key) == GLFW_PRESS)
+                if(glfwGetKey(_window,input.key) == GLFW_PRESS)
                     return true;
             }
             else if(input.inputType == InputType::MOUSE)
             {
-                if(glfwGetMouseButton(window,input.key) == GLFW_PRESS)
+                if(glfwGetMouseButton(_window,input.key) == GLFW_PRESS)
                     return true;
             }
             else
@@ -86,81 +73,73 @@ namespace Solid
 
                 if(buttons == nullptr)
                     return false;
-                
+
                 if(buttons[input.key] == GLFW_PRESS)
                     return true;
-                
+
             }
 
-            return false;   
+            return false;
         }
     public:
         /**
-         * @brief Construct input manager without window set
-         */
-        InputManager()
-        {
-            window = nullptr;
-        }
-
-        /**
          * @brief Construct a new Input Manager object
-         * 
-         * @param _window The pointer of the GLFW _window
+         *
+         * @param window The pointer of the GLFW window
          */
-        InputManager(GLFWwindow* _window)
+        InputManager(GLFWwindow* window)
         {
-            window = _window;
+            _window = window;
 
             glfwSetJoystickCallback(joystickCallBack);
         }
 
-        ~InputManager() = default;
+        ~InputManager(){}
 
         /**
          * @brief Add keyboard input to list
-         * 
+         *
          * @param id id of the input
          * @param key GLFW_KEY input
          * @param detectionType Type of input
          */
-        void AddKeyInput(T id, int key, ImEnumDetectionType detectionType)
+        void AddKeyInput(std::string id, int key, ImEnumDetectionType detectionType)
         {
-            inputList.insert({id,{detectionType,InputType::KEY,key,-1,false,true}});
+            _inputList.insert({id,{detectionType,InputType::KEY,key,-1,false,true}});
         }
 
         /**
          * @brief Add mouse input to list
-         * 
+         *
          * @param id id of the input
          * @param key GLFW_MOUSE input
          * @param detectionType Type of input
          */
-        void AddMouseInput(T id, int key, ImEnumDetectionType detectionType)
+        void AddMouseInput(std::string id, int key, ImEnumDetectionType detectionType)
         {
-            inputList.insert({id,{detectionType,InputType::MOUSE,key,-1,false,true}});
+            _inputList.insert({id,{detectionType,InputType::MOUSE,key,-1,false,true}});
         }
 
         /**
          * @brief Add controller input to list (only button input)
-         * 
+         *
          * @param id id of the input
          * @param glfwJoystick Number of the joystick
          * @param key GLFW_MOUSE input
          * @param detectionType Type of input
          */
-        void AddControllerInput(T id, int glfwJoystick, int key, ImEnumDetectionType detectionType)
+        void AddControllerInput(std::string id, int glfwJoystick, int key, ImEnumDetectionType detectionType)
         {
-            inputList.insert({id,{detectionType,InputType::CONTROLLER,key,glfwJoystick,false,true}});
+            _inputList.insert({id,{detectionType,InputType::CONTROLLER,key,glfwJoystick,false,true}});
         }
-        
+
         /**
          * @brief Update every input added. Update each frame
-         * 
+         *
          */
         void Update()
         {
-            for (auto i = inputList.begin(); i != inputList.end(); i++)
+            for (auto i = _inputList.begin(); i != _inputList.end(); i++)
             {
                 Input& input = i->second;
 
@@ -171,7 +150,7 @@ namespace Solid
 
                 if(!input.isReleased && inputPressed)
                     continue;
-                
+
                 if(input.detectionType == ImEnumDetectionType::SWITCH)
                 {
                     if(inputPressed)
@@ -186,7 +165,6 @@ namespace Solid
                 }
                 else
                 {
-
                     if(inputPressed)
                     {
                         input.isPressed = true;
@@ -199,69 +177,92 @@ namespace Solid
                     }
                 }
             }
-            
+
         }
 
         /**
          * @brief Return if the input is pressed
-         * 
+         *
          * @param id the id of input
          * @return true if the input id is pressed, false instead
          */
-        bool IsPressed(T id)
+        bool IsPressed(std::string id)
         {
-            Input& input = inputList.at(id);
-            bool isPressed = input.isPressed;
+            auto found = _inputList.find(id);
+            for(auto i = found; i != _inputList.end(); ++i)
+            {
+                if(i->first != id)
+                    break;
 
-            return isPressed;
+                if(i->second.isPressed)
+                    return true;
+            }
+
+            return false;
         }
 
         /**
          * @brief Return if the input is pressed
-         * 
+         *
          * @param id the id of input
          * @return true if the input id is released, flase instead
          */
-        bool IsReleased(T id)
+        bool IsReleased(std::string id)
         {
-            return inputList.at(id).isReleased;
+            auto found = _inputList.find(id);
+            for(auto i = found; i != _inputList.end(); ++i)
+            {
+                if(i->first != id)
+                    break;
+
+                if(i->second.isReleased)
+                    return true;
+            }
+
+            return false;
         }
 
         /**
          * @brief Set the cursor pos x in _posx and pos y in _posy
-         * 
+         *
          * @param _posx set the x pos value of cursor
          * @param _posy set the y pos value of cursor
-         */ 
+         */
         void GetCursorPos(double& _posx, double& _posy)
         {
-            glfwGetCursorPos(window,&_posx,&_posy);
+            glfwGetCursorPos(_window,&_posx,&_posy);
         }
-        
-        #if 0 // 0 = Vector2 not included, 1 = Vector2 included
+
+        /**
+         * @brief Set the cursor pos in window
+         * @param _posx x position
+         * @param _posy y position
+         */
+        void SetCursorPos(double _posx, double _posy)
+        {
+            glfwSetCursorPos(_window,_posx,_posy);
+        }
+
+#if 0 // 0 = Vector2 not included, 1 = Vector2 included
         /**
          * @brief Get the cursor pos and return it into a Vector2
-         * 
+         *
          * @return Vector2 x value is the pos x and y value is the pos y of the cursor
          */
         Vector2 getCursorPos()
         {
             Vector2 pos[2];
 
-            glfwGetCursorPos(window,&pos.x,&pos.y);
+            glfwGetCursorPos(_window,&pos.x,&pos.y);
 
             return pos;
         }
-        #endif
+#endif
 
-        void SetCursorPos(double _posx, double _posy)
-        {
-            glfwSetCursorPos(window,_posx,_posy);
-        }
         /**
          * @brief Set the specified axis value of the specified joystick id in _pos
-         * 
-         * @param _jid Joystick id 
+         *
+         * @param _jid Joystick id
          * @param _axeId The joystick axis id
          * @param _pos store the result
          */
@@ -272,7 +273,7 @@ namespace Solid
 
             if(axes == nullptr || _axeId >= count)
                 return;
-            
+
             _pos = axes[_axeId];
             if(_pos < 0.005 && _pos > -0.005)
                 _pos = 0;
@@ -280,7 +281,7 @@ namespace Solid
 
         /**
          * @brief Get the specified axis value of the specified joystick id
-         * 
+         *
          * @param _jid Controller id
          * @param _axeId The joystick axis id
          * @return Value of the joystick axis
@@ -292,17 +293,17 @@ namespace Solid
 
             if(axes == nullptr || _axeId >= count)
                 return 0;
-            
+
             float pos = axes[_axeId];
             if(pos < 0.005 && pos > -0.005)
                 pos = 0;
-            
+
             return pos;
         }
-        
+
         /**
          * @brief Set the value of the hat id and joystick id in _value
-         * 
+         *
          * @param _jid Id of the joystick
          * @param _hatId Id of the hat
          * @param _value Store the value of the hat
@@ -314,13 +315,13 @@ namespace Solid
 
             if(hats == nullptr || _hatId >= count)
                 return;
-            
+
             _value = hats[_hatId];
         }
 
         /**
          * @brief Get the value of the hat id and joystick id
-         * 
+         *
          * @param _jid Id of the joystick
          * @param _hatId Id of the hat
          * @return the value of the hat
@@ -332,18 +333,21 @@ namespace Solid
 
             if(hats == nullptr || _hatId >= count)
                 return 0;
-            
+
             return hats[_hatId];
         }
 
-        void ShowCursor(GLFWwindow* win, bool bShowCursor)
+        /**
+         * @brief Show or disable cursor
+         * @param _showCursor show/disable
+         */
+        void ShowCursor(bool _showCursor)
         {
-            if(!bShowCursor)
-                glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            if(_showCursor)
+                glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
             else
-                glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+                glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         }
-
     };
 
 } //!namespace

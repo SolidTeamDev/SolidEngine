@@ -3,28 +3,11 @@
 
 namespace Solid
 {
-
-    namespace EInputList
-    {
-        enum : int
-        {
-            FORWARD,
-            LEFT,
-            BACK,
-            RIGHT,
-            UP,
-            DOWN,
-            Mouse1,
-            UpCam
-        };
-
-    } // !namespace
-
     /**
      * @brief Add every editor input list
      * @param _inputManager
      */
     //class InputManager;
-    void InitEditorInputList(InputManager<int>* _inputManager);
+    void InitEditorInputList(InputManager* _inputManager);
 
 } // !namespace

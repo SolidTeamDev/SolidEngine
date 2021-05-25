@@ -155,13 +155,13 @@ namespace Solid
 
     bool SceneInterface::MouseInSceneInterface(const Vec2d& mousePos)
     {
-        if(Editor::editorInputManager->IsPressed(EInputList::Mouse1)
+        if(Editor::editorInputManager->IsPressed("MOUSE2")
             && mousePos.x >= sceneFramebuffer.pos.x
             && mousePos.x < sceneFramebuffer.pos.x + sceneFramebuffer.size.x
             && mousePos.y >= sceneFramebuffer.pos.y
             && mousePos.y < sceneFramebuffer.pos.y + sceneFramebuffer.size.y)
         {
-            Editor::editorInputManager->ShowCursor(engine->window->GetHandle(), false);
+            Editor::editorInputManager->ShowCursor(false);
 
             Editor::editorInputManager->SetCursorPos(engine->window->GetWindowSize().x*0.5,
                                                      engine->window->GetWindowSize().y*0.5);
@@ -170,7 +170,7 @@ namespace Solid
         }
         else
         {
-            Editor::editorInputManager->ShowCursor(engine->window->GetHandle(), true);
+            Editor::editorInputManager->ShowCursor(true);
             sceneCam.MouseInCenterScreen = false;
             return false;
 
@@ -188,19 +188,19 @@ namespace Solid
         //movement cam
         float updateCamSpeed = (float) (camSpeed * Time::DeltaTime());
 
-        if (Editor::editorInputManager->IsPressed(EInputList::FORWARD))
+        if (Editor::editorInputManager->IsPressed("W"))
             sceneCam.position += sceneCam.Front * updateCamSpeed;
-        if (Editor::editorInputManager->IsPressed(EInputList::BACK))
+        if (Editor::editorInputManager->IsPressed("S"))
             sceneCam.position -= sceneCam.Front * updateCamSpeed;
 
-        if (Editor::editorInputManager->IsPressed(EInputList::LEFT))
+        if (Editor::editorInputManager->IsPressed("A"))
             sceneCam.position -= sceneCam.Right * updateCamSpeed;
-        if (Editor::editorInputManager->IsPressed(EInputList::RIGHT))
+        if (Editor::editorInputManager->IsPressed("D"))
             sceneCam.position += sceneCam.Right * updateCamSpeed;
 
-        if (Editor::editorInputManager->IsPressed(EInputList::UP))
+        if (Editor::editorInputManager->IsPressed("SPACE"))
             sceneCam.position += Vec3::Up * updateCamSpeed;
-        if (Editor::editorInputManager->IsPressed(EInputList::DOWN))
+        if (Editor::editorInputManager->IsPressed("ALT"))
             sceneCam.position -= Vec3::Up * updateCamSpeed;
 
         //rotation camera
