@@ -73,6 +73,11 @@ namespace Solid
             EditCamera(engine->ecsManager.GetComponent<Camera>(gameObject->GetEntity()));
         }
 
+	    if(engine->ecsManager.GotComponent<Particles::ParticleEffect>(gameObject->GetEntity()))
+	    {
+		    EditParticleEffect(engine->ecsManager.GetComponent<Particles::ParticleEffect>(gameObject->GetEntity()));
+	    }
+
         if(engine->ecsManager.GotComponent<ScriptList>(gameObject->GetEntity()))
         {
 	        ScriptList& sl = engine->ecsManager.GetComponent<ScriptList>(gameObject->GetEntity());
@@ -167,6 +172,14 @@ namespace Solid
                     UI::CloseCurrentPopup();
                 }
             }
+	        if(!engine->ecsManager.GotComponent<Particles::ParticleEffect>(gameObject->GetEntity()))
+	        {
+		        if(UI::Button("ParticleEffect"))
+		        {
+			        engine->ecsManager.AddComponent<Particles::ParticleEffect>(gameObject, Particles::ParticleEffect());
+			        UI::CloseCurrentPopup();
+		        }
+	        }
 	        if(!engine->ecsManager.GotComponent<ScriptList>(gameObject->GetEntity()))
 	        {
 	        	const rfk::Namespace* n = GameCompiler::GetInstance()->GetNamespace("Solid");
@@ -292,6 +305,14 @@ namespace Solid
                     UI::CloseCurrentPopup();
                 }
             }
+		    if(engine->ecsManager.GotComponent<Particles::ParticleEffect>(gameObject->GetEntity()))
+		    {
+			    if(UI::Button("ParticleEffect"))
+			    {
+				    engine->ecsManager.RemoveComponent<Particles::ParticleEffect>(gameObject);
+				    UI::CloseCurrentPopup();
+			    }
+		    }
 		    if(engine->ecsManager.GotComponent<ScriptList>(gameObject->GetEntity()))
 		    {
 		    	ScriptList& sl = engine->ecsManager.GetComponent<ScriptList>(gameObject->GetEntity());
@@ -744,7 +765,13 @@ namespace Solid
         UI::Separator();
     }
 
-    void InspectorInterface::CreateScriptWindow()
+	void InspectorInterface::EditParticleEffect(Particles::ParticleEffect)
+	{
+		UI::Text("ParticleEffect");
+		UI::Separator();
+	}
+
+	void InspectorInterface::CreateScriptWindow()
     {
         UI::SetNextWindowBgAlpha(0.9);
         UI::SetNextWindowSize(ImVec2(325, 100));

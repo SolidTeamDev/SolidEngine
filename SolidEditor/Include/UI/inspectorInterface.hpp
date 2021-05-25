@@ -9,6 +9,7 @@
 #include "ECS/Components/sphereCollider.hpp"
 #include "ECS/Components/capsuleCollider.hpp"
 #include "ECS/Components/light.hpp"
+#include "ECS/Components/particleEffect.hpp"
 
 #include <TextEditor.h>
 
@@ -51,6 +52,7 @@ namespace Solid
         void EditAudioSource(AudioSource& _audioSource);
         void EditLight(Light& _light);
         void EditCamera(Camera& _camera);
+		void EditParticleEffect(Particles::ParticleEffect);
 
         void EditComp(Components* _comp);
 
