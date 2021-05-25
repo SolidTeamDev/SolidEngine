@@ -605,7 +605,7 @@ namespace Solid
                         }
 
                         // Choose Shader
-                        const char* shaderName = mat->GetShader()->name.c_str();
+                        const char* shaderName = mat->GetShader() == nullptr ? "DEFAULT SHADER" : mat->GetShader()->name.c_str();
                         bool combo =UI::BeginCombo(std::string("Shader##"+matId).c_str(),shaderName);
 	                    if(UI::BeginDragDropTarget())
 	                    {

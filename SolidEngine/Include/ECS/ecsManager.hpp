@@ -58,6 +58,7 @@ namespace Solid
 		    Entity temp = entityManager->CreateEntity();
 		    GameObject* obj = sceneGraphManager->GetNodeFromEntity(_parent)->AddToCurrent(temp);
 		    obj->name = _name;
+		    obj->transform = AddComponent<Transform>(obj,Transform());
 		    return obj;
 	    }
 

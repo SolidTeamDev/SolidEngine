@@ -50,6 +50,7 @@ namespace Solid
 	    	delete instance;
 	    };
 	    friend class EngineCleanerInterface;
+	    std::vector<std::function<void(Resource*)>> LoadedSceneCallbacks;
     public:
     	//Engine** test = &instance;
         Window* window;
@@ -87,7 +88,7 @@ namespace Solid
          */
         bool IsEngineContextInitialized() const;
 
-	    void LoadScene(const fs::path& p);
+	    void LoadScene(const char *name);
 
 	    void SaveScene(const fs::path& p);
 
@@ -99,6 +100,8 @@ namespace Solid
 
 
 	    void ForceUpdate();
+
+	    void AddLoadedSceneCallback(const std::function<void(Resource*)>& _func);
 
     };
 

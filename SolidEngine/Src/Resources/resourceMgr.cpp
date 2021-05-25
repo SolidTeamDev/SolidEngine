@@ -230,7 +230,7 @@ MaterialResource *ResourceManager::CreateMaterial(const char *name)
 {
 	MaterialResource* mat = new MaterialResource();
 	mat->name = name;
-	mat->path.emplace_back("\\Assets\\");
+	mat->path.emplace_back("Assets\\");
 
 	AddResource(mat);
 	ResourcesLoader loader;
@@ -264,7 +264,7 @@ void ResourceManager::CreatePrefab(GameObject* _gameObject)
 {
 	PrefabResource* prefab = new PrefabResource();
 	prefab->name = _gameObject->name;
-	prefab->path.emplace_back("\\Assets\\");
+	prefab->path.emplace_back("Assets\\");
 	prefab->UpdatePrefab(_gameObject);
 	AddResource(prefab);
 }
@@ -357,6 +357,57 @@ bool ResourceManager::IsResourceExist(Resource *r)
 		}
 		default:
 			ThrowError("Type Not Stored", ESolidErrorCode::S_INIT_ERROR);
+			break;
+	}
+}
+
+SceneResource * ResourceManager::GetSceneByName(const char *name)
+{
+	auto list = SceneList.List;
+	auto it = list.find(name);
+	if(it == list.end())
+		return nullptr;
+	return (SceneResource*)it->second;
+	return nullptr;
+}
+
+std::unordered_map<std::string, Resource *> *ResourceManager::GetResourcesVecByType(EResourceType _type)
+{
+	switch (_type)
+	{
+		case EResourceType::Mesh:
+			return &MeshList.List;
+			break;
+		case EResourceType::Shader:
+			return &ShaderList.List;
+			break;
+		case EResourceType::Material:
+			return &MaterialList.List;
+			break;
+		case EResourceType::Compute:
+			return &ComputeList.List;
+			break;
+		case EResourceType::Image:
+			return &ImageList.List;
+			break;
+		case EResourceType::Anim:
+			return &AnimList.List;
+			break;
+		case EResourceType::Audio:
+			return &AudioList.List;
+			break;
+		case EResourceType::Skeleton:
+			return &SkeletonList.List;
+			break;
+		case EResourceType::Scene:
+			return &SceneList.List;
+			break;
+		case EResourceType::Prefab:
+			return &PrefabList.List;
+			break;
+		default:
+			ThrowError("Type Not Stored", ESolidErrorCode::S_INIT_ERROR);
+			return nullptr;
 			break;
 	}
 }

@@ -25,8 +25,10 @@ Solid::GameObject::GameObject(Solid::GameObject *_parent, Solid::Entity _entity)
 
 Solid::GameObject::~GameObject()
 {
+
 	for (GameObject* child : childs)
 	{
+		Engine::GetInstance()->ecsManager.DestroyEntity(child->entity,FromSceneGraphMgr{});
 		delete child;
 	}
 }
@@ -62,7 +64,6 @@ void Solid::GameObject::RemoveCurrent()
 			if (parent->childs.at(i) == this)
 			{
 				parent->childs.erase(parent->childs.begin() + i);
-				Engine::GetInstance()->ecsManager.DestroyEntity(entity,FromSceneGraphMgr{});
 				delete this;
 				break;
 			}

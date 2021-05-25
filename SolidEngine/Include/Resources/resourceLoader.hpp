@@ -37,9 +37,10 @@ namespace Solid
 	    Resource * LoadSolidAnim(const fs::path& Rpath);
 	    Resource * LoadSolidAudio(const fs::path& Rpath);
 	    Resource * LoadSolidPrefab(const fs::path& Rpath);
+	    Resource * LoadSolidScene(const fs::path& Rpath);
 	    void LoadFBX(const fs::path& Rpath, FBXWrapper* fbx);
-	    void SetPath(std::deque<std::string> &resPath, const fs::path& Rpath);
     public:
+	    void SetPath(std::deque<std::string> &resPath, const fs::path& Rpath);
 
 
 

@@ -99,6 +99,7 @@ namespace Solid
 	    AudioResource* GetRawAudioByName(const char* name);
 	    MaterialResource* CreateMaterial(const char* name);
 	    PrefabResource* GetPrefabByName(const char* name);
+	    SceneResource * GetSceneByName(const char* name);
 	    void CreatePrefab(GameObject* _gameObject);
 
         template<typename T>
@@ -134,47 +135,8 @@ namespace Solid
 
             return nullptr;
         }
-	    template<typename T>
-	    std::unordered_map<std::string,Resource*> * GetResourcesVecByType(EResourceType _type)
-	    {
-		    switch (_type)
-		    {
-			    case EResourceType::Mesh:
-				    return &MeshList.List;
-				    break;
-			    case EResourceType::Shader:
-				    return &ShaderList.List;
-				    break;
-			    case EResourceType::Material:
-				    return &MaterialList.List;
-				    break;
-			    case EResourceType::Compute:
-				    return &ComputeList.List;
-				    break;
-			    case EResourceType::Image:
-				    return &ImageList.List;
-				    break;
-			    case EResourceType::Anim:
-				    return &AnimList.List;
-				    break;
-		        case EResourceType::Audio:
-                    return &AudioList.List;
-                    break;
-			    case EResourceType::Skeleton:
-				    return &SkeletonList.List;
-				    break;
-			    case EResourceType::Scene:
-				    return &SceneList.List;
-				    break;
-			    case EResourceType::Prefab:
-				    return &PrefabList.List;
-				    break;
-			    default:
-				    ThrowError("Type Not Stored", ESolidErrorCode::S_INIT_ERROR);
-				    return nullptr;
-				    break;
-		    }
-	    };
+
+	    std::unordered_map<std::string,Resource*> * GetResourcesVecByType(EResourceType _type);;
 
     };
 }
