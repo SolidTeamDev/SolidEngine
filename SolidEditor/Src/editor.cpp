@@ -394,6 +394,7 @@ namespace Solid
 			for(auto& elt : rbSave)
 			{
 				*((RigidBody*)elt.TID) = elt.comp;
+                ((RigidBody*)elt.TID)->ResetVelocity();
 			}
 			for(auto& elt : boxSave)
 			{

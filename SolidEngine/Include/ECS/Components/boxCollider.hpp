@@ -18,7 +18,15 @@ namespace Solid SLDNamespace()
         SLDField()
         Vec3 size {1.f,1.f,1.f};
 
+        SLDField()
+        float staticFriction = 0.5f;
+        SLDField()
+        float dynamicFriction = 0.5f;
+        SLDField()
+        float restitution = 0.6f;
+
         physx::PxShape* boxCollider = nullptr;
+        physx::PxMaterial* physicMaterial = nullptr;
     public:
 
         BoxCollider() = default;
@@ -26,6 +34,15 @@ namespace Solid SLDNamespace()
 
         void Init() override;
         void Release() override;
+
+        Vec3 GetCenter();
+        void SetCenter(const Vec3& _center);
+
+        Vec3 GetSize();
+        void SetSize(const Vec3& _size);
+
+        bool IsTrigger();
+        void SetTrigger(bool _trigger);
 
         BoxCollider_GENERATED
     };
