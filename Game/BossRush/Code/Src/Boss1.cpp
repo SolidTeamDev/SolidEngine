@@ -2,16 +2,6 @@
 #include "Boss1.hpp"
 using namespace Solid;
 
-Boss1::Boss1()
-{
-	
-}
-
-Boss1::~Boss1()
-{
-	
-}
-
 void Boss1::Init()
 {
     Pv = 10.f;

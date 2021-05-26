@@ -1,4 +1,3 @@
-#include "ECS/types.hpp"
 #include "Build/solidAPI.hpp"
 #include "ECS/Components/script.hpp"
 #include "Core/Maths/solidMaths.hpp"
@@ -18,8 +17,8 @@ namespace Solid SLDNamespace()
         Vec3 target;
 
 	public:
-		Boss1();
-		~Boss1();
+		Boss1() = default;
+		~Boss1() override = default;
 
 		void Init()   override;
 		void Update() override;
