@@ -9,38 +9,41 @@
 
 namespace Solid
 {
+	struct file
+	{
+		std::string fileNames;
+		std::string ftype;
+		Resource* RPtr = nullptr;
+	};
+	struct filePathData
+	{
+
+
+		std::string folderName;
+		filePathData* parent = nullptr;
+		std::vector<file> fileNames;
+		std::unordered_map<std::string, filePathData> childPaths;
+	};
     class FilesInterface
     {
 	    bool        matNamePopup = false;
 	    std::string matNamestr;
 	    bool        folderPopup = false;
 	    std::string folderstr;
-	    struct file
-	    {
-	    	std::string fileNames;
-	    	std::string ftype;
-	    	Resource* RPtr = nullptr;
-	    };
-	    struct filePathData
-	    {
 
-
-	    	std::string folderName;
-	    	filePathData* parent = nullptr;
-	    	std::vector<file> fileNames;
-	    	std::unordered_map<std::string, filePathData> childPaths;
-	    }root;
+	    struct filePathData root;
 
 	    double counter =0.0f;
-	    filePathData* currentFolder ;
-
         std::unordered_map<std::string, ImageResource*> editorImage;
-        std::unordered_map<std::string, std::shared_ptr<GL::Texture>> editorTex;
-        
+
+	    std::unordered_map<std::string, std::shared_ptr<GL::Texture>> editorTex;
 	    imgui_addons::ImGuiFileBrowser fileBrowser;
+
 	    bool test = false;
     public:
-        FilesInterface();
+
+	    filePathData* currentFolder ;
+	    FilesInterface();
         ~FilesInterface() ;
 
         void Draw();

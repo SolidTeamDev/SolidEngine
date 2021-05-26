@@ -12,7 +12,7 @@
 #include "ECS/Components/scriptList.hpp"
 namespace Solid
 {
-    InputManager<int>* Editor::editorInputManager = nullptr;
+    InputManager* Editor::editorInputManager = nullptr;
 	bool Editor::play = false;
 	bool Editor::paused = false;
 	std::vector<CompDataSave> Editor::compsSave;
@@ -44,11 +44,8 @@ namespace Solid
 
         const Window* window = engine->window;
 
-        editorInputManager = new InputManager<int>(window->GetHandle());
+        editorInputManager = new InputManager(window->GetHandle());
         InitEditorInputList(editorInputManager);
-
-
-
 
     }
 
@@ -396,6 +393,7 @@ namespace Solid
 			for(auto& elt : rbSave)
 			{
 				*((RigidBody*)elt.TID) = elt.comp;
+                ((RigidBody*)elt.TID)->ResetVelocity();
 			}
 			for(auto& elt : boxSave)
 			{

@@ -49,6 +49,8 @@ namespace Solid
 			struct ShaderWrapper{uint id; bool error = false;};
             uint vert;
             uint frag;
+
+            int LastShader = 0;
 		public:
 		//public func
 
@@ -57,6 +59,10 @@ namespace Solid
 			Shader(EResourceType _type):IShader(_type){}
 			ShaderWrapper CreateShader(uint _type, int _sourceCount, std::vector<char*>& _sources);
 
+
+
+			void BindShader()override;
+			void UnbindShader() override;
 			void ReloadShader() override;
 
 			void SetFloat(const char *_name, float _value) override;

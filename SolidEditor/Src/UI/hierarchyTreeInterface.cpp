@@ -36,6 +36,16 @@ namespace Solid
 			    Engine::GetInstance()->ecsManager.Instantiate(r->name, nullptr);
 
 		    }
+		    else
+		    {
+			    drop=UI::AcceptDragDropPayload("Scene");
+			    if(drop != nullptr)
+			    {
+				    Resource* r = *((Resource**)drop->Data);
+				    Engine::GetInstance()->LoadScene(r->name.c_str());
+
+			    }
+		    }
 		    UI::EndDragDropTarget();
 	    }
         UI::End();
