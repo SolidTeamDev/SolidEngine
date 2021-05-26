@@ -26,27 +26,24 @@ namespace Solid
 
 			std::shared_ptr<ITexture> ParticleTex = nullptr;
 
-			/*
-			 * std::shared_ptr<VelFromPosGen> velFromPosGen = nullptr;
-			 * std::shared_ptr<BasicColorGen> colGen = nullptr;
-			 * std::shared_ptr<SphereVelGen> sphereVelGen = nullptr;
-			 * std::shared_ptr<CirclePosGen> circlePosGen = nullptr;
-			 * std::shared_ptr<BasicTimeGen> timeGen = nullptr;
-			 * std::shared_ptr<BasicVelGen> velGen = nullptr;
-			 * std::shared_ptr<BoxPosGen> boxPosGen = nullptr;
-			 */
+			std::shared_ptr<VelFromPosGen> velFromPosGen = nullptr;
+			std::shared_ptr<BasicColorGen> colGen = nullptr;
+			std::shared_ptr<SphereVelGen> sphereVelGen = nullptr;
+			std::shared_ptr<CirclePosGen> circlePosGen = nullptr;
+			std::shared_ptr<BasicTimeGen> timeGen = nullptr;
+			std::shared_ptr<BasicVelGen> velGen = nullptr;
+			std::shared_ptr<BoxPosGen> boxPosGen = nullptr;
 
-			std::vector<std::shared_ptr<ParticleGenerator>> generators;
 
-			/*std::shared_ptr<AttractorUpdater> attractorUpdater = nullptr;
-			 *std::shared_ptr<VelColorUpdater> velColUpdater = nullptr;
-			 *std::shared_ptr<PosColorUpdater> posColUpdater = nullptr;
-			 *std::shared_ptr<BasicColorUpdater> colorUpdater = nullptr;
-			 *std::shared_ptr<EulerUpdater> eulerUpdater = nullptr;
-			 *std::shared_ptr<FloorUpdater> floorUpdater = nullptr;
-			 *std::shared_ptr<BasicTimeUpdater> timeUpdater = nullptr;
-			 */
-			std::vector<std::shared_ptr<ParticleUpdater>> updaters;
+
+			std::shared_ptr<AttractorUpdater> attractorUpdater = nullptr;
+			std::shared_ptr<VelColorUpdater> velColUpdater = nullptr;
+			std::shared_ptr<PosColorUpdater> posColUpdater = nullptr;
+			std::shared_ptr<BasicColorUpdater> colorUpdater = nullptr;
+			std::shared_ptr<EulerUpdater> eulerUpdater = nullptr;
+			std::shared_ptr<FloorUpdater> floorUpdater = nullptr;
+			std::shared_ptr<BasicTimeUpdater> timeUpdater = nullptr;
+
 
 			std::shared_ptr<GLParticleRenderer> renderer = nullptr;
 
