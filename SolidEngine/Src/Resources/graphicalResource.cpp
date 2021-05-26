@@ -230,7 +230,22 @@ GL::Shader::Shader(ShaderResource *_s) :IShader(EResourceType::Shader)
 	ShaderWrapper fShader = CreateShader(GL_FRAGMENT_SHADER, 1, tab);
 
 	if(vShader.error || fShader.error)
+	{
+		if(vShader.error)
+		{
+			GLchar infoLog[1024];
+			glGetShaderInfoLog(vShader.id, ARRAYSIZE(infoLog), nullptr, infoLog);
+			printf("SHADER error: %s\n", infoLog);
+		}
+		if(fShader.error)
+		{
+			GLchar infoLog[1024];
+			glGetShaderInfoLog(fShader.id, ARRAYSIZE(infoLog), nullptr, infoLog);
+			printf("SHADER link error: %s\n", infoLog);
+		}
 		return;
+	}
+
 
 	ProgID = glCreateProgram();
 	glAttachShader(ProgID, vShader.id);
@@ -357,15 +372,17 @@ void GL::Shader::SetLights(Camera& _camera) const
 {
     glUseProgram(ProgID);
 
-    std::vector<Light*> lights = Light::GetLightList();
+    std::vector<LightData> lights = Light::GetLightList();
     int i = 0;
     for(const auto& light : lights)
     {
         std::string id = std::to_string(i);
-        Vec3 pos = light->gameObject->transform->GetPosition();
+        Mat4<float> tf =light.light->gameObject->transform->GetMatrix() * light.light->gameObject->transform->GetParentMatrix();
+
+        Vec3 pos = Vec3(tf.elements[12],tf.elements[13],tf.elements[14]);
         glUniform3fv(glGetUniformLocation(ProgID,std::string("_lights[" + id + "].pos").c_str()),1,&pos.x);
-        glUniform3fv(glGetUniformLocation(ProgID,std::string("_lights[" + id + "].color").c_str()),1,&light->color.x);
-        glUniform1f(glGetUniformLocation(ProgID,std::string("_lights[" + id + "].intensity").c_str()),light->intensity);
+        glUniform3fv(glGetUniformLocation(ProgID,std::string("_lights[" + id + "].color").c_str()),1,&light.light->color.x);
+        glUniform1f(glGetUniformLocation(ProgID,std::string("_lights[" + id + "].intensity").c_str()),light.light->intensity);
 
         ++i;
     }
@@ -569,6 +586,18 @@ void GL::Shader::SetFragSource(const std::string& _src)
 void GL::Shader::SetVertSource(const std::string& _src)
 {
     source->VertexSource = _src;
+}
+
+void GL::Shader::UnbindShader()
+{
+	glUseProgram(LastShader);
+	LastShader = 0;
+}
+
+void GL::Shader::BindShader()
+{
+	glGetIntegerv(GL_CURRENT_PROGRAM, (GLint*)&LastShader);
+	glUseProgram(ProgID);
 }
 
 void GL::Texture::BindTexture(uint _texUnit)

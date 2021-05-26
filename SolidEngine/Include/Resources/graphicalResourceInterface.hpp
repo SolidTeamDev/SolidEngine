@@ -54,6 +54,8 @@ namespace Solid
 		~IShader() = default;
 
         virtual void ReloadShader() = 0;
+		virtual void BindShader() = 0;
+		virtual void UnbindShader() = 0;
 
         virtual void SetFloat(const char *_name, float _value) = 0;
 		virtual void SetInt(const char *_name, int _value) = 0;

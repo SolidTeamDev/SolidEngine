@@ -6,7 +6,7 @@
 
 namespace Solid SLDNamespace()
 {
-    class SOLID_API SLDClass() Script : public Components
+class SOLID_API SLDClass() Script : public Components
     {
 
 
@@ -16,11 +16,16 @@ namespace Solid SLDNamespace()
         Script(GameObject* _go) {gameObject = _go;}
         virtual ~Script() = default;
 
-        virtual void Update() = 0;
-        virtual void FixedUpdate() = 0;
-        virtual void LateUpdate() = 0;
+        virtual void Update() {};
+        virtual void FixedUpdate() {};
+        virtual void LateUpdate() {};
 
-        GameObject* GetGameObject(){return gameObject;}
+        virtual void OnTriggerEnter(GameObject* _other) {};
+        virtual void OnTriggerExit(GameObject* _other) {};
+        virtual void OnContactEnter(GameObject* _other) {};
+        virtual void OnContactExit(GameObject* _other) {};
+
+    GameObject* GetGameObject(){return gameObject;}
 
 		Script_GENERATED
     };

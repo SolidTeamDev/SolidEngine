@@ -8,30 +8,44 @@
 
 namespace Solid SLDNamespace()
 {
+	class Light;
+	struct LightData
+	{
+		void* id = nullptr;
+		Light* light;
+	};
+
     class SOLID_API SLDClass() Light : public Components
     {
     private:
-        static std::vector<Light*> lightList;
+        static std::vector<LightData> lightList;
+        void* id = nullptr;
     public:
 
-        enum ELightType
+        enum SLDEnum() ELightType
         {
             DIRECTIONAL,
             SPOT,
             POINT
         };
 
-        ELightType type = ELightType::DIRECTIONAL;
-        Vec3 color = {1,1,1};
-        float  intensity = 1;
 
-        Light() = default;
-        ~Light() override = default;
+        SLDField()
+        ELightType type = ELightType::DIRECTIONAL;
+	    SLDField()
+        Vec3 color = {1,1,1};
+	    SLDField()
+	    float  intensity = 1;
+
+        Light() ;
+        Light(const Light& _light);
+        Light& operator=(const Light& _light);
+        ~Light() override ;
 
         void Init() override;
         void Release() override;
 
-        static std::vector<Light*> GetLightList();
+        static std::vector<LightData> GetLightList();
 
         Light_GENERATED
     };

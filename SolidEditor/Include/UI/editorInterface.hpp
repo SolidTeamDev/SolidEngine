@@ -21,9 +21,14 @@ namespace Solid
         bool        p_open    = true;
         bool        perfOpen  = false;
         bool        demoOpen  = false;
-        bool        colorOpen = false;
-
-
+	    bool        colorOpen = false;
+	    bool        openScenePopup = false;
+	    bool        saveScenePopup = false;
+	    SceneResource* currentScenePtr = nullptr;
+	    SceneResource* choice = nullptr;
+	    std::string str ;
+		std::string currentOpenedScene = "Untitled";
+		fs::path    currentScenePath;
         Window*     window;
         Renderer*   renderer;
         ImGuiStyle& editorStyle;
@@ -102,5 +107,8 @@ namespace Solid
          * @brief Draws the additional informations overlay
          */
         void AddInfoOverlay();
+
+
+        void LoadSceneCall(Resource* scene);
     };
 }

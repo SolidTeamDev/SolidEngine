@@ -139,8 +139,12 @@ namespace Solid
 			if(defaultShaderInit)
 				return defaultShader;
 			ShaderResource* s=resourceMgr->GetRawShaderByName("DefaultShader");
-			defaultShader = std::make_shared<const GL::Shader>(s);
-			defaultShaderInit = true;
+			if(s != nullptr)
+			{
+				defaultShader = std::make_shared<const GL::Shader>(s);
+				defaultShaderInit = true;
+			}
+
 			return defaultShader;
 		}
 		ShaderMap GetShaders()

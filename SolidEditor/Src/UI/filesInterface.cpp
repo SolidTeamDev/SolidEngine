@@ -6,6 +6,7 @@
 #include "Core/engine.hpp"
 #include "imgui_stdlib.h"
 #include "GameCompiler/gameCompiler.hpp"
+#include "UI/winUI.hpp"
 namespace Solid
 {
     void FilesInterface::Draw()
@@ -27,7 +28,29 @@ namespace Solid
 
         	root.childPaths.clear();
         	root.fileNames.clear();
-	        for(auto& elt : data)
+        	std::function<void(fs::path, filePathData*)> init = [&](fs::path _path, filePathData* node)
+        	{
+        		for(auto& item : fs::directory_iterator(_path))
+        		{
+        			if(fs::is_directory(item))
+			        {
+				        std::string name = item.path().filename().string();
+				        std::transform(name.begin(), name.end(), name.begin(),
+				                       [](unsigned char c){ return std::tolower(c); });
+				        bool isShader = (name.find("shader") != std::string::npos || name.find("compute") != std::string::npos);
+				        if(isShader)
+					        continue;
+				        else
+				        {
+					        name = item.path().filename().string();
+					        filePathData* child = &node->childPaths.emplace(name, filePathData{.folderName=name, .parent=node}).first->second;
+					        init(item.path(), child);
+				        }
+			        }
+        		}
+        	};
+        	init(ResourcesLoader::SolidPath, &root);
+        	for(auto& elt : data)
 	        {
 		        std::string type = "NONE";
 		        switch (elt.RType)
@@ -137,63 +160,98 @@ namespace Solid
 	    {
 	    	if(UI::Button("Import Resource"))
 		    {
-	    		UI::OpenPopup("Importer");
+	    		//UI::OpenPopup("Importer");
+	    		const char* filter = "All Valid Types\0*.OBJ;*.FBX;*.SMESH;*.SANIM;*.PNG;*.BMP;*.SIMAGE;*.JPG;*.JPEG;*.VERT;*.SVERTFRAG;*.COMPUTE;*.SCOMPUTE;*.SMATERIAL;*.SOLIDSCENE;*.WAV;*.OGG;*.SAUDIO;*.SOLIDPREFAB\0Meshes\0*.OBJ;*.FBX;*.SMESH\0Anims\0*.FBX;*.SANIM\0Images\0*.PNG;*.BMP;*.SIMAGE;*.JPG;*.JPEG\0Shader\0*.VERT;*.SVERTFRAG\0Compute Shader\0*.COMPUTE;*.SCOMPUTE\0Material\0*.SMATERIAL\0Scene\0*.SOLIDSCENE\0Audio\0*.WAV;*.OGG;*.SAUDIO\0Prefab\0*.SOLIDPREFAB\0";
+			    HasChosen hc =WinOpenFileMultiSelect(filter);
+			    if(hc.b)
+			    {
+				    std::vector<fs::path> sorted;
+				    std::vector<fs::path> sortedPass2;
+			    	for(const fs::path& elt : hc.vstr)
+			    	{
+			    	    for(const fs::path& elt2 : hc.vstr)
+			    	    {
+			    	        if(elt == elt2)
+					            continue;
+			    	        if(elt.filename().string().find(elt2.filename().string()) != std::string::npos)
+				            {
+			    	        	sorted.push_back(elt2);
+				            }
+			    	    }
+			    	}
+			    	for(const fs::path& elt : hc.vstr)
+			    	{
+			    		bool alreadySorted = false;
+			    	    for(fs::path& elt2 : sorted)
+			    	    {
+			    	        if(elt.filename().string().find(elt2.filename().string()) != std::string::npos)
+				            {
+					            alreadySorted = true;
+				            }
+			    	    }
+			    	    if(!alreadySorted)
+			    	    	sorted.push_back(elt);
+			    	}
+
+			    	for(fs::path& elt :sorted)
+			    	{
+			    		fs::path path = elt;
+					    ResourcesLoader loader;
+					    loader.SetManager(&Engine::GetInstance()->resourceManager);
+					    std::string fn = elt.filename().string();
+					    std::transform(fn.begin(), fn.end(), fn.begin(),
+					                   [](unsigned char c){ return std::tolower(c); });
+					    if(fn.find("vert") != std::string::npos
+					       ||fn.find("frag") != std::string::npos
+					       ||fn.find("compute") != std::string::npos)
+					    {
+						    path =path.parent_path();
+						    fs::path copy = ResourcesLoader::SolidPath;
+						    copy.append(path.filename().string());
+						    if(!fs::exists(copy))
+							    fs::create_directory(copy);
+						    const auto opt = fs::copy_options::recursive | fs::copy_options::update_existing;
+						    fs::copy(path, copy, opt);
+						    ResourcePtrWrapper wrap{.r=nullptr};
+						    loader.LoadRessourceNoAdd(copy, wrap);
+						    if(!Engine::GetInstance()->resourceManager.IsResourceExist(wrap.r))
+						    {
+							    Engine::GetInstance()->resourceManager.AddResource(wrap.r);
+						    }
+						    else
+						    {
+							    fs::remove(copy);
+							    if(wrap.r != nullptr)
+								    delete wrap.r;
+						    }
+					    }
+					    else
+					    {
+						    fs::copy(elt, ResourcesLoader::SolidPath);
+						    fs::path p = ResourcesLoader::SolidPath;
+						    p.append(elt.filename().string());
+						    ResourcePtrWrapper wrap{.r=nullptr};
+						    loader.LoadRessourceNoAdd(p, wrap);
+						    if(!Engine::GetInstance()->resourceManager.IsResourceExist(wrap.r))
+						    {
+							    Engine::GetInstance()->resourceManager.AddResource(wrap.r);
+						    }
+						    else
+						    {
+							    fs::remove(p);
+							    if(wrap.r != nullptr)
+								    delete wrap.r;
+						    }
+					    }
+
+				    }
+			    }
+
+
+
 		    }
 
 
-	    	if(fileBrowser.showFileDialog("Importer", imgui_addons::ImGuiFileBrowser::DialogMode::OPEN,{0,0}, ".jpg,.png,.bmp,.obj,.fbx,.ogg,.wav,.jpeg,.simage,.smesh,.scompute,.svertfrag,.solidprefab,.saudio,.smaterial,.vert,.frag,.compute"))
-		    {
-	    		fs::path path = fileBrowser.selected_path;
-			    ResourcesLoader loader;
-			    loader.SetManager(&Engine::GetInstance()->resourceManager);
-			    std::string fn = fileBrowser.selected_fn;
-			    std::transform(fn.begin(), fn.end(), fn.begin(),
-			                   [](unsigned char c){ return std::tolower(c); });
-	    		if(fn.find("vert") != std::string::npos
-	    		||fn.find("frag") != std::string::npos
-	    		||fn.find("compute") != std::string::npos)
-			    {
-	    			path =path.parent_path();
-	    			fs::path copy = ResourcesLoader::SolidPath;
-	    			copy.append(path.filename().string());
-	    			if(!fs::exists(copy))
-	    				fs::create_directory(copy);
-				    const auto opt = fs::copy_options::recursive | fs::copy_options::update_existing;
-				    fs::copy(path, copy, opt);
-				    ResourcePtrWrapper wrap{.r=nullptr};
-				    loader.LoadRessourceNoAdd(copy, wrap);
-				    if(!Engine::GetInstance()->resourceManager.IsResourceExist(wrap.r))
-				    {
-					    Engine::GetInstance()->resourceManager.AddResource(wrap.r);
-				    }
-				    else
-				    {
-				    	fs::remove(copy);
-					    if(wrap.r != nullptr)
-						    delete wrap.r;
-				    }
-			    }
-	    		else
-			    {
-				    fs::copy(fileBrowser.selected_path, ResourcesLoader::SolidPath);
-				    fs::path p = ResourcesLoader::SolidPath;
-				    p.append(fileBrowser.selected_fn);
-				    ResourcePtrWrapper wrap{.r=nullptr};
-				    loader.LoadRessourceNoAdd(p, wrap);
-				    if(!Engine::GetInstance()->resourceManager.IsResourceExist(wrap.r))
-				    {
-					    Engine::GetInstance()->resourceManager.AddResource(wrap.r);
-				    }
-				    else
-				    {
-					    fs::remove(p);
-					    if(wrap.r != nullptr)
-						    delete wrap.r;
-				    }
-			    }
-
-
-		    }
 	    	UI::Separator();
 
 	        int imgSize = 32;
@@ -502,6 +560,23 @@ namespace Solid
 			UI::InputText("##Folder", &folderstr);
 			if(UI::Button("Create new Folder"))
 			{
+				fs::path p = ResourcesLoader::SolidPath;
+				std::deque<std::string> pathList;
+				if(currentFolder != &root)
+				{
+					filePathData* node = currentFolder;
+					while(node->parent != nullptr)
+					{
+						pathList.push_front(node->folderName);
+						node = node->parent;
+					}
+					for(auto& elt : pathList)
+					{
+						p.append(elt);
+					}
+				}
+				p.append(folderstr);
+				fs::create_directory(p);
 				currentFolder->childPaths.emplace(folderstr, filePathData{.folderName=folderstr, .parent=currentFolder});
 				UI::CloseCurrentPopup();
 			}
@@ -512,7 +587,7 @@ namespace Solid
 
 	FilesInterface::FilesInterface()
 	{
-		root.folderName = "\\Assets\\";
+		root.folderName = "Assets\\";
 		currentFolder =&root;
         fs::path EditorAssets = fs::current_path();
         EditorAssets.append("EditorAssets");

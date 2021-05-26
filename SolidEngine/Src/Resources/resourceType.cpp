@@ -313,6 +313,11 @@ int ShaderResource::FromDataBuffer(char *buffer, int bSize)
 	return ReadPos;
 }
 
+void ShaderResource::operator delete(void* _ptr)
+{
+	::operator delete(_ptr);
+}
+
 void MaterialResource::ToDataBuffer(std::vector<char> &buffer)
 {
 	std::string pString ;
@@ -562,7 +567,7 @@ MaterialResource::MaterialResource(const char *_name, bool _genfile)
 	defaultshader = Engine::GetInstance()->graphicsResourceMgr.GetDefaultShader();
 	name = _name;
 	shouldGenerateFileAtDestroy = _genfile;
-	path.push_front("\\Assets\\");
+	//path.push_front("Assets\\");
 }
 
 const std::shared_ptr<IShader> MaterialResource::GetShader() const
@@ -1153,5 +1158,25 @@ int PrefabResource::FromDataBuffer(char *buffer, int bSize)
 	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
 	PrefabBinary.resize(size);
 	ResourcesLoader::ReadFromBuffer(buffer, PrefabBinary.data(), size*sizeof(char), ReadPos);
+	return ReadPos;
+}
+
+void SceneResource::ToDataBuffer(std::vector<char> &buffer)
+{
+	Resource::ToDataBuffer(buffer);
+	std::uint32_t size = this->rawScene.size();
+
+	ResourcesLoader::Append(buffer, &(size), sizeof(size));
+	ResourcesLoader::Append(buffer, this->rawScene.data(), size *sizeof(char));
+}
+
+int SceneResource::FromDataBuffer(char *buffer, int bSize)
+{
+	std::uint64_t ReadPos =  Resource::FromDataBuffer(buffer, bSize);
+	std::uint32_t size =0;
+	//asset type
+	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
+	rawScene.resize(size);
+	ResourcesLoader::ReadFromBuffer(buffer, rawScene.data(), size*sizeof(char), ReadPos);
 	return ReadPos;
 }
