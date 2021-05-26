@@ -17,6 +17,7 @@ namespace Solid
 
     void AudioSource::Init()
     {
+	    alSourcei(sourceID,AL_SOURCE_SPATIALIZE_SOFT, AL_AUTO_SOFT);
         alGenSources(1, &sourceID);
         alSourcef(sourceID, AL_PITCH, pitch);
         alSourcef(sourceID, AL_GAIN, volume);

@@ -132,6 +132,7 @@ namespace Solid
             engineContextInit = true;
 	    graphicsResourceMgr.Init(&resourceManager, renderer);
 	    particleEffectSystem->InitShaderForGL();
+	    PlayBuffer =renderer->CreateFramebuffer(window->GetWindowSize());
 
     }
 
@@ -791,6 +792,26 @@ namespace Solid
 	void Engine::AddLoadedSceneCallback(const std::function<void(Resource*)>& _func)
 	{
 		LoadedSceneCallbacks.push_back(_func);
+	}
+
+	void Engine::SetActiveCamera(Camera *_newCam)
+	{
+		activeCamera = _newCam;
+	}
+
+	void Engine::RenderToBuffer()
+	{
+		PlayBuffer.size = window->GetWindowSize();
+		renderer->UpdateFramebuffer(PlayBuffer);
+    	if(activeCamera == nullptr)
+    		return;
+		activeCamera->UpdateCamera(PlayBuffer.size);
+		renderer->BeginFramebuffer(PlayBuffer);
+		renderer->ClearColor({0.f,0.f,0.f,1});
+		renderer->Clear(PlayBuffer.size);
+		rendererSystem->Update(renderer, *activeCamera);
+		renderer->EndFramebuffer();
+		audioSystem->Update(*activeCamera);
 	}
 
 

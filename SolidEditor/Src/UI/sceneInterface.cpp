@@ -25,7 +25,7 @@ namespace Solid
         sceneFramebuffer = engine->renderer->CreateFramebuffer(engine->window->GetWindowSize());
         sceneCam.MouseSensitivity = 35.f;
 
-
+		engine->SetActiveCamera(&sceneCam);
     }
 
     void SceneInterface::Draw()
