@@ -88,6 +88,8 @@ namespace Solid
     {
         anim = _anim;
         CurrentTime = 0;
+        AnimTime = anim->numTicks/anim->ticksPerSeconds;
+        std::cout << AnimTime << std::endl;
         InverseRootMat = (anim->Root->LocalTrans ) ;
         FinalsTrans.clear();
         FinalsTrans.reserve(anim->numOfBones);
@@ -103,6 +105,8 @@ namespace Solid
         {
             CurrentTime += anim->ticksPerSeconds * dt;
             CurrentTime = fmod(CurrentTime, anim->numTicks);
+            if(CurrentTime >= AnimTime)
+                CurrentTime = 0;
             CalculateBoneTransform(anim->Root, Mat4f::Identity);
         }
     }
@@ -123,7 +127,7 @@ namespace Solid
                 //SkeletonResource::Bone* bonetoMod = boneChannel.BoneToMod;
                 Vec3 translation = Vec3::Zero;
                 Quat rotation = Quat::Identity;
-                Vec3 scale = Vec3::Zero;
+                Vec3 scale = Vec3(1,1,1);
 
                 if(bone->channel.Frames[index].usePos)
                     translation = bone->channel.Frames[index].pos;

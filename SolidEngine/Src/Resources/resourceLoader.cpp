@@ -618,12 +618,45 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 		delete Mesh;
 		return;
 	}
+
+    for (int i = 0; i < scene->mNumMeshes; ++i)
+    {
+
+        int numIndices = 3 * scene->mMeshes[i]->mNumFaces;
+        MeshResource::SubMesh &Sub = Mesh->Meshes.emplace_back();
+        Sub.indices.resize(numIndices);
+        Sub.vertices.resize(scene->mMeshes[i]->mNumVertices);
+        Sub.animData.resize(scene->mMeshes[i]->mNumVertices);
+        std::uint32_t WritePos = 0;
+        for (int j = 0; j < scene->mMeshes[i]->mNumFaces; ++j)
+        {
+            std::uint32_t size = scene->mMeshes[i]->mFaces[j].mNumIndices * sizeof(unsigned int);
+            std::memcpy(&(Sub.indices[WritePos]), scene->mMeshes[i]->mFaces[j].mIndices, size);
+            WritePos += scene->mMeshes[i]->mFaces[j].mNumIndices;
+        }
+
+
+        for (int j = 0; j < scene->mMeshes[i]->mNumVertices; ++j)
+        {
+            if (scene->mMeshes[i]->HasPositions())
+                std::memcpy(&(Sub.vertices[j].Pos), &(scene->mMeshes[i]->mVertices[j]), 3 * sizeof(float));
+            if (scene->mMeshes[i]->HasNormals())
+                std::memcpy(&(Sub.vertices[j].Normal), &(scene->mMeshes[i]->mNormals[j]), 3 * sizeof(float));
+            if (scene->mMeshes[i]->mTextureCoords[0] != nullptr)
+                std::memcpy(&(Sub.vertices[j].TexCoords), &(scene->mMeshes[i]->mTextureCoords[0][j].x),
+                            2 * sizeof(float));
+        }
+    }
+
 	if(!hasFoundSkeleton)
 	{
-	    for(size_t i = 0 ; i < scene->mMeshes[0]->mNumVertices ; i++)
+	    std::size_t countVertice = 0;
+        for (int i = 0; i < scene->mNumMeshes; ++i)
         {
-	        Mesh->animData.emplace_back();
+            countVertice += scene->mMeshes[i]->mNumVertices;
         }
+
+
 		aiNode* boneNode = nullptr;
 		if(scene->HasAnimations())
 		{
@@ -683,21 +716,26 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 							            _aiBone->mOffsetMatrix.b1, _aiBone->mOffsetMatrix.b2, _aiBone->mOffsetMatrix.b3, _aiBone->mOffsetMatrix.b4,
 							            _aiBone->mOffsetMatrix.c1, _aiBone->mOffsetMatrix.c2, _aiBone->mOffsetMatrix.c3, _aiBone->mOffsetMatrix.c4,
 							            _aiBone->mOffsetMatrix.d1, _aiBone->mOffsetMatrix.d2, _aiBone->mOffsetMatrix.d3, _aiBone->mOffsetMatrix.d4);
-					_bone->offset = offset.GetTransposed();
+					_bone->offset = offset.GetTransposed().GetInversed();
 					_bone->WeightInit = true;
 					///WARN : trasfo matrix of aiBone and ai node *=-1 ?
 					for (int j = 0; j < _aiBone->mNumWeights; ++j)
 					{
 						_bone->Weights.push_back(_aiBone->mWeights[j].mWeight);
-                        for (uint k = 0 ; k < 4 ; k++)
+						int vertexId = _aiBone->mWeights[j].mVertexId;
+						ai_real weight = _aiBone->mWeights[j].mWeight;
+
+                        AnimData& animData = Mesh->Meshes[id].animData[vertexId];
+                        for (int k = 0; k < 4; ++k)
                         {
-                            if (Mesh->animData[_aiBone->mWeights[j].mVertexId].weights[k] == 0.0)
+                            if(animData.boneIds[k] == -1)
                             {
-                                Mesh->animData[_aiBone->mWeights[j].mVertexId].weights[k] = _aiBone->mWeights[j].mWeight;
-                                Mesh->animData[_aiBone->mWeights[j].mVertexId].boneIds[k] = _aiBone->mWeights[j].mVertexId;
+                                animData.boneIds[k] =_bone->id;
+                                animData.weights[k] = weight;
                                 break;
                             }
                         }
+
 					}
 
 					return true;
@@ -718,12 +756,18 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 
 			if(scene->HasMeshes())
 			{
-				for (int l = 0; l < scene->mMeshes[0]->mNumBones; ++l)
-				{
-					aiBone* bone = scene->mMeshes[0]->mBones[l];
-					Log::Send(bone->mName.C_Str(), Log::ELogSeverity::ERROR);
-					setWeights(&Skeleton->rootBone, bone, l);
-				}
+                for (int i = 0; i < scene->mNumMeshes; ++i)
+                {
+                    for (int l = 0; l < scene->mMeshes[i]->mNumBones; ++l)
+                    {
+                        aiBone* bone = scene->mMeshes[i]->mBones[l];
+                        Log::Send(bone->mName.C_Str(), Log::ELogSeverity::ERROR);
+                        setWeights(&Skeleton->rootBone, bone, i);
+                    }
+                }
+
+
+
 			}
 			Skeleton->numOfBone = boneCount;
 			///load bones
@@ -737,6 +781,7 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 		anim->name = "ANIM_"+Rpath.filename().string();
 		anim->numTicks = scene->mAnimations[i]->mDuration;
 		anim->ticksPerSeconds = scene->mAnimations[i]->mTicksPerSecond;
+
 		if(hasFoundSkeleton)
         {
             anim->Root = new SkeletonResource::Bone(Skeleton->rootBone);
@@ -862,36 +907,9 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 		float g = f;
 
 	}
-	for (int i = 0; i < scene->mNumMeshes; ++i)
-	{
 
-		int numIndices = 3 * scene->mMeshes[i]->mNumFaces;
-		MeshResource::SubMesh &Sub = Mesh->Meshes.emplace_back();
-		Sub.indices.resize(numIndices);
-		Sub.vertices.resize(scene->mMeshes[i]->mNumVertices);
-
-		std::uint32_t WritePos = 0;
-		for (int j = 0; j < scene->mMeshes[i]->mNumFaces; ++j)
-		{
-			std::uint32_t size = scene->mMeshes[i]->mFaces[j].mNumIndices * sizeof(unsigned int);
-			std::memcpy(&(Sub.indices[WritePos]), scene->mMeshes[i]->mFaces[j].mIndices, size);
-			WritePos += scene->mMeshes[i]->mFaces[j].mNumIndices;
-		}
-
-
-		for (int j = 0; j < scene->mMeshes[i]->mNumVertices; ++j)
-		{
-			if (scene->mMeshes[i]->HasPositions())
-				std::memcpy(&(Sub.vertices[j].Pos), &(scene->mMeshes[i]->mVertices[j]), 3 * sizeof(float));
-			if (scene->mMeshes[i]->HasNormals())
-				std::memcpy(&(Sub.vertices[j].Normal), &(scene->mMeshes[i]->mNormals[j]), 3 * sizeof(float));
-			if (scene->mMeshes[i]->mTextureCoords[0] != nullptr)
-				std::memcpy(&(Sub.vertices[j].TexCoords), &(scene->mMeshes[i]->mTextureCoords[0][j].x),
-				            2 * sizeof(float));
-		}
-		fbx->mesh = Mesh;
-		fbx->Skeleton = Skeleton;
-	}
+    fbx->mesh = Mesh;
+    fbx->Skeleton = Skeleton;
 }
 
 Resource * ResourcesLoader::LoadImage(const fs::path &Rpath)

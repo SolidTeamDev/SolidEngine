@@ -42,11 +42,12 @@ IMesh(_raw->Meshes.size())
         //ANIM
         if(_raw->hadAnim)
         {
+            glGenBuffers(1,&sub.animVBO);
             size_t bufferSize = 4*sizeof(GLint) + 4*sizeof(GLfloat);
             glBindBuffer(GL_ARRAY_BUFFER, sub.animVBO);
-            glBufferData(GL_ARRAY_BUFFER, _raw->animData.size() * bufferSize, _raw->animData.data(), GL_STATIC_DRAW);
-            glVertexAttribPointer(3,4,GL_INT,GL_FALSE, bufferSize, (void*)0);
-            glVertexAttribPointer(4,4,GL_FLOAT,GL_FALSE, bufferSize, (void*)(4*sizeof(GLint)));
+            glBufferData(GL_ARRAY_BUFFER, rawSub.animData.size() * bufferSize, rawSub.animData.data(), GL_STATIC_DRAW);
+            glVertexAttribIPointer(3,4,GL_INT, bufferSize, (void*)offsetof(AnimData, boneIds));
+            glVertexAttribPointer(4,4,GL_FLOAT,GL_FALSE, bufferSize, (void*)offsetof(AnimData, weights));
             glEnableVertexAttribArray(3);
             glEnableVertexAttribArray(4);
         }
@@ -93,7 +94,7 @@ void GL::Mesh::Init(MeshResource *_raw)
         {
             size_t bufferSize = 4*sizeof(GLint) + 4*sizeof(GLfloat);
             glBindBuffer(GL_ARRAY_BUFFER, sub.animVBO);
-            glBufferData(GL_ARRAY_BUFFER, _raw->animData.size() * bufferSize, _raw->animData.data(), GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, rawSub.animData.size() * bufferSize, rawSub.animData.data(), GL_STATIC_DRAW);
 
             glEnableVertexAttribArray(3);
             glVertexAttribIPointer(3, 4, GL_INT, bufferSize, (const GLvoid*)0);
@@ -392,6 +393,8 @@ void GL::Shader::SetLights(Camera& _camera) const
 
 void GL::Shader::SetAnim(Animation* _anim) const
 {
+    if(_anim == nullptr)
+        return;
     glUseProgram(ProgID);
 
     //for(int)
@@ -401,7 +404,8 @@ void GL::Shader::SetAnim(Animation* _anim) const
     for (int i = 0; i < transforms.size(); ++i)
     {
         std::string id = std::to_string(i);
-        glUniformMatrix4fv(glGetUniformLocation(ProgID,std::string("finalBonesTransformations[" + id + "]").c_str()),1,GL_FALSE,transforms[i].elements.data());
+        glUniformMatrix4fv(glGetUniformLocation(ProgID,std::string("finalBonesMatrices[" + id + "]").c_str()),1,GL_TRUE,transforms[i].elements.data());
+
     }
 }
 

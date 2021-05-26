@@ -95,8 +95,8 @@ namespace Solid {
 
     struct SOLID_API AnimData
     {
-        uint boneIds[4] {0};
-        float  weights[4] {0.0f};
+        int boneIds[4] {-1,-1,-1,-1};
+        float  weights[4] {0.0f,0.0f,0.0f,0.0f};
     };
 
 
@@ -111,10 +111,11 @@ namespace Solid {
 
             std::vector<Vertex> vertices;
             std::vector<uint> indices;
+            std::vector<AnimData> animData;
         };
 
         bool hadAnim = false;
-        std::vector<AnimData> animData;
+
 
         std::vector<SubMesh> Meshes;
 
