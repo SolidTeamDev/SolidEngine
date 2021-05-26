@@ -73,9 +73,33 @@ namespace Solid
             EditCamera(engine->ecsManager.GetComponent<Camera>(gameObject->GetEntity()));
         }
 
+	    if(engine->ecsManager.GotComponent<Particles::ParticleEffect>(gameObject->GetEntity()))
+	    {
+		    EditParticleEffect(engine->ecsManager.GetComponent<Particles::ParticleEffect>(gameObject->GetEntity()));
+	    }
         if(engine->ecsManager.GotComponent<Animation>(gameObject->GetEntity()))
         {
             EditAnimation(engine->ecsManager.GetComponent<Animation>(gameObject->GetEntity()));
+        }
+        
+        if(engine->ecsManager.GotComponent<RigidBody>(gameObject->GetEntity()))
+        {
+            EditRigidBody(engine->ecsManager.GetComponent<RigidBody>(gameObject->GetEntity()));
+        }
+
+        if(engine->ecsManager.GotComponent<BoxCollider>(gameObject->GetEntity()))
+        {
+            EditBoxCollider(engine->ecsManager.GetComponent<BoxCollider>(gameObject->GetEntity()));
+        }
+
+        if(engine->ecsManager.GotComponent<SphereCollider>(gameObject->GetEntity()))
+        {
+            EditSphereCollider(engine->ecsManager.GetComponent<SphereCollider>(gameObject->GetEntity()));
+        }
+
+        if(engine->ecsManager.GotComponent<CapsuleCollider>(gameObject->GetEntity()))
+        {
+            EditCapsuleCollider(engine->ecsManager.GetComponent<CapsuleCollider>(gameObject->GetEntity()));
         }
 
         if(engine->ecsManager.GotComponent<ScriptList>(gameObject->GetEntity()))
@@ -172,6 +196,14 @@ namespace Solid
                     UI::CloseCurrentPopup();
                 }
             }
+	        if(!engine->ecsManager.GotComponent<Particles::ParticleEffect>(gameObject->GetEntity()))
+	        {
+		        if(UI::Button("ParticleEffect"))
+		        {
+			        engine->ecsManager.AddComponent<Particles::ParticleEffect>(gameObject, Particles::ParticleEffect());
+			        UI::CloseCurrentPopup();
+		        }
+	        }
 	        if(!engine->ecsManager.GotComponent<ScriptList>(gameObject->GetEntity()))
 	        {
 	        	const rfk::Namespace* n = GameCompiler::GetInstance()->GetNamespace("Solid");
@@ -306,6 +338,14 @@ namespace Solid
                     UI::CloseCurrentPopup();
                 }
             }
+		    if(engine->ecsManager.GotComponent<Particles::ParticleEffect>(gameObject->GetEntity()))
+		    {
+			    if(UI::Button("ParticleEffect"))
+			    {
+				    engine->ecsManager.RemoveComponent<Particles::ParticleEffect>(gameObject);
+				    UI::CloseCurrentPopup();
+			    }
+		    }
 		    if(engine->ecsManager.GotComponent<ScriptList>(gameObject->GetEntity()))
 		    {
 		    	ScriptList& sl = engine->ecsManager.GetComponent<ScriptList>(gameObject->GetEntity());
@@ -585,7 +625,7 @@ namespace Solid
                         }
 
                         // Choose Shader
-                        const char* shaderName = mat->GetShader()->name.c_str();
+                        const char* shaderName = mat->GetShader() == nullptr ? "DEFAULT SHADER" : mat->GetShader()->name.c_str();
                         bool combo =UI::BeginCombo(std::string("Shader##"+matId).c_str(),shaderName);
 	                    if(UI::BeginDragDropTarget())
 	                    {
@@ -792,7 +832,231 @@ namespace Solid
         UI::Separator();
     }
 
-    void InspectorInterface::CreateScriptWindow()
+    void InspectorInterface::EditRigidBody(RigidBody& _rigidBody)
+    {
+        if(UI::CollapsingHeader("RigidBody", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            if(UI::Button("Reset velocity"))
+                _rigidBody.ResetVelocity();
+
+            {
+                bool gravity = _rigidBody.IsGravityEnabled();
+                if(UI::Checkbox("Enable gravity", &gravity))
+                    _rigidBody.EnableGravity(gravity);
+            }
+            {
+                bool kinematic = _rigidBody.IsKinematic();
+                if(UI::Checkbox("Kinematic",&kinematic))
+                    _rigidBody.SetKinematic(kinematic);
+            }
+            {
+                float mass = _rigidBody.GetMass();
+                if(UI::DragFloat("Mass",&mass))
+                    _rigidBody.SetMass(mass);
+            }
+            {
+                float drag = _rigidBody.GetDrag();
+                if(UI::DragFloat("Drag",&drag))
+                    _rigidBody.SetDrag(drag);
+            }
+            {
+                float angularDrag = _rigidBody.GetAngularDrag();
+                if(UI::DragFloat("Angular drag",&angularDrag))
+                    _rigidBody.SetAngularDrag(angularDrag);
+            }
+
+            if(UI::TreeNode("Constraints"))
+            {
+                {
+                    bool x = _rigidBody.IsFreezePosX();
+                    bool y = _rigidBody.IsFreezePosY();
+                    bool z = _rigidBody.IsFreezePosZ();
+                    UI::Text("Freeze position : ");
+                    if(UI::Checkbox("X##XPosConstraints",&x))
+                        _rigidBody.FreezePosX(x);
+                    UI::SameLine();
+                    if(UI::Checkbox("Y##YPosConstraints",&y))
+                        _rigidBody.FreezePosY(y);
+                    UI::SameLine();
+                    if(UI::Checkbox("Z##ZPosConstraints",&z))
+                        _rigidBody.FreezePosZ(z);
+                }
+                {
+                    bool x = _rigidBody.IsFreezeRotX();
+                    bool y = _rigidBody.IsFreezeRotY();
+                    bool z = _rigidBody.IsFreezeRotZ();
+                    UI::Text("Freeze rotation : ");
+                    if(UI::Checkbox("X##XRotConstraints",&x))
+                        _rigidBody.FreezeRotX(x);
+                    UI::SameLine();
+                    if(UI::Checkbox("Y##YRotConstraints",&y))
+                        _rigidBody.FreezeRotY(y);
+                    UI::SameLine();
+                    if(UI::Checkbox("Z##ZRotConstraints",&z))
+                        _rigidBody.FreezeRotZ(z);
+                }
+                UI::TreePop();
+            }
+
+            if(UI::TreeNode("More Info"))
+            {
+                {
+                    Vec3 vel = _rigidBody.GetLinearVelocity();
+                    UI::Text("Linear velocity");
+                    UI::SameLine();
+                    UI::InputFloat3("##LinearVelocity",&vel.x,"%.3f",ImGuiInputTextFlags_ReadOnly);
+                }
+                {
+                    Vec3 vel = _rigidBody.GetAngularVelocity();
+                    UI::Text("Angular velocity");
+                    UI::SameLine();
+                    UI::InputFloat3("##AngularVelocity",&vel.x,"%.3f",ImGuiInputTextFlags_ReadOnly);
+                }
+                UI::TreePop();
+            }
+
+        }
+        UI::Separator();
+    }
+
+    void InspectorInterface::EditBoxCollider(BoxCollider& _boxCollider)
+    {
+        if(UI::CollapsingHeader("Box collider", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            {
+                Vec3 size = _boxCollider.GetSize();
+                if(EditVec3(size,"Size##Box",0.01f))
+                    _boxCollider.SetSize(size);
+            }
+            {
+                bool isTrigger = _boxCollider.IsTrigger();
+                if(EditBool(isTrigger,"Trigger##Box"))
+                    _boxCollider.SetTrigger(isTrigger);
+            }
+        }
+        UI::Separator();
+    }
+
+    void InspectorInterface::EditSphereCollider(SphereCollider& _sphereCollider)
+    {
+        if(UI::CollapsingHeader("Sphere collider", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            {
+                float radius = _sphereCollider.GetRadius();
+                if(EditFloat(radius,"Radius##Sphere",0.01f))
+                    _sphereCollider.SetRadius(radius);
+            }
+            {
+                bool isTrigger = _sphereCollider.IsTrigger();
+                if(EditBool(isTrigger,"Trigger##Sphere"))
+                    _sphereCollider.SetTrigger(isTrigger);
+            }
+        }
+        UI::Separator();
+    }
+
+    void InspectorInterface::EditCapsuleCollider(CapsuleCollider& _capsuleCollider)
+    {
+        if(UI::CollapsingHeader("Capsule collider", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            {
+                float radius = _capsuleCollider.GetRadius();
+                if(EditFloat(radius,"Radius##Capsule",0.01f))
+                    _capsuleCollider.SetRadius(radius);
+            }
+            {
+                float height = _capsuleCollider.GetHeight();
+                if(EditFloat(height,"height##Capsule",0.01f))
+                    _capsuleCollider.SetHeight(height);
+            }
+            {
+                bool isTrigger = _capsuleCollider.IsTrigger();
+                if(EditBool(isTrigger,"Trigger##Capsule"))
+                    _capsuleCollider.SetTrigger(isTrigger);
+            }
+            {
+                CapsuleCollider::ECapsuleDirection capsDir = _capsuleCollider.GetDirection();
+                std::string dirName = "";
+                switch (capsDir)
+                {
+                    case CapsuleCollider::ECapsuleDirection::X_AXIS:
+                        dirName = "X-AXIS";
+                        break;
+                    case CapsuleCollider::ECapsuleDirection::Y_AXIS:
+                        dirName = "Y-AXIS";
+                        break;
+                    case CapsuleCollider::ECapsuleDirection::Z_AXIS:
+                        dirName = "Z-AXIS";
+                        break;
+                }
+                if(UI::BeginCombo("Direction##Capsule",dirName.c_str()))
+                {
+                    bool selected = dirName == "X-AXIS";
+                    if(UI::Selectable("X-AXIS",selected))
+                        _capsuleCollider.SetCapsuleDirection(CapsuleCollider::ECapsuleDirection::X_AXIS);
+                    if(selected)
+                        UI::SetItemDefaultFocus();
+                    selected = dirName == "Y-AXIS";
+                    if(UI::Selectable("Y-AXIS",selected))
+                        _capsuleCollider.SetCapsuleDirection(CapsuleCollider::ECapsuleDirection::Y_AXIS);
+                    if(selected)
+                        UI::SetItemDefaultFocus();
+                    selected = dirName == "Z-AXIS";
+                    if(UI::Selectable("Z-AXIS",selected))
+                        _capsuleCollider.SetCapsuleDirection(CapsuleCollider::ECapsuleDirection::Z_AXIS);
+                    if(selected)
+                        UI::SetItemDefaultFocus();
+                    UI::EndCombo();
+                }
+            }
+        }
+        UI::Separator();
+    }
+
+	void InspectorInterface::EditParticleEffect(Particles::ParticleEffect& _particle)
+	{
+		if(UI::CollapsingHeader("ParticleEffect",ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			auto tex = _particle.GetTex();
+			const char *texName = tex == nullptr ? "" : tex->name.c_str();
+
+			UI::Text("Texture  ");
+			UI::SameLine();
+
+			bool combo = UI::BeginCombo("##ParticleTexture", texName);
+			if (UI::BeginDragDropTarget())
+			{
+
+				const ImGuiPayload *drop = UI::AcceptDragDropPayload("Texture");
+				if (drop != nullptr)
+				{
+					Resource *r = *((Resource **) drop->Data);
+					_particle.SetTex(engine->graphicsResourceMgr.GetTexture(r->name.c_str()));
+
+				}
+				UI::EndDragDropTarget();
+			}
+			if (combo)
+			{
+				auto *texList = engine->resourceManager.GetResourcesVecByType<ImageResource>();
+
+				for (auto tex : *texList)
+				{
+					bool selected = (texName == tex.second->name);
+					if (UI::Selectable(tex.second->name.c_str(), selected))
+					{
+						_particle.SetTex(engine->graphicsResourceMgr.GetTexture(tex.second->name.c_str()));
+					}
+					if (selected)
+						UI::SetItemDefaultFocus();
+				}
+
+				UI::EndCombo();
+			}
+		}
+	}
+
+	void InspectorInterface::CreateScriptWindow()
     {
         UI::SetNextWindowBgAlpha(0.9);
         UI::SetNextWindowSize(ImVec2(325, 100));
@@ -839,27 +1103,24 @@ namespace Solid
         UI::End();
     }
 
-	void InspectorInterface::EditBool(bool &_num, const std::string &_label)
+    bool InspectorInterface::EditBool(bool &_num, const std::string &_label)
 	{
-		if(UI::Checkbox(_label.c_str(), &_num))
-		{
-
-		}
+		return UI::Checkbox(_label.c_str(), &_num);
 	}
 
-    void InspectorInterface::EditInt(int& _num, const std::string& _label, float _step)
+    bool InspectorInterface::EditInt(int& _num, const std::string& _label, float _step)
     {
-        UI::DragInt(_label.c_str(), &_num, _step);
+        return UI::DragInt(_label.c_str(), &_num, _step);
     }
 
-    void InspectorInterface::EditFloat(float &_num, const std::string& _label, float _step)
+    bool InspectorInterface::EditFloat(float &_num, const std::string& _label, float _step)
     {
-        UI::DragFloat(_label.c_str(), &_num, _step);
+        return UI::DragFloat(_label.c_str(), &_num, _step);
     }
 
-    void InspectorInterface::EditVec2(Vec2& _vec, const std::string& _label, float _step)
+    bool InspectorInterface::EditVec2(Vec2& _vec, const std::string& _label, float _step)
     {
-        UI::DragFloat2(_label.c_str(), &_vec.x, _step);
+        return UI::DragFloat2(_label.c_str(), &_vec.x, _step);
     }
 
 	bool InspectorInterface::EditVec3(Vec3 &_vec, const std::string &_label, float _step)

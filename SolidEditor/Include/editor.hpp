@@ -73,7 +73,7 @@ namespace Solid
 	    static std::vector<PrimaryCompSave<SphereCollider>> sphereSave;
 	    static std::vector<PrimaryCompSave<CapsuleCollider>> capsuleSave;
     public:
-        static InputManager<int>* editorInputManager;
+        static InputManager* editorInputManager;
 
         static float camSpeed;
         //static Framebuffer sceneFramebuffer;
