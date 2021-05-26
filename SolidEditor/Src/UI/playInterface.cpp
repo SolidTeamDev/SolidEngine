@@ -22,7 +22,8 @@ namespace Solid
         ImVec2 windowSize = UI::GetContentRegionAvail();
 
         DrawScene();
-        UI::Image((ImTextureID)(size_t)playFramebuffer.texture,windowSize,ImVec2{0,1},ImVec2{1,0});
+		Engine::GetInstance()->RenderToBuffer();
+        UI::Image((ImTextureID)(size_t)Engine::GetInstance()->PlayBuffer.texture,windowSize,ImVec2{0,1},ImVec2{1,0});
 
         UI::End();
     }

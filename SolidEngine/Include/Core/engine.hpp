@@ -70,6 +70,7 @@ namespace Solid
         Physics physics;
 
         Camera* activeCamera = nullptr;
+        Framebuffer PlayBuffer;
 
         static Engine* GetInstance();
         bool MultiThreadEnabled()const {return mtEnabled;}
@@ -100,6 +101,10 @@ namespace Solid
 
 
 	    void ForceUpdate();
+
+	    void SetActiveCamera(Camera* _newCam);
+
+	    void RenderToBuffer();
 
 	    void AddLoadedSceneCallback(const std::function<void(Resource*)>& _func);
 
