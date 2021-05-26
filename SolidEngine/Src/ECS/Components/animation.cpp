@@ -1,3 +1,4 @@
+#include "Core/engine.hpp"
 #include "ECS/Components/animation.hpp"
 #include "Rendering/OpenGL45/openGl45Renderer.hpp"
 
@@ -9,6 +10,7 @@ namespace Solid
         FinalsTrans.reserve(anim->numOfBones);
         for(int i = 0; i < anim->numOfBones; i++)
             FinalsTrans.push_back(Mat4f::Identity);
+	    AnimName = anim->name;
     }
 
     /// don't forget const bone*
@@ -87,6 +89,7 @@ namespace Solid
     void Animation::SetAnim(AnimResource* _anim)
     {
         anim = _anim;
+        AnimName = anim->name;
         CurrentTime = 0;
         AnimTime = anim->numTicks/anim->ticksPerSeconds;
         std::cout << AnimTime << std::endl;
@@ -156,5 +159,14 @@ namespace Solid
    {
         return  FinalsTrans;
    }
+
+	void Animation::Init()
+	{
+		if(AnimName.empty())
+			return;
+		AnimResource* anim = Engine::GetInstance()->resourceManager.GetRawAnimByName(AnimName.c_str());
+		if(anim)
+			SetAnim(anim);
+	}
 }
 

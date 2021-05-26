@@ -23,12 +23,13 @@ namespace Solid SLDNamespace()
         void UpdateBone(float currTime, SkeletonResource::Bone* bone = nullptr);
         const AnimResource * GetAnim();
         const std::vector<Mat4f> GetFinalTrans();
-
+		void Init();
 
     private:
         //SkeletonResource* Skeleton = nullptr;
         float AnimTime;
         AnimResource* anim = nullptr;
+        String AnimName;
         float CurrentTime;
         Mat4f InverseRootMat = Mat4f::Identity;
         std::vector<Mat4f> FinalsTrans;

@@ -399,7 +399,10 @@ void GL::Shader::SetAnim(Animation* _anim) const
 
     //for(int)
     std::vector<Mat4f> transforms = _anim->GetFinalTrans();
-    glUniform1i(glGetUniformLocation(ProgID,"MAX_BONES"),_anim->GetAnim()->numOfBones);
+    auto a = _anim->GetAnim();
+    if(a== nullptr)
+	    return;
+    glUniform1i(glGetUniformLocation(ProgID,"MAX_BONES"),a->numOfBones);
 
     for (int i = 0; i < transforms.size(); ++i)
     {
