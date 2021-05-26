@@ -3,6 +3,19 @@
 
 using namespace Solid;
 
+void ScriptSystem::Init()
+{
+    for (auto entity : entities)
+    {
+        ScriptList& scriptL = ecsManager.GetComponent<ScriptList>(entity);
+
+
+        scriptL.Init();
+
+    }
+
+}
+
 void ScriptSystem::Update()
 {
 	for (auto entity : entities)

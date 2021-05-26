@@ -318,6 +318,8 @@ namespace Solid
 				        sphereSave.push_back(std::move(save));
 				    }
 			    }
+
+			    Engine::GetInstance()->Init();
 		    }
 
 		    play = true;
