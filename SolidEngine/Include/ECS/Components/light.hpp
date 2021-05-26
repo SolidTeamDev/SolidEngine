@@ -24,9 +24,9 @@ namespace Solid SLDNamespace()
 
         enum SLDEnum() ELightType
         {
-            DIRECTIONAL,
-            SPOT,
-            POINT
+            DIRECTIONAL = 0,
+            POINT,
+            SPOT
         };
 
 
@@ -36,6 +36,8 @@ namespace Solid SLDNamespace()
         Vec3 color = {1,1,1};
 	    SLDField()
 	    float  intensity = 1;
+        SLDField()
+        Vec3 dir;
 
         Light() ;
         Light(const Light& _light);

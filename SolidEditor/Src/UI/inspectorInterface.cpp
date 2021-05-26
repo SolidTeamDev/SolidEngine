@@ -783,8 +783,48 @@ namespace Solid
     {
         if(UI::CollapsingHeader("Light",ImGuiTreeNodeFlags_DefaultOpen))
         {
+            Light::ELightType lightType = _light.type;
+            {
+                std::string lightTypeName = "";
+                switch (lightType)
+                {
+                    case Light::DIRECTIONAL:
+                        lightTypeName = "DIRECTIONAL";
+                        break;
+                    case Light::SPOT:
+                        lightTypeName = "SPOT";
+                        break;
+                    case Light::POINT:
+                        lightTypeName = "POINT";
+                        break;
+                }
+
+                if(UI::BeginCombo("Light type",lightTypeName.c_str()))
+                {
+                    bool selected = lightTypeName == "DIRECTIONAL";
+                    if(UI::Selectable("DIRECTIONAL",selected))
+                        _light.type = Light::ELightType::DIRECTIONAL;
+                    if(selected)
+                        UI::SetItemDefaultFocus();
+                    selected = lightTypeName == "SPOT";
+                    if(UI::Selectable("SPOT",selected))
+                        _light.type = Light::ELightType::SPOT;
+                    if(selected)
+                        UI::SetItemDefaultFocus();
+                    selected = lightTypeName == "POINT";
+                    if(UI::Selectable("POINT",selected))
+                        _light.type = Light::ELightType::POINT;
+                    if(selected)
+                        UI::SetItemDefaultFocus();
+                    UI::EndCombo();
+                }
+            }
+
             UI::ColorEdit3("Color",&_light.color.x);
             EditFloat(_light.intensity,"Intensity",0.01f);
+
+            if(lightType == Light::DIRECTIONAL)
+                EditVec3(_light.dir,"Direction",0.01f);
         }
 
         UI::Separator();
