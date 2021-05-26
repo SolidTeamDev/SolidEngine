@@ -13,6 +13,7 @@ namespace Solid
 	public:
 		ScriptSystem(ECSManager& _ecsManager): System(_ecsManager){};
 
+		void Init();
 		void Update();
 		void FixedUpdate();
 		void LateUpdate();

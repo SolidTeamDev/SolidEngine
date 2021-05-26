@@ -41,6 +41,7 @@ namespace Solid
     Engine::~Engine()
     {
 
+        delete inputManager;
         UIContext::ReleaseSolidUI();
         delete window;
         threadPool.TerminateAllThreads();
@@ -121,6 +122,8 @@ namespace Solid
                 break;
         }
 
+        inputManager = new InputManager(window->GetHandle());
+
         /// TEMPORARY
         UIContext::InitializeSolidUI(window->GetHandle());
         ///
@@ -153,9 +156,16 @@ namespace Solid
 		else{threadPool.PauseAllThreads();}
 	}
 
+    void Engine::Init()
+    {
+        scriptSystem->Init();
+    }
+
     void Engine::Update()
     {
-		scriptSystem->Update();
+        inputManager->Update();
+
+        scriptSystem->Update();
     }
 
     void Engine::FixedUpdate()
@@ -167,8 +177,6 @@ namespace Solid
     void Engine::LateUpdate()
     {
         scriptSystem->LateUpdate();
-
-
     }
 
 	void Engine::ForceUpdate()
