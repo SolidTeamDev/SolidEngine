@@ -23,29 +23,30 @@ namespace Solid
 			size_t numParticles;
 
 			std::shared_ptr<ParticleSystem> system = nullptr;
+			std::shared_ptr<ParticleEmitter> emitter = nullptr;
 
 			std::shared_ptr<ITexture> ParticleTex = nullptr;
+			std::shared_ptr<GLParticleRenderer> renderer = nullptr;
+
+		public:
 
 			std::shared_ptr<VelFromPosGen> velFromPosGen = nullptr;
-			std::shared_ptr<BasicColorGen> colGen = nullptr;
-			std::shared_ptr<SphereVelGen> sphereVelGen = nullptr;
-			std::shared_ptr<CirclePosGen> circlePosGen = nullptr;
-			std::shared_ptr<BasicTimeGen> timeGen = nullptr;
-			std::shared_ptr<BasicVelGen> velGen = nullptr;
-			std::shared_ptr<BoxPosGen> boxPosGen = nullptr;
+			std::shared_ptr<BasicColorGen> colGen        = nullptr;
+			std::shared_ptr<SphereVelGen>  sphereVelGen  = nullptr;
+			std::shared_ptr<CirclePosGen>  circlePosGen  = nullptr;
+			std::shared_ptr<BasicTimeGen>  timeGen       = nullptr;
+			std::shared_ptr<BasicVelGen>   velGen        = nullptr;
+			std::shared_ptr<BoxPosGen>     boxPosGen     = nullptr;
 
 
 
-			std::shared_ptr<AttractorUpdater> attractorUpdater = nullptr;
-			std::shared_ptr<VelColorUpdater> velColUpdater = nullptr;
-			std::shared_ptr<PosColorUpdater> posColUpdater = nullptr;
-			std::shared_ptr<BasicColorUpdater> colorUpdater = nullptr;
-			std::shared_ptr<EulerUpdater> eulerUpdater = nullptr;
-			std::shared_ptr<FloorUpdater> floorUpdater = nullptr;
-			std::shared_ptr<BasicTimeUpdater> timeUpdater = nullptr;
-
-
-			std::shared_ptr<GLParticleRenderer> renderer = nullptr;
+			std::shared_ptr<AttractorUpdater>   attractorUpdater = nullptr;
+			std::shared_ptr<VelColorUpdater>    velColUpdater    = nullptr;
+			std::shared_ptr<PosColorUpdater>    posColUpdater    = nullptr;
+			std::shared_ptr<BasicColorUpdater>  colorUpdater     = nullptr;
+			std::shared_ptr<EulerUpdater>       eulerUpdater     = nullptr;
+			std::shared_ptr<FloorUpdater>       floorUpdater     = nullptr;
+			std::shared_ptr<BasicTimeUpdater>   timeUpdater      = nullptr;
 
 		public:
 			uint defaultParticleNb = 0;
@@ -57,8 +58,6 @@ namespace Solid
 			void Init() override;
 			void Release() override;
 
-			// creates the effect with desired num of particles, (0 means default for the effect)
-			bool Initialize(size_t numParticles);
 			bool InitializeRenderer();
 
 			void Update(const Transform& trsf);
@@ -74,6 +73,12 @@ namespace Solid
 			std::shared_ptr<ITexture> GetTex();
 			int NumAllParticles();
 			int NumAliveParticles();
+
+			void UpdateSystem();
+			void UpdateEmitter();
+
+			void EditUpdaters();
+			void EditGenerators();
 		};
 	}
 }

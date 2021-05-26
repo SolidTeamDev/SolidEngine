@@ -1,7 +1,9 @@
 #include "Core/engine.hpp"
 #include "Resources/graphicalResource.hpp"
 #include "ECS/Components/particleEffect.hpp"
+#include "imgui.h"
 
+#include <iostream>
 #include "Time/time.hpp"
 #include <string>
 
@@ -15,32 +17,32 @@ void ParticleEffect::Init()
 	system = std::make_shared<ParticleSystem>(NUM_PARTICLES);
 	InitializeRenderer();
 	ParticleTex = Engine::GetInstance()->graphicsResourceMgr.GetTexture("particle2.png");
-	auto particleEmitter = std::make_shared<ParticleEmitter>();
-	particleEmitter->emitRate = (float)NUM_PARTICLES * 0.25f;
+	emitter = std::make_shared<ParticleEmitter>();
+	emitter->emitRate = (float)NUM_PARTICLES * 0.25f;
 
 	// pos:
 	boxPosGen = std::make_shared<BoxPosGen>();
 	boxPosGen->pos = Vec4( 0.0f, 0.0f, 0.0f, 0.0f );
 	boxPosGen->maxStartPosOffset = Vec4( 0.0f, 0.0f, 0.0f, 0.0f);
-	particleEmitter->AddGenerator(boxPosGen);
+	emitter->AddGenerator(boxPosGen);
 
 	colGen = std::make_shared<BasicColorGen>();
 	colGen->minStartCol = Vec4( 0.7, 0.7, 0.7, 1.0 );
 	colGen->maxStartCol = Vec4( 1.0, 1.0, 1.0, 1.0 );
 	colGen->minEndCol   = Vec4( 0.5, 0.0, 0.6, 0.0 );
 	colGen->maxEndCol   = Vec4( 0.7, 0.5, 1.0, 0.0 );
-	particleEmitter->AddGenerator(colGen);
+	emitter->AddGenerator(colGen);
 
 	velGen = std::make_shared<BasicVelGen>();
 	velGen->minStartVel = Vec4( -0.2f, -0.2f, -0.2f, 0.0f );
 	velGen->maxStartVel = Vec4( 0.2f, 0.2f, 0.2f, 0.0f );
-	particleEmitter->AddGenerator(velGen);
+	emitter->AddGenerator(velGen);
 
 	timeGen = std::make_shared<BasicTimeGen>();
 	timeGen->minTime = 5.0f;
 	timeGen->maxTime = 7.0f;
-	particleEmitter->AddGenerator(timeGen);
-	system->AddEmitter(particleEmitter);
+	emitter->AddGenerator(timeGen);
+	system->AddEmitter(emitter);
 
 	timeUpdater = std::make_shared<BasicTimeUpdater>();
 	system->AddUpdater(timeUpdater);
@@ -150,4 +152,268 @@ void ParticleEffect::SetTex(const std::shared_ptr<ITexture> _tex)
 std::shared_ptr<ITexture> ParticleEffect::GetTex()
 {
 	return ParticleTex;
+}
+
+void ParticleEffect::UpdateSystem()
+{
+	system->updaters.clear();
+	if (attractorUpdater != nullptr)
+		system->AddUpdater(attractorUpdater);
+	if (velColUpdater != nullptr)
+		system->AddUpdater(velColUpdater);
+	if (posColUpdater != nullptr)
+		system->AddUpdater(posColUpdater);
+	if (colorUpdater != nullptr)
+		system->AddUpdater(colorUpdater);
+	if (eulerUpdater != nullptr)
+		system->AddUpdater(eulerUpdater);
+	if (floorUpdater != nullptr)
+		system->AddUpdater(floorUpdater);
+	if (timeUpdater != nullptr)
+		system->AddUpdater(timeUpdater);
+	std::cout << "yy\n";
+}
+
+void ParticleEffect::UpdateEmitter()
+{
+	if (emitter == nullptr)
+		emitter = std::make_shared<ParticleEmitter>();
+
+	emitter->generators.clear();
+	if (velFromPosGen != nullptr)
+		emitter->AddGenerator(velFromPosGen);
+	if (colGen != nullptr)
+		emitter->AddGenerator(colGen);
+	if (sphereVelGen != nullptr)
+		emitter->AddGenerator(sphereVelGen);
+	if (circlePosGen != nullptr)
+		emitter->AddGenerator(circlePosGen);
+	if (timeGen != nullptr)
+		emitter->AddGenerator(timeGen);
+	if (velGen != nullptr)
+		emitter->AddGenerator(velGen);
+	if (boxPosGen != nullptr)
+		emitter->AddGenerator(boxPosGen);
+
+	system->AddEmitter(emitter);
+}
+
+void ParticleEffect::EditUpdaters()
+{
+	bool upt = false;
+
+	if (UI::CollapsingHeader("Attractor Updater"))
+	{
+		bool created = true;
+		if (attractorUpdater == nullptr)
+			created = false;
+		if (UI::Checkbox("Enable##AttractorUpdaterCreated", &created))
+		{
+			if (created)
+				attractorUpdater = std::make_shared<AttractorUpdater>();
+			else
+				attractorUpdater = nullptr;
+
+			upt = true;
+		}
+		if (created)
+			attractorUpdater->ShowUI(upt);
+	}
+	if (UI::CollapsingHeader("Euler Updater"))
+	{
+		bool created = true;
+		if (eulerUpdater == nullptr)
+			created = false;
+		if (UI::Checkbox("Enable##EulerUpdaterCreated", &created))
+		{
+			if (created)
+				eulerUpdater = std::make_shared<EulerUpdater>();
+			else
+				eulerUpdater = nullptr;
+
+			upt = true;
+		}
+		if (created)
+			eulerUpdater->ShowUI(upt);
+	}
+	if (UI::CollapsingHeader("Floor Updater"))
+	{
+		bool created = true;
+		if (floorUpdater == nullptr)
+			created = false;
+		if (UI::Checkbox("Enable##FloorUpdaterCreated", &created))
+		{
+			if (created)
+				floorUpdater = std::make_shared<FloorUpdater>();
+			else
+				floorUpdater = nullptr;
+
+			upt = true;
+		}
+		if (created)
+			floorUpdater->ShowUI(upt);
+	}
+	if (UI::CollapsingHeader("Pos Color Updater"))
+	{
+		bool created = true;
+		if (posColUpdater == nullptr)
+			created = false;
+		if (UI::Checkbox("Enable##PosColorUpdaterCreated", &created))
+		{
+			if (created)
+				posColUpdater = std::make_shared<PosColorUpdater>();
+			else
+				posColUpdater = nullptr;
+
+			upt = true;
+		}
+		if (created)
+			posColUpdater->ShowUI(upt);
+	}
+	if (UI::CollapsingHeader("Vel Color Updater"))
+	{
+		bool created = true;
+		if (velColUpdater == nullptr)
+			created = false;
+		if (UI::Checkbox("Enable##VelColUpdaterCreated", &created))
+		{
+			if (created)
+				velColUpdater = std::make_shared<VelColorUpdater>();
+			else
+				velColUpdater = nullptr;
+
+			upt = true;
+		}
+		if (created)
+			velColUpdater->ShowUI(upt);
+	}
+	if (upt)
+		UpdateSystem();
+}
+
+void ParticleEffect::EditGenerators()
+{
+	bool upt = false;
+
+	if (UI::CollapsingHeader("Vel From Pos Generator"))
+	{
+		bool created = true;
+		if (velFromPosGen == nullptr)
+			created = false;
+		if (UI::Checkbox("Enable##VelFromPosGenCreated", &created))
+		{
+			if (created)
+				velFromPosGen = std::make_shared<VelFromPosGen>();
+			else
+				velFromPosGen = nullptr;
+
+			upt = true;
+		}
+		if (created)
+			velFromPosGen->ShowUI(upt);
+	}
+	if (UI::CollapsingHeader("Color Generator"))
+	{
+		bool created = true;
+		if (colGen == nullptr)
+			created = false;
+		if (UI::Checkbox("Enable##ColorGeneratorCreated", &created))
+		{
+			if (created)
+				colGen = std::make_shared<BasicColorGen>();
+			else
+				colGen = nullptr;
+
+			upt = true;
+		}
+		if (created)
+			colGen->ShowUI(upt);
+	}
+	if (UI::CollapsingHeader("Sphere Velocity Generator"))
+	{
+		bool created = true;
+		if (sphereVelGen == nullptr)
+			created = false;
+		if (UI::Checkbox("Enable##SphereVelGenCreated", &created))
+		{
+			if (created)
+				sphereVelGen = std::make_shared<SphereVelGen>();
+			else
+				sphereVelGen = nullptr;
+
+			upt = true;
+		}
+		if (created)
+			sphereVelGen->ShowUI(upt);
+	}
+	if (UI::CollapsingHeader("Circle Pos Generator"))
+	{
+		bool created = true;
+		if (circlePosGen == nullptr)
+			created = false;
+		if (UI::Checkbox("Enable##CirclePosGenCreated", &created))
+		{
+			if (created)
+				circlePosGen = std::make_shared<CirclePosGen>();
+			else
+				circlePosGen = nullptr;
+
+			upt = true;
+		}
+		if (created)
+			circlePosGen->ShowUI(upt);
+	}
+	if (UI::CollapsingHeader("Time Generator"))
+	{
+		bool created = true;
+		if (timeGen == nullptr)
+			created = false;
+		if (UI::Checkbox("Enable##TimeGeneratorCreated", &created))
+		{
+			if (created)
+				timeGen = std::make_shared<BasicTimeGen>();
+			else
+				timeGen = nullptr;
+
+			upt = true;
+		}
+		if (created)
+			timeGen->ShowUI(upt);
+	}
+	if (UI::CollapsingHeader("Velocity Generator"))
+	{
+		bool created = true;
+		if (velGen == nullptr)
+			created = false;
+		if (UI::Checkbox("Enable##VelGeneratorCreated", &created))
+		{
+			if (created)
+				velGen = std::make_shared<BasicVelGen>();
+			else
+				velGen = nullptr;
+
+			upt = true;
+		}
+		if (created)
+			velGen->ShowUI(upt);
+	}
+	if (UI::CollapsingHeader("Box Pos Generator"))
+	{
+		bool created = true;
+		if (boxPosGen == nullptr)
+			created = false;
+		if (UI::Checkbox("Enable##BoxPosGeneratorCreated", &created))
+		{
+			if (created)
+				boxPosGen = std::make_shared<BoxPosGen>();
+			else
+				boxPosGen = nullptr;
+
+			upt = true;
+		}
+		if (created)
+			boxPosGen->ShowUI(upt);
+	}
+	if (upt)
+		UpdateEmitter();
 }

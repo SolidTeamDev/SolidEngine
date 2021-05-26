@@ -1017,6 +1017,7 @@ namespace Solid
 	{
 		if(UI::CollapsingHeader("ParticleEffect",ImGuiTreeNodeFlags_DefaultOpen))
 		{
+			{
 			auto tex = _particle.GetTex();
 			const char *texName = tex == nullptr ? "" : tex->name.c_str();
 
@@ -1053,6 +1054,14 @@ namespace Solid
 
 				UI::EndCombo();
 			}
+			}
+			//properties editing
+			{
+				_particle.EditUpdaters();
+				_particle.EditGenerators();
+			}
+
+
 		}
 	}
 
