@@ -26,9 +26,6 @@ namespace Solid
 	    }
 	    delete (char*)id;
 	    id = nullptr;
-		std::cout << lightList.size() << std::endl;
-	    //TODO: Remove light of the list
-	    //lightList.erase(lightList.begin()+id);
     }
 
     std::vector<LightData> Light::GetLightList()

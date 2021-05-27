@@ -16,7 +16,7 @@ class SOLID_API SLDClass() Script : public Components
         Script(GameObject* _go) {gameObject = _go;}
         virtual ~Script() = default;
 
-        virtual void Init() {};
+		virtual void Init() {};
         virtual void Update() {};
         virtual void FixedUpdate() {};
         virtual void LateUpdate() {};
