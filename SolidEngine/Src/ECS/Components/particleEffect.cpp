@@ -202,7 +202,7 @@ void ParticleEffect::EditUpdaters()
 {
 	bool upt = false;
 
-	if (UI::CollapsingHeader("Attractor Updater"))
+	if (UI::TreeNode("Attractor Updater"))
 	{
 		bool created = true;
 		if (attractorUpdater == nullptr)
@@ -218,8 +218,9 @@ void ParticleEffect::EditUpdaters()
 		}
 		if (created)
 			attractorUpdater->ShowUI(upt);
-	}
-	if (UI::CollapsingHeader("Euler Updater"))
+        UI::TreePop();
+    }
+	if (UI::TreeNode("Euler Updater"))
 	{
 		bool created = true;
 		if (eulerUpdater == nullptr)
@@ -235,8 +236,9 @@ void ParticleEffect::EditUpdaters()
 		}
 		if (created)
 			eulerUpdater->ShowUI(upt);
-	}
-	if (UI::CollapsingHeader("Floor Updater"))
+        UI::TreePop();
+    }
+	if (UI::TreeNode("Floor Updater"))
 	{
 		bool created = true;
 		if (floorUpdater == nullptr)
@@ -252,8 +254,9 @@ void ParticleEffect::EditUpdaters()
 		}
 		if (created)
 			floorUpdater->ShowUI(upt);
-	}
-	if (UI::CollapsingHeader("Pos Color Updater"))
+        UI::TreePop();
+    }
+	if (UI::TreeNode("Pos Color Updater"))
 	{
 		bool created = true;
 		if (posColUpdater == nullptr)
@@ -269,8 +272,9 @@ void ParticleEffect::EditUpdaters()
 		}
 		if (created)
 			posColUpdater->ShowUI(upt);
-	}
-	if (UI::CollapsingHeader("Vel Color Updater"))
+        UI::TreePop();
+    }
+	if (UI::TreeNode("Vel Color Updater"))
 	{
 		bool created = true;
 		if (velColUpdater == nullptr)
@@ -286,7 +290,8 @@ void ParticleEffect::EditUpdaters()
 		}
 		if (created)
 			velColUpdater->ShowUI(upt);
-	}
+        UI::TreePop();
+    }
 	if (upt)
 		UpdateSystem();
 }
@@ -295,7 +300,7 @@ void ParticleEffect::EditGenerators()
 {
 	bool upt = false;
 
-	if (UI::CollapsingHeader("Vel From Pos Generator"))
+	if (UI::TreeNode("Vel From Pos Generator"))
 	{
 		bool created = true;
 		if (velFromPosGen == nullptr)
@@ -311,8 +316,9 @@ void ParticleEffect::EditGenerators()
 		}
 		if (created)
 			velFromPosGen->ShowUI(upt);
-	}
-	if (UI::CollapsingHeader("Color Generator"))
+        UI::TreePop();
+    }
+	if (UI::TreeNode("Color Generator"))
 	{
 		bool created = true;
 		if (colGen == nullptr)
@@ -328,8 +334,9 @@ void ParticleEffect::EditGenerators()
 		}
 		if (created)
 			colGen->ShowUI(upt);
-	}
-	if (UI::CollapsingHeader("Sphere Velocity Generator"))
+        UI::TreePop();
+    }
+	if (UI::TreeNode("Sphere Velocity Generator"))
 	{
 		bool created = true;
 		if (sphereVelGen == nullptr)
@@ -345,8 +352,9 @@ void ParticleEffect::EditGenerators()
 		}
 		if (created)
 			sphereVelGen->ShowUI(upt);
-	}
-	if (UI::CollapsingHeader("Circle Pos Generator"))
+        UI::TreePop();
+    }
+	if (UI::TreeNode("Circle Pos Generator"))
 	{
 		bool created = true;
 		if (circlePosGen == nullptr)
@@ -362,8 +370,9 @@ void ParticleEffect::EditGenerators()
 		}
 		if (created)
 			circlePosGen->ShowUI(upt);
-	}
-	if (UI::CollapsingHeader("Time Generator"))
+        UI::TreePop();
+    }
+	if (UI::TreeNode("Time Generator"))
 	{
 		bool created = true;
 		if (timeGen == nullptr)
@@ -379,8 +388,9 @@ void ParticleEffect::EditGenerators()
 		}
 		if (created)
 			timeGen->ShowUI(upt);
-	}
-	if (UI::CollapsingHeader("Velocity Generator"))
+        UI::TreePop();
+    }
+	if (UI::TreeNode("Velocity Generator"))
 	{
 		bool created = true;
 		if (velGen == nullptr)
@@ -396,8 +406,9 @@ void ParticleEffect::EditGenerators()
 		}
 		if (created)
 			velGen->ShowUI(upt);
-	}
-	if (UI::CollapsingHeader("Box Pos Generator"))
+        UI::TreePop();
+    }
+	if (UI::TreeNode("Box Pos Generator"))
 	{
 		bool created = true;
 		if (boxPosGen == nullptr)
@@ -413,6 +424,7 @@ void ParticleEffect::EditGenerators()
 		}
 		if (created)
 			boxPosGen->ShowUI(upt);
+		UI::TreePop();
 	}
 	if (upt)
 		UpdateEmitter();
