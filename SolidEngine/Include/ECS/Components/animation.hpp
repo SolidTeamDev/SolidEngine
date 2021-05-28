@@ -35,6 +35,10 @@ namespace Solid SLDNamespace()
         Mat4f InverseRootMat = Mat4f::Identity;
         std::vector<Mat4f> FinalsTrans;
         std::vector<Mat4f> FinalsTransBone;
+    public:
+		Animation_GENERATED
+       
 
     };
 }
+File_GENERATED

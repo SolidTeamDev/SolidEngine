@@ -12,6 +12,7 @@ PlayerController::PlayerController()
     engine->inputManager->AddKeyInput("Left",GLFW_KEY_A,ImEnumDetectionType::PRESSED);
     engine->inputManager->AddKeyInput("Right",GLFW_KEY_D,ImEnumDetectionType::PRESSED);
     engine->inputManager->AddKeyInput("Jump",GLFW_KEY_SPACE, ImEnumDetectionType::NO_REPEAT);
+    engine->inputManager->AddKeyInput("Fire1",GLFW_MOUSE_BUTTON_1, ImEnumDetectionType::PRESSED);
 }
 
 void PlayerController::Init()
@@ -32,6 +33,9 @@ void PlayerController::Update()
         MoveRight();
     if(engine->inputManager->IsPressed("Jump"))
         Jump();
+
+    if(engine->inputManager->IsPressed("Fire1"))
+        Fire();
 }
 
 void PlayerController::MoveForward()
@@ -72,5 +76,10 @@ void PlayerController::Jump()
         return;
 
     rigidBody->AddImpulse(Vec3(0,jumpForce,0));
+}
+
+void PlayerController::Fire()
+{
+    Log::Send("PIEW");
 }
 

@@ -120,4 +120,37 @@ namespace Solid
             capsuleCollider->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, !isTrigger);
         }
     }
+
+    float CapsuleCollider::GetStaticFriction()
+    {
+        return staticFriction;
+    }
+
+    void CapsuleCollider::SetStaticFriction(float _staticFriction)
+    {
+        staticFriction = _staticFriction;
+        physicMaterial->setStaticFriction(staticFriction);
+    }
+
+    float CapsuleCollider::GetDynamicFriction()
+    {
+        return dynamicFriction;
+    }
+
+    void CapsuleCollider::SetDynamicFriction(float _dynamicFriction)
+    {
+        dynamicFriction = _dynamicFriction;
+        physicMaterial->setDynamicFriction(dynamicFriction);
+    }
+
+    float CapsuleCollider::GetRestitution()
+    {
+        return restitution;
+    }
+
+    void CapsuleCollider::SetRestitution(float _restitution)
+    {
+        restitution = _restitution;
+        physicMaterial->setRestitution(restitution);
+    }
 } //!namespace

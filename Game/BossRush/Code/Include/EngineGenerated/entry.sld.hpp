@@ -1,7 +1,7 @@
 #pragma once
 
 /**
-*	Source file: C:\Users\t.francillonne\Documents\Solid\SolidEngine\Game\BossRush\Code\Include\entry.hpp
+*	Source file: C:\Users\gu.lefebvre\Documents\cpp\SolidEngine\Game\BossRush\Code\Include\entry.hpp
 */
 
 #include "EntityMacros.h"

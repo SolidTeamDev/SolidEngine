@@ -9,8 +9,7 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
-using namespace Solid::Particles;
-
+using namespace Solid;
 void GLParticleRenderer::Generate(ParticleSystem* sys, bool)
 {
 	assert(sys != nullptr);

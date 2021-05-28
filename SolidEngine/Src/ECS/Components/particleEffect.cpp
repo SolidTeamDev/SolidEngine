@@ -8,7 +8,7 @@
 #include <string>
 
 using namespace Solid;
-using namespace Solid::Particles;
+
 
 void ParticleEffect::Init()
 {

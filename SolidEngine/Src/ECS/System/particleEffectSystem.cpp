@@ -1,7 +1,6 @@
 #include "ECS/System/particleEffectSystem.hpp"
 #include "glad/glad.h"
 using namespace Solid;
-using namespace Solid::Particles;
 
 ParticleEffectSystem::ParticleEffectSystem(ECSManager& _ecsManager)
 	: System(_ecsManager)
