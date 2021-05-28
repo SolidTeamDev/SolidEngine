@@ -14,5 +14,6 @@ namespace Solid
         RendererSystem(ECSManager& _ecsManager): System(_ecsManager){};
 
         void Update(const Renderer* _renderer, Camera& _camera);
+
     };
 } //!namespace

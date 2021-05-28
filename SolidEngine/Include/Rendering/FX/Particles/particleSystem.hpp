@@ -60,6 +60,8 @@ namespace Solid
 			}
 
 			static size_t ComputeMemoryUsage(const ParticleSystem &p);
+
+
 		};
 	}
 }

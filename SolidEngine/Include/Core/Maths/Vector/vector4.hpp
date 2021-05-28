@@ -9,6 +9,21 @@ namespace Solid SLDNamespace()
 
     class Vec3;
 
+    class SOLID_API SLDClass() Vec4i
+    {
+    public:
+        SLDField()
+        int x = 0;
+        SLDField()
+        int y = 0;
+        SLDField()
+        int z = 0;
+        SLDField()
+        int w = 0;
+
+        Vec4i_GENERATED
+    };
+
     class SOLID_API SLDClass() Vec4
     {
     public:
@@ -46,10 +61,10 @@ namespace Solid SLDNamespace()
         static const Vec4 Back;
 
 		SLDMethod()
-		static constexpr float Dot(const Vec4& _v1, const Vec4& _v2) noexcept;
+		static float Dot(const Vec4& _v1, const Vec4& _v2) noexcept;
 
 		SLDMethod()
-		static constexpr Vec4 Cross(const Vec4& _v1, const Vec4& _v2) noexcept;
+		static Vec4 Cross(const Vec4& _v1, const Vec4& _v2) noexcept;
 
 		SLDMethod()
 		static Vec4 Lerp(const Vec4& _v1, const Vec4& _v2, float _r) noexcept;

@@ -43,6 +43,7 @@ namespace Solid
 			    {
 				    Resource* r = *((Resource**)drop->Data);
 				    Engine::GetInstance()->LoadScene(r->name.c_str());
+				    EditorInterface::selectedGO = nullptr;
 
 			    }
 		    }

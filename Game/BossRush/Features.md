@@ -13,7 +13,7 @@ Nous visons un jeu comportant au moins 2 boss avec chacun des patterns différen
 - Tir Special qui permettrais de se teleporter (a voir encore si pertinent dans le jeu)
 - Animation
 - Collision 
-- Particule (si fonctionel)
+- Particule
 
 ###Boss1
 
