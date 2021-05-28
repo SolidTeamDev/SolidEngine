@@ -25,7 +25,7 @@ Solid::GameObject::GameObject(Solid::GameObject *_parent, Solid::Entity _entity)
 
 Solid::GameObject::~GameObject()
 {
-
+    physicsActor->release();
 	for (GameObject* child : childs)
 	{
 		Engine::GetInstance()->ecsManager.DestroyEntity(child->entity,FromSceneGraphMgr{});
