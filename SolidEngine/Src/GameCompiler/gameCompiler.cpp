@@ -385,12 +385,12 @@ namespace Solid
 	    if(!fs::exists(buildP))
 	        fs::create_directory(buildP);
 	    std::string t = buildP.string();
-        std::string Gen = " @call vcvarsall.bat x64 >" + srcPath.string()+"\\vcvars.log && cmake.exe -DCMAKE_BUILD_TYPE=Release -G \"CodeBlocks - NMake Makefiles\" -S "+ srcPath.string()+" -B "+buildP.string()+
+        std::string Gen = " @call vcvarsall.bat x64 >" + srcPath.string()+"\\vcvars.log && cmake.exe -DCMAKE_BUILD_TYPE="+SOLID_COMPILED_STATE+" -G \"CodeBlocks - NMake Makefiles\" -S "+ srcPath.string()+" -B "+buildP.string()+
         		" >" + srcPath.string()+"\\SolidCMakeProjectGen.log\n";
 
         std::system(Gen.c_str());
 
-	    std::string Gen2 = "\""+vcVarsP.string()+" x64  && cmake.exe -DCMAKE_BUILD_TYPE=Release -G \"CodeBlocks - NMake Makefiles\" -S "+ srcPath.string()+" -B "+buildP.string()+"\"";
+	    std::string Gen2 = "\""+vcVarsP.string()+" x64  && cmake.exe -DCMAKE_BUILD_TYPE="+SOLID_COMPILED_STATE+" -G \"CodeBlocks - NMake Makefiles\" -S "+ srcPath.string()+" -B "+buildP.string()+"\"";
 	    std::vector<std::string> output;
 #if SOLID_WIN
 
@@ -511,9 +511,9 @@ namespace Solid
 		if(!fs::exists(buildP))
 			fs::create_directory(buildP);
 		std::string t = buildP.string();
-		std::string Gen = " @call vcvarsall.bat x64 >" + srcPath.string()+"\\vcvars.log && cmake.exe -DCMAKE_BUILD_TYPE=Release -G \"CodeBlocks - NMake Makefiles\" -S "+ srcPath.string()+" -B "+buildP.string()+
+		std::string Gen = " @call vcvarsall.bat x64 >" + srcPath.string()+"\\vcvars.log && cmake.exe -DCMAKE_BUILD_TYPE="+SOLID_COMPILED_STATE+" -G \"CodeBlocks - NMake Makefiles\" -S "+ srcPath.string()+" -B "+buildP.string()+
 		                  " >" + srcPath.string()+"\\SolidCMakeProjectGen.log\n";
-		std::string Gen2 = "\""+vcVarsP.string()+" x64  && cmake.exe -DCMAKE_BUILD_TYPE=Release -G \"CodeBlocks - NMake Makefiles\" -S "+ srcPath.string()+" -B "+buildP.string()+"\"";
+		std::string Gen2 = "\""+vcVarsP.string()+" x64  && cmake.exe -DCMAKE_BUILD_TYPE="+SOLID_COMPILED_STATE+" -G \"CodeBlocks - NMake Makefiles\" -S "+ srcPath.string()+" -B "+buildP.string()+"\"";
 		std::vector<std::string> output;
 #if SOLID_WIN
 
