@@ -4,6 +4,7 @@
 #include "ECS/Components/transform.hpp"
 #include "ECS/Components/camera.hpp"
 #include "Resources/resourceType.hpp"
+#include "ECS/Components/animation.hpp"
 
 namespace Solid
 {
@@ -24,8 +25,7 @@ namespace Solid
 		IMesh(uint _count):subMeshCount(_count){}
 		~IMesh() = default;
 		virtual void DrawMesh() = 0;
-		virtual void DrawMesh(const std::vector<MaterialResource *>& _list, Transform& _tr, Camera& _cam) = 0;
-
+		virtual void DrawMesh(const std::vector<MaterialResource *>& _list, Transform& _tr, Camera& _cam,Animation* _anim = nullptr ) = 0;
 	};
 
     struct ShaderUniform
@@ -77,6 +77,7 @@ namespace Solid
 
 		virtual void SetMVP(Transform& _model, Camera& _camera) const = 0;
 		virtual void SetLights(Camera& _camera) const = 0;
+		virtual void SetAnim(Animation* _anim) const = 0;
 		virtual void SetMaterial(const char* _name) = 0;
 
         virtual std::string& GetFragSource() = 0;

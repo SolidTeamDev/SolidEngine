@@ -32,14 +32,25 @@ IMesh(_raw->Meshes.size())
 		glEnableVertexAttribArray(1);
 		glEnableVertexAttribArray(2);
 
-
-
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sub.EBO);
 
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER,  rawSub.indices.size()*sizeof(unsigned int), rawSub.indices.data(), GL_STATIC_DRAW);
 		sub.numOfIndices = rawSub.indices.size();
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        //ANIM
+        if(_raw->hadAnim)
+        {
+            glGenBuffers(1,&sub.animVBO);
+            size_t bufferSize = 4*sizeof(GLint) + 4*sizeof(GLfloat);
+            glBindBuffer(GL_ARRAY_BUFFER, sub.animVBO);
+            glBufferData(GL_ARRAY_BUFFER, rawSub.animData.size() * bufferSize, rawSub.animData.data(), GL_STATIC_DRAW);
+            glVertexAttribIPointer(3,4,GL_INT, bufferSize, (void*)offsetof(AnimData, boneIds));
+            glVertexAttribPointer(4,4,GL_FLOAT,GL_FALSE, bufferSize, (void*)offsetof(AnimData, weights));
+            glEnableVertexAttribArray(3);
+            glEnableVertexAttribArray(4);
+        }
 	}
 	glBindVertexArray(0);
 	bIsInit = true;
@@ -78,7 +89,21 @@ void GL::Mesh::Init(MeshResource *_raw)
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER,  rawSub.indices.size()*sizeof(unsigned int), rawSub.indices.data(), GL_STATIC_DRAW);
 		sub.numOfIndices = rawSub.indices.size();
 
+        //ANIM
+        if(_raw->hadAnim)
+        {
+            size_t bufferSize = 4*sizeof(GLint) + 4*sizeof(GLfloat);
+            glBindBuffer(GL_ARRAY_BUFFER, sub.animVBO);
+            glBufferData(GL_ARRAY_BUFFER, rawSub.animData.size() * bufferSize, rawSub.animData.data(), GL_STATIC_DRAW);
+
+            glEnableVertexAttribArray(3);
+            glVertexAttribIPointer(3, 4, GL_INT, bufferSize, (const GLvoid*)0);
+            glEnableVertexAttribArray(4);
+            glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, bufferSize, (const GLvoid*)16);
+
+        }
 	}
+    glBindVertexArray(0);
 	bIsInit = true;
 }
 
@@ -97,7 +122,7 @@ void GL::Mesh::DrawMesh()
 	glBindVertexArray(0);
 }
 
-void GL::Mesh::DrawMesh(const std::vector<MaterialResource *>& _list, Transform& _tr, Camera& _cam)
+void GL::Mesh::DrawMesh(const std::vector<MaterialResource *>& _list, Transform& _tr, Camera& _cam, Animation* _anim)
 {
 	glEnable(GL_DEPTH_TEST);
 
@@ -155,6 +180,9 @@ void GL::Mesh::DrawMesh(const std::vector<MaterialResource *>& _list, Transform&
 							break;
 					}
 				}
+
+				if(_anim)
+				    shader->SetAnim(_anim);
 
 				shader->SetMVP(_tr, _cam);
 				shader->SetLights(_cam);
@@ -364,6 +392,27 @@ void GL::Shader::SetLights(Camera& _camera) const
     }
     glUniform1i(glGetUniformLocation(ProgID,"_nbLights"),lights.size());
     glUniform3fv(glGetUniformLocation(ProgID,"_camPos"),1,&_camera.position.x);
+}
+
+void GL::Shader::SetAnim(Animation* _anim) const
+{
+    if(_anim == nullptr)
+        return;
+    glUseProgram(ProgID);
+
+    //for(int)
+    std::vector<Mat4f> transforms = _anim->GetFinalTrans();
+    auto a = _anim->GetAnim();
+    if(a== nullptr)
+	    return;
+    glUniform1i(glGetUniformLocation(ProgID,"MAX_BONES"),a->numOfBones);
+
+    for (int i = 0; i < transforms.size(); ++i)
+    {
+        std::string id = std::to_string(i);
+        glUniformMatrix4fv(glGetUniformLocation(ProgID,std::string("finalBonesMatrices[" + id + "]").c_str()),1,GL_TRUE,transforms[i].elements.data());
+
+    }
 }
 
 void GL::Shader::SetMaterial(const char *_name)
