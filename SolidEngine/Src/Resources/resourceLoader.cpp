@@ -1389,7 +1389,7 @@ Resource *ResourcesLoader::LoadSolidMaterial(const fs::path &Rpath)
 	std::ifstream::pos_type pos = ifs.tellg();
 
 	std::vector<char>  buffer(pos);
-
+    //WARN : IF FILE IS 0 KO
 	ifs.seekg(0, std::ios::beg);
 	ifs.read(&buffer[0], pos);
 
