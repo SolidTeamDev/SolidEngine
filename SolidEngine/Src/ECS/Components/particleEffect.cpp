@@ -13,12 +13,12 @@ using namespace Solid::Particles;
 void ParticleEffect::Init()
 {
 	Components::Init();
-	const size_t NUM_PARTICLES = 2000;//numParticles == 0 ? 100000 : numParticles;
-	system = std::make_shared<ParticleSystem>(NUM_PARTICLES);
+	const size_t numP = 2000;
+	system = std::make_shared<ParticleSystem>(numP);
 	InitializeRenderer();
 	ParticleTex = Engine::GetInstance()->graphicsResourceMgr.GetTexture("particle2.png");
 	emitter = std::make_shared<ParticleEmitter>();
-	emitter->emitRate = (float)NUM_PARTICLES * 0.25f;
+	emitter->emitRate = (float)numP * 0.25f;
 
 	// pos:
 	boxPosGen = std::make_shared<BoxPosGen>();
@@ -82,7 +82,9 @@ void ParticleEffect::Update(const Transform& trsf)
 {
 	CpuUpdate();
 	GpuUpdate();
+
 	Render();
+	glDepthMask(GL_TRUE);
 }
 
 void ParticleEffect::CpuUpdate()
@@ -171,7 +173,6 @@ void ParticleEffect::UpdateSystem()
 		system->AddUpdater(floorUpdater);
 	if (timeUpdater != nullptr)
 		system->AddUpdater(timeUpdater);
-	std::cout << "yy\n";
 }
 
 void ParticleEffect::UpdateEmitter()

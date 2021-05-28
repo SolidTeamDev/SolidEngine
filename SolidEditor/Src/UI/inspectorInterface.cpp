@@ -1057,6 +1057,17 @@ namespace Solid
 	{
 		if(UI::CollapsingHeader("ParticleEffect",ImGuiTreeNodeFlags_DefaultOpen))
 		{
+			int prtclCount = (int)_particle.GetCount();
+			if(EditInt(prtclCount, "Number## of Particles", 1))
+			{
+				prtclCount = (prtclCount <= 1 ? 1 : prtclCount);
+				_particle.SetCount((size_t)prtclCount);
+			}
+			float emitRate = _particle.GetEmitRate();
+			if (EditFloat(emitRate, "Rate##emit", 1))
+			{
+				_particle.SetEmitRate(emitRate);
+			}
 			{
 			auto tex = _particle.GetTex();
 			const char *texName = tex == nullptr ? "" : tex->name.c_str();

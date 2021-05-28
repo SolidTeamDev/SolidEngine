@@ -70,6 +70,19 @@ namespace Solid
 				numParticles = _count;
 				system->SetCount(_count);
 			}
+			size_t GetCount()
+			{
+				return system->count;
+			}
+			void SetEmitRate(float _rate)
+			{
+				system->SetEmitRate(_rate);
+			}
+
+			float GetEmitRate()
+			{
+				return system->GetEmitRate();
+			}
 			std::shared_ptr<ITexture> GetTex();
 			int NumAllParticles();
 			int NumAliveParticles();
