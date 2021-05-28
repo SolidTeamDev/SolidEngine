@@ -716,7 +716,7 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
 							            _aiBone->mOffsetMatrix.b1, _aiBone->mOffsetMatrix.b2, _aiBone->mOffsetMatrix.b3, _aiBone->mOffsetMatrix.b4,
 							            _aiBone->mOffsetMatrix.c1, _aiBone->mOffsetMatrix.c2, _aiBone->mOffsetMatrix.c3, _aiBone->mOffsetMatrix.c4,
 							            _aiBone->mOffsetMatrix.d1, _aiBone->mOffsetMatrix.d2, _aiBone->mOffsetMatrix.d3, _aiBone->mOffsetMatrix.d4);
-					_bone->offset = offset.GetTransposed().GetInversed();
+					_bone->offset = offset;
 					_bone->WeightInit = true;
 					///WARN : trasfo matrix of aiBone and ai node *=-1 ?
 					for (int j = 0; j < _aiBone->mNumWeights; ++j)

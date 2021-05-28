@@ -1,7 +1,7 @@
 #pragma once
 
 /**
-*	Source file: F:\Dev\cpp\SolidEngine\Game\BossRush\Code\Include\PlayerController.hpp
+*	Source file: C:\Users\t.francillonne\Documents\Solid\SolidEngine\Game\BossRush\Code\Include\PlayerController.hpp
 */
 
 #include "EntityMacros.h"
@@ -19,13 +19,13 @@
 #ifdef __RFK3698706698196451833u_DeclareGetNamespaceFragment
 	#undef __RFK3698706698196451833u_DeclareGetNamespaceFragment
 #endif
-#define __RFK3698706698196451833u_DeclareGetNamespaceFragment inline rfk::NamespaceFragment const& getNamespaceFragment3698706698196451833u_10189270957831661615() noexcept;
+#define __RFK3698706698196451833u_DeclareGetNamespaceFragment inline rfk::NamespaceFragment const& getNamespaceFragment3698706698196451833u_587527118187529644() noexcept;
 
 #ifdef __RFK3698706698196451833u_DefineGetNamespaceFragment
 	#undef __RFK3698706698196451833u_DefineGetNamespaceFragment
 #endif
 #define __RFK3698706698196451833u_DefineGetNamespaceFragment	\
-	inline rfk::NamespaceFragment const& getNamespaceFragment3698706698196451833u_10189270957831661615() noexcept	\
+	inline rfk::NamespaceFragment const& getNamespaceFragment3698706698196451833u_587527118187529644() noexcept	\
 	{	\
 		static rfk::NamespaceFragment	fragment("Solid", 3698706698196451833u);	\
 		static bool						initialized = false;	\
@@ -41,7 +41,7 @@
 	#undef __RFK3698706698196451833u_RegisterNamespace
 #endif
 #define __RFK3698706698196451833u_RegisterNamespace	\
-	inline rfk::NamespaceFragmentRegisterer namespaceFragmentRegisterer3698706698196451833u_10189270957831661615 = rfk::NamespaceFragmentRegisterer("Solid", 3698706698196451833u, &getNamespaceFragment3698706698196451833u_10189270957831661615(), true);
+	inline rfk::NamespaceFragmentRegisterer namespaceFragmentRegisterer3698706698196451833u_587527118187529644 = rfk::NamespaceFragmentRegisterer("Solid", 3698706698196451833u, &getNamespaceFragment3698706698196451833u_587527118187529644(), true);
 
 #ifdef __RFK3698706698196451833u_GENERATED
 	#undef __RFK3698706698196451833u_GENERATED
