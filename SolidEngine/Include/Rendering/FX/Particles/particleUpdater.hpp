@@ -7,8 +7,7 @@
 
 namespace Solid
 {
-	namespace Particles
-	{
+
 		class SOLID_API ParticleUpdater
 		{
 		public:
@@ -106,5 +105,5 @@ namespace Solid
 
 			void Update(float dt, ParticleData *p) override;
 		};
-	}
+
 }

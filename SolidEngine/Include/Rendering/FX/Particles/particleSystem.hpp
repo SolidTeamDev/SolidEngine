@@ -8,8 +8,7 @@
 
 namespace Solid
 {
-	namespace Particles
-	{
+
 		class SOLID_API ParticleSystem
 		{
 		public:
@@ -63,6 +62,6 @@ namespace Solid
 
 
 		};
-	}
+
 }
 

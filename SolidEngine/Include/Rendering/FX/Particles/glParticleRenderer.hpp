@@ -4,8 +4,7 @@
 
 namespace Solid
 {
-	namespace Particles
-	{
+
 		class SOLID_API GLParticleRenderer
 		{
 		protected:
@@ -31,5 +30,5 @@ namespace Solid
 
 			void Render();
 		};
-	}
+
 }

@@ -73,9 +73,9 @@ namespace Solid
             EditCamera(engine->ecsManager.GetComponent<Camera>(gameObject->GetEntity()));
         }
 
-	    if(engine->ecsManager.GotComponent<Particles::ParticleEffect>(gameObject->GetEntity()))
+	    if(engine->ecsManager.GotComponent<ParticleEffect>(gameObject->GetEntity()))
 	    {
-		    EditParticleEffect(engine->ecsManager.GetComponent<Particles::ParticleEffect>(gameObject->GetEntity()));
+		    EditParticleEffect(engine->ecsManager.GetComponent<ParticleEffect>(gameObject->GetEntity()));
 	    }
         if(engine->ecsManager.GotComponent<Animation>(gameObject->GetEntity()))
         {
@@ -196,11 +196,11 @@ namespace Solid
                     UI::CloseCurrentPopup();
                 }
             }
-	        if(!engine->ecsManager.GotComponent<Particles::ParticleEffect>(gameObject->GetEntity()))
+	        if(!engine->ecsManager.GotComponent<ParticleEffect>(gameObject->GetEntity()))
 	        {
 		        if(UI::Button("ParticleEffect"))
 		        {
-			        engine->ecsManager.AddComponent<Particles::ParticleEffect>(gameObject, Particles::ParticleEffect());
+			        engine->ecsManager.AddComponent<ParticleEffect>(gameObject, ParticleEffect());
 			        UI::CloseCurrentPopup();
 		        }
 	        }
@@ -338,11 +338,11 @@ namespace Solid
                     UI::CloseCurrentPopup();
                 }
             }
-		    if(engine->ecsManager.GotComponent<Particles::ParticleEffect>(gameObject->GetEntity()))
+		    if(engine->ecsManager.GotComponent<ParticleEffect>(gameObject->GetEntity()))
 		    {
 			    if(UI::Button("ParticleEffect"))
 			    {
-				    engine->ecsManager.RemoveComponent<Particles::ParticleEffect>(gameObject);
+				    engine->ecsManager.RemoveComponent<ParticleEffect>(gameObject);
 				    UI::CloseCurrentPopup();
 			    }
 		    }
@@ -1053,7 +1053,7 @@ namespace Solid
         UI::Separator();
     }
 
-	void InspectorInterface::EditParticleEffect(Particles::ParticleEffect& _particle)
+	void InspectorInterface::EditParticleEffect(ParticleEffect& _particle)
 	{
 		if(UI::CollapsingHeader("ParticleEffect",ImGuiTreeNodeFlags_DefaultOpen))
 		{

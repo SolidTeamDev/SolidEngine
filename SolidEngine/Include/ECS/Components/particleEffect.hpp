@@ -12,11 +12,11 @@
 #include "Rendering/FX/Particles/particleSystem.hpp"
 
 #include "Rendering/FX/Particles/glParticleRenderer.hpp"
+#include "EngineGenerated/particleEffect.sld.hpp"
 
-namespace Solid
+namespace Solid SLDNamespace()
 {
-	namespace Particles
-	{
+
 		class SOLID_API SLDClass() ParticleEffect : public Components
 		{
 			SLDField()
@@ -79,6 +79,8 @@ namespace Solid
 
 			void EditUpdaters();
 			void EditGenerators();
+			ParticleEffect_GENERATED
 		};
-	}
+
 }
+File_GENERATED
