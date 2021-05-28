@@ -11,11 +11,11 @@ namespace Solid SLDNamespace()
 	{
 	public:
         SLDField()
-        float moveSpeed;
+        float moveSpeed = 0;
         SLDField()
-        float jumpForce;
+        float jumpForce = 0;
         SLDField()
-        int health;
+        int health = 0;
 	private:
 		Engine* engine = nullptr;
 	    RigidBody* rigidBody = nullptr;
