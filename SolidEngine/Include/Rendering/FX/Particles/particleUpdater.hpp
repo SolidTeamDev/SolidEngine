@@ -27,7 +27,9 @@ namespace Solid
 			EulerUpdater() : globalAcceleration(0.f, 0.f, 0.f, 0.f)
 			{}
 
-			virtual void Update(float dt, ParticleData *p) override;
+
+			void ShowUI(bool& upt);
+			void Update(float dt, ParticleData *p) override;
 		};
 
 		class SOLID_API FloorUpdater : public ParticleUpdater
@@ -39,7 +41,9 @@ namespace Solid
 			FloorUpdater() : floorY(0.0), bounceFactor(0.5f)
 			{}
 
-			virtual void Update(float dt, ParticleData *p) override;
+
+			void ShowUI(bool& upt);
+			void Update(float dt, ParticleData *p) override;
 		};
 
 		class SOLID_API AttractorUpdater : public ParticleUpdater
@@ -47,7 +51,9 @@ namespace Solid
 		protected:
 			std::vector<Vec4> attractors; // .w is force
 		public:
-			virtual void Update(float dt, ParticleData *p) override;
+
+			void ShowUI(bool& upt);
+			void Update(float dt, ParticleData *p) override;
 
 			size_t CollectionSize() const
 			{ return attractors.size(); }
@@ -62,7 +68,8 @@ namespace Solid
 		class SOLID_API BasicColorUpdater : public ParticleUpdater
 		{
 		public:
-			virtual void Update(float dt, ParticleData *p) override;
+
+			void Update(float dt, ParticleData *p) override;
 		};
 
 		class SOLID_API PosColorUpdater : public ParticleUpdater
@@ -74,7 +81,9 @@ namespace Solid
 			PosColorUpdater() : minPos(0.f, 0.f, 0.f, 0.f), maxPos(1.f, 1.f, 1.f, 1.f)
 			{}
 
-			virtual void Update(float dt, ParticleData *p) override;
+
+			void ShowUI(bool& upt);
+			void Update(float dt, ParticleData *p) override;
 		};
 
 		class SOLID_API VelColorUpdater : public ParticleUpdater
@@ -86,13 +95,16 @@ namespace Solid
 			VelColorUpdater() : minVel(0.f, 0.f, 0.f, 0.f), maxVel(1.f, 1.f, 1.f, 1.f)
 			{}
 
-			virtual void Update(float dt, ParticleData *p) override;
+
+			void ShowUI(bool& upt);
+			void Update(float dt, ParticleData *p) override;
 		};
 
 		class SOLID_API BasicTimeUpdater : public ParticleUpdater
 		{
 		public:
-			virtual void Update(float dt, ParticleData *p) override;
+
+			void Update(float dt, ParticleData *p) override;
 		};
 	}
 }
