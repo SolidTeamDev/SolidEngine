@@ -2,7 +2,6 @@
 #include "imgui.h"
 
 using namespace Solid;
-using namespace Solid::Particles;
 
 float Mix(float x, float y, float a)
 {

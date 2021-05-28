@@ -8,8 +8,7 @@
 
 namespace Solid
 {
-	namespace Particles
-	{
+
 		class SOLID_API ParticleEmitter
 		{
 		public:
@@ -42,6 +41,6 @@ namespace Solid
 				generators.push_back(gen);
 			}
 		};
-	}
+
 }
 #endif

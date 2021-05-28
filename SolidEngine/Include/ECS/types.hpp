@@ -19,7 +19,7 @@ namespace Solid SLDNamespace()
     	~Components() override = default;
     	Components(const Components& ) = default;
     	virtual void Init() {};
-    	virtual void Release() { gameObject = nullptr;};
+    	virtual void Release() { };
     	GameObject* gameObject = nullptr;
     	Components& operator=(const Components&)
 	    {

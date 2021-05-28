@@ -33,6 +33,8 @@ namespace Solid SLDNamespace()
         float CurrentTime;
         Mat4f InverseRootMat = Mat4f::Identity;
         std::vector<Mat4f> FinalsTrans;
-
+    public:
+		Animation_GENERATED
     };
 }
+File_GENERATED

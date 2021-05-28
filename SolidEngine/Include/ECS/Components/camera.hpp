@@ -20,6 +20,9 @@ namespace Solid SLDNamespace()
         Mat4<float> view;
 
         bool isActiveCamera = false;
+
+	    SLDField()
+	    bool isDefaultCamera = false;
     public:
 	    SLDField()
 	    float fov;
@@ -52,6 +55,8 @@ namespace Solid SLDNamespace()
         Mat4<float> lookAt(const Vec3& eye, const Vec3& center, const Vec3& up);
 
         void SetActiveCamera();
+
+
 
         Camera_GENERATED
     };

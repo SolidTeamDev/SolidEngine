@@ -4,8 +4,7 @@
 
 namespace Solid
 {
-	namespace Particles
-	{
+
 		class SOLID_API ParticleGenerator
 		{
 		public:
@@ -129,5 +128,5 @@ namespace Solid
 			void Generate(double dt, ParticleData *p, size_t startId, size_t endId) override;
 			void ShowUI(bool& upt);
 		};
-	}
+
 }
