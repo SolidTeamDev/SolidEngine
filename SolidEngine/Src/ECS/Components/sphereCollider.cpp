@@ -66,4 +66,37 @@ namespace Solid
             sphereCollider->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, !isTrigger);
         }
     }
+
+    float SphereCollider::GetStaticFriction()
+    {
+        return staticFriction;
+    }
+
+    void SphereCollider::SetStaticFriction(float _staticFriction)
+    {
+        staticFriction = _staticFriction;
+        physicMaterial->setStaticFriction(staticFriction);
+    }
+
+    float SphereCollider::GetDynamicFriction()
+    {
+        return dynamicFriction;
+    }
+
+    void SphereCollider::SetDynamicFriction(float _dynamicFriction)
+    {
+        dynamicFriction = _dynamicFriction;
+        physicMaterial->setDynamicFriction(dynamicFriction);
+    }
+
+    float SphereCollider::GetRestitution()
+    {
+        return restitution;
+    }
+
+    void SphereCollider::SetRestitution(float _restitution)
+    {
+        restitution = _restitution;
+        physicMaterial->setRestitution(restitution);
+    }
 } //!namespace

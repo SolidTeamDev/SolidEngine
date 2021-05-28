@@ -29,7 +29,10 @@ Solid::GameObject::~GameObject()
 	for (GameObject* child : childs)
 	{
 	    if(child->physicsActor != nullptr)
+        {
 		    child->physicsActor->release();
+            child->physicsActor = nullptr;
+        }
 		Engine::GetInstance()->ecsManager.DestroyEntity(child->entity,FromSceneGraphMgr{});
 		delete child;
 	}
@@ -67,7 +70,10 @@ void Solid::GameObject::RemoveCurrent()
 			{
 				parent->childs.erase(parent->childs.begin() + i);
 				if(physicsActor != nullptr)
+                {
 				    physicsActor->release();
+				    physicsActor = nullptr;
+                }
 				delete this;
 				break;
 			}

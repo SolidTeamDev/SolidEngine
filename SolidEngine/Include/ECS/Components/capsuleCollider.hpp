@@ -64,6 +64,15 @@ namespace Solid SLDNamespace()
         bool IsTrigger();
         void SetTrigger(bool _trigger);
 
+        float GetStaticFriction();
+        void SetStaticFriction(float _staticFriction);
+
+        float GetDynamicFriction();
+        void SetDynamicFriction(float _dynamicFriction);
+
+        float GetRestitution();
+        void SetRestitution(float _restitution);
+
         CapsuleCollider_GENERATED
     };
 } //!namespace
