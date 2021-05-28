@@ -22,6 +22,7 @@ namespace Solid
 			SLDField()
 			size_t numParticles;
 
+
 			std::shared_ptr<ParticleSystem> system = nullptr;
 			std::shared_ptr<ParticleEmitter> emitter = nullptr;
 
@@ -29,6 +30,9 @@ namespace Solid
 			std::shared_ptr<GLParticleRenderer> renderer = nullptr;
 
 		public:
+
+			SLDField()
+			float particlesSize;
 
 			std::shared_ptr<VelFromPosGen> velFromPosGen = nullptr;
 			std::shared_ptr<BasicColorGen> colGen        = nullptr;
@@ -69,6 +73,8 @@ namespace Solid
 			{
 				numParticles = _count;
 				system->SetCount(_count);
+				renderer->Destroy();
+				renderer->Generate(system.get(), true);
 			}
 			size_t GetCount()
 			{

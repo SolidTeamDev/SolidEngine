@@ -59,7 +59,7 @@ void ParticleEffect::Init()
 bool ParticleEffect::InitializeRenderer()
 {
 	renderer = std::make_shared<GLParticleRenderer>();
-	renderer->Generate(system.get(), false);
+	renderer->Generate(system.get(), true);
 	return true;
 }
 
@@ -90,6 +90,8 @@ void ParticleEffect::Update(const Transform& trsf)
 void ParticleEffect::CpuUpdate()
 {
 	system->Update(Time::DeltaTime());
+	if (particlesSize <= 0.f)
+		particlesSize = 0.1f;
 }
 
 void ParticleEffect::GpuUpdate()
@@ -124,6 +126,10 @@ void ParticleEffect::Render()
 	GLboolean last_enable_scissor_test = glIsEnabled(GL_SCISSOR_TEST);
 
 	ParticleTex->BindTexture(0);
+	GLint prog = 0;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &prog);
+	int loc = glGetUniformLocation(prog, "size");
+	glUniform1f(loc,particlesSize);
 	renderer->Render();
 
 	glUseProgram(last_program);

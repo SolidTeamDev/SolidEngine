@@ -1068,6 +1068,7 @@ namespace Solid
 			{
 				_particle.SetEmitRate(emitRate);
 			}
+			EditFloat(_particle.particlesSize, "Size##particles", 0.2f);
 			{
 			auto tex = _particle.GetTex();
 			const char *texName = tex == nullptr ? "" : tex->name.c_str();
