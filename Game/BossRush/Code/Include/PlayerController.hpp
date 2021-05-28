@@ -36,6 +36,8 @@ namespace Solid SLDNamespace()
 	    void MoveRight();
 	    void Jump();
 
+	    void Fire();
+
 		PlayerController_GENERATED
 	};
 	
