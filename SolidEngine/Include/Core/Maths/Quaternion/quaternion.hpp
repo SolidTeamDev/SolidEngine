@@ -37,7 +37,7 @@ namespace Solid SLDNamespace()
         static Quat Identity;
 
         SLDMethod()
-        static constexpr float Dot(const Quat &_q1,const Quat &_q2) noexcept;
+        static float Dot(const Quat &_q1,const Quat &_q2) noexcept;
 
 		SLDMethod()
         static Quat Lerp(const Quat& _q1,const Quat& _q2, float _r) noexcept;

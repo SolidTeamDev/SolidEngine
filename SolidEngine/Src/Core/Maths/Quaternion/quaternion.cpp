@@ -70,7 +70,7 @@ namespace Solid
 
     Quat Quat::Identity{0, 0, 0, 1};
 
-    constexpr float Quat::Dot(const Quat &_q1, const Quat &_q2) noexcept
+    float Quat::Dot(const Quat &_q1, const Quat &_q2) noexcept
     {
         return (_q1.w * _q2.w) +
                (_q1.x * _q2.x) +
