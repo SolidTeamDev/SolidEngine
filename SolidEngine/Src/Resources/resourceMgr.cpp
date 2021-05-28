@@ -412,4 +412,14 @@ std::unordered_map<std::string, Resource *> *ResourceManager::GetResourcesVecByT
 	}
 }
 
+AnimResource *ResourceManager::GetRawAnimByName(const char *name)
+{
+	auto list = AnimList.List;
+	auto it = list.find(name);
+	if(it == list.end())
+		return nullptr;
+	return (AnimResource*)it->second;
+	return nullptr;
+}
+
 

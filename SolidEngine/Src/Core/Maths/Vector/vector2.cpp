@@ -48,14 +48,14 @@ namespace Solid
     Vec2 const Vec2::Left{-1,0};
     Vec2 const Vec2::Right{1,0};
 
-    constexpr float Vec2::Dot(const Vec2& _v1,const Vec2 &_v2) noexcept
+    float Vec2::Dot(const Vec2& _v1,const Vec2 &_v2) noexcept
     {
 
         return _v1.x * _v2.x +
                 _v1.y * _v2.y;
     }
 
-    constexpr float Vec2::Cross(const Vec2& _v1,const Vec2 &_v2) noexcept
+    float Vec2::Cross(const Vec2& _v1,const Vec2 &_v2) noexcept
     {
         return _v1.x * _v2.y +
                 _v1.y * _v2.x;

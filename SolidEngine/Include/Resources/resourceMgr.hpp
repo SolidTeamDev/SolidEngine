@@ -97,6 +97,7 @@ namespace Solid
 	    MaterialResource* GetRawMaterialByName(const char* name);
 	    ImageResource* GetRawImageByName(const char* name);
 	    AudioResource* GetRawAudioByName(const char* name);
+	    AnimResource* GetRawAnimByName(const char* name);
 	    MaterialResource* CreateMaterial(const char* name);
 	    PrefabResource* GetPrefabByName(const char* name);
 	    SceneResource * GetSceneByName(const char* name);

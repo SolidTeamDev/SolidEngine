@@ -68,10 +68,10 @@ namespace Solid SLDNamespace()
         static const Vec3 Back;
 
 		SLDMethod()
-		static constexpr float Dot(const Vec3& _v1, const Vec3& _v2) noexcept;
+		static float Dot(const Vec3& _v1, const Vec3& _v2) noexcept;
 
 		SLDMethod()
-		static constexpr Vec3 Cross(const Vec3& _v1, const Vec3& _v2) noexcept;
+		static Vec3 Cross(const Vec3& _v1, const Vec3& _v2) noexcept;
 
 		SLDMethod()
 		static Vec3 Lerp(const Vec3& _v1, const Vec3& _v2, float _r) noexcept;
