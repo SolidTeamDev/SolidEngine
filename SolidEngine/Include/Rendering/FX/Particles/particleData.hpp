@@ -7,8 +7,7 @@
 
 namespace Solid
 {
-	namespace Particles
-	{
+
 		class SOLID_API ParticleData
 		{
 		public:
@@ -47,5 +46,5 @@ namespace Solid
 				return p.count * (7 * sizeof(Vec4) + sizeof(bool)) + sizeof(size_t) * 2;
 			}
 		};
-	}
+
 }

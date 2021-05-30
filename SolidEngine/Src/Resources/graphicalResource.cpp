@@ -381,9 +381,12 @@ void GL::Shader::SetLights(Camera& _camera) const
         Mat4<float> tf =light.light->gameObject->transform->GetMatrix() * light.light->gameObject->transform->GetParentMatrix();
 
         Vec3 pos = Vec3(tf.elements[12],tf.elements[13],tf.elements[14]);
+        glUniform1i(glGetUniformLocation(ProgID,std::string("_lights[" + id + "].type").c_str()),light.light->type);
         glUniform3fv(glGetUniformLocation(ProgID,std::string("_lights[" + id + "].pos").c_str()),1,&pos.x);
         glUniform3fv(glGetUniformLocation(ProgID,std::string("_lights[" + id + "].color").c_str()),1,&light.light->color.x);
         glUniform1f(glGetUniformLocation(ProgID,std::string("_lights[" + id + "].intensity").c_str()),light.light->intensity);
+        if(light.light->type == Light::DIRECTIONAL)
+            glUniform3fv(glGetUniformLocation(ProgID,std::string("_lights[" + id + "].dir").c_str()),1,&light.light->dir.x);
 
         ++i;
     }

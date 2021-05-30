@@ -1,7 +1,7 @@
 #include "Rendering/FX/Particles/ParticleUpdater.hpp"
+#include "imgui.h"
 
 using namespace Solid;
-using namespace Solid::Particles;
 
 float Mix(float x, float y, float a)
 {
@@ -46,6 +46,8 @@ void EulerUpdater::Update(float dt, ParticleData* p)
 		pos[i].w += localDT * vel[i].w;
 	}
 }
+
+
 
 void FloorUpdater::Update(float dt, ParticleData* p)
 {
@@ -201,3 +203,74 @@ void BasicTimeUpdater::Update(float dt, ParticleData* p)
 		}
 	}
 }
+
+void AttractorUpdater::ShowUI(bool& upt)
+{
+	if (UI::Button("Create Attractor"))
+	{
+		Vec4 newVec(0.f, 0.f, 0.f, 0.f);
+		attractors.push_back(newVec);
+		upt = true;
+	}
+	for (size_t it = 0; it < attractors.size(); it++)
+	{
+		ImVec4 _vec(attractors[it].x, attractors[it].y, attractors[it].z, attractors[it].w);
+		if (UI::DragFloat4(("Pos##" + std::to_string(it)).c_str(), &_vec.x))
+		{
+			attractors[it] = {_vec.x, _vec.y, _vec.z, _vec.w};
+			upt = true;
+		}
+	}
+}
+
+void PosColorUpdater::ShowUI(bool &upt)
+{
+	ImVec4 _min(minPos.x, minPos.y, minPos.z, minPos.w);
+	if (UI::DragFloat4("Min Pos##poscol", &_min.x))
+	{
+		minPos = {_min.x, _min.y, _min.z, _min.w};
+		upt = true;
+	}
+	ImVec4 _max(maxPos.x, maxPos.y, maxPos.z, maxPos.w);
+	if (UI::DragFloat4("Max Pos##poscol", &_max.x))
+	{
+		maxPos = {_max.x, _max.y, _max.z, _max.w};
+		upt = true;
+	}
+}
+
+void VelColorUpdater::ShowUI(bool &upt)
+{
+	ImVec4 _min(minVel.x, minVel.y, minVel.z, minVel.w);
+	if (UI::DragFloat4("Min Vel##velcol", &_min.x))
+	{
+		minVel = {_min.x, _min.y, _min.z, _min.w};
+		upt = true;
+	}
+	ImVec4 _max(maxVel.x, maxVel.y, maxVel.z, maxVel.w);
+	if (UI::DragFloat4("Max Vel##velcol", &_max.x))
+	{
+		maxVel = {_max.x, _max.y, _max.z, _max.w};
+		upt = true;
+	}
+}
+
+void FloorUpdater::ShowUI(bool &upt)
+{
+	if (UI::DragFloat("Y", &floorY))
+		upt = true;
+	if (UI::DragFloat("Bounciness##floor", &bounceFactor))
+		upt = true;
+}
+
+void EulerUpdater::ShowUI(bool &upt)
+{
+	ImVec4 _acc(globalAcceleration.x, globalAcceleration.y, globalAcceleration.z, globalAcceleration.w);
+	if (UI::DragFloat4("Acceleration##euler", &_acc.x))
+	{
+		globalAcceleration = {_acc.x, _acc.y, _acc.z, _acc.w};
+		upt = true;
+	}
+}
+
+

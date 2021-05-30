@@ -1,9 +1,10 @@
 #include "Rendering/FX/Particles/particleGenerator.hpp"
 #include <random>
+#include "imgui.h"
 
 #define M_PI 3.14159265358979323846
 
-using namespace Solid::Particles;
+using namespace Solid;
 
 float LinearRand(float min, float max)
 {
@@ -101,3 +102,108 @@ void BasicTimeGen::Generate(double dt, ParticleData* p, size_t startId, size_t e
 		p->time[i].w = 1.f / p->time[i].x;
 	}
 }
+
+void BoxPosGen::ShowUI(bool& upt)
+{
+	ImVec4 _pos(pos.x, pos.y, pos.z, pos.w);
+	if (UI::DragFloat4("Position##boxpos", &_pos.x))
+	{
+		pos = {_pos.x, _pos.y, _pos.z, _pos.w};
+		upt = true;
+	}
+	ImVec4 _posOffset(maxStartPosOffset.x, maxStartPosOffset.y, maxStartPosOffset.z, maxStartPosOffset.w);
+	if (UI::DragFloat4("Max Offset##boxpos", &_posOffset.x))
+	{
+		maxStartPosOffset = {_posOffset.x, _posOffset.y, _posOffset.z, _posOffset.w};
+		upt = true;
+	}
+}
+
+void SphereVelGen::ShowUI(bool &upt)
+{
+	if (UI::DragFloat("Min Vel##sphereVel", &minVel))
+		upt = true;
+	if (UI::DragFloat("Max Vel##sphereVel", &maxVel))
+		upt = true;
+}
+
+void BasicVelGen::ShowUI(bool &upt)
+{
+	ImVec4 _minStartVel(minStartVel.x, minStartVel.y, minStartVel.z, minStartVel.w);
+	if (UI::DragFloat4("Min Vel##basicvel", &_minStartVel.x))
+	{
+		minStartVel = {_minStartVel.x, _minStartVel.y, _minStartVel.z, _minStartVel.w};
+		upt = true;
+	}
+	ImVec4 _maxStartVel(maxStartVel.x, maxStartVel.y, maxStartVel.z, maxStartVel.w);
+	if (UI::DragFloat4("Max Vel##basicvel", &_maxStartVel.x))
+	{
+		maxStartVel = {_maxStartVel.x, _maxStartVel.y, _maxStartVel.z, _maxStartVel.w};
+		upt = true;
+	}
+}
+
+void BasicTimeGen::ShowUI(bool &upt)
+{
+	if (UI::DragFloat("Min Time##basictime", &minTime))
+		upt = true;
+	if (UI::DragFloat("Max Time##basictime", &maxTime))
+		upt = true;
+}
+
+void CirclePosGen::ShowUI(bool &upt)
+{
+	ImVec4 _center(center.x, center.y, center.z, center.w);
+	if (UI::DragFloat4("Center##circlepos", &_center.x))
+	{
+		center = {_center.x, _center.y, _center.z, _center.w};
+		upt = true;
+	}
+	if (UI::DragFloat("X Radius##circlepos", &radX))
+		upt = true;
+	if (UI::DragFloat("Y Radius##circlepos", &radY))
+		upt = true;
+}
+
+void VelFromPosGen::ShowUI(bool &upt)
+{
+	ImVec4 _offset(offset.x, offset.y, offset.z, offset.w);
+	if (UI::DragFloat4("Center##circlepos", &_offset.x))
+	{
+		offset = {_offset.x, _offset.y, _offset.z, _offset.w};
+		upt = true;
+	}
+	if (UI::DragFloat("Min Scale##velfrompos", &minScale))
+		upt = true;
+	if (UI::DragFloat("Max Scale##velfrompos", &maxScale))
+		upt = true;
+}
+
+void BasicColorGen::ShowUI(bool &upt)
+{
+	ImVec4 _minStartCol(minStartCol.x, minStartCol.y, minStartCol.z, minStartCol.w);
+	if (UI::DragFloat4("Start Min##col", &_minStartCol.x))
+	{
+		minStartCol = {_minStartCol.x, _minStartCol.y, _minStartCol.z, _minStartCol.w};
+		upt = true;
+	}
+	ImVec4 _maxStartCol(maxStartCol.x, maxStartCol.y, maxStartCol.z, maxStartCol.w);
+	if (UI::DragFloat4("Start Max##col", &_maxStartCol.x))
+	{
+		maxStartCol = {_maxStartCol.x, _maxStartCol.y, _maxStartCol.z, _maxStartCol.w};
+		upt = true;
+	}
+	ImVec4 _minEndCol(minEndCol.x, minEndCol.y, minEndCol.z, minEndCol.w);
+	if (UI::DragFloat4("End Min##col", &_minEndCol.x))
+	{
+		minEndCol = {_minEndCol.x, _minEndCol.y, _minEndCol.z, _minEndCol.w};
+		upt = true;
+	}
+	ImVec4 _maxEndCol(maxEndCol.x, maxEndCol.y, maxEndCol.z, maxEndCol.w);
+	if (UI::DragFloat4("End Max##col", &_maxEndCol.x))
+	{
+		maxEndCol = {_maxEndCol.x, _maxEndCol.y, _maxEndCol.z, _maxEndCol.w};
+		upt = true;
+	}
+}
+

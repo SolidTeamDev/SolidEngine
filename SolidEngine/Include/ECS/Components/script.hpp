@@ -26,7 +26,7 @@ class SOLID_API SLDClass() Script : public Components
         virtual void OnContactEnter(GameObject* _other) {};
         virtual void OnContactExit(GameObject* _other) {};
 
-    GameObject* GetGameObject(){return gameObject;}
+    	GameObject* GetGameObject(){return gameObject;}
 
 		Script_GENERATED
     };

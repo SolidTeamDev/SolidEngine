@@ -7,8 +7,7 @@
 
 namespace Solid
 {
-	namespace Particles
-	{
+
 		class SOLID_API ParticleEffectSystem : public System
 		{
 		public:
@@ -21,5 +20,5 @@ namespace Solid
 			void Update(Camera& _cam);
 
 		};
-	}
+
 }

@@ -8,8 +8,13 @@ namespace Solid
     anim{_anim}
     {
         FinalsTrans.reserve(anim->numOfBones);
+        FinalsTransBone.reserve(anim->numOfBones);
         for(int i = 0; i < anim->numOfBones; i++)
+        {
             FinalsTrans.push_back(Mat4f::Identity);
+            FinalsTransBone.push_back(Mat4f::Identity);
+        }
+
 	    AnimName = anim->name;
     }
 
@@ -36,14 +41,14 @@ namespace Solid
 
             if(bone->Parent == nullptr)
             {
-                parentPos = FinalsTrans[bone->id] * Vec4::Zero;
+                parentPos = FinalsTransBone[bone->id] * Vec4::Zero;
                 points[bone->id] = parentPos ;
             }
             else
             {
 
-                parentPos = FinalsTrans[bone->Parent->id] * Vec4::Zero;
-                childPos = FinalsTrans[bone->id] * Vec4::Zero;
+                parentPos = FinalsTransBone[bone->Parent->id] * Vec4::Zero;
+                childPos = FinalsTransBone[bone->id] * Vec4::Zero;
                 if(bone->isAnimated)
                 {
                     points[bone->id] = childPos;
@@ -74,12 +79,14 @@ namespace Solid
             nodeTransform = newBone->LocalTrans;
         }
 
-        Mat4f GlobalTrans = _parentTRS * nodeTransform;
+        Mat4f GlobalTrans =  _parentTRS * nodeTransform;
 
         //auto boneInfoMap = m_CurrentAnimation->GetBoneIDMap();
         //if (boneInfoMap.find(nodeName) != boneInfoMap.end())
         {
             FinalsTrans[bone->id] =  ( GlobalTrans * newBone->offset );
+            FinalsTransBone[bone->id] =  ( GlobalTrans * newBone->offset.GetTransposed().GetInversed() );
+
         }
 
         for (auto child : newBone->Childrens)
@@ -90,14 +97,19 @@ namespace Solid
     {
         anim = _anim;
         AnimName = anim->name;
-        CurrentTime = 0;
         AnimTime = anim->numTicks/anim->ticksPerSeconds;
+        CurrentTime = 0;
         std::cout << AnimTime << std::endl;
         InverseRootMat = (anim->Root->LocalTrans ) ;
         FinalsTrans.clear();
+        FinalsTransBone.clear();
         FinalsTrans.reserve(anim->numOfBones);
+        FinalsTransBone.reserve(anim->numOfBones);
         for(int i = 0; i < anim->numOfBones; i++)
+        {
             FinalsTrans.push_back(Mat4f::Identity);
+            FinalsTransBone.push_back(Mat4f::Identity);
+        }
 
         CalculateBoneTransform(anim->Root, Mat4f::Identity);
 
@@ -116,7 +128,6 @@ namespace Solid
 
     void Animation::UpdateBone(float currTime, SkeletonResource::Bone* bone)
     {
-        //for (auto& boneChannel : anim->Channels)
         {
             SkeletonResource::Bone* newBone = anim->Root->FindBoneByName(bone->name.c_str());
             if(bone->channel.Frames.size() != 0)
@@ -127,7 +138,6 @@ namespace Solid
                 else
                     index = (int)bone->channel.Frames.size()-1;
 
-                //SkeletonResource::Bone* bonetoMod = boneChannel.BoneToMod;
                 Vec3 translation = Vec3::Zero;
                 Quat rotation = Quat::Identity;
                 Vec3 scale = Vec3(1,1,1);

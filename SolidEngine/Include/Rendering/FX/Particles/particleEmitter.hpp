@@ -8,13 +8,13 @@
 
 namespace Solid
 {
-	namespace Particles
-	{
+
 		class SOLID_API ParticleEmitter
 		{
-		protected:
-			std::vector<std::shared_ptr<ParticleGenerator>> m_generators;
 		public:
+
+			std::vector<std::shared_ptr<ParticleGenerator>> generators;
+
 			float emitRate{0.0};
 
 			ParticleEmitter()
@@ -29,7 +29,7 @@ namespace Solid
 				const size_t startId = p->countAlive;
 				const size_t endId = std::min<size_t>(startId + maxNewParticles, p->count - 1);
 
-				for (std::shared_ptr<ParticleGenerator> &gen : m_generators)
+				for (std::shared_ptr<ParticleGenerator> &gen : generators)
 					gen->Generate(dt, p, startId, endId);
 
 				for (size_t i = startId; i < endId; i++)
@@ -38,9 +38,9 @@ namespace Solid
 
 			void AddGenerator(std::shared_ptr<ParticleGenerator> gen)
 			{
-				m_generators.push_back(gen);
+				generators.push_back(gen);
 			}
 		};
-	}
+
 }
 #endif

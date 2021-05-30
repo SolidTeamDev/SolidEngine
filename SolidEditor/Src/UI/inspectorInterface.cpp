@@ -73,9 +73,9 @@ namespace Solid
             EditCamera(engine->ecsManager.GetComponent<Camera>(gameObject->GetEntity()));
         }
 
-	    if(engine->ecsManager.GotComponent<Particles::ParticleEffect>(gameObject->GetEntity()))
+	    if(engine->ecsManager.GotComponent<ParticleEffect>(gameObject->GetEntity()))
 	    {
-		    EditParticleEffect(engine->ecsManager.GetComponent<Particles::ParticleEffect>(gameObject->GetEntity()));
+		    EditParticleEffect(engine->ecsManager.GetComponent<ParticleEffect>(gameObject->GetEntity()));
 	    }
         if(engine->ecsManager.GotComponent<Animation>(gameObject->GetEntity()))
         {
@@ -196,11 +196,11 @@ namespace Solid
                     UI::CloseCurrentPopup();
                 }
             }
-	        if(!engine->ecsManager.GotComponent<Particles::ParticleEffect>(gameObject->GetEntity()))
+	        if(!engine->ecsManager.GotComponent<ParticleEffect>(gameObject->GetEntity()))
 	        {
 		        if(UI::Button("ParticleEffect"))
 		        {
-			        engine->ecsManager.AddComponent<Particles::ParticleEffect>(gameObject, Particles::ParticleEffect());
+			        engine->ecsManager.AddComponent<ParticleEffect>(gameObject, ParticleEffect());
 			        UI::CloseCurrentPopup();
 		        }
 	        }
@@ -338,11 +338,11 @@ namespace Solid
                     UI::CloseCurrentPopup();
                 }
             }
-		    if(engine->ecsManager.GotComponent<Particles::ParticleEffect>(gameObject->GetEntity()))
+		    if(engine->ecsManager.GotComponent<ParticleEffect>(gameObject->GetEntity()))
 		    {
 			    if(UI::Button("ParticleEffect"))
 			    {
-				    engine->ecsManager.RemoveComponent<Particles::ParticleEffect>(gameObject);
+				    engine->ecsManager.RemoveComponent<ParticleEffect>(gameObject);
 				    UI::CloseCurrentPopup();
 			    }
 		    }
@@ -783,8 +783,48 @@ namespace Solid
     {
         if(UI::CollapsingHeader("Light",ImGuiTreeNodeFlags_DefaultOpen))
         {
+            Light::ELightType lightType = _light.type;
+            {
+                std::string lightTypeName = "";
+                switch (lightType)
+                {
+                    case Light::DIRECTIONAL:
+                        lightTypeName = "DIRECTIONAL";
+                        break;
+                    case Light::SPOT:
+                        lightTypeName = "SPOT";
+                        break;
+                    case Light::POINT:
+                        lightTypeName = "POINT";
+                        break;
+                }
+
+                if(UI::BeginCombo("Light type",lightTypeName.c_str()))
+                {
+                    bool selected = lightTypeName == "DIRECTIONAL";
+                    if(UI::Selectable("DIRECTIONAL",selected))
+                        _light.type = Light::ELightType::DIRECTIONAL;
+                    if(selected)
+                        UI::SetItemDefaultFocus();
+                    selected = lightTypeName == "SPOT";
+                    if(UI::Selectable("SPOT",selected))
+                        _light.type = Light::ELightType::SPOT;
+                    if(selected)
+                        UI::SetItemDefaultFocus();
+                    selected = lightTypeName == "POINT";
+                    if(UI::Selectable("POINT",selected))
+                        _light.type = Light::ELightType::POINT;
+                    if(selected)
+                        UI::SetItemDefaultFocus();
+                    UI::EndCombo();
+                }
+            }
+
             UI::ColorEdit3("Color",&_light.color.x);
             EditFloat(_light.intensity,"Intensity",0.01f);
+
+            if(lightType == Light::DIRECTIONAL)
+                EditVec3(_light.dir,"Direction",0.01f);
         }
 
         UI::Separator();
@@ -933,6 +973,22 @@ namespace Solid
                 if(EditBool(isTrigger,"Trigger##Box"))
                     _boxCollider.SetTrigger(isTrigger);
             }
+
+            if(UI::TreeNode("Material##Box"))
+            {
+                float staticFriction = _boxCollider.GetStaticFriction();
+                float dynamicFriction = _boxCollider.GetDynamicFriction();
+                float restitution = _boxCollider.GetRestitution();
+
+                if(EditFloat(staticFriction,"Static friction##Box",0.01f))
+                    _boxCollider.SetStaticFriction(staticFriction);
+                if(EditFloat(dynamicFriction,"Dynamic friction##Box",0.01f))
+                    _boxCollider.SetDynamicFriction(dynamicFriction);
+                if(EditFloat(restitution,"Restitution##Box",0.01f))
+                    _boxCollider.SetRestitution(restitution);
+
+                UI::TreePop();
+            }
         }
         UI::Separator();
     }
@@ -950,6 +1006,22 @@ namespace Solid
                 bool isTrigger = _sphereCollider.IsTrigger();
                 if(EditBool(isTrigger,"Trigger##Sphere"))
                     _sphereCollider.SetTrigger(isTrigger);
+            }
+
+            if(UI::TreeNode("Material##Sphere"))
+            {
+                float staticFriction = _sphereCollider.GetStaticFriction();
+                float dynamicFriction = _sphereCollider.GetDynamicFriction();
+                float restitution = _sphereCollider.GetRestitution();
+
+                if(EditFloat(staticFriction,"Static friction##Sphere",0.01f))
+                    _sphereCollider.SetStaticFriction(staticFriction);
+                if(EditFloat(dynamicFriction,"Dynamic friction##Sphere",0.01f))
+                    _sphereCollider.SetDynamicFriction(dynamicFriction);
+                if(EditFloat(restitution,"Restitution##Sphere",0.01f))
+                    _sphereCollider.SetRestitution(restitution);
+
+                UI::TreePop();
             }
         }
         UI::Separator();
@@ -1009,14 +1081,31 @@ namespace Solid
                     UI::EndCombo();
                 }
             }
+
+            if(UI::TreeNode("Material##Capsule"))
+            {
+                float staticFriction = _capsuleCollider.GetStaticFriction();
+                float dynamicFriction = _capsuleCollider.GetDynamicFriction();
+                float restitution = _capsuleCollider.GetRestitution();
+
+                if(EditFloat(staticFriction,"Static friction##Capsule",0.01f))
+                    _capsuleCollider.SetStaticFriction(staticFriction);
+                if(EditFloat(dynamicFriction,"Dynamic friction##Capsule",0.01f))
+                    _capsuleCollider.SetDynamicFriction(dynamicFriction);
+                if(EditFloat(restitution,"Restitution##Capsule",0.01f))
+                    _capsuleCollider.SetRestitution(restitution);
+
+                UI::TreePop();
+            }
         }
         UI::Separator();
     }
 
-	void InspectorInterface::EditParticleEffect(Particles::ParticleEffect& _particle)
+	void InspectorInterface::EditParticleEffect(ParticleEffect& _particle)
 	{
 		if(UI::CollapsingHeader("ParticleEffect",ImGuiTreeNodeFlags_DefaultOpen))
 		{
+			{
 			auto tex = _particle.GetTex();
 			const char *texName = tex == nullptr ? "" : tex->name.c_str();
 
@@ -1053,6 +1142,14 @@ namespace Solid
 
 				UI::EndCombo();
 			}
+			}
+			//properties editing
+			{
+				_particle.EditUpdaters();
+				_particle.EditGenerators();
+			}
+
+
 		}
 	}
 

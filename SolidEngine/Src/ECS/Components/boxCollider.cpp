@@ -67,4 +67,37 @@ namespace Solid
         }
     }
 
+    float BoxCollider::GetStaticFriction()
+    {
+        return staticFriction;
+    }
+
+    void BoxCollider::SetStaticFriction(float _staticFriction)
+    {
+        staticFriction = _staticFriction;
+        physicMaterial->setStaticFriction(staticFriction);
+    }
+
+    float BoxCollider::GetDynamicFriction()
+    {
+        return dynamicFriction;
+    }
+
+    void BoxCollider::SetDynamicFriction(float _dynamicFriction)
+    {
+        dynamicFriction = _dynamicFriction;
+        physicMaterial->setDynamicFriction(dynamicFriction);
+    }
+
+    float BoxCollider::GetRestitution()
+    {
+        return restitution;
+    }
+
+    void BoxCollider::SetRestitution(float _restitution)
+    {
+        restitution = _restitution;
+        physicMaterial->setRestitution(restitution);
+    }
+
 } //!namespace

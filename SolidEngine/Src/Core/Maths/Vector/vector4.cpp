@@ -48,7 +48,7 @@ namespace Solid
     Vec4 const Vec4::Forward{1,0,1,1};
     Vec4 const Vec4::Back{0,0,-1,1};
 
-    constexpr float Vec4::Dot(const Vec4& _v1,const Vec4 &_v2) noexcept
+    float Vec4::Dot(const Vec4& _v1,const Vec4 &_v2) noexcept
     {
 
         return _v1.x * _v2.x +
@@ -57,7 +57,7 @@ namespace Solid
                _v1.w * _v2.w;
     }
 
-    constexpr Vec4 Vec4::Cross(const Vec4& _v1,const Vec4 &_v2) noexcept
+    Vec4 Vec4::Cross(const Vec4& _v1,const Vec4 &_v2) noexcept
     {
         return Vec4(_v1.y * _v2.z - _v1.z * _v2.y,
                 _v1.z * _v2.x - _v1.x * _v2.z,

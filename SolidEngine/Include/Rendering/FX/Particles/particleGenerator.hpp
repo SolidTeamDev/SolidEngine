@@ -4,16 +4,13 @@
 
 namespace Solid
 {
-	namespace Particles
-	{
+
 		class SOLID_API ParticleGenerator
 		{
 		public:
-			ParticleGenerator()
-			{};
+			ParticleGenerator() = default;
 
-			virtual ~ParticleGenerator()
-			{};
+			virtual ~ParticleGenerator() = default;
 
 			virtual void Generate(double dt, ParticleData *p, size_t start, size_t end) = 0;
 		};
@@ -34,7 +31,8 @@ namespace Solid
 			{};
 
 
-			virtual void Generate(double dt, ParticleData *p, size_t start, size_t end) override;
+			void Generate(double dt, ParticleData *p, size_t start, size_t end) override;
+			void ShowUI(bool& upt);
 		};
 
 		class SOLID_API CirclePosGen : public ParticleGenerator
@@ -54,7 +52,8 @@ namespace Solid
 					radY(_radY)
 			{};
 
-			virtual void Generate(double dt, ParticleData *p, size_t start, size_t end) override;
+			void Generate(double dt, ParticleData *p, size_t start, size_t end) override;
+			void ShowUI(bool& upt);
 		};
 
 		class SOLID_API BasicColorGen : public ParticleGenerator
@@ -69,7 +68,8 @@ namespace Solid
 			                  minEndCol(0.f, 0.f, 0.f, 0.f), maxEndCol(0.f, 0.f, 0.f, 0.f)
 			{};
 
-			virtual void Generate(double dt, ParticleData *p, size_t startId, size_t endId) override;
+			void Generate(double dt, ParticleData *p, size_t startId, size_t endId) override;
+			void ShowUI(bool& upt);
 		};
 
 		class SOLID_API BasicVelGen : public ParticleGenerator
@@ -77,11 +77,12 @@ namespace Solid
 		public:
 			Vec4 minStartVel;
 			Vec4 maxStartVel;
-		public:
+
 			BasicVelGen() : minStartVel(0.f, 0.f, 0.f, 0.f), maxStartVel(0.f, 0.f, 0.f, 0.f)
 			{}
 
-			virtual void Generate(double dt, ParticleData *p, size_t startId, size_t endId) override;
+			void Generate(double dt, ParticleData *p, size_t startId, size_t endId) override;
+			void ShowUI(bool& upt);
 		};
 
 		class SOLID_API SphereVelGen : public ParticleGenerator
@@ -89,11 +90,12 @@ namespace Solid
 		public:
 			float minVel;
 			float maxVel;
-		public:
+
 			SphereVelGen() : minVel(0.0), maxVel(0.0)
 			{}
 
-			virtual void Generate(double dt, ParticleData *p, size_t startId, size_t endId) override;
+			void Generate(double dt, ParticleData *p, size_t startId, size_t endId) override;
+			void ShowUI(bool& upt);
 		};
 
 		class SOLID_API VelFromPosGen : public ParticleGenerator
@@ -102,7 +104,7 @@ namespace Solid
 			Vec4 offset;
 			float minScale;
 			float maxScale;
-		public:
+
 			VelFromPosGen() : offset(0.f, 0.f, 0.f, 0.f), minScale(0.0), maxScale(0.0)
 			{}
 
@@ -110,7 +112,8 @@ namespace Solid
 					: offset(off), minScale((float) minS), maxScale((float) maxS)
 			{}
 
-			virtual void Generate(double dt, ParticleData *p, size_t startId, size_t endId) override;
+			void Generate(double dt, ParticleData *p, size_t startId, size_t endId) override;
+			void ShowUI(bool& upt);
 		};
 
 		class SOLID_API BasicTimeGen : public ParticleGenerator
@@ -118,11 +121,12 @@ namespace Solid
 		public:
 			float minTime;
 			float maxTime;
-		public:
+
 			BasicTimeGen() : minTime(0.0), maxTime(0.0)
 			{}
 
-			virtual void Generate(double dt, ParticleData *p, size_t startId, size_t endId) override;
+			void Generate(double dt, ParticleData *p, size_t startId, size_t endId) override;
+			void ShowUI(bool& upt);
 		};
-	}
+
 }
