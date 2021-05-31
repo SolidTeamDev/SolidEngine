@@ -89,7 +89,7 @@ link_directories(SolidEngine/ThirdParty/Lib Build/${CMAKE_BUILD_TYPE})
 
 set(EDITOR_LIBS PUBLIC glfw3dll OpenGL::GL SolidEngine)
 
-add_executable(SolidEditor ${EDITOR_SOURCE_FILES})
+add_executable(SolidEditor ${EDITOR_SOURCE_FILES} Resources/icon.rc)
 target_link_libraries(SolidEditor ${EDITOR_LIBS})
 target_compile_definitions(SolidEditor PUBLIC "IMGUI_API=__declspec(dllimport)")
 target_compile_definitions(SolidEditor PUBLIC "SOLID_API=__declspec(dllimport)")
@@ -130,7 +130,7 @@ link_directories(SolidEngine/ThirdParty/Lib Build/${CMAKE_BUILD_TYPE})
 
 set(LAUNCHER_LIBS PUBLIC glfw3dll OpenGL::GL SolidEngine)
 
-add_executable(SolidLauncher ${LAUNCHER_SOURCE_FILES})
+add_executable(SolidLauncher ${LAUNCHER_SOURCE_FILES} Resources/icon.rc)
 target_link_libraries(SolidLauncher ${LAUNCHER_LIBS})
 target_compile_definitions(SolidLauncher PUBLIC "IMGUI_API=__declspec(dllimport)")
 target_compile_definitions(SolidLauncher PUBLIC "SOLID_API=__declspec(dllimport)")

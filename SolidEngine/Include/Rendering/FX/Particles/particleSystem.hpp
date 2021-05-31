@@ -58,6 +58,23 @@ namespace Solid
 					particles.alive[i] = false;
 			}
 
+			size_t GetCount()
+			{
+				return count;
+			}
+
+			void SetEmitRate(float _rate)
+			{
+				if (_rate < 0.0f)
+					_rate = 0.0f;
+				emitters[0]->emitRate = _rate;
+			}
+
+			float GetEmitRate()
+			{
+				return emitters[0]->emitRate;
+			}
+
 			static size_t ComputeMemoryUsage(const ParticleSystem &p);
 
 

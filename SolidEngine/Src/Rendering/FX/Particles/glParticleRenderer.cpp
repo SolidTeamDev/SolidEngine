@@ -77,6 +77,7 @@ void GLParticleRenderer::Update()
 void GLParticleRenderer::Render()
 {
 
+	glDepthMask(GL_FALSE);
 	glEnable(GL_DEPTH_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
