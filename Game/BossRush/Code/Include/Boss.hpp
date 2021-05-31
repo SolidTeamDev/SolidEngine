@@ -25,7 +25,8 @@ namespace Solid SLDNamespace()
 		float BossHealth = 100;
 		SLDField()
 		Vec3 Target = Vec3::Zero;
-	private:
+    protected:
+	    class Engine* engine;
 		GameObject* Player = nullptr;
 	public:
 		Boss();

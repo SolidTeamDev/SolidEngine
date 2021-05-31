@@ -10,7 +10,7 @@ namespace Solid SLDNamespace()
 	public:
 		
 	private:
-		
+		std::vector<GameObject*> CubeBullets;
 	public:
 		Megalos_kyvos();
 		~Megalos_kyvos();
@@ -21,13 +21,13 @@ namespace Solid SLDNamespace()
 		void LateUpdate() override;
 
 	private:
-        virtual void PrimaryAttack(){};
-        virtual void SecondaryAttack(){};
-        virtual void TertiaryAttack(){};
-        virtual void Special1Attack(){};
-        virtual void Special2Attack(){};
+        void PrimaryAttack()override;
+        void SecondaryAttack()override;
+        void TertiaryAttack()override;
+        void Special1Attack()override;
+        void Special2Attack()override;
 
-        virtual void ChooseAttack() {};
+        void ChooseAttack() ;
 		Megalos_kyvos_GENERATED
 	};
 	

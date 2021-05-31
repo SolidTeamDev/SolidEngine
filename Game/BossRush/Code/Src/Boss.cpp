@@ -14,7 +14,8 @@ Boss::~Boss()
 
 void Boss::Init()
 {
-    Player = Engine::GetInstance()->ecsManager.FindGameObjectByName("Player");
+    engine = Engine::GetInstance();
+    Player = engine->ecsManager.FindGameObjectByName("Player");
     if(Player)
         Target = Player->transform->GetPosition();
 }

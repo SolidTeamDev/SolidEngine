@@ -348,7 +348,6 @@ void GL::Shader::ReloadShader()
     {
         glLinkProgram(ProgID);
         LoadShaderFields();
-        source.
     }
 }
 
