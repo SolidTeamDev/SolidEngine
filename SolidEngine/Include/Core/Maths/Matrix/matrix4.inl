@@ -175,7 +175,8 @@ namespace Solid
         m.elements[5] = 1/halfFov;
         m.elements[10] = -(_far+_near) / invRange;
         m.elements[11] = -1;
-        m.elements[14] = -2*_far * _near / invRange;
+	    m.elements[14] = -2*_far * _near / invRange;
+	    m.elements[15] = 0;
 
         return m;
     }

@@ -16,6 +16,8 @@
 #include "ECS/System/scriptSystem.hpp"
 #include "ECS/System/particleEffectSystem.hpp"
 #include "ECS/System/transformSystem.hpp"
+#include "ECS/System/cameraSystem.hpp"
+
 #include "Resources/graphicalResourceMgr.hpp"
 
 #include "Physics/physics.hpp"
@@ -65,6 +67,7 @@ namespace Solid
 	    std::shared_ptr<ScriptSystem> scriptSystem;
 	    std::shared_ptr<ParticleEffectSystem> particleEffectSystem;
 	    std::shared_ptr<TransformSystem> transformSystem;
+	    std::shared_ptr<CameraSystem> cameraSystem;
         ResourceManager resourceManager;
         TaskManager taskManager;
         ThreadManager threadPool;

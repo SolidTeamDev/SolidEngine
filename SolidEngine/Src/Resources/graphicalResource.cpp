@@ -311,7 +311,8 @@ GL::Shader::ShaderWrapper GL::Shader::CreateShader(GLenum _type, int _sourceCoun
 	{
 		GLchar infoLog[1024];
 		glGetShaderInfoLog(compute.id, 1024, nullptr, infoLog);
-		printf("Shader compilation error: %s", infoLog);
+		Log::Send(infoLog, Log::ELogSeverity::ERROR);
+
 		compute.error = true;
 	}
 
@@ -334,7 +335,7 @@ void GL::Shader::ReloadShader()
     {
         GLchar infoLog[1024];
         glGetShaderInfoLog(frag, 1024, nullptr, infoLog);
-        printf("Shader compilation error: %s", infoLog);
+        Log::Send(infoLog, Log::ELogSeverity::ERROR);
     }
     success = 0;
     glGetShaderiv(vert, GL_COMPILE_STATUS, &success);
@@ -342,7 +343,7 @@ void GL::Shader::ReloadShader()
     {
         GLchar infoLog[1024];
         glGetShaderInfoLog(vert, 1024, nullptr, infoLog);
-        printf("Shader compilation error: %s", infoLog);
+	    Log::Send(infoLog, Log::ELogSeverity::ERROR);
     }
     if (success > 0)
     {
