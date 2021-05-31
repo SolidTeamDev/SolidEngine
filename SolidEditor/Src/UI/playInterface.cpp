@@ -21,24 +21,9 @@ namespace Solid
 
         ImVec2 windowSize = UI::GetContentRegionAvail();
 
-        DrawScene();
-		Engine::GetInstance()->RenderToBuffer();
-        UI::Image((ImTextureID)(size_t)Engine::GetInstance()->PlayBuffer.texture,windowSize,ImVec2{0,1},ImVec2{1,0});
+        engine->RenderToBuffer();
+        UI::Image((ImTextureID)(size_t)engine->PlayBuffer.texture,windowSize,ImVec2{0,1},ImVec2{1,0});
 
         UI::End();
-    }
-
-    void PlayInterface::DrawScene()
-    {
-        Camera* camera = engine->activeCamera;
-
-        if(camera != nullptr)
-            camera->UpdateCamera(playFramebuffer.size);
-        engine->renderer->BeginFramebuffer(playFramebuffer);
-        engine->renderer->ClearColor({0.f,0.f,0.f,1});
-        engine->renderer->Clear(playFramebuffer.size);
-        if(engine->activeCamera != nullptr)
-            engine->rendererSystem->Update(engine->renderer,*engine->activeCamera);
-        engine->renderer->EndFramebuffer();
     }
 }
