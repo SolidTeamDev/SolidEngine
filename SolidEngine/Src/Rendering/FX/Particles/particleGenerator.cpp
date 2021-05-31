@@ -26,14 +26,17 @@ void BoxPosGen::Generate(double dt, ParticleData* p, size_t startId, size_t endI
 	}
 }
 
-void CirclePosGen::Generate(double dt, ParticleData* p, size_t startId, size_t endId)
+void SpherePosGen::Generate(double dt, ParticleData* p, size_t startId, size_t endId)
 {
 	for (size_t i = startId; i < endId; ++i)
 	{
-		double ang = LinearRand(0.0, M_PI * 2.0);
-		p->pos[i].x = center.x + radX * sin(ang);
-		p->pos[i].y = center.y + radY * cos(ang);
-		p->pos[i].z = center.z + 0.0;
+		double theta = LinearRand(0.0, M_PI);
+		double rand = LinearRand(0, 1);
+		double phi = LinearRand(0.0, M_PI * 2.0);
+
+		p->pos[i].x = center.x + radX * sin(theta) * cos (phi);
+		p->pos[i].y = center.y + radY * sin(theta) * sin (phi);
+		p->pos[i].z = center.z + radZ * cos(theta);
 		p->pos[i].w = center.w + 1.0;
 	}
 }
@@ -151,7 +154,7 @@ void BasicTimeGen::ShowUI(bool &upt)
 		upt = true;
 }
 
-void CirclePosGen::ShowUI(bool &upt)
+void SpherePosGen::ShowUI(bool &upt)
 {
 	ImVec4 _center(center.x, center.y, center.z, center.w);
 	if (UI::DragFloat4("Center##circlepos", &_center.x))
