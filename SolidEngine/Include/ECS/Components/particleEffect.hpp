@@ -44,6 +44,7 @@ namespace Solid SLDNamespace()
 
 
 
+			std::shared_ptr<KillerZoneUpdater>  killerZoneUpdater= nullptr;
 			std::shared_ptr<AttractorUpdater>   attractorUpdater = nullptr;
 			std::shared_ptr<VelColorUpdater>    velColUpdater    = nullptr;
 			std::shared_ptr<PosColorUpdater>    posColUpdater    = nullptr;

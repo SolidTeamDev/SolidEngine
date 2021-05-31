@@ -106,4 +106,18 @@ namespace Solid
 			void Update(float dt, ParticleData *p) override;
 		};
 
+	class SOLID_API KillerZoneUpdater : public ParticleUpdater
+	{
+	public:
+		Vec3 pos;
+		Vec3 offset;
+	public:
+		KillerZoneUpdater() : pos(0.f, 0.f, 0.f), offset(0.f, 0.f, 0.f)
+		{}
+
+
+		void ShowUI(bool& upt);
+		void Update(float dt, ParticleData *p) override;
+	};
+
 }
