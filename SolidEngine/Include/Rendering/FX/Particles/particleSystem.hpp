@@ -69,7 +69,6 @@ namespace Solid
 				if (_rate < 0.0f)
 					_rate = 0.0f;
 				emitters[0]->emitRate = _rate;
-				std::cout << std::to_string(emitters[0]->emitRate) + "\n";
 			}
 
 			float GetEmitRate()
