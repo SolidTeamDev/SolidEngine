@@ -222,6 +222,7 @@ namespace Solid {
 				else
 				{
 					fs::path p = currentScenePath;
+					p.append(currentOpenedScene);
 					Engine::GetInstance()->SaveScene(p);
 				}
 

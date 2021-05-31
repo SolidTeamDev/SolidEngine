@@ -91,6 +91,28 @@ namespace Solid
         {
             return sceneGraphManager->GetNodeFromEntity(_e);
         }
+
+        GameObject* FindGameObjectByName(std::string name, GameObject* _go = nullptr)
+        {
+            GameObject* go = nullptr;
+            if(_go == nullptr)
+                 go = sceneGraphManager->GetWorld();
+            else
+                go = _go;
+
+            for (auto entity : go->childs)
+            {
+                if(entity->name == name)
+                    return entity;
+            }
+
+            for (auto entity : go->childs)
+                FindGameObjectByName(name, entity);
+
+            Log::Send("No GameObject found", Log::ELogSeverity::WARNING);
+            return nullptr;
+        }
+
         GameObject* GetWorld()
         {
             return sceneGraphManager->GetWorld();

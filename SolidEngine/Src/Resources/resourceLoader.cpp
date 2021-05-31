@@ -522,7 +522,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 	        Manager->AddResource(mat);
 	    }
 
-
+		delete[] RessourceArray;
     }
         /// MonoThread Loading
     else
@@ -761,7 +761,7 @@ void ResourcesLoader::LoadFBX(const fs::path &Rpath, FBXWrapper* fbx)
                     for (int l = 0; l < scene->mMeshes[i]->mNumBones; ++l)
                     {
                         aiBone* bone = scene->mMeshes[i]->mBones[l];
-                        Log::Send(bone->mName.C_Str(), Log::ELogSeverity::ERROR);
+
                         setWeights(&Skeleton->rootBone, bone, i);
                     }
                 }

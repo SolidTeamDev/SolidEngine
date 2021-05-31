@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Build/solidAPI.hpp"
 #include "Rendering/renderer.hpp"
 #include "Window/window.hpp"

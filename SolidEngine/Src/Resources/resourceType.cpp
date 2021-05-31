@@ -71,7 +71,10 @@ int Resource::FromDataBuffer(char *buffer, int bSize)
 
 #define SASSET_GEN 1
 
-ImageResource::~ImageResource() = default;
+ImageResource::~ImageResource() 
+{
+
+}
 
 
 

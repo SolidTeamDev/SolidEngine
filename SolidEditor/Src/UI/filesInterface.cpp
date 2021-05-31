@@ -30,6 +30,8 @@ namespace Solid
         	root.fileNames.clear();
         	std::function<void(fs::path, filePathData*)> init = [&](fs::path _path, filePathData* node)
         	{
+				if (!fs::exists(_path))
+					return;
         		for(auto& item : fs::directory_iterator(_path))
         		{
         			if(fs::is_directory(item))

@@ -11,6 +11,12 @@ Megalos_kyvos::~Megalos_kyvos()
 	
 }
 
+void Megalos_kyvos::Init()
+{
+    Boss::Init();
+
+}
+
 void Megalos_kyvos::Update() {
 
 
