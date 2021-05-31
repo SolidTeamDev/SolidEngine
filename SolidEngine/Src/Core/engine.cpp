@@ -973,7 +973,8 @@ namespace Solid
 								std::size_t memSize = 0;
 								//Get Field Data
 
-								const rfk::Field *f = s->getArchetype().getField(Name);
+								const rfk::Field *f = s->getArchetype().getField(Name, rfk::EFieldFlags::Default,
+                                                         true);
 
 								if (f->type.archetype->name == "String")
 								{

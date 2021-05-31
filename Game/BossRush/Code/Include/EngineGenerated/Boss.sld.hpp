@@ -1,7 +1,7 @@
 #pragma once
 
 /**
-*	Source file: C:\Users\Trist\Desktop\Isart\SolidEngine\Game\BossRush\Code\Include\PlayerController.hpp
+*	Source file: C:\Users\Trist\Desktop\Isart\SolidEngine\Game\BossRush\Code\Include\Boss.hpp
 */
 
 #include "EntityMacros.h"
@@ -19,20 +19,20 @@
 #ifdef __RFK3698706698196451833u_DeclareGetNamespaceFragment
 	#undef __RFK3698706698196451833u_DeclareGetNamespaceFragment
 #endif
-#define __RFK3698706698196451833u_DeclareGetNamespaceFragment inline rfk::NamespaceFragment const& getNamespaceFragment3698706698196451833u_10081942756667058263() noexcept;
+#define __RFK3698706698196451833u_DeclareGetNamespaceFragment inline rfk::NamespaceFragment const& getNamespaceFragment3698706698196451833u_8473783425526364551() noexcept;
 
 #ifdef __RFK3698706698196451833u_DefineGetNamespaceFragment
 	#undef __RFK3698706698196451833u_DefineGetNamespaceFragment
 #endif
 #define __RFK3698706698196451833u_DefineGetNamespaceFragment	\
-	inline rfk::NamespaceFragment const& getNamespaceFragment3698706698196451833u_10081942756667058263() noexcept	\
+	inline rfk::NamespaceFragment const& getNamespaceFragment3698706698196451833u_8473783425526364551() noexcept	\
 	{	\
 		static rfk::NamespaceFragment	fragment("Solid", 3698706698196451833u);	\
 		static bool						initialized = false;	\
 		if (!initialized)	\
 		{	\
 			initialized = true;	\
-			fragment.nestedEntities.reserve(1u); rfk::NamespaceFragment* fragmentPtr = &fragment; fragmentPtr->addNestedEntity(&Solid::PlayerController::staticGetArchetype());	\
+			fragment.nestedEntities.reserve(1u); rfk::NamespaceFragment* fragmentPtr = &fragment; fragmentPtr->addNestedEntity(&Solid::Boss::staticGetArchetype());	\
 		}	\
 	return fragment;	\
 	}
@@ -41,7 +41,7 @@
 	#undef __RFK3698706698196451833u_RegisterNamespace
 #endif
 #define __RFK3698706698196451833u_RegisterNamespace	\
-	inline rfk::NamespaceFragmentRegisterer namespaceFragmentRegisterer3698706698196451833u_10081942756667058263 = rfk::NamespaceFragmentRegisterer("Solid", 3698706698196451833u, &getNamespaceFragment3698706698196451833u_10081942756667058263(), true);
+	inline rfk::NamespaceFragmentRegisterer namespaceFragmentRegisterer3698706698196451833u_8473783425526364551 = rfk::NamespaceFragmentRegisterer("Solid", 3698706698196451833u, &getNamespaceFragment3698706698196451833u_8473783425526364551(), true);
 
 #ifdef __RFK3698706698196451833u_GENERATED
 	#undef __RFK3698706698196451833u_GENERATED
@@ -58,14 +58,14 @@
 
 #endif
 
-#define __RFK7977671938205726473u_GenerateParentsMetadata	\
+#define __RFK17056073160710408345u_GenerateParentsMetadata	\
 	type.directParents.reserve(1);	\
 	type.addToParents<Solid::Script>(static_cast<rfk::EAccessSpecifier>(1));	\
 
-#define __RFK7977671938205726473u_GenerateFieldsMetadata	\
-	registerChild<PlayerController>(&type);	\
+#define __RFK17056073160710408345u_GenerateFieldsMetadata	\
+	registerChild<Boss>(&type);	\
 
-#define __RFK7977671938205726473u_GenerateFieldHelperMethods	\
+#define __RFK17056073160710408345u_GenerateFieldHelperMethods	\
 private:	\
 	template <typename ParentType, typename ChildType>	\
 	static constexpr void recurseRegisterChild([[maybe_unused]] rfk::Struct* childArchetype)	\
@@ -89,64 +89,63 @@ public:	\
 		[[maybe_unused]] rfk::StaticField*	staticField = nullptr; 	\
 		__RFK_DISABLE_WARNING_PUSH	\
 		__RFK_DISABLE_WARNING_OFFSETOF	\
-		field = childArchetype->addField("moveSpeed", 5692696800363440678u, rfk::Type::getType<float>(), static_cast<rfk::EFieldFlags>(1), &thisArchetype, offsetof(ChildType, moveSpeed));	\
-		field = childArchetype->addField("jumpForce", 11909141086532344541u, rfk::Type::getType<float>(), static_cast<rfk::EFieldFlags>(1), &thisArchetype, offsetof(ChildType, jumpForce));	\
-		field = childArchetype->addField("health", 1657424245421476716u, rfk::Type::getType<int>(), static_cast<rfk::EFieldFlags>(1), &thisArchetype, offsetof(ChildType, health));	\
+		field = childArchetype->addField("BossHealth", 16290076979163361721u, rfk::Type::getType<float>(), static_cast<rfk::EFieldFlags>(1), &thisArchetype, offsetof(ChildType, BossHealth));	\
+		field = childArchetype->addField("Target", 6566670557806133231u, rfk::Type::getType<Solid::Vec3>(), static_cast<rfk::EFieldFlags>(1), &thisArchetype, offsetof(ChildType, Target));	\
 		__RFK_DISABLE_WARNING_POP	\
 	}
 
-#define __RFK7977671938205726473u_GenerateMethodsMetadata	\
+#define __RFK17056073160710408345u_GenerateMethodsMetadata	\
 
-#define __RFK7977671938205726473u_GenerateArchetypeProperties	\
+#define __RFK17056073160710408345u_GenerateArchetypeProperties	\
 	
 
-#define __RFK7977671938205726473u_GenerateDefaultInstantiatorSetup	\
-	type.setDefaultInstantiator(&rfk::defaultInstantiator<PlayerController>);
+#define __RFK17056073160710408345u_GenerateDefaultInstantiatorSetup	\
+	type.setDefaultInstantiator(&rfk::defaultInstantiator<Boss>);
 
-#define __RFK7977671938205726473u_GetTypeDeclaration	\
-	__RFK7977671938205726473u_GenerateFieldHelperMethods	\
+#define __RFK17056073160710408345u_GetTypeDeclaration	\
+	__RFK17056073160710408345u_GenerateFieldHelperMethods	\
 	public:	\
 		inline static rfk::Class const& staticGetArchetype() noexcept;	\
-		rfk::Class const& getArchetype() const noexcept override { return PlayerController::staticGetArchetype(); }
+		rfk::Class const& getArchetype() const noexcept override { return Boss::staticGetArchetype(); }
 
 #ifdef KODGEN_PARSING
-#define __RFK7977671938205726473u_GetTypeDefinition
+#define __RFK17056073160710408345u_GetTypeDefinition
 #else
-#define __RFK7977671938205726473u_GetTypeDefinition	\
-		inline rfk::Class const& Solid::PlayerController::staticGetArchetype() noexcept	\
+#define __RFK17056073160710408345u_GetTypeDefinition	\
+		inline rfk::Class const& Solid::Boss::staticGetArchetype() noexcept	\
 		{	\
 			static bool			initialized = false;	\
-			static rfk::Class	type("PlayerController", 7977671938205726473u, sizeof(PlayerController));	\
+			static rfk::Class	type("Boss", 17056073160710408345u, sizeof(Boss));	\
 			\
 			if (!initialized)	\
 			{	\
 				initialized = true;	\
 			\
-				__RFK7977671938205726473u_GenerateArchetypeProperties	\
-				__RFK7977671938205726473u_GenerateParentsMetadata	\
+				__RFK17056073160710408345u_GenerateArchetypeProperties	\
+				__RFK17056073160710408345u_GenerateParentsMetadata	\
 					\
-				__RFK7977671938205726473u_GenerateFieldsMetadata	\
-				__RFK7977671938205726473u_GenerateDefaultInstantiatorSetup	\
-				__RFK7977671938205726473u_GenerateMethodsMetadata	\
+				__RFK17056073160710408345u_GenerateFieldsMetadata	\
+				__RFK17056073160710408345u_GenerateDefaultInstantiatorSetup	\
+				__RFK17056073160710408345u_GenerateMethodsMetadata	\
 			}	\
 			\
 			return type;	\
 		}
 
 #endif
-#define __RFK7977671938205726473u_RegisterArchetype	\
+#define __RFK17056073160710408345u_RegisterArchetype	\
 	private:	\
 		static inline rfk::ArchetypeRegisterer __rfkArchetypeRegisterer;
 
 
 #ifdef KODGEN_PARSING
-#define PlayerController_GENERATED
+#define Boss_GENERATED
 #else
-#define PlayerController_GENERATED	\
+#define Boss_GENERATED	\
 	friend rfk::Struct;	\
-	friend rfk::hasField___rfkArchetypeRegisterer<PlayerController, rfk::ArchetypeRegisterer>;	\
-	__RFK7977671938205726473u_GetTypeDeclaration	\
-	__RFK7977671938205726473u_RegisterArchetype	\
+	friend rfk::hasField___rfkArchetypeRegisterer<Boss, rfk::ArchetypeRegisterer>;	\
+	__RFK17056073160710408345u_GetTypeDeclaration	\
+	__RFK17056073160710408345u_RegisterArchetype	\
 		\
 	private:
 
@@ -163,7 +162,7 @@ public:	\
 	#undef File_GENERATED
 #endif
 #define File_GENERATED	\
-	__RFK7977671938205726473u_GetTypeDefinition	\
+	__RFK17056073160710408345u_GetTypeDefinition	\
 	__RFK3698706698196451833u_GENERATED	\
 	__RFKNativeProperties_GENERATED	\
 
