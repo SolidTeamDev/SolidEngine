@@ -61,6 +61,7 @@ endif()
 
 target_compile_definitions(SolidEngine PUBLIC "IMGUI_API=__declspec(dllexport)")
 target_compile_definitions(SolidEngine PUBLIC "SOLID_API=__declspec(dllexport)")
+target_compile_definitions(SolidEngine PUBLIC "SOLID_COMPILED_STATE=\"${CMAKE_BUILD_TYPE}\"")
 
 # ========= EDITOR ==========
 

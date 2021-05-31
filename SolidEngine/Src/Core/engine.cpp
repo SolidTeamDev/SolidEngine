@@ -89,6 +89,14 @@ namespace Solid
             ecsManager.SetSystemSignature<AudioSystem>(signature);
         }
 
+	    cameraSystem = ecsManager.RegisterSystem<CameraSystem>();
+	    {
+		    Signature signature;
+		    signature.set(ecsManager.GetComponentType<Transform>());
+		    signature.set(ecsManager.GetComponentType<Camera>());
+		    ecsManager.SetSystemSignature<CameraSystem>(signature);
+	    }
+
         physicsSystem = ecsManager.RegisterSystem<PhysicsSystem>();
         {
             Signature signature;
@@ -183,7 +191,7 @@ namespace Solid
 	void Engine::ForceUpdate()
 	{
 		transformSystem->Update();
-
+		cameraSystem->Update();
 
 	}
 

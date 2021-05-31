@@ -236,13 +236,13 @@ GL::Shader::Shader(ShaderResource *_s) :IShader(EResourceType::Shader)
 		{
 			GLchar infoLog[1024];
 			glGetShaderInfoLog(vShader.id, ARRAYSIZE(infoLog), nullptr, infoLog);
-			printf("SHADER error: %s\n", infoLog);
+			Log::Send(infoLog, Log::ELogSeverity::ERROR);
 		}
 		if(fShader.error)
 		{
 			GLchar infoLog[1024];
 			glGetShaderInfoLog(fShader.id, ARRAYSIZE(infoLog), nullptr, infoLog);
-			printf("SHADER link error: %s\n", infoLog);
+			Log::Send(infoLog, Log::ELogSeverity::ERROR);
 		}
 		return;
 	}
@@ -260,7 +260,7 @@ GL::Shader::Shader(ShaderResource *_s) :IShader(EResourceType::Shader)
 	{
 		GLchar infoLog[1024];
 		glGetProgramInfoLog(ProgID, ARRAYSIZE(infoLog), nullptr, infoLog);
-		printf("Program link error: %s", infoLog);
+		Log::Send(infoLog, Log::ELogSeverity::ERROR);
 		//TODO : cleanup at return
 	}
 
@@ -287,7 +287,7 @@ GL::ComputeShader::ComputeShader(ComputeShaderResource *_cs) :Shader(EResourceTy
 
 		GLchar infoLog[1024];
 		glGetProgramInfoLog(ProgID, ARRAYSIZE(infoLog), nullptr, infoLog);
-		printf("Program link error: %s", infoLog);
+		Log::Send(infoLog, Log::ELogSeverity::ERROR);
 		//TODO : Cleanup at return
 		compute.error = true;
 	}
@@ -311,7 +311,7 @@ GL::Shader::ShaderWrapper GL::Shader::CreateShader(GLenum _type, int _sourceCoun
 	{
 		GLchar infoLog[1024];
 		glGetShaderInfoLog(compute.id, 1024, nullptr, infoLog);
-		printf("Shader compilation error: %s", infoLog);
+		Log::Send(infoLog, Log::ELogSeverity::ERROR);
 		compute.error = true;
 	}
 
@@ -334,7 +334,7 @@ void GL::Shader::ReloadShader()
     {
         GLchar infoLog[1024];
         glGetShaderInfoLog(frag, 1024, nullptr, infoLog);
-        printf("Shader compilation error: %s", infoLog);
+        Log::Send(infoLog, Log::ELogSeverity::ERROR);
     }
     success = 0;
     glGetShaderiv(vert, GL_COMPILE_STATUS, &success);
@@ -342,12 +342,13 @@ void GL::Shader::ReloadShader()
     {
         GLchar infoLog[1024];
         glGetShaderInfoLog(vert, 1024, nullptr, infoLog);
-        printf("Shader compilation error: %s", infoLog);
+	    Log::Send(infoLog, Log::ELogSeverity::ERROR);
     }
     if (success > 0)
     {
         glLinkProgram(ProgID);
         LoadShaderFields();
+        source.
     }
 }
 
@@ -552,6 +553,7 @@ void GL::Shader::LoadShaderFields()
 
         uniforms.push_back(shaderUniform);
     }
+
 }
 
 std::vector<ShaderUniform> &GL::Shader::GetUniformList()

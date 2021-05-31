@@ -1346,6 +1346,7 @@ enum ImGuiKey_
     ImGuiKey_X,                 // for text edit CTRL+X: cut
     ImGuiKey_Y,                 // for text edit CTRL+Y: redo
     ImGuiKey_Z,                 // for text edit CTRL+Z: undo
+	ImGuiKey_S,                 // for text edit CTRL+S: SAVE
     ImGuiKey_COUNT
 };
 

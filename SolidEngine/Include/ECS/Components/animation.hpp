@@ -6,6 +6,7 @@
 #include "EngineGenerated/animation.sld.hpp"
 
 
+
 namespace Solid SLDNamespace()
 {
     class SOLID_API SLDClass()  Animation : public Components
@@ -33,8 +34,11 @@ namespace Solid SLDNamespace()
         float CurrentTime;
         Mat4f InverseRootMat = Mat4f::Identity;
         std::vector<Mat4f> FinalsTrans;
+        std::vector<Mat4f> FinalsTransBone;
     public:
 		Animation_GENERATED
+       
+
     };
 }
 File_GENERATED

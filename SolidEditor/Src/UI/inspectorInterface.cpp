@@ -560,6 +560,14 @@ namespace Solid
                             auto cpos = codeEditor.imCodeEditor.GetCursorPosition();
                             UI::SetNextWindowSize(ImVec2(800,600),ImGuiCond_Once);
                             UI::Begin("Edit shader##Window", &codeEditor.isCodeEditorOpen,ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking);
+	                        ImGuiIO& io = ImGui::GetIO();
+	                        auto shift = io.KeyShift;
+	                        auto ctrl = io.ConfigMacOSXBehaviors ? io.KeySuper : io.KeyCtrl;
+	                        auto alt = io.ConfigMacOSXBehaviors ? io.KeyCtrl : io.KeyAlt;
+
+
+
+
                             if (ImGui::BeginMenuBar())
                             {
                                 if (ImGui::BeginMenu("File"))
@@ -621,6 +629,18 @@ namespace Solid
                                         codeEditor.imCodeEditor.GetLanguageDefinition().mName.c_str(), mat->GetShader()->name.c_str());
 
                             codeEditor.imCodeEditor.Render("Edit shader",UI::GetContentRegionAvail(), false);
+	                        if (codeEditor.imCodeEditor.WantSave())
+	                        {
+
+		                        if(codeEditor.codeType == CodeEditor::ECodeType::FRAGMENT)
+			                        mat->GetShader()->SetFragSource(codeEditor.imCodeEditor.GetText());
+		                        else if(codeEditor.codeType == CodeEditor::ECodeType::VERTEX)
+			                        mat->GetShader()->SetVertSource(codeEditor.imCodeEditor.GetText());
+
+		                        mat->GetShader()->ReloadShader();
+		                        mat->LoadShaderFields();
+
+	                        }
                             UI::End();
                         }
 
