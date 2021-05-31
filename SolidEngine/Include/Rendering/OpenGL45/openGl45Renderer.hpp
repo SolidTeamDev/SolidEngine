@@ -11,14 +11,21 @@ namespace Solid
     private:
         OpenGL45Renderer();
         ~OpenGL45Renderer() override = default;
+        //TODO: CLEAN CODE (c'est sale oui)
         uint gridProgram;
         uint grid_vbo;
         uint grid_ebo;
         uint linesProgram;
         uint lines_vbo;
         uint lines_ebo;
+        uint skyboxProgram;
+        uint skybox_vbo;
+        uint skybox_vao;
+        uint skybox_ebo;
+
         void InitGridGL();
         void InitLinesGL();
+        void InitSkyboxGL();
 
     public:
         static Renderer* InitRenderer();
@@ -40,7 +47,7 @@ namespace Solid
         uint CreateShaderFromBinary(ShaderBinary _binary) const final;
 
 	    void DrawSolidGrid(const Camera& _camera, float _gridSize, Vec3 _color, float _thickness) const final;
-	    void DrawSkybox(const Camera& _camera)const final;
+	    void DrawSkybox(const Camera &_camera) const final;
 	    void DrawLines(const Camera& _camera, std::vector<Vec3> _points, std::vector<uint> indices) const final;
     };
 

@@ -62,6 +62,7 @@ namespace Solid
 	    ResourceList<AudioResource>          AudioList;
 	    ResourceList<SceneResource>          SceneList;
 	    ResourceList<PrefabResource>         PrefabList;
+	    ResourceList<CubemapResource>        CubemapList;
         const MaterialResource* defaultMat = nullptr;
         class Engine* EnginePtr = nullptr;
         bool defaultMatInit = false;
@@ -100,7 +101,8 @@ namespace Solid
 	    AnimResource* GetRawAnimByName(const char* name);
 	    MaterialResource* CreateMaterial(const char* name);
 	    PrefabResource* GetPrefabByName(const char* name);
-	    SceneResource * GetSceneByName(const char* name);
+        SceneResource * GetSceneByName(const char* name);
+        CubemapResource * GetRawCubemapByName(const char* name);
 	    void CreatePrefab(GameObject* _gameObject);
 
         template<typename T>
@@ -133,6 +135,8 @@ namespace Solid
 		        return  &(PrefabList.List);
             if(type_value == SkeletonList.type_value)
                 return  &(SkeletonList.List);
+            if(type_value == CubemapList.type_value)
+                return  &(CubemapList.List);
 
             return nullptr;
         }

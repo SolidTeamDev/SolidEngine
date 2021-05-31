@@ -37,9 +37,24 @@ namespace Solid
 				        std::string name = item.path().filename().string();
 				        std::transform(name.begin(), name.end(), name.begin(),
 				                       [](unsigned char c){ return std::tolower(c); });
+                        bool isCubemap = false;
+				        for(auto& item2 : fs::directory_iterator(item))
+                        {
+                            if(!item2.is_directory())
+                            {
+                                std::string ext = item2.path().filename().string();
+                                std::transform(ext.begin(), ext.end(), ext.begin(),
+                                               [](unsigned char c){ return std::tolower(c); });
+                                if(ext.find(".cubemap") != std::string::npos)
+                                {
+                                    isCubemap = true;
+                                }
+                            }
+                        }
 				        bool isShader = (name.find("shader") != std::string::npos || name.find("compute") != std::string::npos);
-				        if(isShader)
+				        if(isShader || isCubemap)
 					        continue;
+
 				        else
 				        {
 					        name = item.path().filename().string();
@@ -105,6 +120,11 @@ namespace Solid
 				        type="Prefab";
 				        break;
 			        }
+                    case EResourceType::Cubemap:
+                    {
+                        type="Cubemap";
+                        break;
+                    }
 			        default:
 				        ThrowError("Type Not Stored", ESolidErrorCode::S_INIT_ERROR);
 				        break;
@@ -428,7 +448,13 @@ namespace Solid
                 else if(elt.ftype == "Material")
                     img = "MatFile";
 			    UI::PushID(elt.fileNames.c_str());
-                UI::ImageButton((ImTextureID)editorTex[img]->texId,ImVec2(imgSize,imgSize),ImVec2(0,1),ImVec2(1,0));
+                bool press =UI::ImageButton((ImTextureID)editorTex[img]->texId,ImVec2(imgSize,imgSize),ImVec2(0,1),ImVec2(1,0));
+
+                if(press && (elt.ftype == "Cubemap"))
+                {
+                    Engine::GetInstance()->renderer->_map = Engine::GetInstance()->graphicsResourceMgr.GetCubemap("Skybox");
+                }
+
                 UI::PopID();
                 if(UI::BeginDragDropSource())
 			    {

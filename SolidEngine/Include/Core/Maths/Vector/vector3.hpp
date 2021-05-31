@@ -20,6 +20,16 @@ namespace Solid SLDNamespace()
         int z;
         Vec3i_GENERATED
     };
+    struct SOLID_API SLDStruct() Vec3ui
+    {
+        SLDField()
+        uint x;
+        SLDField()
+        uint y;
+        SLDField()
+        uint z;
+        Vec3ui_GENERATED
+    };
 
     class SOLID_API SLDClass() Vec3
     {

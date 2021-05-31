@@ -37,6 +37,7 @@ namespace Solid {
         Audio,
         Skeleton,
         Prefab,
+        Cubemap,
         NONE,
     };
 
@@ -83,6 +84,31 @@ namespace Solid {
 	    virtual void ToDataBuffer(std::vector<char> &buffer) override;
 
 	    virtual int FromDataBuffer(char *buffer, int bSize) override;
+
+    };
+
+    class SOLID_API CubemapResource : public Resource
+    {
+    public:
+        struct CubemapImg
+        {
+            int x;
+            int y;
+            int ChannelsNum;
+            std::vector<unsigned char> image;
+        };
+
+        std::array<CubemapImg,6> imageMap;
+
+        CubemapResource() {
+            type = EResourceType::Cubemap;
+        }
+
+        ~CubemapResource() = default;
+
+        virtual void ToDataBuffer(std::vector<char> &buffer) override;
+
+        virtual int FromDataBuffer(char *buffer, int bSize) override;
 
     };
 

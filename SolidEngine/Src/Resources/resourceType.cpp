@@ -1180,3 +1180,13 @@ int SceneResource::FromDataBuffer(char *buffer, int bSize)
 	ResourcesLoader::ReadFromBuffer(buffer, rawScene.data(), size*sizeof(char), ReadPos);
 	return ReadPos;
 }
+
+void CubemapResource::ToDataBuffer(std::vector<char> &buffer)
+{
+
+}
+
+int CubemapResource::FromDataBuffer(char *buffer, int bSize)
+{
+    return 0;
+}

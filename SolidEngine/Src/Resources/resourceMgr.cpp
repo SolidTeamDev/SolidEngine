@@ -73,6 +73,9 @@ void ResourceManager::AddResource(Resource *r)
 		case EResourceType::Prefab:
 			PrefabList.List.emplace(r->name, r);
 			break;
+        case EResourceType::Cubemap:
+            CubemapList.List.emplace(r->name, r);
+            break;
 		default:
 			ThrowError("Type Not Stored", ESolidErrorCode::S_INIT_ERROR);
 			break;
@@ -257,6 +260,7 @@ std::vector<ResourcesPathData> ResourceManager::GetAllResourcesPath()
 	AudioList.addPathToVec(vec);
 	SceneList.addPathToVec(vec);
 	PrefabList.addPathToVec(vec);
+	CubemapList.addPathToVec(vec);
 	return vec;
 }
 
@@ -355,6 +359,13 @@ bool ResourceManager::IsResourceExist(Resource *r)
 			else
 				return false;
 		}
+        case EResourceType::Cubemap:
+        {
+            if (CubemapList.Find(r->name.c_str()) != nullptr)
+                return true;
+            else
+                return false;
+        }
 		default:
 			ThrowError("Type Not Stored", ESolidErrorCode::S_INIT_ERROR);
 			break;
@@ -405,6 +416,9 @@ std::unordered_map<std::string, Resource *> *ResourceManager::GetResourcesVecByT
 		case EResourceType::Prefab:
 			return &PrefabList.List;
 			break;
+        case EResourceType::Cubemap:
+            return &CubemapList.List;
+            break;
 		default:
 			ThrowError("Type Not Stored", ESolidErrorCode::S_INIT_ERROR);
 			return nullptr;
@@ -420,6 +434,16 @@ AnimResource *ResourceManager::GetRawAnimByName(const char *name)
 		return nullptr;
 	return (AnimResource*)it->second;
 	return nullptr;
+}
+
+CubemapResource *ResourceManager::GetRawCubemapByName(const char *name)
+{
+    auto list = CubemapList.List;
+    auto it = list.find(name);
+    if(it == list.end())
+        return nullptr;
+    return (CubemapResource*)it->second;
+    return nullptr;
 }
 
 

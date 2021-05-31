@@ -67,6 +67,21 @@ void  ResourcesLoader::LoadRessourceNoAdd(const fs::path &Rpath, ResourcePtrWrap
             r=LoadShader(Rpath);
         else
         {
+            for(auto& item2 : fs::directory_iterator(Rpath))
+            {
+                if(!item2.is_directory())
+                {
+                    std::string ext = item2.path().filename().string();
+                    std::transform(ext.begin(), ext.end(), ext.begin(),
+                                   [](unsigned char c){ return std::tolower(c); });
+                    if(ext.find(".cubemap") != std::string::npos)
+                    {
+                        r =LoadCubemap(Rpath);
+                        wrapper.r = r;
+                        return;
+                    }
+                }
+            }
             return;
         }
     }
@@ -176,6 +191,19 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 			    std::string name = item.filename().string();
 			    std::transform(name.begin(), name.end(), name.begin(),
 			                   [](unsigned char c){ return std::tolower(c); });
+			    for(auto& item2 : fs::directory_iterator(item))
+                {
+			        if(!item2.is_directory())
+                    {
+			            std::string ext = item2.path().filename().string();
+                        std::transform(ext.begin(), ext.end(), ext.begin(),
+                                       [](unsigned char c){ return std::tolower(c); });
+			            if(ext.find(".cubemap") != std::string::npos)
+                        {
+			                return true;
+                        }
+                    }
+                }
 			    return (name.find("shader") != std::string::npos || name.find("compute") != std::string::npos);
 
 		    }
@@ -203,7 +231,23 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 			    std::string name = item.filename().string();
 			    std::transform(name.begin(), name.end(), name.begin(),
 			                   [](unsigned char c){ return std::tolower(c); });
-			    return (name.find("shader") == std::string::npos && name.find("compute") == std::string::npos);
+			    bool found = false;
+                for(auto& item2 : fs::directory_iterator(item))
+                {
+                    if(!item2.is_directory())
+                    {
+                        std::string ext = item2.path().filename().string();
+                        std::transform(ext.begin(), ext.end(), ext.begin(),
+                                       [](unsigned char c){ return std::tolower(c); });
+                        if(ext.find(".cubemap") != std::string::npos)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+
+			    return (name.find("shader") == std::string::npos && name.find("compute") == std::string::npos) || !found;
 
 		    }
 		    else
@@ -428,6 +472,24 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
                     Shaders.push_back({item, i});
                     ++i;
                 }
+                for(auto& item2 : fs::directory_iterator(item))
+                {
+                    if(!item2.is_directory())
+                    {
+                        std::string ext = item2.path().filename().string();
+                        std::transform(ext.begin(), ext.end(), ext.begin(),
+                                       [](unsigned char c){ return std::tolower(c); });
+                        if(ext.find(".cubemap") != std::string::npos)
+                        {
+                            TaskMan.AddTask(Task(Task::MakeID("Load " + name), ETaskType::RESOURCES_LOADER, Lambda, newP, &RessourceArray[i]));
+                            IDS.push_back( {"Load " + name, i});
+
+                            ++i;
+                            break;
+                        }
+                    }
+                }
+
                 continue; //recursive func
             }
             else
@@ -940,8 +1002,61 @@ Resource * ResourcesLoader::LoadImage(const fs::path &Rpath)
     return Image;
 }
 
+Resource *ResourcesLoader::LoadCubemap(const fs::path &Rpath)
+{
+    CubemapResource* cubemap = new CubemapResource();
 
+    cubemap->name = Rpath.filename().string();
+    SetPath(cubemap->path, Rpath);
 
+    stbi_set_flip_vertically_on_load(false);
+
+    const std::string faces[6] =
+    {
+            "right.jpg",
+            "left.jpg",
+            "top.jpg",
+            "bottom.jpg",
+            "back.jpg",
+            "front.jpg"
+    };
+
+    for (size_t i = 0; i < 6; i++)
+    {
+        std::string curFile = (Rpath.string() + "\\" + faces[i]);
+        CubemapResource::CubemapImg& imgCubemap = cubemap->imageMap[i];
+
+        unsigned char* colors = stbi_load(curFile.c_str(), &imgCubemap.x, &imgCubemap.y, &imgCubemap.ChannelsNum, 0);
+
+        if(colors == nullptr)
+        {
+            delete cubemap;
+            Log::Send("Image cubemap failed to load",Log::ELogSeverity::ERROR);
+            return nullptr;
+        }
+
+        imgCubemap.image.resize(imgCubemap.x * imgCubemap.y * imgCubemap.ChannelsNum);
+        std::memcpy(imgCubemap.image.data(), colors, imgCubemap.image.size());
+
+        #if SASSET_GEN
+        {
+            std::vector<char> Data;
+            cubemap->ToDataBuffer(Data);
+            fs::path cachePath = Rpath.parent_path();
+            cachePath.append(Rpath.filename().string() + ".SCubemap");
+            std::ofstream cacheFile(cachePath, std::fstream::binary | std::fstream::trunc);
+            if(cacheFile.is_open())
+            {
+                cacheFile.write(Data.data(), Data.size());
+            }
+        }
+        #endif
+
+        stbi_image_free(colors);
+    }
+
+    return cubemap;
+}
 
 
 Resource * ResourcesLoader::LoadMesh(const fs::path &Rpath)

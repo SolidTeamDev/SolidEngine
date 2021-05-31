@@ -1,5 +1,5 @@
 #include "Resources/ressources.hpp"
-
+#include "Resources/graphicalResource.hpp"
 #include "Rendering/OpenGL45/openGl45Renderer.hpp"
 
 #include <GLFW/glfw3.h>
@@ -37,6 +37,7 @@ namespace Solid
         }
         InitGridGL();
         InitLinesGL();
+        InitSkyboxGL();
     }
 
 	void OpenGL45Renderer::InitGridGL()
@@ -184,7 +185,129 @@ namespace Solid
         glDeleteShader(fs);
     }
 
-	void OpenGL45Renderer::GLDebugCallback(GLenum _source, GLenum _type, GLuint _id, GLenum _severity, GLsizei _length,
+    void OpenGL45Renderer::InitSkyboxGL()
+    {
+        const char* vertexS =  R"GLSL(
+		#version 450
+
+        layout(location = 0) in vec3 aPosition;
+
+        out vec3 textCoords;
+
+        uniform mat4 proj;
+        uniform mat4 view;
+        uniform mat4 model;
+
+        void main()
+        {
+            textCoords = aPosition;
+            vec4 pos = proj * view * model * vec4(aPosition, 1.0);
+            gl_Position = pos.xyww;
+        }
+        )GLSL";
+        const char* fragS =  R"GLSL(
+		#version 450
+
+		in vec3 textCoords;
+
+        out vec4 fragColor;
+
+        uniform samplerCube skybox;
+
+        void main()
+        {
+            fragColor = texture(skybox, textCoords);
+        }
+        )GLSL";
+
+        uint vs = glCreateShader(GL_VERTEX_SHADER);
+        uint fs = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderSource(vs, 1, &vertexS, nullptr);
+        glShaderSource(fs, 1, &fragS, nullptr);
+        glCompileShader(vs);
+        glCompileShader(fs);
+        GLint compileStatus;
+        glGetShaderiv(vs, GL_COMPILE_STATUS, &compileStatus);
+        if (compileStatus == GL_FALSE)
+        {
+            GLchar infoLog[1024];
+            glGetShaderInfoLog(vs, 1024, nullptr, infoLog);
+            std::string log = infoLog;
+            printf("Shader compilation error: %s\n", infoLog);
+            abort();
+        }
+        glGetShaderiv(fs, GL_COMPILE_STATUS, &compileStatus);
+        if (compileStatus == GL_FALSE)
+        {
+            GLchar infoLog[1024];
+            glGetShaderInfoLog(fs, 1024, nullptr, infoLog);
+            std::string log = infoLog;
+            printf("Shader compilation error: %s", infoLog);
+            abort();
+
+        }
+        skyboxProgram = glCreateProgram();
+        glAttachShader(skyboxProgram, vs);
+        glAttachShader(skyboxProgram, fs);
+        glLinkProgram(skyboxProgram);
+        GLint linkStatus;
+        glGetProgramiv(skyboxProgram, GL_LINK_STATUS, &linkStatus);
+        if (linkStatus == GL_FALSE)
+        {
+            GLchar infoLog[1024];
+            glGetProgramInfoLog(skyboxProgram, ARRAYSIZE(infoLog), nullptr, infoLog);
+            printf("Program link error: %s", infoLog);
+            abort();
+        }
+
+        std::array<Vec3,8> pos
+        {
+                Vec3(1,1,-1),
+                Vec3(1,-1,-1),
+                Vec3(1,1,1),
+                Vec3(1,-1,1),
+                Vec3(-1,1,-1),
+                Vec3(-1,-1,-1),
+                Vec3(-1,1,1),
+                Vec3(-1,-1,1)
+        };
+        std::array<Vec3ui,12> index
+        {
+                Vec3ui{6,3,2},
+                Vec3ui{4,7,6},
+                Vec3ui{3,5,1},
+                Vec3ui{2,1,0},
+                Vec3ui{0,5,4},
+                Vec3ui{6,0,4},
+                Vec3ui{6,7,3},
+                Vec3ui{4,5,7},
+                Vec3ui{3,7,5},
+                Vec3ui{2,3,1},
+                Vec3ui{0,1,5},
+                Vec3ui{6,2,0}
+        };
+
+        glGenVertexArrays(1,&skybox_vao);
+
+        glGenBuffers(1,&skybox_vbo);
+        glGenBuffers(1,&skybox_ebo);
+
+        glBindVertexArray(skybox_vao);
+
+        glBindBuffer(GL_ARRAY_BUFFER, skybox_vbo);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skybox_ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, 12 * sizeof(Vec3ui), index.data(),GL_STATIC_DRAW);
+
+        glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(Vec3), pos.data(), GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vec3), (const GLvoid*)0);
+
+        glDeleteShader(vs);
+        glDeleteShader(fs);
+    }
+
+    void OpenGL45Renderer::GLDebugCallback(GLenum _source, GLenum _type, GLuint _id, GLenum _severity, GLsizei _length,
                                            const GLchar *_message, const void *_userParam)
     {
         Log::ELogSeverity logSeverity = Log::ELogSeverity::DEBUG;
@@ -459,9 +582,35 @@ namespace Solid
 
 	}
 
-    void OpenGL45Renderer::DrawSkybox(const Camera& _camera) const
+    void OpenGL45Renderer::DrawSkybox(const Camera &_camera) const
     {
+        if(_map == nullptr)
+            return;
 
+        glUseProgram(skyboxProgram);
+
+        glDepthFunc(GL_LEQUAL);
+
+        Mat4<float> view = _camera.GetView();
+        Mat4<float> model;
+
+        view.elements[12] = 0;
+        view.elements[13] = 0;
+        view.elements[14] = 0;
+
+        glUseProgram(skyboxProgram);
+        glUniformMatrix4fv(glGetUniformLocation(skyboxProgram, "proj"), 1, GL_FALSE, _camera.GetProjection().elements.data());
+        glUniformMatrix4fv(glGetUniformLocation(skyboxProgram, "view"), 1, GL_FALSE, view.elements.data());
+        glUniformMatrix4fv(glGetUniformLocation(skyboxProgram, "model"), 1, GL_FALSE, model.elements.data());
+
+        glBindVertexArray(skybox_vao);
+        glBindBuffer(GL_ARRAY_BUFFER, skybox_vbo);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skybox_ebo);
+        glActiveTexture(GL_TEXTURE0);
+
+        glBindTexture(GL_TEXTURE_CUBE_MAP, ((GL::Cubemap*)_map.get())->cubemapID);
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr); // Draw triangle
+        glDepthFunc(GL_LESS);
     }
 
     void OpenGL45Renderer::DrawLines(const Camera& _camera, std::vector<Vec3> _points, std::vector<uint> indices) const

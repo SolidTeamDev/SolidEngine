@@ -22,6 +22,7 @@ namespace Solid
     {
         ResourceManager* Manager;
         Resource * LoadImage(const fs::path& Rpath);
+        Resource * LoadCubemap(const fs::path& Rpath);
 	    ///void LoadMeshOBJ(const fs::path& Rpath);
         Resource * LoadMesh(const fs::path& Rpath);
 	    Resource * LoadAnim(const fs::path& Rpath);

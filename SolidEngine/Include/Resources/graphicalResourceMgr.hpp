@@ -12,12 +12,13 @@ namespace Solid
 		//public members
 		typedef std::unordered_map<std::string, std::shared_ptr<IMesh>>   MeshMap;
 		typedef std::unordered_map<std::string, std::shared_ptr<IShader>>   ShaderMap;
-
+        typedef std::unordered_map<std::string, std::shared_ptr<ICubemap>>   CubemapMap;
 	protected:
 		//protected members
 		std::unordered_map<std::string, std::shared_ptr<IMesh>> Meshes;
 		std::unordered_map<std::string, std::shared_ptr<IShader>> Shaders;
-		std::unordered_map<std::string, std::shared_ptr<ITexture>> textures;
+        std::unordered_map<std::string, std::shared_ptr<ITexture>> textures;
+        std::unordered_map<std::string, std::shared_ptr<ICubemap>> cubemaps;
 		ResourceManager* resourceMgr = nullptr;
 		Renderer* renderer = nullptr;
 		std::shared_ptr<const IShader> defaultShader = nullptr;
@@ -88,6 +89,21 @@ namespace Solid
 					break;
 			}
 		}
+        std::shared_ptr<ICubemap> StoreCubemap(CubemapResource* _cubemap)
+        {
+            switch (renderer->GetRenderType())
+            {
+                case ERendererType::OpenGl45:
+                {
+                    auto it =cubemaps.emplace(_cubemap->name,std::make_shared<GL::Cubemap>());
+                    return it.first->second;
+                    break;
+                }
+                default:
+                    return nullptr;
+                    break;
+            }
+        }
 		MeshMap GetMeshes()
 		{
 			return Meshes;
@@ -116,6 +132,18 @@ namespace Solid
 			}
 			return it->second;
 		}
+        std::shared_ptr<ICubemap> GetCubemap(const char* _name)
+        {
+            auto it = cubemaps.find(_name);
+            if(it == cubemaps.end())
+            {
+                CubemapResource* map = resourceMgr->GetRawCubemapByName(_name);
+                if(map == nullptr)
+                    return nullptr;
+                return cubemaps.emplace(map->name, std::make_shared<GL::Cubemap>(map)).first->second;
+            }
+            return it->second;
+        }
 		std::shared_ptr<IShader> GetShader(const char* _name)
 		{
 			auto it = Shaders.find(_name);

@@ -151,6 +151,25 @@ namespace Solid
 			virtual void UnBindTexture(uint _texUnit) override;
 		};
 
+		class SOLID_API Cubemap : public ICubemap
+		{
+		public:
+			//public members
+			uint cubemapID = 0;
+		protected:
+			//protected members
+
+
+		public:
+			//public func
+			Cubemap() = default;
+			Cubemap(CubemapResource* _cubemap);
+			~Cubemap() = default;
+
+			virtual void BindCubemap() override;
+			virtual void UnBindCubemap() override;
+		};
+
 	}
 
 	//namespace VK {}

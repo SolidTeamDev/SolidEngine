@@ -101,7 +101,7 @@ namespace Solid
         engine->renderer->BeginFramebuffer(sceneFramebuffer);
         engine->renderer->ClearColor({0.f,0.f,0.f,1});
         engine->renderer->Clear(sceneFramebuffer.size);
-
+        engine->renderer->DrawSkybox(sceneCam);
         if(ShowSkeleton)
         {
             for(GameObject* gameObject : engine->ecsManager.GetWorld()->childs)
@@ -123,6 +123,8 @@ namespace Solid
 
         engine->rendererSystem->Update(engine->renderer,sceneCam);
         engine->particleEffectSystem->Update(sceneCam);
+
+
         engine->renderer->EndFramebuffer();
 
         engine->audioSystem->Update(sceneCam);

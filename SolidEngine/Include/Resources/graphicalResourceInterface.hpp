@@ -102,4 +102,21 @@ namespace Solid
 	    virtual void UnBindTexture(uint _texUnit) = 0;
 
 	};
+
+	class SOLID_API ICubemap
+    {
+    public:
+        //public members
+        std::string name;
+    protected:
+        //protected members
+
+
+    public:
+        //public func
+        ICubemap() = default;
+        ~ICubemap() = default;
+        virtual void BindCubemap() = 0;
+        virtual void UnBindCubemap() = 0;
+    };
 }

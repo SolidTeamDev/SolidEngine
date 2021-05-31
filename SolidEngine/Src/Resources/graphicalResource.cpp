@@ -622,3 +622,35 @@ void GL::Texture::UnBindTexture(uint _texUnit)
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+GL::Cubemap::Cubemap(CubemapResource *_cubemap)
+{
+    name = _cubemap->name;
+
+    glGenTextures(1, &cubemapID);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapID);
+
+    for (size_t i = 0; i < 6; ++i)
+    {
+        const CubemapResource::CubemapImg& cubemapImg = _cubemap->imageMap[i];
+        GLenum format = (cubemapImg.ChannelsNum == 3) ? GL_RGB : GL_RGBA;
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format, cubemapImg.x, cubemapImg.y, 0, format, GL_UNSIGNED_BYTE, cubemapImg.image.data());
+    }
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+}
+
+void GL::Cubemap::BindCubemap()
+{
+    glBindTexture(GL_TEXTURE_CUBE_MAP,cubemapID);
+}
+
+void GL::Cubemap::UnBindCubemap()
+{
+    glBindTexture(GL_TEXTURE_CUBE_MAP,0);
+}
