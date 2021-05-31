@@ -35,8 +35,6 @@ namespace Solid
 
     void Camera::UpdateCamera(const Vec2i _spaceScreen)
     {
-
-
         view       = lookAt(position, position + Front, Up);
         projection = Mat4<>::Perspective(fov,(float)_spaceScreen.x / (float)_spaceScreen.y,_near,_far);
     }

@@ -21,7 +21,7 @@ namespace Solid
 
         ImVec2 windowSize = UI::GetContentRegionAvail();
 
-        engine->RenderToBuffer();
+        engine->RenderToBuffer({(int)windowSize.x,(int)windowSize.y});
         UI::Image((ImTextureID)(size_t)engine->PlayBuffer.texture,windowSize,ImVec2{0,1},ImVec2{1,0});
 
         UI::End();

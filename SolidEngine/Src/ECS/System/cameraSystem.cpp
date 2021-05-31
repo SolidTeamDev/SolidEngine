@@ -14,6 +14,7 @@ void Solid::CameraSystem::Update()
 
 		cam.position = transform.GetPosition();
 		cam.Euler = transform.GetEuler();
+
 		Vec3 _front;
 		_front.z = Maths::Cos(Maths::DegToRad(cam.Euler.x)) *
 		           Maths::Cos(Maths::DegToRad(cam.Euler.y));

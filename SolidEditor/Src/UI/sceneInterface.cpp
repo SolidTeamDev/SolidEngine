@@ -14,16 +14,12 @@
 
 namespace Solid
 {
-    //TODO: Replace static
-
-
-    float SceneInterface::camSpeed = 2.f;
-
     SceneInterface::SceneInterface()
     {
         engine = Engine::GetInstance();
         sceneFramebuffer = engine->renderer->CreateFramebuffer(engine->window->GetWindowSize());
-        sceneCam.MouseSensitivity = 35.f;
+        mouseSensitivity = 35.f;
+        camSpeed = 4.f;
 
 		engine->SetActiveCamera(&sceneCam);
     }
@@ -173,7 +169,7 @@ namespace Solid
         else
         {
             Editor::editorInputManager->ShowCursor(true);
-            sceneCam.MouseInCenterScreen = false;
+            mouseInCenterOfScreen = false;
             return false;
 
         }
@@ -181,9 +177,9 @@ namespace Solid
 
     void SceneInterface::MovementAndRotationCam(float xpos, float ypos)
     {
-        if (!sceneCam.MouseInCenterScreen)
+        if (!mouseInCenterOfScreen)
         {
-            sceneCam.MouseInCenterScreen = true;
+            mouseInCenterOfScreen = true;
             return;
         }
 
@@ -207,28 +203,26 @@ namespace Solid
 
         //rotation camera
 
+        sceneCam.Euler.x += xpos * mouseSensitivity;
+        sceneCam.Euler.y += ypos * mouseSensitivity;
 
-            sceneCam.Euler.x += xpos * sceneCam.MouseSensitivity;
-            sceneCam.Euler.y += ypos * sceneCam.MouseSensitivity;;
+        if (sceneCam.Euler.y > 89.0f)
+            sceneCam.Euler.y = 89.0f;
+        if (sceneCam.Euler.y < -89.0f)
+            sceneCam.Euler.y = -89.0f;
 
-            if (sceneCam.Euler.y > 89.0f)
-                sceneCam.Euler.y = 89.0f;
-            if (sceneCam.Euler.y < -89.0f)
-                sceneCam.Euler.y = -89.0f;
+        Vec3 _front;
+        _front.z = Maths::Cos(Maths::DegToRad(sceneCam.Euler.x)) *
+                   Maths::Cos(Maths::DegToRad(sceneCam.Euler.y));
 
-            Vec3 _front;
-            _front.z = Maths::Cos(Maths::DegToRad(sceneCam.Euler.x)) *
-                       Maths::Cos(Maths::DegToRad(sceneCam.Euler.y));
+        _front.y = Maths::Sin(Maths::DegToRad(sceneCam.Euler.y));
 
-            _front.y = Maths::Sin(Maths::DegToRad(sceneCam.Euler.y));
+        _front.x = Maths::Sin(Maths::DegToRad(sceneCam.Euler.x)) *
+                   Maths::Cos(Maths::DegToRad(sceneCam.Euler.y));
 
-            _front.x = Maths::Sin(Maths::DegToRad(sceneCam.Euler.x)) *
-                       Maths::Cos(Maths::DegToRad(sceneCam.Euler.y));
-
-            sceneCam.Front = _front.GetNormalized();
-            sceneCam.Right = Vec3::Cross(sceneCam.Front, Vec3::Up).GetNormalized();
-            sceneCam.Up = Vec3::Cross(sceneCam.Right, sceneCam.Front).GetNormalized();
-
+        sceneCam.Front = _front.GetNormalized();
+        sceneCam.Right = Vec3::Cross(sceneCam.Front, Vec3::Up).GetNormalized();
+        sceneCam.Up = Vec3::Cross(sceneCam.Right, sceneCam.Front).GetNormalized();
     }
 }
 

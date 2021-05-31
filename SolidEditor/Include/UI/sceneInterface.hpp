@@ -21,7 +21,9 @@ namespace Solid
 
     private:
 
-        static float camSpeed;
+        float camSpeed;
+        float mouseSensitivity;
+        bool mouseInCenterOfScreen = false;
         Camera sceneCam;
         Framebuffer sceneFramebuffer;
         Engine* engine = nullptr;
