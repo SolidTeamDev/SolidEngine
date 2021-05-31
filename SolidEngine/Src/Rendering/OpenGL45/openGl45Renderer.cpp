@@ -329,6 +329,9 @@ namespace Solid
 
     void OpenGL45Renderer::Clear(const Vec2i& _windowSize) const
     {
+        if(_windowSize.x <= 0 || _windowSize.y <= 0)
+            return;
+
         glViewport(0,0,_windowSize.x,_windowSize.y);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
@@ -378,6 +381,9 @@ namespace Solid
 
     void OpenGL45Renderer::UpdateFramebuffer(const Framebuffer& _framebuffer) const
     {
+        if(_framebuffer.size.x <= 0 || _framebuffer.size.y <= 0)
+            return;
+
         glBindTexture(GL_TEXTURE_2D, _framebuffer.texture);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _framebuffer.size.x, _framebuffer.size.y, 0, GL_RGB, GL_UNSIGNED_BYTE,
                      nullptr);
