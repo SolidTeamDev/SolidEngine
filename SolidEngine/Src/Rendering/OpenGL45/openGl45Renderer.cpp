@@ -80,7 +80,7 @@ namespace Solid
 			GLchar infoLog[1024];
 			glGetShaderInfoLog(vs, 1024, nullptr, infoLog);
 			std::string log = infoLog;
-			printf("Shader compilation error: %s", infoLog);
+			Log::Send(infoLog, Log::ELogSeverity::ERROR);
 			abort();
 		}
 		glGetShaderiv(fs, GL_COMPILE_STATUS, &compileStatus);
@@ -89,7 +89,7 @@ namespace Solid
 			GLchar infoLog[1024];
 			glGetShaderInfoLog(fs, 1024, nullptr, infoLog);
 			std::string log = infoLog;
-			printf("Shader compilation error: %s", infoLog);
+			Log::Send(infoLog, Log::ELogSeverity::ERROR);
 			abort();
 
 		}
@@ -103,7 +103,7 @@ namespace Solid
 		{
 			GLchar infoLog[1024];
 			glGetProgramInfoLog(gridProgram, ARRAYSIZE(infoLog), nullptr, infoLog);
-			printf("Program link error: %s", infoLog);
+			Log::Send(infoLog, Log::ELogSeverity::ERROR);
 			abort();
 		}
 		glGenBuffers(1,&grid_vbo);
@@ -152,7 +152,7 @@ namespace Solid
             GLchar infoLog[1024];
             glGetShaderInfoLog(vs, 1024, nullptr, infoLog);
             std::string log = infoLog;
-            printf("Shader compilation error: %s\n", infoLog);
+	        Log::Send(infoLog, Log::ELogSeverity::ERROR);
             abort();
         }
         glGetShaderiv(fs, GL_COMPILE_STATUS, &compileStatus);
@@ -161,7 +161,7 @@ namespace Solid
             GLchar infoLog[1024];
             glGetShaderInfoLog(fs, 1024, nullptr, infoLog);
             std::string log = infoLog;
-            printf("Shader compilation error: %s", infoLog);
+	        Log::Send(infoLog, Log::ELogSeverity::ERROR);
             abort();
 
         }
@@ -175,7 +175,7 @@ namespace Solid
         {
             GLchar infoLog[1024];
             glGetProgramInfoLog(linesProgram, ARRAYSIZE(infoLog), nullptr, infoLog);
-            printf("Program link error: %s", infoLog);
+	        Log::Send(infoLog, Log::ELogSeverity::ERROR);
             abort();
         }
         glGenBuffers(1,&lines_vbo);
@@ -278,42 +278,6 @@ namespace Solid
     }
 
 
-/*
-
-
-
-
-//
-
-
-
-    Renderer::CShader OpenGL45Renderer::CreateComputeProgram(std::vector<char*>& _sources) const
-    {
-
-        CShader compute = CreateShader(GL_COMPUTE_SHADER, 1, _sources);
-        if(compute.error)
-            return compute;
-        compute.pID = glCreateProgram();
-        glAttachShader(compute.pID, compute.sID);
-        glLinkProgram(compute.pID);
-        GLint linkStatus;
-        glGetProgramiv(compute.pID, GL_LINK_STATUS, &linkStatus);
-        if (linkStatus == GL_FALSE)
-        {
-
-            GLchar infoLog[1024];
-            glGetProgramInfoLog(compute.pID, ARRAYSIZE(infoLog), nullptr, infoLog);
-            printf("Program link error: %s", infoLog);
-            //TODO : Cleanup at return
-            compute.error = true;
-        }
-        return compute;
-    }
-
-    Renderer::VFShader OpenGL45Renderer::CreateVertFragProgram(std::vector<char*>& _VertexSources, std::vector<char*>& _fragSources) const
-    {
-
-    }*/
 
     ShaderBinary OpenGL45Renderer::GetShaderBinary(uint _PID) const
     {
@@ -336,12 +300,11 @@ namespace Solid
 
             if(ErrorCode == GL_INVALID_ENUM)
             {
-
-                printf("Binary Format = %u is not a value recognized by the implementation.\n", _binary.format);
+	            Log::Send("Binary Format = %u is not a value recognized by the implementation.\n", Log::ELogSeverity::ERROR);
             }
             if(ErrorCode == GL_INVALID_OPERATION )
             {
-                printf("programID = %u is not the name of an existing program object .\n", ID);
+	            Log::Send("programID = %u is not the name of an existing program object .\n", Log::ELogSeverity::ERROR);
             }
             ErrorCode = glGetError();
         }

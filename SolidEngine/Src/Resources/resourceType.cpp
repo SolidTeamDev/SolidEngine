@@ -589,12 +589,49 @@ void MaterialResource::SetShader(const std::shared_ptr<IShader> _shader)
 
 void MaterialResource::LoadShaderFields()
 {
+	std::vector<MaterialResource::ShaderField> temp = fields;
     fields.clear();
 
     auto uniforms = shader->GetUniformList();
 
     for(const auto& uniform: uniforms)
         fields.emplace_back(uniform);
+	for (int i = 0; i < fields.size(); ++i)
+	{
+		for (int j = 0; j < temp.size(); ++j)
+		{
+			if(fields[i].name == temp[j].name && fields[i].type == temp[j].type)
+			{
+				switch (fields[i].type)
+				{
+					case EShaderFieldType::BOOL:
+						fields[i].b = temp[j].b;
+						break;
+					case EShaderFieldType::INT:
+						fields[i].i = temp[j].i;
+						break;
+					case EShaderFieldType::FLOAT:
+						fields[i].f = temp[j].f;
+						break;
+					case EShaderFieldType::VEC2:
+						fields[i].v2 = temp[j].v2;
+						break;
+					case EShaderFieldType::VEC3:
+						fields[i].v3 = temp[j].v3;
+						break;
+					case EShaderFieldType::VEC4:
+						fields[i].v4 = temp[j].v4;
+						break;
+					case EShaderFieldType::TEXT:
+						fields[i].text = temp[j].text;
+						break;
+					default:
+						break;
+
+				}
+			}
+		}
+	}
 }
 
 MaterialResource::ShaderField::ShaderField(MaterialResource::EShaderFieldType _type)

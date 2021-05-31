@@ -252,24 +252,33 @@ public:
 	void SelectWordUnderCursor();
 	void SelectAll();
 	bool HasSelection() const;
+	bool WantSave()
+	{
+		if(wantToSave)
+		{
+			wantToSave = false;
+			return true;
+		}
+		return false;
+	}
+
 
 	void Copy();
 	void Cut();
 	void Paste();
-	void Delete();
 
+	void Delete();
 	bool CanUndo() const;
 	bool CanRedo() const;
 	void Undo(int aSteps = 1);
 	void Redo(int aSteps = 1);
-
 	static const Palette& GetDarkPalette();
 	static const Palette& GetLightPalette();
 	static const Palette& GetRetroBluePalette();
 
 private:
-	typedef std::vector<std::pair<std::regex, PaletteIndex>> RegexList;
 
+	typedef std::vector<std::pair<std::regex, PaletteIndex>> RegexList;
 	struct EditorState
 	{
 		Coordinates mSelectionStart;
@@ -311,6 +320,8 @@ private:
 	};
 
 	typedef std::vector<UndoRecord> UndoBuffer;
+
+	bool wantToSave = false;
 
 	void ProcessInputs();
 	void Colorize(int aFromLine = 0, int aCount = -1);
