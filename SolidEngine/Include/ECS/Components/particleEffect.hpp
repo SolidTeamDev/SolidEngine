@@ -10,7 +10,7 @@
 #include "Rendering/FX/Particles/particleGenerator.hpp"
 #include "Rendering/FX/Particles/particleUpdater.hpp"
 #include "Rendering/FX/Particles/particleSystem.hpp"
-
+#include "Resources/graphicalResourceInterface.hpp"
 #include "Rendering/FX/Particles/glParticleRenderer.hpp"
 #include "EngineGenerated/particleEffect.sld.hpp"
 
@@ -37,7 +37,7 @@ namespace Solid SLDNamespace()
 			std::shared_ptr<VelFromPosGen> velFromPosGen = nullptr;
 			std::shared_ptr<BasicColorGen> colGen        = nullptr;
 			std::shared_ptr<SphereVelGen>  sphereVelGen  = nullptr;
-			std::shared_ptr<CirclePosGen>  circlePosGen  = nullptr;
+			std::shared_ptr<SpherePosGen>  spherePosGen  = nullptr;
 			std::shared_ptr<BasicTimeGen>  timeGen       = nullptr;
 			std::shared_ptr<BasicVelGen>   velGen        = nullptr;
 			std::shared_ptr<BoxPosGen>     boxPosGen     = nullptr;
