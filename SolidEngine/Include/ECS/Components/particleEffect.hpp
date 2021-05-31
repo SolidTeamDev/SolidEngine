@@ -22,6 +22,7 @@ namespace Solid SLDNamespace()
 			SLDField()
 			size_t numParticles;
 
+
 			std::shared_ptr<ParticleSystem> system = nullptr;
 			std::shared_ptr<ParticleEmitter> emitter = nullptr;
 
@@ -29,6 +30,9 @@ namespace Solid SLDNamespace()
 			std::shared_ptr<GLParticleRenderer> renderer = nullptr;
 
 		public:
+
+			SLDField()
+			float particlesSize;
 
 			std::shared_ptr<VelFromPosGen> velFromPosGen = nullptr;
 			std::shared_ptr<BasicColorGen> colGen        = nullptr;
@@ -69,6 +73,21 @@ namespace Solid SLDNamespace()
 			{
 				numParticles = _count;
 				system->SetCount(_count);
+				renderer->Destroy();
+				renderer->Generate(system.get(), true);
+			}
+			size_t GetCount()
+			{
+				return system->count;
+			}
+			void SetEmitRate(float _rate)
+			{
+				system->SetEmitRate(_rate);
+			}
+
+			float GetEmitRate()
+			{
+				return system->GetEmitRate();
 			}
 			std::shared_ptr<ITexture> GetTex();
 			int NumAllParticles();

@@ -13,12 +13,12 @@ using namespace Solid;
 void ParticleEffect::Init()
 {
 	Components::Init();
-	const size_t NUM_PARTICLES = 2000;//numParticles == 0 ? 100000 : numParticles;
-	system = std::make_shared<ParticleSystem>(NUM_PARTICLES);
+	const size_t numP = 2000;
+	system = std::make_shared<ParticleSystem>(numP);
 	InitializeRenderer();
 	ParticleTex = Engine::GetInstance()->graphicsResourceMgr.GetTexture("particle2.png");
 	emitter = std::make_shared<ParticleEmitter>();
-	emitter->emitRate = (float)NUM_PARTICLES * 0.25f;
+	emitter->emitRate = (float)numP * 0.25f;
 
 	// pos:
 	boxPosGen = std::make_shared<BoxPosGen>();
@@ -59,7 +59,7 @@ void ParticleEffect::Init()
 bool ParticleEffect::InitializeRenderer()
 {
 	renderer = std::make_shared<GLParticleRenderer>();
-	renderer->Generate(system.get(), false);
+	renderer->Generate(system.get(), true);
 	return true;
 }
 
@@ -82,12 +82,16 @@ void ParticleEffect::Update(const Transform& trsf)
 {
 	CpuUpdate();
 	GpuUpdate();
+
 	Render();
+	glDepthMask(GL_TRUE);
 }
 
 void ParticleEffect::CpuUpdate()
 {
 	system->Update(Time::DeltaTime());
+	if (particlesSize <= 0.f)
+		particlesSize = 0.1f;
 }
 
 void ParticleEffect::GpuUpdate()
@@ -122,6 +126,10 @@ void ParticleEffect::Render()
 	GLboolean last_enable_scissor_test = glIsEnabled(GL_SCISSOR_TEST);
 
 	ParticleTex->BindTexture(0);
+	GLint prog = 0;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &prog);
+	int loc = glGetUniformLocation(prog, "size");
+	glUniform1f(loc,particlesSize);
 	renderer->Render();
 
 	glUseProgram(last_program);
@@ -171,7 +179,6 @@ void ParticleEffect::UpdateSystem()
 		system->AddUpdater(floorUpdater);
 	if (timeUpdater != nullptr)
 		system->AddUpdater(timeUpdater);
-	std::cout << "yy\n";
 }
 
 void ParticleEffect::UpdateEmitter()
