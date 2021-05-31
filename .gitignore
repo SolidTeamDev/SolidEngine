@@ -5,6 +5,9 @@ Build/*
 */cmake-build-release/*
 Game/BossRush/EngineInclude/*
 !Game/BossRush/EngineInclude/GitInit
+Game/BossRush/EngineInclude/INIT
+Game/BossRush/EngineInclude/INIT/*
+Game/BossRush/EngineInclude/INIT/**
 Game/BossRush/Code/Build/*
 Game/BossRush/Code/Dlls/*
 Game/BossRush/Code/.idea/*
