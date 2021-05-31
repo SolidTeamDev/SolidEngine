@@ -193,8 +193,8 @@ void ParticleEffect::UpdateEmitter()
 		emitter->AddGenerator(colGen);
 	if (sphereVelGen != nullptr)
 		emitter->AddGenerator(sphereVelGen);
-	if (circlePosGen != nullptr)
-		emitter->AddGenerator(circlePosGen);
+	if (spherePosGen != nullptr)
+		emitter->AddGenerator(spherePosGen);
 	if (timeGen != nullptr)
 		emitter->AddGenerator(timeGen);
 	if (velGen != nullptr)
@@ -364,19 +364,19 @@ void ParticleEffect::EditGenerators()
 	if (UI::TreeNode("Circle Pos Generator"))
 	{
 		bool created = true;
-		if (circlePosGen == nullptr)
+		if (spherePosGen == nullptr)
 			created = false;
 		if (UI::Checkbox("Enable##CirclePosGenCreated", &created))
 		{
 			if (created)
-				circlePosGen = std::make_shared<CirclePosGen>();
+				spherePosGen = std::make_shared<SpherePosGen>();
 			else
-				circlePosGen = nullptr;
+				spherePosGen = nullptr;
 
 			upt = true;
 		}
 		if (created)
-			circlePosGen->ShowUI(upt);
+			spherePosGen->ShowUI(upt);
         UI::TreePop();
     }
 	if (UI::TreeNode("Time Generator"))
