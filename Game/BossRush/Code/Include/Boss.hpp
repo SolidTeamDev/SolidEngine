@@ -36,7 +36,7 @@ namespace Solid SLDNamespace()
 		virtual void Update() override;
         virtual void FixedUpdate() override;
         virtual void LateUpdate() override;
-
+        virtual void Destroy() override;
 	private:
 	    virtual void PrimaryAttack() = 0;
         virtual void SecondaryAttack() = 0;

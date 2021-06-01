@@ -15,12 +15,15 @@ namespace Solid SLDNamespace()
 		Megalos_kyvos();
 		~Megalos_kyvos();
 
+		SLDField()
+		Vec3 Lerp = Vec3::Zero;
         void Init() override;
 		void Update() override;
 		void FixedUpdate() override;
 		void LateUpdate() override;
+        void Destroy() override;
 
-	private:
+    private:
         void PrimaryAttack()override;
         void SecondaryAttack()override;
         void TertiaryAttack()override;
@@ -28,6 +31,7 @@ namespace Solid SLDNamespace()
         void Special2Attack()override;
 
         void ChooseAttack() ;
+        void UpdateAttack();
 		Megalos_kyvos_GENERATED
 	};
 	
@@ -36,3 +40,4 @@ namespace Solid SLDNamespace()
 }
 
 File_GENERATED
+

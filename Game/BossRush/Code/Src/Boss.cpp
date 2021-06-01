@@ -20,6 +20,11 @@ void Boss::Init()
         Target = Player->transform->GetPosition();
 }
 
+void Boss::Destroy()
+{
+
+}
+
 void Boss::Update()
 {
 
