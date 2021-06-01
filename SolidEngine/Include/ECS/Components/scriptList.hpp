@@ -69,6 +69,15 @@ namespace Solid SLDNamespace()
 			Scripts.clear();
 		};
 
+        virtual void Destroy()
+        {
+            for (int i = 0; i < Scripts.size(); ++i)
+            {
+                Script* elt = Scripts[i];
+                elt->Destroy();
+            }
+        } ;
+
 		ScriptList_GENERATED
 
 	};

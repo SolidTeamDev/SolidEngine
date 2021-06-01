@@ -14,6 +14,7 @@ namespace Solid
 		ScriptSystem(ECSManager& _ecsManager): System(_ecsManager){};
 
 		void Init();
+		void Destroy();
 		void Update();
 		void FixedUpdate();
 		void LateUpdate();

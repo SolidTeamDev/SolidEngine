@@ -319,7 +319,7 @@ namespace Solid
 				    }
 			    }
 
-			    Engine::GetInstance()->Init();
+			    Engine::GetInstance()->InitScript();
 		    }
 
 		    play = true;
@@ -409,6 +409,7 @@ namespace Solid
 			}
 
 			play = false;
+			Engine::GetInstance()->DestroyScript();
 			compsSave.clear();
 			transSave.clear();
 			camSave.clear();

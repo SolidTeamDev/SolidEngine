@@ -99,7 +99,9 @@ namespace Solid
 
 	    void SaveScene(const fs::path& p);
 
-	    void Init();
+	    void InitScript();
+
+	    void DestroyScript();
 
         void Update();
 
