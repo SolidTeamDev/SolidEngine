@@ -1266,21 +1266,23 @@ namespace Solid
 		activeCamera = _newCam;
 	}
 
-	void Engine::RenderToBuffer()
+	void Engine::RenderToBuffer(const Vec2i& _size = {0,0})
 	{
-		PlayBuffer.size = window->GetWindowSize();
-		renderer->UpdateFramebuffer(PlayBuffer);
+		PlayBuffer.size = (_size.x <= 0 && _size.y <= 0) ? window->GetWindowSize() : _size;
+        renderer->UpdateFramebuffer(PlayBuffer);
+
     	if(activeCamera == nullptr)
     		return;
+
 		activeCamera->UpdateCamera(PlayBuffer.size);
 		renderer->BeginFramebuffer(PlayBuffer);
 		renderer->ClearColor({0.f,0.f,0.f,1});
 		renderer->Clear(PlayBuffer.size);
 		rendererSystem->Update(renderer, *activeCamera);
+		renderer->DrawSkybox(*activeCamera);
 		renderer->EndFramebuffer();
 		audioSystem->Update(*activeCamera);
 	}
-
 
 } //!namespace
 

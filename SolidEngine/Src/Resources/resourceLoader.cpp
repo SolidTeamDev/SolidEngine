@@ -60,12 +60,7 @@ void  ResourcesLoader::LoadRessourceNoAdd(const fs::path &Rpath, ResourcePtrWrap
     Resource* r = nullptr;
     if(fs::is_directory(Rpath))
     {
-        std::string name = Rpath.filename().string();
-        std::transform(name.begin(), name.end(), name.begin(),
-                       [](unsigned char c){ return std::tolower(c); });
-        if(name.find("shader") != std::string::npos || name.find("compute") != std::string::npos)
-            r=LoadShader(Rpath);
-        else
+
         {
             for(auto& item2 : fs::directory_iterator(Rpath))
             {
@@ -79,6 +74,12 @@ void  ResourcesLoader::LoadRessourceNoAdd(const fs::path &Rpath, ResourcePtrWrap
                         r =LoadCubemap(Rpath);
                         wrapper.r = r;
                         return;
+                    }
+                    else if(ext.find(".rendershader") != std::string::npos || ext.find(".computeshader") != std::string::npos)
+                    {
+	                    r=LoadShader(Rpath);
+	                    wrapper.r = r;
+	                    return;
                     }
                 }
             }
@@ -202,9 +203,13 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
                         {
 			                return true;
                         }
+			            else if(ext.find(".rendershader") != std::string::npos || ext.find(".computeshader") != std::string::npos)
+			            {
+				            return true;
+			            }
                     }
                 }
-			    return (name.find("shader") != std::string::npos || name.find("compute") != std::string::npos);
+			    return false;
 
 		    }
 		    else
@@ -244,10 +249,15 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
                             found = true;
                             break;
                         }
+                        else if(ext.find(".rendershader") != std::string::npos || ext.find(".computeshader") != std::string::npos)
+                        {
+	                        found = true;
+	                        break;
+                        }
                     }
                 }
 
-			    return (name.find("shader") == std::string::npos && name.find("compute") == std::string::npos) || !found;
+			    return !found;
 
 		    }
 		    else
@@ -413,7 +423,18 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
                 std::string name = item.filename().string();
                 std::transform(name.begin(), name.end(), name.begin(),
                                [](unsigned char c){ return std::tolower(c); });
-                return (name.find("shader") != std::string::npos || name.find("compute") != std::string::npos);
+	            for(auto& item2 : fs::directory_iterator(item))
+	            {
+		            if(!item2.is_directory())
+		            {
+			            std::string ext = item2.path().filename().string();
+			            std::transform(ext.begin(), ext.end(), ext.begin(),
+			                           [](unsigned char c){ return std::tolower(c); });
+
+			            return ext.find(".rendershader") != std::string::npos || ext.find(".computeshader") != std::string::npos;
+
+		            }
+	            }
 
             }
             else
@@ -465,13 +486,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
             fs::path* newP = new fs::path(item);
             if(fs::is_directory(item))
             {
-                std::transform(name.begin(), name.end(), name.begin(),
-                               [](unsigned char c){ return std::tolower(c); });
-                if(name.find("shader") != std::string::npos || name.find("compute") != std::string::npos)
-                {
-                    Shaders.push_back({item, i});
-                    ++i;
-                }
+
                 for(auto& item2 : fs::directory_iterator(item))
                 {
                     if(!item2.is_directory())
@@ -486,6 +501,11 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 
                             ++i;
                             break;
+                        }
+                        else if(ext.find(".rendershader") != std::string::npos || ext.find(".computeshader") != std::string::npos)
+                        {
+	                        Shaders.push_back({item, i});
+	                        ++i;
                         }
                     }
                 }
@@ -597,16 +617,33 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
                 std::string name = Rpath.filename().string();
                 std::transform(name.begin(), name.end(), name.begin(),
                                [](unsigned char c){ return std::tolower(c); });
-                if(name.find("shader") != std::string::npos || name.find("compute") != std::string::npos)
-                {
+	            for(auto& item2 : fs::directory_iterator(item))
+	            {
+		            if(!item2.is_directory())
+		            {
+			            std::string ext = item2.path().filename().string();
+			            std::transform(ext.begin(), ext.end(), ext.begin(),
+			                           [](unsigned char c){ return std::tolower(c); });
+			            if(ext.find(".cubemap") != std::string::npos)
+			            {
+				            Resource *r = LoadCubemap(Rpath);
+				            Manager->AddResource(r);
+				            break;
+			            }
+			            else if(ext.find(".rendershader") != std::string::npos || ext.find(".computeshader") != std::string::npos)
+			            {
+				            Resource *r = LoadShader(Rpath);
+				            Manager->AddResource(r);
+				           break;
+			            }
+			            else
+			            {
 
-                    LoadRessource(item);
-                }
-                else
-                {
+				            continue; //recursive func
+			            }
+		            }
+	            }
 
-                    continue; //recursive func
-                }
             }
             else
             {

@@ -37,13 +37,10 @@ namespace Solid SLDNamespace()
         SLDField()
         Vec3 Up =  Vec3::Up;
         SLDField()
-        float MouseSensitivity = 50.f;
-        SLDField()
         Vec3 position = {0,0,0};
         SLDField()
         Vec3 Euler = Vec3::Zero;
-        SLDField()
-        bool MouseInCenterScreen = false;
+
         Camera();
 
         void Release() override;
