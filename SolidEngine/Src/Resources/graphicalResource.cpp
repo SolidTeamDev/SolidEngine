@@ -348,6 +348,38 @@ void GL::Shader::ReloadShader()
     {
         glLinkProgram(ProgID);
         LoadShaderFields();
+		fs::path p=ResourcesLoader::SolidPath.parent_path();
+		for(auto& elt : source->path)
+		{
+		    p.append(elt);
+		}
+	    fs::path vert = p;
+	    fs::path frag = p;
+	    vert.append(source->name).append("main.vert");
+	    frag.append(source->name).append("main.frag");
+		p.append(source->name + ".SVertFrag");
+		std::vector<char> buffer;
+
+		source->ToDataBuffer(buffer);
+		std::ofstream file(p, std::fstream::binary | std::fstream::trunc);
+	    std::ofstream vertfile(vert, std::fstream::binary | std::fstream::trunc);
+	    std::ofstream fragfile(frag, std::fstream::binary | std::fstream::trunc);
+
+	    if(file.is_open())
+		{
+			file.write(buffer.data(),buffer.size());
+			file.close();
+		}
+	    if(vertfile.is_open())
+	    {
+		    vertfile.write(source->VertexSource.data(),source->VertexSource.size());
+		    vertfile.close();
+	    }
+	    if(fragfile.is_open())
+	    {
+		    fragfile.write(source->FragSource.data(),source->FragSource.size());
+		    fragfile.close();
+	    }
     }
 }
 

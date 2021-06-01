@@ -10,7 +10,6 @@ namespace Solid
         Framebuffer playFramebuffer;
         Engine* engine = nullptr;
 
-        void DrawScene();
     public:
         PlayInterface();
         ~PlayInterface() = default;

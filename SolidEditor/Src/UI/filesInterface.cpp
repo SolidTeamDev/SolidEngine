@@ -40,6 +40,7 @@ namespace Solid
 				        std::transform(name.begin(), name.end(), name.begin(),
 				                       [](unsigned char c){ return std::tolower(c); });
                         bool isCubemap = false;
+				        bool isShader = false;
 				        for(auto& item2 : fs::directory_iterator(item))
                         {
                             if(!item2.is_directory())
@@ -51,9 +52,14 @@ namespace Solid
                                 {
                                     isCubemap = true;
                                 }
+                                else if(ext.find(".rendershader") != std::string::npos || ext.find(".computeshader") != std::string::npos)
+                                {
+	                                isShader = true;
+	                                break;
+                                }
                             }
                         }
-				        bool isShader = (name.find("shader") != std::string::npos || name.find("compute") != std::string::npos);
+
 				        if(isShader || isCubemap)
 					        continue;
 

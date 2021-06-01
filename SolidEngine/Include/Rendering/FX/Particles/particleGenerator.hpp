@@ -35,21 +35,23 @@ namespace Solid
 			void ShowUI(bool& upt);
 		};
 
-		class SOLID_API CirclePosGen : public ParticleGenerator
+		class SOLID_API SpherePosGen : public ParticleGenerator
 		{
 		public:
 
 			Vec4 center;
 			float radX;
 			float radY;
+			float radZ;
 
-			CirclePosGen() : center(0.f, 0.f, 0.f, 0.f), radX(0.f), radY(0.f)
+			SpherePosGen() : center(0.f, 0.f, 0.f, 0.f), radX(0.f), radY(0.f), radZ(0.f)
 			{};
 
-			CirclePosGen(const Vec4 &_center, float _radX, float _radY) :
+			SpherePosGen(const Vec4 &_center, float _radX, float _radY, float _radZ) :
 					center(_center),
 					radX(_radX),
-					radY(_radY)
+					radY(_radY),
+					radZ(_radZ)
 			{};
 
 			void Generate(double dt, ParticleData *p, size_t start, size_t end) override;
