@@ -46,6 +46,15 @@ namespace Solid
 				    EditorInterface::selectedGO = nullptr;
 
 			    }
+			    else
+			    {
+				    drop=UI::AcceptDragDropPayload("Cubemap");
+				    if(drop != nullptr)
+				    {
+					    Resource* r = *((Resource**)drop->Data);
+					    Engine::GetInstance()->renderer->_map = Engine::GetInstance()->graphicsResourceMgr.GetCubemap(r->name.c_str());
+				    }
+			    }
 		    }
 		    UI::EndDragDropTarget();
 	    }

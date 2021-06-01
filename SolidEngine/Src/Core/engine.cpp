@@ -509,7 +509,8 @@ namespace Solid
 				Lambda(std::ref(it.value()), ent->GetEntity());
 			}
 		}
-
+		std::string str = j ["Scene"]["{SkyBoxName}"];
+		Engine::GetInstance()->renderer->_map = Engine::GetInstance()->graphicsResourceMgr.GetCubemap(str.c_str());
 		AddAllComps(world, scene->rawScene, readPos);
 
 		for(auto& elt : LoadedSceneCallbacks)
@@ -544,6 +545,12 @@ namespace Solid
 			}
 
 		};
+		std::string subP = elt + "/{SkyBoxName}" ;
+		if(renderer->_map != nullptr)
+			j[subP] = renderer->_map->name;
+		else
+			j[subP] = "NO_SKYBOX";
+
 		Lambda(std::ref(j), world, std::ref(elt));
 		j = j.unflatten();
 
