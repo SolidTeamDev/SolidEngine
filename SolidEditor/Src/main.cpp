@@ -23,30 +23,32 @@ int main(int argc, char** argv)
 	    bool b = false;
     	if(argc > 1)
 	    {
+		    std::string ProjectPath;
 		    for (int i = 1; i < argc; ++i)
 		    {
 			    std::string arg = argv[i];
-			    if(arg == "-Solid")
+			    if(arg == "--ForceReinitIncludes" ||arg == "-FRI")
 			    {
-				    b = true;
+				    editor.ForceInit =true;
 			    }
 
 			    else if(arg.find("-Project=") != std::string::npos)
 			    {
 			    	std::size_t pos = arg.find('=');
-			    	std::string ProjectPath = arg.substr(pos+1);
+			    	ProjectPath = arg.substr(pos+1);
 			    	ProjectPath.erase(ProjectPath.end());
 			    	std::cout << ProjectPath << std::endl;
 			    	std::ifstream file(ProjectPath);
 			    	editor.CurrentProjectJson.clear();
 				    file >> editor.CurrentProjectJson;
 				    file.close();
-				    editor.InitFromProject(ProjectPath);
+
 			    }
 			    Solid::Log::Send(std::string("ARG :") +argv[i]);
 
 		    }
 
+		    editor.InitFromProject(ProjectPath);
 	    }
 
 

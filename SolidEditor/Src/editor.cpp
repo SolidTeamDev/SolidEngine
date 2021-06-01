@@ -120,7 +120,7 @@ namespace Solid
 		fs::path init = EngineIncPath;
 		init.append("INIT");
 		bool b = (!fs::is_empty(EngineIncPath) && fs::exists(init));
-		if(!b)
+		if(fs::is_empty(EngineIncPath) || !fs::exists(init) || ForceInit)
 		{
 			auto editP =fs::current_path();
 			auto EngineInc = editP.append("Include");
@@ -131,8 +131,8 @@ namespace Solid
 				fs::copy(EngineInc, EngineIncPath, opt);
 			}
 
-
-			fs::create_directory(init);
+			if(!fs::exists(init))
+				fs::create_directory(init);
 
 
 		}

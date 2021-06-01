@@ -83,6 +83,7 @@ namespace Solid
         static Camera editorCamera;
 
         json CurrentProjectJson;
+        bool ForceInit = false;
 
         Editor();
         ~Editor();
