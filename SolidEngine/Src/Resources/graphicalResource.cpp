@@ -529,7 +529,9 @@ void GL::Shader::GetInt(const char *_name, int *_value)
 	GLenum error = glGetError();
     while (error != GL_NO_ERROR)
     {
-        std::cout << glGetString(error) << "\n";
+        const unsigned char* err =glGetString(error);
+        if(err != nullptr)
+            std::cout << err << "\n";
         error = glGetError();
     }
 }

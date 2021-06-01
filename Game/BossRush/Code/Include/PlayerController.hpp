@@ -2,6 +2,7 @@
 #include "Build/solidAPI.hpp"
 #include "ECS/Components/script.hpp"
 #include "ECS/Components/rigidBody.hpp"
+#include "ECS/Components/camera.hpp"
 #include "EngineGenerated/EntityMacros.h"
 #include "EngineGenerated/PlayerController.sld.hpp"
 namespace Solid SLDNamespace()
@@ -19,6 +20,9 @@ namespace Solid SLDNamespace()
 	private:
 		Engine* engine = nullptr;
 	    RigidBody* rigidBody = nullptr;
+	    Camera* camera = nullptr;
+
+	    bool isGrounded = false;
 
 	public:
 		PlayerController();
@@ -28,8 +32,13 @@ namespace Solid SLDNamespace()
 
 		void Update() override;
 
-	private:
+        void OnContactEnter(GameObject *_other) override;
 
+        void OnContactExit(GameObject *_other) override;
+
+    private:
+
+	    void RotateCamera();
 	    void MoveForward();
 	    void MoveBack();
 	    void MoveLeft();

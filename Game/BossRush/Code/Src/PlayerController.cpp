@@ -12,13 +12,15 @@ PlayerController::PlayerController()
     engine->inputManager->AddKeyInput("Left",GLFW_KEY_A,ImEnumDetectionType::PRESSED);
     engine->inputManager->AddKeyInput("Right",GLFW_KEY_D,ImEnumDetectionType::PRESSED);
     engine->inputManager->AddKeyInput("Jump",GLFW_KEY_SPACE, ImEnumDetectionType::NO_REPEAT);
-    engine->inputManager->AddKeyInput("Fire1",GLFW_MOUSE_BUTTON_1, ImEnumDetectionType::PRESSED);
+    engine->inputManager->AddMouseInput("Fire1",GLFW_MOUSE_BUTTON_1, ImEnumDetectionType::PRESSED);
 }
 
 void PlayerController::Init()
 {
     if(engine->ecsManager.GotComponent<RigidBody>(gameObject->GetEntity()))
         rigidBody = &engine->ecsManager.GetComponent<RigidBody>(gameObject->GetEntity());
+    if(engine->ecsManager.GotComponent<Camera>(gameObject->GetEntity()))
+        camera = &engine->ecsManager.GetComponent<Camera>(gameObject->GetEntity());
 }
 
 void PlayerController::Update()
@@ -31,7 +33,7 @@ void PlayerController::Update()
         MoveLeft();
     if(engine->inputManager->IsPressed("Right"))
         MoveRight();
-    if(engine->inputManager->IsPressed("Jump"))
+    if(engine->inputManager->IsPressed("Jump") && isGrounded)
         Jump();
 
     if(engine->inputManager->IsPressed("Fire1"))
@@ -80,6 +82,21 @@ void PlayerController::Jump()
 
 void PlayerController::Fire()
 {
-    Log::Send("PIEW");
+    GameObject* go = engine->ecsManager.Instantiate("Bullet", nullptr, "PlayerBullet");
+
+    go->transform->SetPosition(gameObject->transform->GetPosition());
+    engine->ecsManager.GetComponent<RigidBody>(go->GetEntity()).SetLinearVelocity(Vec3(0,0,10));
+}
+
+void PlayerController::OnContactEnter(GameObject *_other)
+{
+    if(_other->name == "Ground")
+        isGrounded = true;
+}
+
+void PlayerController::OnContactExit(GameObject *_other)
+{
+    if(_other->name == "Ground")
+        isGrounded = false;
 }
 

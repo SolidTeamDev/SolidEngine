@@ -325,6 +325,11 @@ namespace Solid
         }
 
         Log::Send("OpenGL Debug : " + std::string(_message), logSeverity);
+        GLenum error = glGetError();
+        while (error != GL_NO_ERROR)
+        {
+            error = glGetError();
+        }
     }
 
     void OpenGL45Renderer::Clear(const Vec2i& _windowSize) const
