@@ -346,6 +346,14 @@ namespace Solid
 				    UI::CloseCurrentPopup();
 			    }
 		    }
+            if(engine->ecsManager.GotComponent<Animation>(gameObject->GetEntity()))
+            {
+                if(UI::Button("Animation"))
+                {
+                    engine->ecsManager.RemoveComponent<Animation>(gameObject);
+                    UI::CloseCurrentPopup();
+                }
+            }
 		    if(engine->ecsManager.GotComponent<ScriptList>(gameObject->GetEntity()))
 		    {
 		    	ScriptList& sl = engine->ecsManager.GetComponent<ScriptList>(gameObject->GetEntity());
