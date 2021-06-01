@@ -73,4 +73,13 @@ namespace Solid
     {
         return logMessageList.at(idx);
     }
+
+    void Log::Clear()
+    {
+        LogMessage empty;
+        empty.logMessage = "";
+        logMessageList.fill(empty);
+        logCount = 0;
+        logIndex = 0;
+    }
 }
