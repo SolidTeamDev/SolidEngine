@@ -105,6 +105,10 @@ namespace Solid
 
 	    void SaveScene(const fs::path& p);
 
+	    SceneResource* SaveTempScene();
+
+	    void LoadTempScene(SceneResource* scene);
+
 	    void Init();
 
         void Update();

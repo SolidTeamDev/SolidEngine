@@ -738,6 +738,280 @@ namespace Solid
 			resourceManager.AddResource(scene);
 	}
 
+	void Engine::LoadTempScene(SceneResource* name)
+	{
+		json j;
+		SceneResource* scene =name;
+
+		//SCENE : implement load function here
+		if(scene == nullptr)
+		{
+			return;
+		}
+		rfk::Namespace const* n = rfk::Database::getNamespace("Solid");
+		std::uint64_t readPos = 0;
+		//LOADS
+
+
+
+
+		std::size_t jsonSize = 0;
+		ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), &jsonSize, sizeof(std::size_t),readPos);
+		std::string jsonStr;
+		jsonStr.resize(jsonSize / sizeof(std::string::value_type));
+		ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), jsonStr.data(), jsonSize,readPos);
+		j = j.parse(jsonStr) ;
+
+		Engine* engine = instance;
+		GameObject* world = engine->ecsManager.GetWorld();
+		for (auto it = world->childs.begin() ; it != world->childs.end();)
+		{
+			engine->ecsManager.DestroyEntity((*it)->GetEntity());
+			//(*it)->RemoveCurrent();
+			it = world->childs.begin();
+			if(it == world->childs.end())
+			{
+				break;
+			}
+		}
+
+		std::function<void(json&,Entity)> Lambda = [&, engine](json& j,Entity e){
+			for(auto it = j.begin(); it != j.end(); ++it)
+			{
+				std::string key = (it).key();
+				if(key.find("GameObject") != std::string::npos)
+				{
+					GameObject* ent = engine->ecsManager.CreateEntity( it.value()["Name"], e);
+					Lambda(std::ref(it.value()), ent->GetEntity());
+				}
+			}
+		};
+		for(auto it = j["Scene"].begin(); it != j["Scene"].end(); ++it)
+		{
+			std::string key = (it).key();
+			if(key.find("GameObject") != std::string::npos)
+			{
+				std::string name = it.value()["Name"];
+				GameObject* ent = engine->ecsManager.CreateEntity(name);
+				Lambda(std::ref(it.value()), ent->GetEntity());
+			}
+		}
+		std::string str = j ["Scene"]["{SkyBoxName}"];
+		Engine::GetInstance()->renderer->_map = Engine::GetInstance()->graphicsResourceMgr.GetCubemap(str.c_str());
+		AddAllComps(world, scene->rawScene, readPos);
+
+		for(auto& elt : LoadedSceneCallbacks)
+		{
+			elt(scene);
+		}
+
+	}
+
+	SceneResource* Engine::SaveTempScene()
+	{
+
+		SceneResource* scene = new SceneResource();
+		json j;
+		j["Scene"].array();
+		j = j.flatten();
+		std::string elt = "/Scene";
+		GameObject* world = ecsManager.GetWorld();
+		std::function<void(json&, GameObject*, std::string&)> Lambda = [&](json& j, GameObject* elt, std::string& path){
+
+			for(GameObject* sub : elt->childs)
+			{
+				std::string subP = path + "/{GameObject_"+ std::to_string(sub->GetEntity()) + "}" ;
+				j[subP + "/Name"] = sub->name;
+				Lambda(std::ref(j), sub, std::ref(subP));
+			}
+
+		};
+		std::string subP = elt + "/{SkyBoxName}" ;
+		if(renderer->_map != nullptr)
+			j[subP] = renderer->_map->name;
+		else
+			j[subP] = "NO_SKYBOX";
+
+		Lambda(std::ref(j), world, std::ref(elt));
+		j = j.unflatten();
+
+		std::vector<char> buffer;
+		std::stringstream sstr;
+		sstr << std::setw(4) << j << std::endl;
+		std::size_t sstrSize = sstr.str().size() * sizeof(std::string::value_type);
+		ResourcesLoader::Append(buffer, &sstrSize , sizeof(std::size_t));
+
+		ResourcesLoader::Append(buffer, sstr.str().data(), sstrSize);
+		std::function<void(GameObject*)> LambdaCmp = [&](GameObject* elt){
+			//store Num of Childs
+			std::size_t ChildNum = elt->childs.size();
+			ResourcesLoader::Append(buffer, &ChildNum, sizeof(std::size_t));
+			for(GameObject* sub : elt->childs)
+			{
+				//store num of comps
+				std::size_t cmpNum = sub->compsList.size();
+				ResourcesLoader::Append(buffer, &cmpNum, sizeof(std::size_t));
+				for(Components* cmp : sub->compsList)
+				{
+					if(cmp->getArchetype().name == "ScriptList")
+					{
+						for(Script* script : ((ScriptList*)cmp)->GetAllScripts())
+						{
+							Log::Send(script->getArchetype().name);
+							std::size_t offset =0;
+
+							std::size_t scriptNameSize = 0;
+
+							//store comp name / string
+							scriptNameSize = script->getArchetype().name.size()*sizeof(std::string::value_type);
+							ResourcesLoader::Append(buffer, &scriptNameSize, sizeof(std::size_t));
+							ResourcesLoader::Append(buffer, (void*)script->getArchetype().name.data(),  scriptNameSize);
+
+							//store num of fields
+							std::size_t numFields = script->getArchetype().fields.size();
+							ResourcesLoader::Append(buffer, &numFields, sizeof(std::size_t));
+							for(auto& cField : script->getArchetype().fields)//2 cField var WARN
+							{
+								std::size_t size = 0;
+								size = cField.name.size()*sizeof(std::string::value_type);
+								//store field name / string
+								ResourcesLoader::Append(buffer, &size, sizeof(std::size_t));
+								ResourcesLoader::Append(buffer, (void*)cField.name.data(),  size);
+								short isNull = 128;
+								if(cField.type.archetype == nullptr)
+								{
+									isNull = 256;
+									std::string str = cField.getData<std::string>(script);
+									std::size_t strS =  str.size()*sizeof(std::string::value_type);
+									//store isNull
+									ResourcesLoader::Append(buffer, &isNull, sizeof(short));
+									//store field data
+									ResourcesLoader::Append(buffer, &strS, sizeof(std::size_t));
+									ResourcesLoader::Append(buffer, str.data(), strS);
+								}
+								else
+								{
+									ResourcesLoader::Append(buffer, &isNull, sizeof(short));
+									if(cField.type.archetype->name == "String")
+									{
+										String* str = (String*)cField.getDataAddress(script);
+										size = str->size()*sizeof(std::string::value_type);
+										ResourcesLoader::Append(buffer, &size, sizeof(std::size_t));
+										ResourcesLoader::Append(buffer, str->data(), size);
+									}
+									else if(cField.type.archetype->name == "vectorStr")
+									{
+										vectorStr* vstr = (vectorStr*)cField.getDataAddress(script);
+										size = vstr->size();
+										ResourcesLoader::Append(buffer, &size, sizeof(std::size_t));
+										for(auto& str : *vstr)
+										{
+											std::size_t strSize = str.size()*sizeof(std::string::value_type);
+											ResourcesLoader::Append(buffer, &strSize, sizeof(std::size_t));
+											ResourcesLoader::Append(buffer, str.data(), strSize);
+										}
+									}
+									else
+									{
+										size = cField.type.archetype->memorySize;
+										//store isNull
+										//store field data
+										ResourcesLoader::Append(buffer, &size, sizeof(std::size_t));
+										ResourcesLoader::Append(buffer, cField.getDataAddress(script), size);
+
+									}
+								}
+
+							}
+
+						}
+					}
+					else
+					{
+						Log::Send(cmp->getArchetype().name);
+						std::size_t offset =0;
+
+						std::size_t cmpNameSize = 0;
+
+						//store comp name / string
+						cmpNameSize = cmp->getArchetype().name.size()*sizeof(std::string::value_type);
+						ResourcesLoader::Append(buffer, &cmpNameSize, sizeof(std::size_t));
+						ResourcesLoader::Append(buffer, (void*)cmp->getArchetype().name.data(),  cmpNameSize);
+
+						//store num of fields
+						std::size_t numFields = cmp->getArchetype().fields.size();
+						ResourcesLoader::Append(buffer, &numFields, sizeof(std::size_t));
+						for(auto& cField : cmp->getArchetype().fields)//2 cField var WARN
+						{
+							std::size_t size = 0;
+							size = cField.name.size()*sizeof(std::string::value_type);
+							//store field name / string
+							ResourcesLoader::Append(buffer, &size, sizeof(std::size_t));
+							ResourcesLoader::Append(buffer, (void*)cField.name.data(),  size);
+							short isNull = 128;
+							if(cField.type.archetype == nullptr)
+							{
+								isNull = 256;
+								std::string str = cField.getData<std::string>(cmp);
+								std::size_t strS =  str.size()*sizeof(std::string::value_type);
+								//store isNull
+								ResourcesLoader::Append(buffer, &isNull, sizeof(short));
+								//store field data
+								ResourcesLoader::Append(buffer, &strS, sizeof(std::size_t));
+								ResourcesLoader::Append(buffer, str.data(), strS);
+							}
+							else
+							{
+								ResourcesLoader::Append(buffer, &isNull, sizeof(short));
+								if(cField.type.archetype->name == "String")
+								{
+									String* str = (String*)cField.getDataAddress(cmp);
+									size = str->size()*sizeof(std::string::value_type);
+									ResourcesLoader::Append(buffer, &size, sizeof(std::size_t));
+									ResourcesLoader::Append(buffer, str->data(), size);
+								}
+								else if(cField.type.archetype->name == "vectorStr")
+								{
+									vectorStr* vstr = (vectorStr*)cField.getDataAddress(cmp);
+									size = vstr->size();
+									ResourcesLoader::Append(buffer, &size, sizeof(std::size_t));
+									for(auto& str : *vstr)
+									{
+										std::size_t strSize = str.size()*sizeof(std::string::value_type);
+										ResourcesLoader::Append(buffer, &strSize, sizeof(std::size_t));
+										ResourcesLoader::Append(buffer, str.data(), strSize);
+									}
+								}
+								else
+								{
+									size = cField.type.archetype->memorySize;
+									//store isNull
+									//store field data
+									ResourcesLoader::Append(buffer, &size, sizeof(std::size_t));
+									ResourcesLoader::Append(buffer, cField.getDataAddress(cmp), size);
+
+								}
+							}
+
+						}
+
+					}
+
+
+				}
+				LambdaCmp(sub);
+			}
+
+		};
+		LambdaCmp(world);
+		scene->rawScene = buffer;
+		scene->name = "TempScene";
+
+		scene->path.clear();
+
+		return scene;
+	}
+
 	void Engine::AddLoadedSceneCallback(const std::function<void(Resource*)>& _func)
 	{
 		LoadedSceneCallbacks.push_back(_func);
