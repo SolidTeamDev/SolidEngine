@@ -12,7 +12,7 @@ PlayerController::PlayerController()
     engine->inputManager->AddKeyInput("Left",GLFW_KEY_A,ImEnumDetectionType::PRESSED);
     engine->inputManager->AddKeyInput("Right",GLFW_KEY_D,ImEnumDetectionType::PRESSED);
     engine->inputManager->AddKeyInput("Jump",GLFW_KEY_SPACE, ImEnumDetectionType::NO_REPEAT);
-    engine->inputManager->AddMouseInput("Fire1",GLFW_MOUSE_BUTTON_1, ImEnumDetectionType::PRESSED);
+    engine->inputManager->AddMouseInput("Fire1",GLFW_MOUSE_BUTTON_1, ImEnumDetectionType::NO_REPEAT);
 }
 
 void PlayerController::Init()
@@ -82,10 +82,10 @@ void PlayerController::Jump()
 
 void PlayerController::Fire()
 {
-    GameObject* go = engine->ecsManager.Instantiate("Bullet", nullptr, "PlayerBullet");
+    /*GameObject* go = engine->ecsManager.Instantiate("Bullet", nullptr, "PlayerBullet");
 
     go->transform->SetPosition(gameObject->transform->GetPosition());
-    engine->ecsManager.GetComponent<RigidBody>(go->GetEntity()).SetLinearVelocity(Vec3(0,0,10));
+    engine->ecsManager.GetComponent<RigidBody>(go->GetEntity()).SetLinearVelocity(Vec3(0,0,10));*/
 }
 
 void PlayerController::OnContactEnter(GameObject *_other)
