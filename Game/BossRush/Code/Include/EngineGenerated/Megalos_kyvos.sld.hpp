@@ -85,6 +85,12 @@ public:	\
 		{	\
 			const_cast<rfk::Struct&>(thisArchetype).children.insert(childArchetype);	\
 		}	\
+		[[maybe_unused]] rfk::Field*		field		= nullptr; 	\
+		[[maybe_unused]] rfk::StaticField*	staticField = nullptr; 	\
+		__RFK_DISABLE_WARNING_PUSH	\
+		__RFK_DISABLE_WARNING_OFFSETOF	\
+		field = childArchetype->addField("Lerp", 439483425070383761u, rfk::Type::getType<Solid::Vec3>(), static_cast<rfk::EFieldFlags>(1), &thisArchetype, offsetof(ChildType, Lerp));	\
+		__RFK_DISABLE_WARNING_POP	\
 	}
 
 #define __RFK14755004778381226863u_GenerateMethodsMetadata	\

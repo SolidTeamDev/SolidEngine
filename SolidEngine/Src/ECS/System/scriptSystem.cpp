@@ -16,6 +16,19 @@ void ScriptSystem::Init()
 
 }
 
+void ScriptSystem::Destroy()
+{
+    for (auto entity : entities)
+    {
+        ScriptList& scriptL = ecsManager.GetComponent<ScriptList>(entity);
+
+
+        scriptL.Destroy();
+
+    }
+
+}
+
 void ScriptSystem::Update()
 {
 	for (auto entity : entities)

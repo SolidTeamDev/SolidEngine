@@ -17,6 +17,7 @@ class SOLID_API SLDClass() Script : public Components
         virtual ~Script() = default;
 
 		virtual void Init() {};
+		virtual void Destroy() {};
         virtual void Update() {};
         virtual void FixedUpdate() {};
         virtual void LateUpdate() {};
