@@ -17,12 +17,17 @@ namespace Solid SLDNamespace()
         float jumpForce = 0;
         SLDField()
         int health = 0;
+
+        SLDField()
+        float mouseSensitivity = 0;
 	private:
 		Engine* engine = nullptr;
 	    RigidBody* rigidBody = nullptr;
-	    Camera* camera = nullptr;
+	    GameObject* camera = nullptr;
 
 	    bool isGrounded = false;
+
+	    bool isPaused = false;//Temporary
 
 	public:
 		PlayerController();
@@ -30,7 +35,9 @@ namespace Solid SLDNamespace()
 
 		void Init() override;
 
-		void Update() override;
+        void Destroy() override;
+
+        void Update() override;
 
         void OnContactEnter(GameObject *_other) override;
 
