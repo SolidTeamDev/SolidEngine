@@ -54,7 +54,12 @@ void Solid::Launcher::Run()
 	auto& style = UI::GetStyle();
 	Vec3 c = Vec3(29, 124, 139);
 	style.Colors[2] = ImVec4(c.x/255.0, c.y/255.0, c.z/255.0,1.0);
-	style.FramePadding.y =0;
+    style.Colors[ImGuiCol_WindowBg] = ImVec4(0.15f, 0.15f, 0.15f, 1.f);
+    style.Colors[ImGuiCol_Button] = ImVec4(0.3f, 0.3f, 0.3f, 1.f);
+    style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.25f, 0.25f, 0.25f, 1.f);
+    style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.35f, 0.35f, 0.35f, 1.f);
+
+    style.FramePadding.y =0;
 	//io.ConfigFlags = io.ConfigFlags & ~ImGuiConfigFlags_ViewportsEnable;
 
 	while (!glfwWindowShouldClose(window->GetHandle()) && !needClose)
@@ -90,8 +95,8 @@ void Solid::Launcher::UpdateInterface()
 	auto& style = UI::GetStyle();
 
 	UI::SetNextWindowSize({(float)s.x,(float)s.y});
-	Vec2 buttonPos = Vec2(200, 100);
-	Vec2 buttonSize = Vec2(100,100);
+	Vec2 buttonPos = Vec2(250, 200);
+	Vec2 buttonSize = Vec2(150,150);
 	UI::Begin("##Launcher", nullptr, ImGuiWindowFlags_AlwaysUseWindowPadding|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoResize);
 	{
 		io.FontGlobalScale = 1.5;
@@ -126,6 +131,13 @@ void Solid::Launcher::UpdateInterface()
 				needClose = true;
 			}
 		}
+		float old = UI::GetFontSize();
+        UI::SetWindowFontScale(2.f);
+        ImVec2 textSize = UI::CalcTextSize("Welcome in Solid Engine!");
+        ImVec2 textPos(s.x/2.f - textSize.x/2.f, 3.f * s.y/5.f - textSize.y/2.f);
+        UI::SetCursorPos(textPos);
+        UI::Text("Welcome in Solid Engine");
+        UI::SetWindowFontScale(1.f);
 
 		if (UI::BeginPopup("CreatWin"))
 		{
