@@ -719,7 +719,7 @@ namespace Solid
         for (unsigned int i = 0; i < 4; i++)
         {
             for (unsigned int j = 0; j < 4; j++)
-                resultVect[i] += elements[(i*4)+j]*_vec[j];
+                resultVect[i] += elements[(i)+(j*4)]*_vec[j];
 
         }
         return resultVect;
