@@ -196,7 +196,7 @@ namespace Solid
 		    tempScene = Engine::GetInstance()->SaveTempScene();
 
 
-		    Engine::GetInstance()->Init();
+		    Engine::GetInstance()->InitScript();
 
 		    play = true;
 			//save component State
@@ -233,6 +233,7 @@ namespace Solid
 			if(!selectName.empty())
 				EditorInterface::selectedGO = Engine::GetInstance()->ecsManager.FindGameObjectByName(selectName);
 			play = false;
+			Engine::GetInstance()->DestroyScript();
 		}
 	}
 } //!namespace

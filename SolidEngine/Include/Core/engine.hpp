@@ -114,7 +114,6 @@ namespace Solid
 
 	    void LoadTempScene(SceneResource* scene);
 
-	    void Init();
 
         void Update();
 

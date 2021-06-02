@@ -545,6 +545,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 
 
         bool b = true;
+        bool hasLoadedPrisme = false;
         while(b)
         {
             b = false;
@@ -564,7 +565,23 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
                         Manager->AddResource(RessourceArray[k].r);
                     }
 	                else if(RessourceArray[k].isFBX) {
-	                	Manager->AddResource(RessourceArray[k].fbx.mesh);
+
+	                	std::string name =RessourceArray[k].fbx.mesh->name;
+	                    std::transform(name.begin(), name.end(), name.begin(),
+	                                   [](unsigned char c){ return std::tolower(c); });
+	                    if(name.find("prism") != std::string::npos)
+	                    {
+	                	    if(!hasLoadedPrisme)
+		                    {
+
+				                Manager->AddResource(RessourceArray[k].fbx.mesh);
+				                hasLoadedPrisme = true;
+			                }
+	                	    else
+	                	    	delete RessourceArray[k].fbx.mesh;
+		                }
+	                    else
+		                    Manager->AddResource(RessourceArray[k].fbx.mesh);
 	                    Manager->AddResource(RessourceArray[k].fbx.Skeleton);
 	                    for(AnimResource* elt : RessourceArray[k].fbx.anims)
 	                    {
