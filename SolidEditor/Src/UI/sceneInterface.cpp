@@ -63,15 +63,16 @@ namespace Solid
         GameObject* go = EditorInterface::selectedGO;
         if (go != nullptr && engine->ecsManager.GotComponent<Transform>(go->GetEntity()))
         {
-	        Mat4<float> transMat = engine->ecsManager.GetComponent<Transform>(go->GetEntity()).GetMatrix();
-	        Mat4<float> Parent = engine->ecsManager.GetComponent<Transform>(go->GetEntity()).GetParentMatrix();
-			transMat = (transMat*Parent );
+	        Mat4<float> transMat = engine->ecsManager.GetComponent<Transform>(go->GetEntity()).GetLocalMatrix();
+	        Transform* Parent = engine->ecsManager.GetComponent<Transform>(go->GetEntity()).GetParentTransform();
+	        Mat4<float> ParentMat = (Parent != nullptr) ? Parent->GetGlobalMatrix() : Mat4f::Identity;
+			transMat = (transMat*ParentMat );
             ImGuizmo::Manipulate(viewMat.elements.data(), projMat.elements.data(),
                                  ButtonInterface::gizmoMode, ButtonInterface::gizmoReferential,
                                  transMat.elements.data() );
             if (ImGuizmo::IsUsing())
             {
-            	transMat =   transMat *Parent.GetInversed();
+            	transMat =   transMat *ParentMat.GetInversed();
                 engine->ecsManager.GetComponent<Transform>(go->GetEntity()).SetTransformMatrix(transMat);
             }
         }
@@ -100,18 +101,8 @@ namespace Solid
         engine->renderer->DrawSkybox(sceneCam);
         if(ShowSkeleton)
         {
-            for(GameObject* gameObject : engine->ecsManager.GetWorld()->childs)
-            {
-                if(engine->ecsManager.GotComponent<Animation>(gameObject->GetEntity()))
-                {
-                    std::vector<Vec3> points;
-                    std::vector<uint> indices;
-                    Animation& anim = engine->ecsManager.GetComponent<Animation>(gameObject->GetEntity());
-                    anim.UpdateAnim(Time::DeltaTime());
-                    anim.DrawSkeleton(points,indices);
-                    engine->renderer->DrawLines(sceneCam, points, indices);
-                }
-            }
+        	///TOMOVE
+            engine->animSystem->Update(sceneCam);
         }
 
         if(ShowGrid)

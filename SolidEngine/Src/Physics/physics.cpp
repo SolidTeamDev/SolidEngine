@@ -87,8 +87,8 @@ namespace Solid
 
     void Physics::SetTransform(physx::PxActor* _actor, const Transform& _transform) const
     {
-        Vec3 pos = _transform.GetPosition();
-        Quat rot = _transform.GetRotation().GetInversed();
+        Vec3 pos = _transform.GetLocalPosition();
+        Quat rot = _transform.GetLocalRotation().GetInversed();
         PxTransform pxT = PxTransform(PxVec3(pos.x,pos.y,pos.z),PxQuat(rot.x,rot.y,rot.z,rot.w));
 
         switch(_actor->getType())
@@ -113,8 +113,8 @@ namespace Solid
 
     physx::PxRigidDynamic* Physics::CreateDynamic(GameObject* _go, const Transform& _transform)
     {
-        Vec3 pos = _transform.GetPosition();
-        Quat rot = _transform.GetRotation().GetInversed();
+        Vec3 pos = _transform.GetLocalPosition();
+        Quat rot = _transform.GetLocalRotation().GetInversed();
         PxTransform pxT = PxTransform(PxVec3(pos.x,pos.y,pos.z),PxQuat(rot.x,rot.y,rot.z,rot.w));
         PxRigidDynamic* dynamicActor = pxPhysics->createRigidDynamic(pxT);
         dynamicActor->userData = _go;
@@ -125,8 +125,8 @@ namespace Solid
 
     physx::PxRigidStatic* Physics::CreateStatic(GameObject* _go, const Transform& _transform)
     {
-        Vec3 pos = _transform.GetPosition();
-        Quat rot = _transform.GetRotation().GetInversed();
+        Vec3 pos = _transform.GetLocalPosition();
+        Quat rot = _transform.GetLocalRotation().GetInversed();
         PxTransform pxT = PxTransform(PxVec3(pos.x,pos.y,pos.z),PxQuat(rot.x,rot.y,rot.z,rot.w));
         PxRigidStatic* staticActor = pxPhysics->createRigidStatic(pxT);
         staticActor->userData = _go;

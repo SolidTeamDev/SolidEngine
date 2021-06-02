@@ -348,7 +348,7 @@ namespace Solid {
         std::string fps = std::to_string(Time::Fps()) + " fps";
         UI::Text("%s", fps.c_str());
 
-        /*Vec3 camPos = Editor::editorCamera.transform.GetPosition();
+        /*Vec3 camPos = Editor::editorCamera.transform.GetLocalPosition();
         std::string posSubText = std::to_string(camPos.x);
         std::string xCut = posSubText.substr(0, posSubText.find(".")+3);
 

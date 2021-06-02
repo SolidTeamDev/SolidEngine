@@ -189,7 +189,7 @@ namespace Solid
 	    	if(UI::Button("Import Resource"))
 		    {
 	    		//UI::OpenPopup("Importer");
-	    		const char* filter = "All Valid Types\0*.OBJ;*.FBX;*.SMESH;*.SANIM;*.PNG;*.BMP;*.SIMAGE;*.JPG;*.JPEG;*.VERT;*.SVERTFRAG;*.COMPUTE;*.SCOMPUTE;*.SMATERIAL;*.SOLIDSCENE;*.WAV;*.OGG;*.SAUDIO;*.SOLIDPREFAB\0Meshes\0*.OBJ;*.FBX;*.SMESH\0Anims\0*.FBX;*.SANIM\0Images\0*.PNG;*.BMP;*.SIMAGE;*.JPG;*.JPEG\0Shader\0*.VERT;*.SVERTFRAG\0Compute Shader\0*.COMPUTE;*.SCOMPUTE\0Material\0*.SMATERIAL\0Scene\0*.SOLIDSCENE\0Audio\0*.WAV;*.OGG;*.SAUDIO\0Prefab\0*.SOLIDPREFAB\0";
+	    		const char* filter = "All Valid Types\0*.OBJ;*.FBX;*.SMESH;*.SANIM;*.PNG;*.BMP;*.SIMAGE;*.JPG;*.JPEG;*.CUBEMAP;*.RENDERSHADER;*.SVERTFRAG;*.COMPUTESHADER;*.SCOMPUTE;*.SMATERIAL;*.SOLIDSCENE;*.WAV;*.OGG;*.SAUDIO;*.SOLIDPREFAB\0Meshes\0*.OBJ;*.FBX;*.SMESH\0Anims\0*.FBX;*.SANIM\0Images\0*.PNG;*.BMP;*.SIMAGE;*.JPG;*.JPEG\0Shader\0*.RENDERSHADER;*.SVERTFRAG\0Compute Shader\0*.COMPUTESHADER;*.SCOMPUTE\0Material\0*.SMATERIAL\0Scene\0*.SOLIDSCENE\0Audio\0*.WAV;*.OGG;*.SAUDIO\0Prefab\0*.SOLIDPREFAB\0Cubemap\0*.CUBEMAP\0";
 			    HasChosen hc =WinOpenFileMultiSelect(filter);
 			    if(hc.b)
 			    {
@@ -229,9 +229,9 @@ namespace Solid
 					    std::string fn = elt.filename().string();
 					    std::transform(fn.begin(), fn.end(), fn.begin(),
 					                   [](unsigned char c){ return std::tolower(c); });
-					    if(fn.find("vert") != std::string::npos
-					       ||fn.find("frag") != std::string::npos
-					       ||fn.find("compute") != std::string::npos)
+					    if(fn.find("cubemap") != std::string::npos
+					       ||fn.find("rendershader") != std::string::npos
+					       ||fn.find("computeshader") != std::string::npos)
 					    {
 						    path =path.parent_path();
 						    fs::path copy = ResourcesLoader::SolidPath;
@@ -456,12 +456,8 @@ namespace Solid
                 else if(elt.ftype == "Material")
                     img = "MatFile";
 			    UI::PushID(elt.fileNames.c_str());
-                bool press =UI::ImageButton((ImTextureID)editorTex[img]->texId,ImVec2(imgSize,imgSize),ImVec2(0,1),ImVec2(1,0));
+                UI::ImageButton((ImTextureID)editorTex[img]->texId,ImVec2(imgSize,imgSize),ImVec2(0,1),ImVec2(1,0));
 
-                if(press && (elt.ftype == "Cubemap"))
-                {
-                    Engine::GetInstance()->renderer->_map = Engine::GetInstance()->graphicsResourceMgr.GetCubemap("Skybox");
-                }
 
                 UI::PopID();
                 if(UI::BeginDragDropSource())

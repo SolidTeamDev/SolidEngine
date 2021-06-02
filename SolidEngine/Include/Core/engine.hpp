@@ -16,6 +16,7 @@
 #include "ECS/System/particleEffectSystem.hpp"
 #include "ECS/System/transformSystem.hpp"
 #include "ECS/System/cameraSystem.hpp"
+#include "ECS/System/animationSystem.hpp"
 
 #include "Resources/graphicalResourceMgr.hpp"
 
@@ -53,6 +54,12 @@ namespace Solid
 	    };
 	    friend class EngineCleanerInterface;
 	    std::vector<std::function<void(Resource*)>> LoadedSceneCallbacks;
+
+	    template<class T>
+	    void AddComp(const std::string &className, std::vector<char> &buffer, std::uint64_t &readPos,
+	                 GameObject *go, Components *cmp, std::size_t FieldNum, std::size_t cmpNameSize);
+
+	    void AddAllComps(GameObject *elt, std::vector<char> &buffer, uint64_t &ReadPos);
     public:
     	//Engine** test = &instance;
         Window* window;
@@ -67,6 +74,7 @@ namespace Solid
 	    std::shared_ptr<ParticleEffectSystem> particleEffectSystem;
 	    std::shared_ptr<TransformSystem> transformSystem;
 	    std::shared_ptr<CameraSystem> cameraSystem;
+	    std::shared_ptr<AnimationSystem> animSystem;
         ResourceManager resourceManager;
         TaskManager taskManager;
         ThreadManager threadPool;
@@ -102,6 +110,10 @@ namespace Solid
 	    void InitScript();
 
 	    void DestroyScript();
+	    SceneResource* SaveTempScene();
+
+	    void LoadTempScene(SceneResource* scene);
+
 
         void Update();
 
