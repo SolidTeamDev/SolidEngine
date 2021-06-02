@@ -46,12 +46,17 @@ namespace Solid SLDNamespace()
         Vec3 GetLocalPosition() const;
         Vec3 GetLocalEuler()const;
         Quat GetLocalRotation() const;
-        Vec3 GetLocalScale() const;
+	    Vec3 GetLocalScale() const;
+	    Vec3 GetLocalForward() const;
+	    Vec3 GetLocalRight() const;
+	    Vec3 GetLocalUp() const;
 	    Vec3 GetGlobalPosition() const;
 	    Vec3 GetGlobalEuler()const;
 	    Quat GetGlobalRotation() const;
 	    Vec3 GetGlobalScale() const;
-
+	    Vec3 GetGlobalForward() const;
+	    Vec3 GetGlobalRight() const;
+	    Vec3 GetGlobalUp() const;
         Mat4<float> GetLocalMatrix();
 	    Mat4<float> GetGlobalMatrix();
 	    void SetParentTransform( Transform* _parent);

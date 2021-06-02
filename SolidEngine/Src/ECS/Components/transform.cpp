@@ -169,5 +169,35 @@ namespace Solid
 		return parentTransform;
 	}
 
+	Vec3 Transform::GetLocalForward() const
+	{
+		return rotation.Rotate(Vec3(0,0,1));
+	}
+
+	Vec3 Transform::GetLocalRight() const
+	{
+		return rotation.Rotate(Vec3(-1,0,0));
+	}
+
+	Vec3 Transform::GetLocalUp() const
+	{
+		return rotation.Rotate(Vec3(0,1,0));
+	}
+
+	Vec3 Transform::GetGlobalForward() const
+	{
+		return GetGlobalRotation().Rotate(Vec3(0,0,1));
+	}
+
+	Vec3 Transform::GetGlobalRight() const
+	{
+		return GetGlobalRotation().Rotate(Vec3(-1,0,0));
+	}
+
+	Vec3 Transform::GetGlobalUp() const
+	{
+		return GetGlobalRotation().Rotate(Vec3(0,1,0));
+	}
+
 
 } //!namespace
