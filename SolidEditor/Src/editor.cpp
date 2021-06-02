@@ -222,9 +222,11 @@ namespace Solid
 			if(paused)
 				paused = false;
 			std::string selectName;
+
 			if(EditorInterface::selectedGO != nullptr)
 				selectName = EditorInterface::selectedGO->name;
 			Engine::GetInstance()->LoadTempScene(tempScene);
+
 			if(tempScene != nullptr)
 			{
 				delete tempScene;

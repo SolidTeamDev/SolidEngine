@@ -83,4 +83,7 @@ namespace Solid
         Engine::GetInstance()->activeCamera = this;
         isActiveCamera = true;
     }
+
+	bool Camera::IsActive() const
+	{ return isActiveCamera;}
 } //!namespace
