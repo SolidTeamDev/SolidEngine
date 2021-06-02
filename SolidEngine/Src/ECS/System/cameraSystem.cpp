@@ -12,8 +12,8 @@ void Solid::CameraSystem::Update()
 		auto& cam  = ecsManager.GetComponent<Camera>(entity);
 		auto& transform = ecsManager.GetComponent<Transform>(entity);
 
-		cam.position = transform.GetPosition();
-		cam.Euler = transform.GetEuler();
+		cam.position = transform.GetLocalPosition();
+		cam.Euler = transform.GetLocalEuler();
 		Vec3 _front;
 		_front.z = Maths::Cos(Maths::DegToRad(cam.Euler.x)) *
 		           Maths::Cos(Maths::DegToRad(cam.Euler.y));

@@ -398,9 +398,9 @@ namespace Solid
         {
             UI::Indent();
 
-            Vec3 tempPos   = _trs.GetPosition();
-            Vec3 tempRot   = _trs.GetEuler();
-            Vec3 tempScale = _trs.GetScale();
+            Vec3 tempPos   = _trs.GetLocalPosition();
+            Vec3 tempRot   = _trs.GetLocalEuler();
+            Vec3 tempScale = _trs.GetLocalScale();
 
             UI::Text("Position");UI::SameLine();
 	        EditVec3(tempPos, "##trsPos", 0.01f);

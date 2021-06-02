@@ -30,7 +30,7 @@ namespace Solid
 
             Transform& transform = ecsManager.GetComponent<Transform>(entity);
 
-            Vec3 scale = transform.GetScale();
+            Vec3 scale = transform.GetLocalScale();
             transform = _physics.GetTransform(go->physicsActor);
             transform.SetScale(scale);
         }

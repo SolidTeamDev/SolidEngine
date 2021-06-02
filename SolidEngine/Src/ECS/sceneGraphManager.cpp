@@ -199,7 +199,7 @@ void Solid::SceneGraphManager::AddComp(const std::string &className, std::vector
 		if (className == "Transform" && Name == "rotation")
 		{
 
-			((Transform*)t)->SetRotation(((Transform*)t)->GetRotation());
+			((Transform*)t)->SetRotation(((Transform *) t)->GetLocalRotation());
 		}
 	}
 	if(className.find("Collider") != std::string::npos)

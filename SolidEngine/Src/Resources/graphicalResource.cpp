@@ -182,7 +182,7 @@ void GL::Mesh::DrawMesh(const std::vector<MaterialResource *>& _list, Transform&
 				}
 
 				if(_anim)
-				    shader->SetAnim(_anim);
+				{ shader->SetAnim(_anim); }
 
 				shader->SetMVP(_tr, _cam);
 				shader->SetLights(_cam);
@@ -396,7 +396,7 @@ void GL::Shader::SetMVP(Transform& _model, Camera& _camera)const
 
 	glUniformMatrix4fv(glGetUniformLocation(ProgID,"proj"),1,GL_FALSE,_camera.GetProjection().elements.data());
 	glUniformMatrix4fv(glGetUniformLocation(ProgID,"view"),1,GL_FALSE,_camera.GetView().elements.data());
-	Mat4<float> modelM =  (_model.GetMatrix()*_model.GetParentMatrix()) ;
+	Mat4<float> modelM =  (_model.GetGlobalMatrix()) ;
 	glUniformMatrix4fv(glGetUniformLocation(ProgID,"model"),1,GL_FALSE,modelM.elements.data());
 
 }
@@ -410,7 +410,7 @@ void GL::Shader::SetLights(Camera& _camera) const
     for(const auto& light : lights)
     {
         std::string id = std::to_string(i);
-        Mat4<float> tf =light.light->gameObject->transform->GetMatrix() * light.light->gameObject->transform->GetParentMatrix();
+        Mat4<float> tf =light.light->gameObject->transform->GetGlobalMatrix();
 
         Vec3 pos = Vec3(tf.elements[12],tf.elements[13],tf.elements[14]);
         glUniform1i(glGetUniformLocation(ProgID,std::string("_lights[" + id + "].type").c_str()),light.light->type);

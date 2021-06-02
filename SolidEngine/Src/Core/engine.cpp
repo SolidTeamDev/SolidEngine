@@ -110,7 +110,12 @@ namespace Solid
 		    signature.set(ecsManager.GetComponentType<ScriptList>());
 		    ecsManager.SetSystemSignature<ScriptSystem>(signature);
 	    }
-
+	    animSystem = ecsManager.RegisterSystem<AnimationSystem>();
+	    {
+		    Signature signature;
+		    signature.set(ecsManager.GetComponentType<Animation>());
+		    ecsManager.SetSystemSignature<AnimationSystem>(signature);
+	    }
 	    particleEffectSystem = ecsManager.RegisterSystem<ParticleEffectSystem>();
 	    {
 	    	Signature signature;
@@ -269,7 +274,7 @@ namespace Solid
 			if (className == "Transform" && Name == "rotation")
 			{
 
-				((Transform*)t)->SetRotation(((Transform*)t)->GetRotation());
+				((Transform*)t)->SetRotation(((Transform *) t)->GetLocalRotation());
 			}
 		}
 		if(className.find("Collider") != std::string::npos)

@@ -10,7 +10,7 @@ using namespace Solid;
 void TransformSystem::Update()
 {
 	GameObject* world =ecsManager.GetWorld();
-	std::function<void(GameObject*, const Mat4<float>&)> update = [&](GameObject* object,const Mat4<float>& trans)
+	std::function<void(GameObject*, Transform*)> update = [&](GameObject* object,Transform* trans)
 	{
 		for(GameObject* child : object->childs)
 		{
@@ -20,11 +20,11 @@ void TransformSystem::Update()
 
 
 			auto& transform = ecsManager.GetComponent<Transform>(child->GetEntity());
-			transform.SetParentMatrix(trans);
-			update(child,transform.GetMatrix()*trans );
+			transform.SetParentTransform(trans);
+			update(child,child->transform );
 		}
 	};
-	update(world, Mat4<float>::Identity);
+	update(world, nullptr);
 
 }
 

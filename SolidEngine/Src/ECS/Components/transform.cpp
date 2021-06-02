@@ -6,12 +6,12 @@ namespace Solid
 {
     Transform::Transform():
     transMat(Mat4<>::Identity),
-    ParentTransMat(Mat4<>::Identity)
+    parentTransform(nullptr)
     {}
 
     Transform::Transform(const Vec3 &_position, const Quat &_rotation, const Vec3 &_scale):
     transMat(Mat4<>::Identity),
-    ParentTransMat(Mat4<>::Identity),
+    parentTransform(nullptr),
     position(_position),
     rotation(_rotation),
     euler(Maths::RadToDeg(rotation.ToEuler())),
@@ -72,29 +72,29 @@ namespace Solid
         hasToUpdateMat = true;
     }
 
-    Vec3 Transform::GetPosition() const
+    Vec3 Transform::GetLocalPosition() const
     {
         return position;
     }
 
-    Quat Transform::GetRotation() const
+    Quat Transform::GetLocalRotation() const
     {
         return rotation;
     }
 
-    Vec3 Transform::GetScale() const
+    Vec3 Transform::GetLocalScale() const
     {
         return scale;
     }
 
 
 
-    Vec3 Transform::GetEuler() const
+    Vec3 Transform::GetLocalEuler() const
     {
         return euler;
     }
 
-    Mat4<float> Transform::GetMatrix()
+    Mat4<float> Transform::GetLocalMatrix()
     {
         if(hasToUpdateMat)
         {
@@ -119,21 +119,55 @@ namespace Solid
         hasToUpdateMat = false;
     }
 
-	void Transform::SetParentMatrix(const Mat4<float>& mat)
-	{
-		ParentTransMat = mat;
-	}
-
-	Mat4<float> Transform::GetParentMatrix()
-	{
-		return ParentTransMat;
-	}
 
 	void Transform::Release()
 	{
 		Components::Release();
 	}
 
+	void Transform::SetParentTransform( Transform *_parent)
+	{
+		parentTransform = _parent;
+	}
+
+	Vec3 Transform::GetGlobalPosition() const
+	{
+		return parentTransform->GetGlobalMatrix() * Vec4(position);
+	}
+
+	Mat4<float> Transform::GetGlobalMatrix()
+	{
+    	if(parentTransform == nullptr)
+		    return GetLocalMatrix();
+
+		return GetLocalMatrix() *parentTransform->GetGlobalMatrix() ;
+	}
+
+	Quat Transform::GetGlobalRotation() const
+	{
+    	if(parentTransform == nullptr)
+    		return rotation;
+		return parentTransform->GetGlobalRotation() *rotation ;
+	}
+
+	Vec3 Transform::GetGlobalScale() const
+	{
+		if(parentTransform == nullptr)
+			return scale;
+		return scale * parentTransform->GetGlobalScale();
+	}
+
+	Vec3 Transform::GetGlobalEuler() const
+	{
+		if(parentTransform == nullptr)
+			return euler;
+		return euler + parentTransform->GetGlobalEuler();
+	}
+
+	Transform *Transform::GetParentTransform()
+	{
+		return parentTransform;
+	}
 
 
 } //!namespace

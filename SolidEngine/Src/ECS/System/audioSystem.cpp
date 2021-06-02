@@ -14,7 +14,7 @@ namespace Solid
             auto& audioSource  = ecsManager.GetComponent<AudioSource>(entity);
             auto& transform = ecsManager.GetComponent<Transform>(entity);
 
-            audioSource.SetPosition(transform.GetPosition());
+            audioSource.SetPosition(transform.GetLocalPosition());
         }
     }
 } //!namespace
