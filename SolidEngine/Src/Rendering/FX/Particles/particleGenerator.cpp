@@ -157,7 +157,7 @@ void BasicTimeGen::ShowUI(bool &upt)
 void SpherePosGen::ShowUI(bool &upt)
 {
 	ImVec4 _center(center.x, center.y, center.z, center.w);
-	if (UI::DragFloat4("Center##circlepos", &_center.x))
+	if (UI::DragFloat3("Center##circlepos", &_center.x))
 	{
 		center = {_center.x, _center.y, _center.z, _center.w};
 		upt = true;
@@ -165,6 +165,8 @@ void SpherePosGen::ShowUI(bool &upt)
 	if (UI::DragFloat("X Radius##circlepos", &radX))
 		upt = true;
 	if (UI::DragFloat("Y Radius##circlepos", &radY))
+		upt = true;
+	if (UI::DragFloat("Z Radius##circlepos", &radZ))
 		upt = true;
 }
 

@@ -37,7 +37,7 @@ namespace Solid SLDNamespace()
         virtual void FixedUpdate() override;
         virtual void LateUpdate() override;
         virtual void Destroy() override;
-	private:
+	protected:
 	    virtual void PrimaryAttack() = 0;
         virtual void SecondaryAttack() = 0;
         virtual void TertiaryAttack() = 0;
@@ -45,6 +45,7 @@ namespace Solid SLDNamespace()
         virtual void Special2Attack() = 0;
 
         virtual void ChooseAttack() = 0;
+        virtual void UpdateAttack() = 0;
 
 		Boss_GENERATED
 	};

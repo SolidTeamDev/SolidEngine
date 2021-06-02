@@ -381,7 +381,7 @@ void ParticleEffect::EditGenerators()
 			sphereVelGen->ShowUI(upt);
         UI::TreePop();
     }
-	if (UI::TreeNode("Circle Pos Generator"))
+	if (UI::TreeNode("Sphere Pos Generator"))
 	{
 		bool created = true;
 		if (spherePosGen == nullptr)
