@@ -42,6 +42,7 @@ namespace Solid
 
 	};
 
+
     class Editor
     {
     private:
@@ -72,6 +73,7 @@ namespace Solid
 	    static std::vector<PrimaryCompSave<BoxCollider>> boxSave;
 	    static std::vector<PrimaryCompSave<SphereCollider>> sphereSave;
 	    static std::vector<PrimaryCompSave<CapsuleCollider>> capsuleSave;
+	    static SceneResource* tempScene ;
     public:
         static InputManager* editorInputManager;
 
@@ -81,6 +83,7 @@ namespace Solid
         static Camera editorCamera;
 
         json CurrentProjectJson;
+        bool ForceInit = false;
 
         Editor();
         ~Editor();
