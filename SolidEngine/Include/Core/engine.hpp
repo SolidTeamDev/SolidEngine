@@ -56,7 +56,7 @@ namespace Solid
 	    std::vector<std::function<void(Resource*)>> LoadedSceneCallbacks;
 
 	    template<class T>
-	    void AddComp(const std::string &className, std::vector<char> &buffer, std::uint64_t &readPos,
+	    T* AddComp(const std::string &className, std::vector<char> &buffer, std::uint64_t &readPos,
 	                 GameObject *go, Components *cmp, std::size_t FieldNum, std::size_t cmpNameSize);
 
 	    void AddAllComps(GameObject *elt, std::vector<char> &buffer, uint64_t &ReadPos);

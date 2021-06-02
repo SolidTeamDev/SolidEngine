@@ -206,7 +206,7 @@ namespace Solid
 	}
 
 	template<class T>
-	void Engine::AddComp(const std::string &className, std::vector<char> &buffer, std::uint64_t &readPos,
+	T* Engine::AddComp(const std::string &className, std::vector<char> &buffer, std::uint64_t &readPos,
 	                              GameObject *go, Components *cmp, std::size_t FieldNum, std::size_t cmpNameSize)
 	{
 		T *t = Engine::GetInstance()->ecsManager.AddComponent(go, *(T *) cmp);
@@ -285,6 +285,7 @@ namespace Solid
 		if(className.find("Collider") != std::string::npos)
 			t->Release();
 		t->Init();
+		return t;
 	}
 	void Engine::AddAllComps(GameObject *elt, std::vector<char> &buffer, uint64_t &readPos)
 	{
@@ -370,7 +371,9 @@ namespace Solid
 						}
 						else if (className == "Camera")
 						{
-							AddComp<Camera>(className, buffer, readPos, go, cmp,FieldNum, cmpNameSize);
+							Camera* cam = AddComp<Camera>(className, buffer, readPos, go, cmp,FieldNum, cmpNameSize);
+							if(cam->IsActive())
+								cam->SetActiveCamera();
 							delete cmp;
 						}
 						else if (className == "Light")

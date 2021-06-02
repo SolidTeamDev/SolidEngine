@@ -47,9 +47,8 @@ namespace Solid
 
 		class SOLID_API AttractorUpdater : public ParticleUpdater
 		{
-		protected:
-			std::vector<Vec4> attractors; // .w is force
 		public:
+			std::vector<Vec4> attractors; // .w is force
 
 			void ShowUI(bool& upt);
 			void Update(float dt, ParticleData *p) override;
