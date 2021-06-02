@@ -18,9 +18,9 @@ void Solid::CameraSystem::Update()
 		_front.z = Maths::Cos(Maths::DegToRad(cam.Euler.x)) *
 		           Maths::Cos(Maths::DegToRad(cam.Euler.y));
 
-		_front.y = Maths::Sin(Maths::DegToRad(cam.Euler.y));
+		_front.x = Maths::Sin(Maths::DegToRad(cam.Euler.y));
 
-		_front.x = Maths::Sin(Maths::DegToRad(cam.Euler.x)) *
+		_front.y = Maths::Sin(Maths::DegToRad(cam.Euler.x)) *
 		           Maths::Cos(Maths::DegToRad(cam.Euler.y));
 
 		cam.Front = _front.GetNormalized();
