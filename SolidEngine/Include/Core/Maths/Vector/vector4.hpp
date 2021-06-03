@@ -38,15 +38,15 @@ namespace Solid SLDNamespace()
         float w = 0;
 
 
-        constexpr Vec4() noexcept = default;
+        Vec4() noexcept = default;
 
-        constexpr Vec4(float _value) noexcept;
+        Vec4(float _value) noexcept;
 
-        constexpr Vec4(float _x, float _y, float _z, float _w) noexcept;
+        Vec4(float _x, float _y, float _z, float _w) noexcept;
 
-        constexpr Vec4(const Vec3& _copy) noexcept;
+        Vec4(const Vec3& _copy) noexcept;
 
-        constexpr Vec4(const Vec4& _copy) noexcept;
+        Vec4(const Vec4& _copy) noexcept;
 
         ~Vec4() = default;
 
@@ -79,43 +79,43 @@ namespace Solid SLDNamespace()
 #pragma region Methods
 
 		SLDMethod()
-		constexpr float SqrtLength() const noexcept;
+		float SqrtLength() const noexcept;
 
 		SLDMethod()
-		constexpr float Length() const noexcept;
+		float Length() const noexcept;
 
 		SLDMethod()
 		Vec4& Scale(float _scale) noexcept;
 
 		SLDMethod()
-		constexpr Vec4 GetScaled(float _scale) const noexcept;
+		Vec4 GetScaled(float _scale) const noexcept;
 
 		SLDMethod()
 		Vec4& Unscale(float _scale) noexcept;
 
 		SLDMethod()
-		constexpr Vec4 GetUnscaled(float _scale) const noexcept;
+		Vec4 GetUnscaled(float _scale) const noexcept;
 
 		SLDMethod()
 		Vec4& Normalize() noexcept;
 
 		SLDMethod()
-		constexpr Vec4 GetNormalized() const noexcept;
+		Vec4 GetNormalized() const noexcept;
 
 		SLDMethod()
-		constexpr bool IsNormalized() const noexcept;
+		bool IsNormalized() const noexcept;
 
 		SLDMethod()
-		constexpr bool IsEquals(const Vec4& vec) const noexcept;
+		bool IsEquals(const Vec4& vec) const noexcept;
 
 		SLDMethod()
-		constexpr float Dist(const Vec4& vec) const noexcept;
+		float Dist(const Vec4& vec) const noexcept;
 
 		SLDMethod()
-		constexpr float SqrtDist(const Vec4& vec) const noexcept;
+		float SqrtDist(const Vec4& vec) const noexcept;
 
 		SLDMethod()
-		constexpr Vec3 ToVector3() const noexcept;
+		Vec3 ToVector3() const noexcept;
 
 		SLDMethod()
 		const std::string ToString() const noexcept;
@@ -124,25 +124,25 @@ namespace Solid SLDNamespace()
 #pragma region Operator
 
 		SLDMethod()
-		constexpr Vec4& operator=(const Vec4& vec) noexcept = default;
+		Vec4& operator=(const Vec4& vec) noexcept = default;
 
 		SLDMethod()
-		constexpr bool operator==(const Vec4& _vec) const noexcept;
+		bool operator==(const Vec4& _vec) const noexcept;
 
 		SLDMethod()
-		constexpr bool operator!=(const Vec4& _vec) const noexcept;
+		bool operator!=(const Vec4& _vec) const noexcept;
 
 		SLDMethod()
-		constexpr Vec4 operator+(const Vec4& _vec) const noexcept;
+		Vec4 operator+(const Vec4& _vec) const noexcept;
 
 		SLDMethod()
-		constexpr Vec4 operator-(const Vec4& _vec) const noexcept;
+		Vec4 operator-(const Vec4& _vec) const noexcept;
 
 		SLDMethod()
-		constexpr Vec4 operator*(const Vec4& _vec) const noexcept;
+		Vec4 operator*(const Vec4& _vec) const noexcept;
 
 		SLDMethod()
-		constexpr Vec4 operator/(const Vec4& _vec) const noexcept;
+		Vec4 operator/(const Vec4& _vec) const noexcept;
 
 		SLDMethod()
 		Vec4& operator+=(const Vec4& _vec) noexcept;
@@ -157,16 +157,16 @@ namespace Solid SLDNamespace()
 		Vec4& operator/=(const Vec4& _vec) noexcept;
 
 		SLDMethod()
-		constexpr Vec4 operator+(float _value) const noexcept;
+		Vec4 operator+(float _value) const noexcept;
 
 		SLDMethod()
-		constexpr Vec4 operator-(float _value) const noexcept;
+		Vec4 operator-(float _value) const noexcept;
 
 		SLDMethod()
-		constexpr Vec4 operator*(float _value) const noexcept;
+		Vec4 operator*(float _value) const noexcept;
 
 		SLDMethod()
-		constexpr Vec4 operator/(float _value) const noexcept;
+		Vec4 operator/(float _value) const noexcept;
 
 		SLDMethod()
 		Vec4& operator+=(float _value) noexcept;
@@ -181,7 +181,7 @@ namespace Solid SLDNamespace()
 		Vec4& operator/=(float _value) noexcept;
 
 		SLDMethod()
-		constexpr Vec4 operator-() noexcept;
+		Vec4 operator-() noexcept;
 
         float& operator[](unsigned int index);
         float  operator[](unsigned int index) const;
@@ -189,9 +189,9 @@ namespace Solid SLDNamespace()
 		Vec4_GENERATED
     };
 
-    constexpr Vec4 operator*(float _value, const Vec4& vec) noexcept;
+    Vec4 operator*(float _value, const Vec4& vec) noexcept;
 
-    constexpr Vec4 operator/(float _value, const Vec4& vec);
+    Vec4 operator/(float _value, const Vec4& vec);
 
 };
 

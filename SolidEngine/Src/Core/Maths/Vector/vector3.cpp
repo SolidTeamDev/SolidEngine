@@ -9,25 +9,25 @@ namespace Solid
 
 #pragma region Constructor
 
-    constexpr Vec3::Vec3(float _value)noexcept :
+    Vec3::Vec3(float _value)noexcept :
     x{_value},
     y{_value},
     z{_value}
     {}
 
-    constexpr Vec3::Vec3(float _x,float _y, float _z)noexcept:
+    Vec3::Vec3(float _x,float _y, float _z)noexcept:
     x{_x},
     y{_y},
     z{_z}
     {}
 
-    constexpr Vec3::Vec3(const Vec4& _copy)noexcept:
+    Vec3::Vec3(const Vec4& _copy)noexcept:
     x{_copy.x},
     y{_copy.y},
     z{_copy.z}
     {}
 
-    constexpr Vec3::Vec3(const Vec3& _copy)noexcept:
+    Vec3::Vec3(const Vec3& _copy)noexcept:
     x{_copy.x},
     y{_copy.y},
     z{_copy.z}
@@ -83,12 +83,12 @@ namespace Solid
 #pragma endregion
 #pragma region Methods
 
-    constexpr float Vec3::SqrtLength() const noexcept
+    float Vec3::SqrtLength() const noexcept
     {
         return x * x + y *  + z * z;
     }
 
-    constexpr float Vec3::Length() const noexcept
+    float Vec3::Length() const noexcept
     {
         return Maths::Sqrt(x * x + y * y + z * z);
     }
@@ -102,7 +102,7 @@ namespace Solid
 
     }
 
-    constexpr Vec3 Vec3::GetScaled(float _scale) const noexcept
+    Vec3 Vec3::GetScaled(float _scale) const noexcept
     {
 
         return Vec3(x*_scale, y*_scale, z * _scale);
@@ -122,7 +122,7 @@ namespace Solid
         return *this;
     }
 
-    constexpr Vec3 Vec3::GetUnscaled(float _scale) const noexcept
+    Vec3 Vec3::GetUnscaled(float _scale) const noexcept
     {
         if(_scale == 0)
         {
@@ -149,7 +149,7 @@ namespace Solid
 
     }
 
-    constexpr Vec3 Vec3::GetNormalized() const noexcept
+    Vec3 Vec3::GetNormalized() const noexcept
     {
         float len = Length();
         if(len == 0)
@@ -160,24 +160,24 @@ namespace Solid
         return Vec3(x/len, y/len,z/len);
     }
 
-    constexpr bool Vec3::IsNormalized() const noexcept
+    bool Vec3::IsNormalized() const noexcept
     {
         return Maths::Equals<float>(SqrtLength(), 3.f * S_EPSILON);
     }
 
-    constexpr bool Vec3::IsEquals(const Vec3& vec) const noexcept
+    bool Vec3::IsEquals(const Vec3& vec) const noexcept
     {
         return  Solid::Maths::Equals(x,vec.x, 0.01f) &&
                 Solid::Maths::Equals(y,vec.y, 0.01f) &&
                 Solid::Maths::Equals(z,vec.z, 0.01f);
     }
 
-    constexpr float Vec3::Dist(const Vec3 &vec) const noexcept
+    float Vec3::Dist(const Vec3 &vec) const noexcept
     {
         return (*this - vec).Length();
     }
 
-    constexpr float Vec3::SqrtDist(const Vec3 &vec) const noexcept
+    float Vec3::SqrtDist(const Vec3 &vec) const noexcept
     {
         return (*this - vec).SqrtLength();
     }
@@ -192,32 +192,32 @@ namespace Solid
 #pragma endregion
 #pragma region Operator
 
-    constexpr bool Vec3::operator==(const Vec3 &_vec) const noexcept
+    bool Vec3::operator==(const Vec3 &_vec) const noexcept
     {
         return IsEquals(_vec);
     }
 
-    constexpr bool Vec3::operator!=(const Vec3 &_vec) const noexcept
+    bool Vec3::operator!=(const Vec3 &_vec) const noexcept
     {
         return !IsEquals(_vec);
     }
 
-    constexpr Vec3 Vec3::operator+(const Vec3 &_vec) const noexcept
+    Vec3 Vec3::operator+(const Vec3 &_vec) const noexcept
     {
         return Vec3(x + _vec.x,y + _vec.y, z + _vec.z);
     }
 
-    constexpr Vec3 Vec3::operator-(const Vec3 &_vec) const noexcept
+    Vec3 Vec3::operator-(const Vec3 &_vec) const noexcept
     {
         return Vec3(x - _vec.x,y - _vec.y, z - _vec.z);
     }
 
-    constexpr Vec3 Vec3::operator*(const Vec3 &_vec) const noexcept
+    Vec3 Vec3::operator*(const Vec3 &_vec) const noexcept
     {
         return Vec3(x * _vec.x,y * _vec.y, z * _vec.z);
     }
 
-    constexpr Vec3 Vec3::operator/(const Vec3 &_vec) const noexcept
+    Vec3 Vec3::operator/(const Vec3 &_vec) const noexcept
     {
         return Vec3(x / _vec.x,y / _vec.y, z / _vec.z);
     }
@@ -254,23 +254,23 @@ namespace Solid
         return *this;
     }
 
-    constexpr Vec3 Vec3::operator+(float _value) const noexcept
+    Vec3 Vec3::operator+(float _value) const noexcept
     {
 
         return Vec3(x + _value,y + _value, z + _value);
     }
 
-    constexpr Vec3 Vec3::operator-(float _value) const noexcept
+    Vec3 Vec3::operator-(float _value) const noexcept
     {
         return Vec3(x - _value,y - _value, z - _value);
     }
 
-    constexpr Vec3 Vec3::operator*(float _value) const noexcept
+    Vec3 Vec3::operator*(float _value) const noexcept
     {
         return Vec3(x * _value,y * _value, z *_value);
     }
 
-    constexpr Vec3 Vec3::operator/(float _value) const noexcept
+    Vec3 Vec3::operator/(float _value) const noexcept
     {
         return Vec3(x / _value,y / _value, z / _value);
     }
@@ -307,17 +307,17 @@ namespace Solid
         return *this;
     }
 
-    constexpr Vec3 Vec3::operator-() noexcept
+    Vec3 Vec3::operator-() noexcept
     {
         return Vec3(-x,-y, -z);
     }
 
-    constexpr Vec3 operator * (float _value, const Vec3& _vec) noexcept
+    Vec3 operator * (float _value, const Vec3& _vec) noexcept
     {
         return _vec.GetScaled(_value);
     }
 
-    constexpr Vec3 operator / (float _value, const Vec3& _vec)
+    Vec3 operator / (float _value, const Vec3& _vec)
     {
         return _vec.GetUnscaled(_value);
     }

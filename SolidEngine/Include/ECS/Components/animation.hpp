@@ -16,7 +16,7 @@ namespace Solid SLDNamespace()
         Animation(AnimResource* _anim);
         ~Animation() = default;
 
-        void CalculateBoneTransform (SkeletonResource::Bone* bone, Solid::Mat4f _parent);
+        void CalculateBoneTransform (SkeletonResource::Bone* bone, const Solid::Mat4f& _parent);
         void DrawSkeleton(std::vector<Vec3>& points, std::vector<uint>& indices,
                           SkeletonResource::Bone* bone = nullptr);
         void SetAnim(AnimResource *_anim);

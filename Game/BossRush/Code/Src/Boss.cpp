@@ -17,7 +17,7 @@ void Boss::Init()
     engine = Engine::GetInstance();
     Player = engine->ecsManager.FindGameObjectByName("Player");
     if(Player)
-        Target = Player->transform->GetPosition();
+        Target = Player->transform->GetGlobalPosition();
 }
 
 void Boss::Destroy()

@@ -89,7 +89,7 @@ public:	\
 		[[maybe_unused]] rfk::StaticField*	staticField = nullptr; 	\
 		__RFK_DISABLE_WARNING_PUSH	\
 		__RFK_DISABLE_WARNING_OFFSETOF	\
-		field = childArchetype->addField("Lerp", 439483425070383761u, rfk::Type::getType<Solid::Vec3>(), static_cast<rfk::EFieldFlags>(1), &thisArchetype, offsetof(ChildType, Lerp));	\
+		field = childArchetype->addField("SpeedPrimaryAttack", 8180773268483240923u, rfk::Type::getType<float>(), static_cast<rfk::EFieldFlags>(1), &thisArchetype, offsetof(ChildType, SpeedPrimaryAttack));	\
 		__RFK_DISABLE_WARNING_POP	\
 	}
 

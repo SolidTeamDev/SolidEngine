@@ -12,11 +12,11 @@ namespace Solid SLDNamespace()
     class SOLID_API SLDClass() Quat
     {
     public:
-        constexpr Quat()noexcept:x(0),y(0),z(0),w(1){}
-        constexpr Quat(float _value) noexcept;
-        constexpr Quat(float _x,float _y, float _z, float _w = 1) noexcept;
-        constexpr Quat(const Vec3& _angles) noexcept;
-        constexpr Quat(const Quat& _copy) noexcept = default;
+        Quat()noexcept:x(0),y(0),z(0),w(1){}
+        Quat(float _value) noexcept;
+        Quat(float _x,float _y, float _z, float _w = 1) noexcept;
+        Quat(const Vec3& _angles) noexcept;
+        Quat(const Quat& _copy) noexcept = default;
         Quat(float _angle, const Vec3& _axis) noexcept;
 
         ~Quat() = default;
@@ -52,53 +52,53 @@ namespace Solid SLDNamespace()
 #pragma region Methods
 
 		SLDMethod()
-        constexpr bool IsZero() const noexcept;
+        bool IsZero() const noexcept;
 
 		SLDMethod()
-        constexpr float SqrtLength() const noexcept;
+        float SqrtLength() const noexcept;
 
 		SLDMethod()
-        constexpr float Length() const noexcept;
+        float Length() const noexcept;
 
 		SLDMethod()
         Quat &Scale(float _scale) noexcept;
 
 		SLDMethod()
-        constexpr Quat GetScaled(float _scale) const noexcept;
+        Quat GetScaled(float _scale) const noexcept;
 
 		SLDMethod()
         Quat &Unscale(float _scale) noexcept;
 
 		SLDMethod()
-        constexpr Quat GetUnscaled(float _scale) const noexcept;
+        Quat GetUnscaled(float _scale) const noexcept;
 
 		SLDMethod()
         Quat &Normalize() noexcept;
 
 		SLDMethod()
-        constexpr Quat GetNormalized() const noexcept;
+        Quat GetNormalized() const noexcept;
 
 		SLDMethod()
-        constexpr Quat& Inverse();
+        Quat& Inverse();
 
 		SLDMethod()
-        constexpr Quat GetInversed() const;
+        Quat GetInversed() const;
 
 		SLDMethod()
-        constexpr bool IsNormalized() const noexcept;
+        bool IsNormalized() const noexcept;
 
 		SLDMethod()
-        constexpr bool IsEquals(const Quat& _quat) const noexcept;
+        bool IsEquals(const Quat& _quat) const noexcept;
 
 		SLDMethod()
-        constexpr Vec3 Rotate(const Vec3& _vec) const;
+        Vec3 Rotate(const Vec3& _vec) const;
 		SLDMethod()
-        constexpr Quat Rotate(const Quat& _quat) const;
+        Quat Rotate(const Quat& _quat) const;
 
 		SLDMethod()
-        constexpr Vec3 Unrotate(const Vec3& _vec) const;
+        Vec3 Unrotate(const Vec3& _vec) const;
 		SLDMethod()
-        constexpr Quat Unrotate(const Quat& _quat) const;
+        Quat Unrotate(const Quat& _quat) const;
 
 		SLDMethod()
         Vec3 ToEuler() const;
@@ -119,35 +119,35 @@ namespace Solid SLDNamespace()
         Quat& operator = (Quat&& _quat) = default;
 
 		SLDMethod()
-        constexpr Quat operator * (float _scale) const noexcept;
+        Quat operator * (float _scale) const noexcept;
 
 		SLDMethod()
-        constexpr Quat operator / (float _scale) const noexcept;
+        Quat operator / (float _scale) const noexcept;
 
 		SLDMethod()
-        constexpr Quat operator + (float _scale) const noexcept;
+        Quat operator + (float _scale) const noexcept;
 
 		SLDMethod()
-        constexpr Quat operator - (float _scale) const noexcept;
+        Quat operator - (float _scale) const noexcept;
 
 		SLDMethod()
-        constexpr Quat operator * (const Quat& _quat) const noexcept;
+        Quat operator * (const Quat& _quat) const noexcept;
 
 		SLDMethod()
-        constexpr Vec3 operator * (const Vec3& _vec) const noexcept;
+        Vec3 operator * (const Vec3& _vec) const noexcept;
 
 
 		SLDMethod()
-        constexpr Quat operator / (const Quat& _quat) const noexcept;
+        Quat operator / (const Quat& _quat) const noexcept;
 
 		SLDMethod()
-        constexpr Vec3 operator / (const Vec3& _vec) const noexcept;
+        Vec3 operator / (const Vec3& _vec) const noexcept;
 
 		SLDMethod()
-        constexpr Quat operator + (const Quat& _quat) const noexcept;
+        Quat operator + (const Quat& _quat) const noexcept;
 
 		SLDMethod()
-        constexpr Quat operator - (const Quat& _quat) const noexcept;
+        Quat operator - (const Quat& _quat) const noexcept;
 
 		SLDMethod()
         Quat& operator *= (float _scale) ;
@@ -174,19 +174,19 @@ namespace Solid SLDNamespace()
         Quat& operator -= (const Quat& _quat);
 
 		SLDMethod()
-        constexpr bool operator == (const Quat& _quat);
+        bool operator == (const Quat& _quat);
 
 		SLDMethod()
-        constexpr bool operator != (const Quat& _quat);
+        bool operator != (const Quat& _quat);
 
 		SLDMethod()
-        constexpr Quat operator - () const noexcept;
+        Quat operator - () const noexcept;
 #pragma endregion
 		Quat_GENERATED
     };
 
-    constexpr Quat operator * (float _value, const Quat& _quat) noexcept;
-    constexpr Quat operator / (float _value, const Quat& _quat) ;
+    Quat operator * (float _value, const Quat& _quat) noexcept;
+    Quat operator / (float _value, const Quat& _quat) ;
 }
 
 File_GENERATED

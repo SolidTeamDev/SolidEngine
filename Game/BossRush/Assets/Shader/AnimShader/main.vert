@@ -10,7 +10,7 @@ uniform mat4 proj;
 uniform mat4 view;
 uniform mat4 model;
 
-const int MAX_BONES = 100;
+const int MAX_BONES = 230;
 const int MAX_BONE_INFLUENCE = 4;
 uniform mat4 finalBonesMatrices[MAX_BONES];
 uniform int boneIndex = 0;
@@ -39,3 +39,4 @@ void main()
     mat4 viewModel = view * model;
     gl_Position =  proj * (viewModel * vec4(totalPosition));
 }
+
