@@ -40,6 +40,7 @@ namespace Solid
         euler=_euler;
         Vec3 temp {Maths::DegToRad(_euler.x),Maths::DegToRad(_euler.y),Maths::DegToRad(_euler.z)};
         rotation = Quat(temp);
+        hasToUpdateMat = true;
     }
 
     void Transform::SetScale(const Vec3 &_vec)

@@ -22,7 +22,7 @@ void PlayerController::Init()
     if(engine->ecsManager.GotComponent<RigidBody>(gameObject->GetEntity()))
         rigidBody = &engine->ecsManager.GetComponent<RigidBody>(gameObject->GetEntity());
 
-    camera = engine->ecsManager.FindGameObjectByName("Camera",gameObject);
+    camera = engine->activeCamera->gameObject;
 
     engine->inputManager->ShowCursor(false);
 }
@@ -62,7 +62,7 @@ void PlayerController::RotateCamera()
     if(!camera || isPaused)
         return;
 
-    auto& transform = engine->ecsManager.GetComponent<Transform>(camera->GetEntity());
+    auto& transform = engine->ecsManager.GetComponent<Transform>(camera->parent->GetEntity());
 
     Vec3 rot = transform.GetLocalEuler();
     double xpos = 0, ypos = 0;
@@ -74,14 +74,14 @@ void PlayerController::RotateCamera()
     engine->inputManager->SetCursorPos(engine->window->GetWindowSize().x*0.5,
                                        engine->window->GetWindowSize().y*0.5);
 
-    rot.x += (float)ypos * mouseSensitivity;
-    rot.y += (float)xpos * mouseSensitivity;
+    //rot.x += (float)ypos * mouseSensitivity;
+    rot.y -= (float)xpos * mouseSensitivity;
 
 
-    if (rot.x > 89.0f)
-        rot.x = 89.0f;
-    if (rot.x < -89.0f)
-        rot.x = -89.0f;
+    if (rot.x < -120.0f)
+        rot.x = -120.0f;
+    if (rot.x > -63.0f)
+        rot.x = -63.0f;
 
     transform.SetEuler(rot);
 }
@@ -91,10 +91,12 @@ void PlayerController::MoveForward()
     if(!rigidBody)
         return;
 
-    Vec3 camRot = camera->transform->GetLocalEuler();
+    Vec3 camRot = camera->parent->transform->GetLocalEuler();
     Vec3 playerRot = gameObject->transform->GetLocalEuler();
 
-    gameObject->transform->SetEuler(Vec3(playerRot.x,-camRot.y,playerRot.z));
+    camera->parent->transform->SetEuler(Vec3(0));
+
+    gameObject->transform->SetEuler(Vec3(playerRot.x,playerRot.y,camRot.y));
 
     rigidBody->AddForce(Vec3(0,0,moveSpeed));
 }
