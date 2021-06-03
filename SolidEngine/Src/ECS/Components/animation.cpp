@@ -1,7 +1,7 @@
 #include "Core/engine.hpp"
 #include "ECS/Components/animation.hpp"
 #include "Rendering/OpenGL45/openGl45Renderer.hpp"
-
+#include "Core/Debug/log.hpp"
 namespace Solid
 {
     Animation::Animation(AnimResource* _anim):
@@ -66,30 +66,26 @@ namespace Solid
         }
     }
 
-    void Animation::CalculateBoneTransform (SkeletonResource::Bone* bone, Mat4f _parentTRS)
+    void Animation::CalculateBoneTransform (SkeletonResource::Bone* bone, const Mat4f& _parentTRS)
     {
-        const char* nodeName = bone->name.c_str();
+        //const char* nodeName = bone->name.c_str();
         Mat4f nodeTransform = Mat4f::Identity;
 
-        SkeletonResource::Bone* newBone = anim->Root->FindBoneByName(nodeName);
+        //SkeletonResource::Bone* newBone = anim->Root->FindBoneByName(nodeName);
 
-        if (newBone)
+        if (bone)
         {
-           UpdateBone(CurrentTime, newBone);
-            nodeTransform = newBone->LocalTrans;
+            UpdateBone(CurrentTime, bone);
+            nodeTransform = bone->LocalTrans;
         }
 
         Mat4f GlobalTrans =  _parentTRS * nodeTransform;
-
-        //auto boneInfoMap = m_CurrentAnimation->GetBoneIDMap();
-        //if (boneInfoMap.find(nodeName) != boneInfoMap.end())
         {
-            FinalsTrans[bone->id] =  ( GlobalTrans * newBone->offset );
-            FinalsTransBone[bone->id] =  ( GlobalTrans * newBone->offset.GetTransposed().GetInversed() );
-
+            FinalsTrans[bone->id] =  ( GlobalTrans * bone->offset);
+            //FinalsTransBone[bone->id] =  ( GlobalTrans * newBone->offset.GetTransposed().GetInversed() );
         }
 
-        for (auto child : newBone->Childrens)
+        for (auto child : bone->Childrens)
             CalculateBoneTransform(child, GlobalTrans);
     }
 
@@ -129,7 +125,6 @@ namespace Solid
     void Animation::UpdateBone(float currTime, SkeletonResource::Bone* bone)
     {
         {
-            SkeletonResource::Bone* newBone = anim->Root->FindBoneByName(bone->name.c_str());
             if(bone->channel.Frames.size() != 0)
             {
                 int index = 0;
@@ -138,25 +133,17 @@ namespace Solid
                 else
                     index = (int)bone->channel.Frames.size()-1;
 
-                Vec3 translation = Vec3::Zero;
-                Quat rotation = Quat::Identity;
-                Vec3 scale = Vec3(1,1,1);
+                SkeletonResource::Bone::KeyFrame& keyFrame = bone->channel.Frames[index];
 
-                if(bone->channel.Frames[index].usePos)
-                    translation = bone->channel.Frames[index].pos;
+                Vec3 translation = keyFrame.usePos   ? keyFrame.pos   : Vec3::Zero;
+                Quat rotation    = keyFrame.useRot   ? keyFrame.Rot   : Quat::Identity;
+                Vec3 scale       = keyFrame.useScale ? keyFrame.Scale : Vec3(1,1,1);
 
-                if(bone->channel.Frames[index].useRot)
-                    rotation = bone->channel.Frames[index].Rot;
-
-                if(bone->channel.Frames[index].useScale)
-                    scale = bone->channel.Frames[index].Scale;
-
-                Mat4f newTF = Mat4f::Transform(translation, rotation,scale);
+                Mat4f newTF = Mat4f::Transform(translation, rotation, scale);
 
                 bone->LocalTrans = newTF.GetTransposed();
                 return;
             }
-
         }
     }
 

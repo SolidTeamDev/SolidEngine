@@ -10,13 +10,21 @@ namespace Solid SLDNamespace()
 	public:
 		
 	private:
+	    struct Data
+	    {
+            int Index;
+	        float Ratio;
+	        Vec3  pos = Vec3::Zero;
+	    };
 		std::vector<GameObject*> CubeBullets;
+	    std::vector<Data>       DataBullets;
 	public:
+	    SLDField()
+	    float SpeedPrimaryAttack = 0.5;
+
 		Megalos_kyvos();
 		~Megalos_kyvos();
 
-		SLDField()
-		Vec3 Lerp = Vec3::Zero;
         void Init() override;
 		void Update() override;
 		void FixedUpdate() override;

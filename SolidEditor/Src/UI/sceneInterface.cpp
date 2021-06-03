@@ -108,7 +108,7 @@ namespace Solid
                     std::vector<uint> indices;
                     Animation& anim = engine->ecsManager.GetComponent<Animation>(gameObject->GetEntity());
                     anim.UpdateAnim(Time::DeltaTime());
-                    anim.DrawSkeleton(points,indices);
+                    //anim.DrawSkeleton(points,indices);
                     engine->renderer->DrawLines(sceneCam, points, indices);
                 }
             }

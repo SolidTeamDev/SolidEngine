@@ -9,28 +9,28 @@ namespace Solid
 {
 
 #pragma region Constructor
-    constexpr Vec4::Vec4(float _value)noexcept :
+    Vec4::Vec4(float _value)noexcept :
     x{_value},
     y{_value},
     z{_value},
     w{1}
     {}
 
-    constexpr Vec4::Vec4(float _x, float _y, float _z, float _w)noexcept:
+    Vec4::Vec4(float _x, float _y, float _z, float _w)noexcept:
     x{_x},
     y{_y},
     z{_z},
     w{_w}
     {}
 
-    constexpr Vec4::Vec4(const Vec3& _copy)noexcept:
+    Vec4::Vec4(const Vec3& _copy)noexcept:
     x{_copy.x},
     y{_copy.y},
     z{_copy.z},
     w{1}
     {}
 
-    constexpr Vec4::Vec4(const Vec4& _copy)noexcept:
+    Vec4::Vec4(const Vec4& _copy)noexcept:
     x{_copy.x},
     y{_copy.y},
     z{_copy.z},
@@ -82,12 +82,12 @@ namespace Solid
 #pragma endregion
 #pragma region Methods
 
-    constexpr float Vec4::SqrtLength() const noexcept
+    float Vec4::SqrtLength() const noexcept
     {
         return x * x + y *  + z * z + w * w;
     }
 
-    constexpr float Vec4::Length() const noexcept
+    float Vec4::Length() const noexcept
     {
         return Maths::Sqrt(x * x + y * y + z * z + w * w);
     }
@@ -102,7 +102,7 @@ namespace Solid
 
     }
 
-    constexpr Vec4 Vec4::GetScaled(float _scale) const noexcept
+    Vec4 Vec4::GetScaled(float _scale) const noexcept
     {
 
         return Vec4(x*_scale, y*_scale, z * _scale, w * _scale);
@@ -123,7 +123,7 @@ namespace Solid
         return *this;
     }
 
-    constexpr Vec4 Vec4::GetUnscaled(float _scale) const noexcept
+    Vec4 Vec4::GetUnscaled(float _scale) const noexcept
     {
         if(_scale == 0)
         {
@@ -151,7 +151,7 @@ namespace Solid
 
     }
 
-    constexpr Vec4 Vec4::GetNormalized() const noexcept
+    Vec4 Vec4::GetNormalized() const noexcept
     {
         float len = Length();
         if(len == 0)
@@ -162,12 +162,12 @@ namespace Solid
         return Vec4(x/len, y/len,z/len,1);
     }
 
-    constexpr bool Vec4::IsNormalized() const noexcept
+    bool Vec4::IsNormalized() const noexcept
     {
         return Maths::Equals<float>(SqrtLength(), 3.f * S_EPSILON);
     }
 
-    constexpr bool Vec4::IsEquals(const Vec4& vec) const noexcept
+    bool Vec4::IsEquals(const Vec4& vec) const noexcept
     {
         return  Solid::Maths::Equals(x,vec.x, 0.0001f) &&
                 Solid::Maths::Equals(y,vec.y, 0.0001f) &&
@@ -175,17 +175,17 @@ namespace Solid
                 Solid::Maths::Equals(w,vec.w, 0.0001f) ;
     }
 
-    constexpr float Vec4::Dist(const Vec4 &vec) const noexcept
+    float Vec4::Dist(const Vec4 &vec) const noexcept
     {
         return (*this - vec).Length();
     }
 
-    constexpr float Vec4::SqrtDist(const Vec4 &vec) const noexcept
+    float Vec4::SqrtDist(const Vec4 &vec) const noexcept
     {
         return (*this - vec).SqrtLength();
     }
 
-    constexpr Vec3 Vec4::ToVector3() const noexcept
+    Vec3 Vec4::ToVector3() const noexcept
     {
         return Vec3(x/w,y/w,z/w);
     }
@@ -199,32 +199,32 @@ namespace Solid
 #pragma endregion
 #pragma region Operator
 
-    constexpr bool Vec4::operator==(const Vec4 &_vec) const noexcept
+    bool Vec4::operator==(const Vec4 &_vec) const noexcept
     {
         return IsEquals(_vec);
     }
 
-    constexpr bool Vec4::operator!=(const Vec4 &_vec) const noexcept
+    bool Vec4::operator!=(const Vec4 &_vec) const noexcept
     {
         return !IsEquals(_vec);
     }
 
-    constexpr Vec4 Vec4::operator+(const Vec4 &_vec) const noexcept
+    Vec4 Vec4::operator+(const Vec4 &_vec) const noexcept
     {
         return Vec4(x + _vec.x,y + _vec.y, z + _vec.z, w + _vec.w);
     }
 
-    constexpr Vec4 Vec4::operator-(const Vec4 &_vec) const noexcept
+    Vec4 Vec4::operator-(const Vec4 &_vec) const noexcept
     {
         return Vec4(x - _vec.x,y - _vec.y, z - _vec.z, w - _vec.w);
     }
 
-    constexpr Vec4 Vec4::operator*(const Vec4 &_vec) const noexcept
+    Vec4 Vec4::operator*(const Vec4 &_vec) const noexcept
     {
         return Vec4(x * _vec.x,y * _vec.y, z * _vec.z, w * _vec.w);
     }
 
-    constexpr Vec4 Vec4::operator/(const Vec4 &_vec) const noexcept
+    Vec4 Vec4::operator/(const Vec4 &_vec) const noexcept
     {
         return Vec4(x / _vec.x,y / _vec.y, z / _vec.z, w / _vec.w);
     }
@@ -268,23 +268,23 @@ namespace Solid
         return *this;
     }
 
-    constexpr Vec4 Vec4::operator+(float _value) const noexcept
+    Vec4 Vec4::operator+(float _value) const noexcept
     {
 
         return Vec4(x + _value,y + _value, z + _value, w + _value);
     }
 
-    constexpr Vec4 Vec4::operator-(float _value) const noexcept
+    Vec4 Vec4::operator-(float _value) const noexcept
     {
         return Vec4(x - _value,y - _value, z - _value, w - _value);
     }
 
-    constexpr Vec4 Vec4::operator*(float _value) const noexcept
+    Vec4 Vec4::operator*(float _value) const noexcept
     {
         return Vec4(x * _value,y * _value, z *_value, w * _value);
     }
 
-    constexpr Vec4 Vec4::operator/(float _value) const noexcept
+    Vec4 Vec4::operator/(float _value) const noexcept
     {
         return Vec4(x / _value,y / _value, z / _value, w / _value);
     }
@@ -325,7 +325,7 @@ namespace Solid
         return *this;
     }
 
-    constexpr Vec4 Vec4::operator-() noexcept
+    Vec4 Vec4::operator-() noexcept
     {
         return Vec4(-x,-y, -z, -w);
     }
@@ -374,12 +374,12 @@ namespace Solid
         }
     }
 
-    constexpr Vec4 operator * (float _value, const Vec4& _vec) noexcept
+    Vec4 operator * (float _value, const Vec4& _vec) noexcept
     {
         return _vec.GetScaled(_value);
     }
 
-    constexpr Vec4 operator / (float _value, const Vec4& _vec)
+    Vec4 operator / (float _value, const Vec4& _vec)
     {
         return _vec.GetUnscaled(_value);
     }

@@ -9,21 +9,21 @@ namespace Solid
 {
 #pragma region Constructors
 
-    constexpr Quat::Quat(float _value) noexcept:
+    Quat::Quat(float _value) noexcept:
             x{_value},
             y{_value},
             z{_value},
             w{_value}
     {}
 
-    constexpr Quat::Quat(float _x, float _y, float _z, float _w) noexcept:
+    Quat::Quat(float _x, float _y, float _z, float _w) noexcept:
             x{_x},
             y{_y},
             z{_z},
             w{_w}
     {}
 
-    constexpr Quat::Quat(const Vec3 &_angles) noexcept :
+    Quat::Quat(const Vec3 &_angles) noexcept :
     x{0},
     y{0},
     z{0},
@@ -96,19 +96,19 @@ namespace Solid
 #pragma endregion
 #pragma region Methods
 
-    constexpr bool Quat::IsZero() const noexcept
+    bool Quat::IsZero() const noexcept
     {
 
         return Maths::Equals0(x) && Maths::Equals0(y)
                && Maths::Equals0(z) && Maths::Equals0(w);
     }
 
-    constexpr float Quat::SqrtLength() const noexcept
+    float Quat::SqrtLength() const noexcept
     {
         return (x * x + y * y + z * z + w * w);
     }
 
-    constexpr float Quat::Length() const noexcept
+    float Quat::Length() const noexcept
     {
         return Maths::Sqrt(x * x + y * y + z * z + w * w);
     }
@@ -122,7 +122,7 @@ namespace Solid
         return *this;
     }
 
-    constexpr Quat Quat::GetScaled(float _scale) const noexcept
+    Quat Quat::GetScaled(float _scale) const noexcept
     {
         return Quat(x * _scale, y * _scale, z * _scale, w * _scale);
     }
@@ -141,7 +141,7 @@ namespace Solid
         return *this;
     }
 
-    constexpr Quat Quat::GetUnscaled(float _scale) const noexcept
+    Quat Quat::GetUnscaled(float _scale) const noexcept
     {
         if (_scale == 0)
         {
@@ -168,7 +168,7 @@ namespace Solid
         return *this;
     }
 
-    constexpr Quat Quat::GetNormalized() const noexcept
+    Quat Quat::GetNormalized() const noexcept
     {
         float len = Length();
         if (len == 0)
@@ -179,7 +179,7 @@ namespace Solid
         return Quat(x / len, y / len, z / len, w / len);
     }
 
-    constexpr Quat& Quat::Inverse()
+    Quat& Quat::Inverse()
     {
         if (IsNormalized())
         {
@@ -193,7 +193,7 @@ namespace Solid
         return *this;
     }
 
-    constexpr Quat Quat::GetInversed() const
+    Quat Quat::GetInversed() const
     {
         if (IsNormalized())
         {
@@ -204,13 +204,13 @@ namespace Solid
         return Quat(-x, -y, -z, w);
     }
 
-    constexpr bool Quat::IsNormalized() const noexcept
+    bool Quat::IsNormalized() const noexcept
     {
         return Maths::Equals<float>(SqrtLength(), 3.f * S_EPSILON);
     }
 
 
-    constexpr bool Quat::IsEquals(const Quat& _quat) const noexcept
+    bool Quat::IsEquals(const Quat& _quat) const noexcept
     {
         return Solid::Maths::Equals(x, _quat.x, 0.0001f) &&
                Solid::Maths::Equals(y, _quat.y,  0.0001f) &&
@@ -218,7 +218,7 @@ namespace Solid
                Solid::Maths::Equals(w, _quat.w,  0.0001f);
     }
 
-    constexpr Vec3 Quat::Rotate(const Vec3 &_vec) const
+    Vec3 Quat::Rotate(const Vec3 &_vec) const
     {
         if(IsNormalized())
         {
@@ -233,7 +233,7 @@ namespace Solid
         return _vec + (w * v2) + Vec3::Cross(v1,v2);
     }
 
-    constexpr Quat Quat::Rotate(const Quat &_quat) const
+    Quat Quat::Rotate(const Quat &_quat) const
     {
         if(IsNormalized() || _quat.IsNormalized())
         {
@@ -247,7 +247,7 @@ namespace Solid
                     w * _quat.w - x * _quat.x - y * _quat.y - z * _quat.z);
     }
 
-    constexpr Vec3 Quat::Unrotate(const Vec3 &_vec) const
+    Vec3 Quat::Unrotate(const Vec3 &_vec) const
     {
         if(IsNormalized())
         {
@@ -258,7 +258,7 @@ namespace Solid
         return GetInversed().Rotate(_vec);
     }
 
-    constexpr Quat Quat::Unrotate(const Quat &_quat) const
+    Quat Quat::Unrotate(const Quat &_quat) const
     {
         if(IsNormalized() || _quat.IsNormalized())
         {
@@ -332,44 +332,44 @@ namespace Solid
 #pragma endregion
 #pragma region Operator
 
-    constexpr Quat Quat::operator*(float _scale) const noexcept
+    Quat Quat::operator*(float _scale) const noexcept
     {
         return GetScaled(_scale);
     }
 
-    constexpr Quat Quat::operator/(float _scale) const noexcept
+    Quat Quat::operator/(float _scale) const noexcept
     {
         return GetUnscaled(_scale);
     }
 
-    constexpr Quat Quat::operator+(float _scale) const noexcept
+    Quat Quat::operator+(float _scale) const noexcept
     {
         return Quat(x + _scale, y + _scale, z + _scale, w + _scale);
     }
 
-    constexpr Quat Quat::operator-(float _scale) const noexcept
+    Quat Quat::operator-(float _scale) const noexcept
     {
         return Quat(x - _scale, y - _scale, z - _scale, w - _scale);
 
     }
 
-    constexpr Quat Quat::operator*(const Quat &_quat) const noexcept
+    Quat Quat::operator*(const Quat &_quat) const noexcept
     {
         return Rotate(_quat);
     }
 
-    constexpr Vec3 Quat::operator*(const Vec3 &_vec) const noexcept
+    Vec3 Quat::operator*(const Vec3 &_vec) const noexcept
     {
         return Rotate(_vec);
     }
 
-    constexpr Quat Quat::operator/(const Quat &_quat) const noexcept
+    Quat Quat::operator/(const Quat &_quat) const noexcept
     {
         return Unrotate(_quat);
 
     }
 
-    constexpr Vec3 Quat::operator/(const Vec3 &_vec) const noexcept
+    Vec3 Quat::operator/(const Vec3 &_vec) const noexcept
     {
         return Unrotate(_vec);
 
@@ -419,26 +419,26 @@ namespace Solid
         return *this;
     }
 
-    constexpr bool Quat::operator==(const Quat &_quat)
+    bool Quat::operator==(const Quat &_quat)
     {
         return IsEquals(_quat);
     }
 
-    constexpr bool Quat::operator!=(const Quat &_quat)
+    bool Quat::operator!=(const Quat &_quat)
     {
         return !IsEquals(_quat);
 
     }
 
-    constexpr Quat Quat::operator-() const noexcept
+    Quat Quat::operator-() const noexcept
     {
         return Quat(-x, -y, -z, -w);
     }
-    constexpr Quat operator * (float _value, const Quat& _quat) noexcept
+    Quat operator * (float _value, const Quat& _quat) noexcept
     {
         return _quat * _value;
     }
-    constexpr Quat operator / (float _value, const Quat& _quat)
+    Quat operator / (float _value, const Quat& _quat)
     {
         return Quat(_value/_quat.x,
                     _value/_quat.y,
@@ -446,7 +446,7 @@ namespace Solid
                     _value/_quat.w);
     }
 
-    constexpr Quat Quat::operator+(const Quat &_quat) const noexcept
+    Quat Quat::operator+(const Quat &_quat) const noexcept
     {
         return Quat(x + _quat.x,
                     y + _quat.y,
@@ -454,7 +454,7 @@ namespace Solid
                     w + _quat.w);
     }
 
-    constexpr Quat Quat::operator-(const Quat &_quat) const noexcept
+    Quat Quat::operator-(const Quat &_quat) const noexcept
     {
         return Quat(x - _quat.x,
                     y - _quat.y,

@@ -22,9 +22,9 @@ Nous visons un jeu comportant au moins 2 boss avec chacun des patterns différen
 
 ####Pattern 1 
 
-- Attaque 1: lance un cube et le scale dans la direction du joueur
+- Attaque 1: lance un cube le scale et tourne sur lui meme
 - Attaque 2: pose tous ses cubes au sol les scales jusqu'a un mur et tourne sur lui a la maniere d'une helice
-- Attaque 3: lance un cube le scale et tourne sur lui meme
+- Attaque 3: Place au dessus du joueur plein de cube oriente de maniere differente et les scales 
 
 ####Pattern 2
 - Attaque 4: invoque un enorme cube au dessus du joueur et le laisse tomber

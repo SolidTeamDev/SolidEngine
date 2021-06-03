@@ -39,22 +39,22 @@ namespace Solid SLDNamespace()
         float y = 0;
 
 	    SLDMethod()
-        constexpr Vec2() noexcept = default;
+        Vec2() noexcept = default;
 
 	    SLDMethod()
-        constexpr Vec2(const float &_value) noexcept;
+        Vec2(const float &_value) noexcept;
 
 	    SLDMethod()
-        constexpr Vec2(float _x, float _y) noexcept;
+        Vec2(float _x, float _y) noexcept;
 
 	    SLDMethod()
-        constexpr Vec2(const Vec2 &_copy) noexcept;
+        Vec2(const Vec2 &_copy) noexcept;
 
 	    SLDMethod()
-        constexpr Vec2(const Vec3 &_copy) noexcept;
+        Vec2(const Vec3 &_copy) noexcept;
 
 	    SLDMethod()
-        constexpr Vec2(const Vec4 &_copy) noexcept;
+        Vec2(const Vec4 &_copy) noexcept;
 
         ~Vec2() = default;
 
@@ -85,40 +85,40 @@ namespace Solid SLDNamespace()
 #pragma region Methods
 
 		SLDMethod()
-        constexpr float SqrtLength() const noexcept;
+        float SqrtLength() const noexcept;
 
 		SLDMethod()
-        constexpr float Length() const noexcept;
+        float Length() const noexcept;
 
 		SLDMethod()
         Vec2 &Scale(float _scale) noexcept;
 
 		SLDMethod()
-        constexpr Vec2 GetScaled(float _scale) const noexcept;
+        Vec2 GetScaled(float _scale) const noexcept;
 
 		SLDMethod()
         Vec2 &Unscale(float _scale) noexcept;
 
 		SLDMethod()
-        constexpr Vec2 GetUnscaled(float _scale) const noexcept;
+        Vec2 GetUnscaled(float _scale) const noexcept;
 
 		SLDMethod()
         Vec2 &Normalize() noexcept;
 
 		SLDMethod()
-        constexpr Vec2 GetNormalized() const noexcept;
+        Vec2 GetNormalized() const noexcept;
 
 		SLDMethod()
-        constexpr bool IsNormalized() const noexcept;
+        bool IsNormalized() const noexcept;
 
 		SLDMethod()
-        constexpr bool IsEquals(const Vec2& vec) const noexcept;
+        bool IsEquals(const Vec2& vec) const noexcept;
 
 		SLDMethod()
-        constexpr float Dist(const Vec2& vec) const noexcept;
+        float Dist(const Vec2& vec) const noexcept;
 
 		SLDMethod()
-        constexpr float SqrtDist(const Vec2& vec) const noexcept;
+        float SqrtDist(const Vec2& vec) const noexcept;
 
 		SLDMethod()
         const std::string ToString() const noexcept;
@@ -126,19 +126,19 @@ namespace Solid SLDNamespace()
 #pragma endregion
 #pragma region Operator
 
-        constexpr Vec2 &operator = (const Vec2& vec) noexcept = default;
+        Vec2 &operator = (const Vec2& vec) noexcept = default;
 
-        constexpr bool operator == (const Vec2 &_vec) const noexcept;
+        bool operator == (const Vec2 &_vec) const noexcept;
 
-        constexpr bool operator != (const Vec2 &_vec) const noexcept;
+        bool operator != (const Vec2 &_vec) const noexcept;
 
-        constexpr Vec2 operator + (const Vec2 &_vec) const noexcept;
+        Vec2 operator + (const Vec2 &_vec) const noexcept;
 
-        constexpr Vec2 operator - (const Vec2 &_vec) const noexcept;
+        Vec2 operator - (const Vec2 &_vec) const noexcept;
 
-        constexpr Vec2 operator * (const Vec2 &_vec) const noexcept;
+        Vec2 operator * (const Vec2 &_vec) const noexcept;
 
-        constexpr Vec2 operator / (const Vec2 &_vec) const noexcept;
+        Vec2 operator / (const Vec2 &_vec) const noexcept;
 
         Vec2 &operator += (const Vec2 &_vec) noexcept;
 
@@ -148,13 +148,13 @@ namespace Solid SLDNamespace()
 
         Vec2 &operator /= (const Vec2 &_vec) noexcept;
 
-        constexpr Vec2 operator + (float _value) const noexcept;
+        Vec2 operator + (float _value) const noexcept;
 
-        constexpr Vec2 operator - (float _value) const noexcept;
+        Vec2 operator - (float _value) const noexcept;
 
-        constexpr Vec2 operator * (float _value) const noexcept;
+        Vec2 operator * (float _value) const noexcept;
 
-        constexpr Vec2 operator / (float _value) const noexcept;
+        Vec2 operator / (float _value) const noexcept;
 
         Vec2 &operator += (float _value) noexcept;
 
@@ -164,13 +164,13 @@ namespace Solid SLDNamespace()
 
         Vec2 &operator /= (float _value) noexcept;
 
-        constexpr Vec2 operator -() noexcept;
+        Vec2 operator -() noexcept;
 
 #pragma endregion
 		Vec2_GENERATED
     };
-    constexpr Vec2 operator * (float _value, const Vec2& vec) noexcept;
-    constexpr Vec2 operator / (float _value, const Vec2& vec) ;
+    Vec2 operator * (float _value, const Vec2& vec) noexcept;
+    Vec2 operator / (float _value, const Vec2& vec) ;
 
 };
 
