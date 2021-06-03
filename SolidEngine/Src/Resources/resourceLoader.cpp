@@ -489,7 +489,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
             if(fs::is_directory(item))
             {
 
-                /*for(auto& item2 : fs::directory_iterator(item))
+                for(auto& item2 : fs::directory_iterator(item))
                 {
                     if(!item2.is_directory())
                     {
@@ -511,7 +511,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
                         }
                     }
                 }
-*/
+
                 continue; //recursive func
             }
             else
@@ -569,10 +569,10 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
                 }
                 else
                 {
-                    /*IDS[j].destroy = true;
+                    IDS[j].destroy = true;
                     int k = IDS[j].i;
                     if(RessourceArray[k].r!= nullptr) {
-                       // Manager->AddResource(RessourceArray[k].r);
+                        Manager->AddResource(RessourceArray[k].r);
                     }
 	                else if(RessourceArray[k].isFBX) {
 
@@ -598,7 +598,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 		                    Manager->AddResource(elt);
 	                    }
 
-	                }*/
+	                }
                 }
             }
         }
