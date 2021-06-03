@@ -218,7 +218,7 @@ void ComputeShaderResource::ToDataBuffer(std::vector<char> &buffer)
     // Write Program Binary
     GL::ComputeShader TempShader = GL::ComputeShader(this);
 
-    binaries =Renderer::GetInstance()->GetShaderBinary(TempShader.ProgID);
+	binaries =Renderer::GetInstance()->GetShaderBinary(TempShader.shader.ProgID);
     std::uint32_t PSize = binaries.size;
     ResourcesLoader::Append(buffer, &PSize, sizeof  (PSize));
     ResourcesLoader::Append(buffer, &binaries.format, sizeof  (binaries.format));

@@ -45,10 +45,10 @@ namespace Solid
 		//public members
 
 			uint ProgID;
-		protected:
-		//protected members
 			struct ShaderWrapper{uint id; bool error = false;};
-            uint vert;
+		protected:
+			//protected members
+			uint vert;
             uint frag;
 
             int LastShader = 0;
@@ -113,19 +113,81 @@ namespace Solid
             ~Shader() = default;
 
 		};
-		class SOLID_API ComputeShader : public Shader
+		class SOLID_API ComputeShader : public ICompute
 		{
 		public:
 		//public members
-
+		Shader shader;
 		protected:
-		//protected members
-
+			//protected members
+			Vec2i TexSize;
+			uint OutTexId;
+			uint compute;
 
 		public:
 		//public func
-		    ComputeShader():Shader(EResourceType::Compute){}
+		    ComputeShader(): ICompute(EResourceType::Compute){}
+			 void ReloadShader() override;
+
+			 void BindShader() override;
+
+			 void UnbindShader() override;
+
+			 void SetFloat(const char *_name, float _value) override;
+
+			 void SetInt(const char *_name, int _value) override;
+
+			 void SetBool(const char *_name, bool _value) override;
+
+			 void SetVec2(const char *_name, Vec2 _value) override;
+
+			 void SetVec3(const char *_name, Vec3 _value) override;
+
+			 void SetVec4(const char *_name, Vec4 _value) override;
+
+			 void SetMatrix(const char *_name, Mat4<float> _value) override;
+
+			 void SetFloatArray(const char *_name, int size, float *_value) override;
+
+			 void SetIntArray(const char *_name, int size, int *_value) override;
+
+			 void SetVec3Array(const char *_name, int size, Vec3 *_value) override;
+
+			 void SetMatrixArray(const char *_name, int size, Mat4<float> *_value) override;
+
+			 void GetIntArray(const char *_name, int size, int *_value) override;
+
+			 void GetInt(const char *_name, int *_value) override;
+
+			 void LoadShaderFields() override;
+
+			 std::vector<ShaderUniform> &GetUniformList() override;
+
+			 void SetMVP(Transform &_model, Camera &_camera) const override;
+
+			 void SetLights(Camera &_camera) const override;
+
+			 void SetAnim(Animation *_anim) const override;
+
+			 void SetMaterial(const char *_name) override;
+
+			 std::string &GetFragSource() override;
+
+			 std::string &GetVertSource() override;
+
+			 void SetFragSource(const std::string &_src) override;
+
+			 void SetVertSource(const std::string &_src) override;
+
 			ComputeShader(ComputeShaderResource* _cs);
+			void InitTex(Vec2i size) override;
+			uint Dispatch()override;
+
+			virtual void SetComputeSource(const std::string &_src) override;
+
+			virtual std::string &GetComputeSource() override;
+
+
 
 			~ComputeShader() = default;
 

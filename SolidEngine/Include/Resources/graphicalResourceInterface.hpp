@@ -85,6 +85,28 @@ namespace Solid
         virtual void SetFragSource(const std::string& _src) = 0;
         virtual void SetVertSource(const std::string& _src) = 0;
 	};
+
+	class SOLID_API ICompute : public IShader
+	{
+	public:
+
+
+
+	protected:
+		ComputeShaderResource* source = nullptr;
+		bool isInit = false;
+
+	public:
+		//public func
+		ICompute() = default;
+		ICompute(EResourceType _type):IShader(_type){}
+		~ICompute() = default;
+
+		virtual void InitTex(Vec2i size) = 0;
+		virtual void SetComputeSource(const std::string& _src) = 0;
+		virtual std::string& GetComputeSource() = 0;
+		virtual uint Dispatch() = 0;
+	};
 	class SOLID_API ITexture
 	{
 	public:
