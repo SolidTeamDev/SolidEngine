@@ -813,11 +813,7 @@ namespace Solid
 		std::string str = j ["Scene"]["{SkyBoxName}"];
 		Engine::GetInstance()->renderer->_map = Engine::GetInstance()->graphicsResourceMgr.GetCubemap(str.c_str());
 		AddAllComps(world, scene->rawScene, readPos);
-
-		for(auto& elt : LoadedSceneCallbacks)
-		{
-			elt(scene);
-		}
+		
 
 	}
 

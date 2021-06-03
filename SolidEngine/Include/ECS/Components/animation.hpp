@@ -30,6 +30,7 @@ namespace Solid SLDNamespace()
         //SkeletonResource* Skeleton = nullptr;
         float AnimTime;
         AnimResource* anim = nullptr;
+	    SLDField()
         String AnimName;
         float CurrentTime;
         Mat4f InverseRootMat = Mat4f::Identity;
