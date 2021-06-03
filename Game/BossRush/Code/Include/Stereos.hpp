@@ -13,12 +13,17 @@ namespace Solid SLDNamespace()
 		GameObject* player;
 		Vec3 target;
 		std::vector<GameObject*> SolidMinions;
+        GameObject* gatheringParticle = nullptr;
 
 		bool charging = false;
 		bool shooting = false;
 		float cdShoot = 0.f;
+		float currGather = 0.f;
 
 	public:
+	    SLDField()
+	    bool ShouldPrimaryAtk = false;
+
 		Stereos();
 		~Stereos();
 
