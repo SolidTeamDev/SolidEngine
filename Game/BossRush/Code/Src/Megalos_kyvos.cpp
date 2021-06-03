@@ -94,13 +94,16 @@ void Megalos_kyvos::UpdateAttack()
 
     if(StateAttack == EAttack::PRIMARY)
     {
-        Vec3 pos = CubeBullets[0]->transform->GetGlobalPosition();
-        CubeBullets[0]->transform->SetPosition(Vec3::Nlerp(pos,Target, 0.2 * Time::DeltaTime()));
-        Lerp = Vec3::Nlerp(pos, Target, 0.2 * Time::DeltaTime());
+        int i = DataBullets[0].Index;
+        DataBullets[0].Ratio += Time::DeltaTime() * SpeedPrimaryAttack;
+        if(DataBullets[0].Ratio > 1)
+        {
+            DataBullets[0].Ratio = 1;
+            return;
+        }
+        float t = FunctionCurve::easeInOutBack(DataBullets[0].Ratio);
 
-        //Lerp = Vec3::Nlerp(gameObject->transform->GetPosition(), Target- gameObject->transform->GetPosition(), 0.2 * Time::DeltaTime());
-
-        CubeBullets[0]->transform->SetPosition(Lerp);
+        CubeBullets[i]->transform->SetPosition(Vec3::Lerp(gameObject->transform->GetGlobalPosition(), Target, t));
     }
 }
 
