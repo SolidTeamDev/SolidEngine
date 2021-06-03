@@ -101,9 +101,9 @@ void Megalos_kyvos::UpdateAttack()
             DataBullets[0].Ratio = 1;
             return;
         }
-        float t = FunctionCurve::easeInOutBack(DataBullets[0].Ratio);
-
-        CubeBullets[i]->transform->SetPosition(Vec3::Lerp(gameObject->transform->GetGlobalPosition(), Target, t));
+        float t = FunctionCurve::easeInOutQuart(DataBullets[0].Ratio);
+        //float t = DataBullets[0].Ratio;
+        CubeBullets[i]->transform->SetPosition(Vec3::Lerp(gameObject->transform->GetLocalPosition(), Target, t));
     }
 }
 
