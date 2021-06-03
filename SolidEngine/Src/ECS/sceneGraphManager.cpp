@@ -328,7 +328,8 @@ void Solid::SceneGraphManager::AddAllComps(GameObject *elt, std::vector<char> &b
 						{}
 						char *buf = new char[memSize]();
 						ResourcesLoader::ReadFromBuffer(buffer.data(), buf, memSize, readPos, buffer.size());
-						const rfk::Field *f = s->getArchetype().getField(Name);
+						const rfk::Field *f = s->getArchetype().getField(Name, rfk::EFieldFlags::Default,
+																		 true);
 						f->setData(s, ((void *) buf), memSize);
 						delete[] buf;
 
