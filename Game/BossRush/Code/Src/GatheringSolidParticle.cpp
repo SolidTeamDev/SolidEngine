@@ -14,6 +14,9 @@ GatheringSolidParticle::~GatheringSolidParticle()
 
 void GatheringSolidParticle::Init()
 {
+    if (isInit)
+        return;
+    isInit = true;
 	Engine* engine = Engine::GetInstance();
 	if (!engine->ecsManager.GotComponent<ParticleEffect>(gameObject->GetEntity()))
 		effect = engine->ecsManager.AddComponent<ParticleEffect>(gameObject, ParticleEffect());
@@ -43,6 +46,9 @@ void GatheringSolidParticle::Init()
 
 void GatheringSolidParticle::Update()
 {
+    if (!isInit)
+        return;
+
     if (!gathering)
 	{
 	    autoDestroy += Time::DeltaTime();
@@ -82,4 +88,5 @@ void GatheringSolidParticle::Destroy()
 	Engine* engine = Engine::GetInstance();
 	if (engine->ecsManager.GotComponent<ParticleEffect>(gameObject->GetEntity()))
 		engine->ecsManager.RemoveComponent<ParticleEffect>(gameObject);
+	isInit = false;
 }

@@ -42,6 +42,8 @@ namespace Solid SLDNamespace()
 		void ChooseAttack() override;
 		void UpdateAttack() override;
 
+		Quat LookAt(Vec3 src, Vec3 dir);
+
 		Stereos_GENERATED
 	};
 	

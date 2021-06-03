@@ -47,6 +47,7 @@ namespace Solid SLDNamespace()
         virtual void ChooseAttack() = 0;
         virtual void UpdateAttack() = 0;
 
+
 		Boss_GENERATED
 	};
 	

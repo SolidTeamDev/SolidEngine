@@ -8,9 +8,9 @@ namespace Solid SLDNamespace()
 {
 class SOLID_API SLDClass() Script : public Components
     {
-
-
     public:
+        bool isInit = false;
+
 
         Script() = default;
         Script(GameObject* _go) {gameObject = _go;}
