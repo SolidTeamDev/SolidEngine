@@ -23,7 +23,7 @@ namespace Solid SLDNamespace()
     	Vec3 scale {1,1,1};
         Vec3 euler{};
         Mat4<float> transMat;
-	    Mat4<float> ParentTransMat;
+	    Transform* parentTransform = nullptr;
         bool hasToUpdateMat = true;
 
         void UpdateTransformMatrix();
@@ -43,15 +43,24 @@ namespace Solid SLDNamespace()
         void Rotate(const Quat& _quat);
         void Scale(const Vec3& _vec);
 
-        Vec3 GetPosition() const;
-        Vec3 GetEuler()const;
-        Quat GetRotation() const;
-        Vec3 GetScale() const;
-
-        Mat4<float> GetMatrix();
-	    void SetParentMatrix(const Mat4<float>& mat);
-	    Mat4<float> GetParentMatrix();
-
+        Vec3 GetLocalPosition() const;
+        Vec3 GetLocalEuler()const;
+        Quat GetLocalRotation() const;
+	    Vec3 GetLocalScale() const;
+	    Vec3 GetLocalForward() const;
+	    Vec3 GetLocalRight() const;
+	    Vec3 GetLocalUp() const;
+	    Vec3 GetGlobalPosition();
+	    Vec3 GetGlobalEuler()const;
+	    Quat GetGlobalRotation() const;
+	    Vec3 GetGlobalScale() const;
+	    Vec3 GetGlobalForward() const;
+	    Vec3 GetGlobalRight() const;
+	    Vec3 GetGlobalUp() const;
+        Mat4<float> GetLocalMatrix();
+	    Mat4<float> GetGlobalMatrix();
+	    void SetParentTransform( Transform* _parent);
+	    Transform* GetParentTransform();
 	    void Release()override;
 
 

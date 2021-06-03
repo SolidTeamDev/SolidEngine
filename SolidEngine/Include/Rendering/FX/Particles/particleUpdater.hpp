@@ -47,9 +47,8 @@ namespace Solid
 
 		class SOLID_API AttractorUpdater : public ParticleUpdater
 		{
-		protected:
-			std::vector<Vec4> attractors; // .w is force
 		public:
+			std::vector<Vec4> attractors; // .w is force
 
 			void ShowUI(bool& upt);
 			void Update(float dt, ParticleData *p) override;
@@ -105,5 +104,19 @@ namespace Solid
 
 			void Update(float dt, ParticleData *p) override;
 		};
+
+	class SOLID_API KillerZoneUpdater : public ParticleUpdater
+	{
+	public:
+		Vec3 pos;
+		Vec3 offset;
+	public:
+		KillerZoneUpdater() : pos(0.f, 0.f, 0.f), offset(0.f, 0.f, 0.f)
+		{}
+
+
+		void ShowUI(bool& upt);
+		void Update(float dt, ParticleData *p) override;
+	};
 
 }

@@ -167,7 +167,9 @@ void ButtonInterface::Draw()
 	UI::SameLine();
 
 	if(UI::ImageButton((ImTextureID)editorTex["Stop"]->texId, bS))
+	{
 		Editor::Stop();
+	}
 
 	UI::SameLine();
 

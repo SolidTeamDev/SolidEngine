@@ -13,18 +13,29 @@ PlayerController::PlayerController()
     engine->inputManager->AddKeyInput("Right",GLFW_KEY_D,ImEnumDetectionType::PRESSED);
     engine->inputManager->AddKeyInput("Jump",GLFW_KEY_SPACE, ImEnumDetectionType::NO_REPEAT);
     engine->inputManager->AddMouseInput("Fire1",GLFW_MOUSE_BUTTON_1, ImEnumDetectionType::NO_REPEAT);
+
+    engine->inputManager->AddKeyInput("Pause",GLFW_KEY_ESCAPE, ImEnumDetectionType::NO_REPEAT);
 }
 
 void PlayerController::Init()
 {
     if(engine->ecsManager.GotComponent<RigidBody>(gameObject->GetEntity()))
         rigidBody = &engine->ecsManager.GetComponent<RigidBody>(gameObject->GetEntity());
-    if(engine->ecsManager.GotComponent<Camera>(gameObject->GetEntity()))
-        camera = &engine->ecsManager.GetComponent<Camera>(gameObject->GetEntity());
+
+    camera = engine->ecsManager.FindGameObjectByName("Camera",gameObject);
+
+    engine->inputManager->ShowCursor(false);
+}
+
+void PlayerController::Destroy()
+{
+    engine->inputManager->ShowCursor(true);
 }
 
 void PlayerController::Update()
 {
+    RotateCamera();
+
     if(engine->inputManager->IsPressed("Forward"))
         MoveForward();
     if(engine->inputManager->IsPressed("Back"))
@@ -38,12 +49,52 @@ void PlayerController::Update()
 
     if(engine->inputManager->IsPressed("Fire1"))
         Fire();
+
+    if(engine->inputManager->IsPressed("Pause"))
+    {
+        isPaused = !isPaused;
+        engine->inputManager->ShowCursor(isPaused);
+    }
+}
+
+void PlayerController::RotateCamera()
+{
+    if(!camera || isPaused)
+        return;
+
+    auto& transform = engine->ecsManager.GetComponent<Transform>(camera->GetEntity());
+
+    Vec3 rot = transform.GetLocalEuler();
+    double xpos = 0, ypos = 0;
+    engine->inputManager->GetCursorPos(xpos,ypos);
+
+    xpos = Time::DeltaTime()  * ((int)(engine->window->GetWindowSize().x/2) - (int)xpos);
+    ypos = Time::DeltaTime()  * ((int)(engine->window->GetWindowSize().y/2) - (int)ypos);
+
+    engine->inputManager->SetCursorPos(engine->window->GetWindowSize().x*0.5,
+                                       engine->window->GetWindowSize().y*0.5);
+
+    rot.x += (float)ypos * mouseSensitivity;
+    rot.y += (float)xpos * mouseSensitivity;
+
+
+    if (rot.x > 89.0f)
+        rot.x = 89.0f;
+    if (rot.x < -89.0f)
+        rot.x = -89.0f;
+
+    transform.SetEuler(rot);
 }
 
 void PlayerController::MoveForward()
 {
     if(!rigidBody)
         return;
+
+    Vec3 camRot = camera->transform->GetLocalEuler();
+    Vec3 playerRot = gameObject->transform->GetLocalEuler();
+
+    gameObject->transform->SetEuler(Vec3(playerRot.x,-camRot.y,playerRot.z));
 
     rigidBody->AddForce(Vec3(0,0,moveSpeed));
 }

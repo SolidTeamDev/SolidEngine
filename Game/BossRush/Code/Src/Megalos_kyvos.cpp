@@ -54,7 +54,7 @@ void Megalos_kyvos::PrimaryAttack()
 {
     GameObject* go = engine->ecsManager.Instantiate("CubeBullet",
                                                     nullptr, "cube");
-    go->transform->SetPosition(gameObject->transform->GetPosition());
+    go->transform->SetPosition(gameObject->transform->GetGlobalPosition());
     CubeBullets.push_back(go);
     int i = CubeBullets.size() - 1;
     DataBullets.push_back({i, 0,Vec3::Zero});
@@ -94,16 +94,13 @@ void Megalos_kyvos::UpdateAttack()
 
     if(StateAttack == EAttack::PRIMARY)
     {
-        int i = DataBullets[0].Index;
-        DataBullets[0].Ratio += Time::DeltaTime() * SpeedPrimaryAttack;
-        if(DataBullets[0].Ratio > 1)
-        {
-            DataBullets[0].Ratio = 1;
-            return;
-        }
-        float t = FunctionCurve::easeInOutBack(DataBullets[0].Ratio);
+        Vec3 pos = CubeBullets[0]->transform->GetGlobalPosition();
+        CubeBullets[0]->transform->SetPosition(Vec3::Nlerp(pos,Target, 0.2 * Time::DeltaTime()));
+        Lerp = Vec3::Nlerp(pos, Target, 0.2 * Time::DeltaTime());
 
-        CubeBullets[i]->transform->SetPosition(Vec3::Lerp(gameObject->transform->GetPosition(), Target, t));
+        //Lerp = Vec3::Nlerp(gameObject->transform->GetPosition(), Target- gameObject->transform->GetPosition(), 0.2 * Time::DeltaTime());
+
+        CubeBullets[0]->transform->SetPosition(Lerp);
     }
 }
 

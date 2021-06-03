@@ -38,8 +38,8 @@ namespace Solid SLDNamespace()
         void Special1Attack()override;
         void Special2Attack()override;
 
-        void ChooseAttack() ;
-        void UpdateAttack();
+        void ChooseAttack() override;
+        void UpdateAttack() override;
 		Megalos_kyvos_GENERATED
 	};
 	

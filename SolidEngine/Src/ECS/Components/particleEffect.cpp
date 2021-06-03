@@ -179,6 +179,8 @@ void ParticleEffect::UpdateSystem()
 		system->AddUpdater(floorUpdater);
 	if (timeUpdater != nullptr)
 		system->AddUpdater(timeUpdater);
+	if (killerZoneUpdater != nullptr)
+		system->AddUpdater(killerZoneUpdater);
 }
 
 void ParticleEffect::UpdateEmitter()
@@ -209,7 +211,7 @@ void ParticleEffect::EditUpdaters()
 {
 	bool upt = false;
 
-	if (UI::TreeNode("Attractor Updater"))
+	if (UI::TreeNode("Attractor"))
 	{
 		bool created = true;
 		if (attractorUpdater == nullptr)
@@ -227,7 +229,7 @@ void ParticleEffect::EditUpdaters()
 			attractorUpdater->ShowUI(upt);
         UI::TreePop();
     }
-	if (UI::TreeNode("Euler Updater"))
+	if (UI::TreeNode("Euler"))
 	{
 		bool created = true;
 		if (eulerUpdater == nullptr)
@@ -245,7 +247,7 @@ void ParticleEffect::EditUpdaters()
 			eulerUpdater->ShowUI(upt);
         UI::TreePop();
     }
-	if (UI::TreeNode("Floor Updater"))
+	if (UI::TreeNode("Floor"))
 	{
 		bool created = true;
 		if (floorUpdater == nullptr)
@@ -263,7 +265,7 @@ void ParticleEffect::EditUpdaters()
 			floorUpdater->ShowUI(upt);
         UI::TreePop();
     }
-	if (UI::TreeNode("Pos Color Updater"))
+	if (UI::TreeNode("PosColor"))
 	{
 		bool created = true;
 		if (posColUpdater == nullptr)
@@ -281,7 +283,7 @@ void ParticleEffect::EditUpdaters()
 			posColUpdater->ShowUI(upt);
         UI::TreePop();
     }
-	if (UI::TreeNode("Vel Color Updater"))
+	if (UI::TreeNode("VelColor"))
 	{
 		bool created = true;
 		if (velColUpdater == nullptr)
@@ -299,6 +301,24 @@ void ParticleEffect::EditUpdaters()
 			velColUpdater->ShowUI(upt);
         UI::TreePop();
     }
+	if (UI::TreeNode("KillerZone"))
+	{
+		bool created = true;
+		if (killerZoneUpdater == nullptr)
+			created = false;
+		if (UI::Checkbox("Enable##KillZoneUpdaterCreated", &created))
+		{
+			if (created)
+				killerZoneUpdater = std::make_shared<KillerZoneUpdater>();
+			else
+				killerZoneUpdater = nullptr;
+
+			upt = true;
+		}
+		if (created)
+			killerZoneUpdater->ShowUI(upt);
+		UI::TreePop();
+	}
 	if (upt)
 		UpdateSystem();
 }
@@ -361,7 +381,7 @@ void ParticleEffect::EditGenerators()
 			sphereVelGen->ShowUI(upt);
         UI::TreePop();
     }
-	if (UI::TreeNode("Circle Pos Generator"))
+	if (UI::TreeNode("Sphere Pos Generator"))
 	{
 		bool created = true;
 		if (spherePosGen == nullptr)

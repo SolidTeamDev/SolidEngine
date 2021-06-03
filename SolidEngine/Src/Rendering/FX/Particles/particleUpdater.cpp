@@ -204,6 +204,36 @@ void BasicTimeUpdater::Update(float dt, ParticleData* p)
 	}
 }
 
+void KillerZoneUpdater::Update(float dt, ParticleData *p)
+{
+	Vec4* __restrict _pos      = p->pos.get();
+
+	unsigned int endId = p->countAlive;
+	for (size_t i = 0; i < endId; ++i)
+	{
+		if     (_pos[i].x <= pos.x + offset.x && _pos[i].x >= pos.x - offset.x &&
+				_pos[i].y <= pos.y + offset.y && _pos[i].y >= pos.y - offset.y &&
+				_pos[i].z <= pos.z + offset.z && _pos[i].z >= pos.z - offset.z)
+			p->Kill(i);
+	}
+}
+
+void KillerZoneUpdater::ShowUI(bool &upt)
+{
+	ImVec4 _pos(pos.x, pos.y, pos.z, 0.f);
+	if (UI::DragFloat4("Pos##poscol", &_pos.x))
+	{
+		pos = {_pos.x, _pos.y, _pos.z};
+		upt = true;
+	}
+	ImVec4 off(offset.x, offset.y, offset.z, 0.f);
+	if (UI::DragFloat4("Offset##poscol", &off.x))
+	{
+		offset = {off.x, off.y, off.z};
+		upt = true;
+	}
+}
+
 void AttractorUpdater::ShowUI(bool& upt)
 {
 	if (UI::Button("Create Attractor"))
