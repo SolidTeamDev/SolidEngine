@@ -13,7 +13,7 @@ namespace Solid
 	};
     struct SOLID_API ResourcePtrWrapper
     {
-        Resource* r;
+        Resource* r = nullptr;
         bool isFBX = false;
 	    FBXWrapper fbx;
     };
@@ -63,6 +63,7 @@ namespace Solid
         void SaveMaterialToFile(MaterialResource* _mat);
 	    void SavePrefabToFile(PrefabResource* _prefab);
         //inline static void ReadFromBuffer(std::vector<char>& DataBuffer, void* Data, std::uint64_t sizeInByte, std::uint64_t& ReadPos);
-        static void ReadFromBuffer(char* DataBuffer, void* Data, std::uint64_t sizeInByte, std::uint64_t& ReadPos);
+        static void ReadFromBuffer(char *DataBuffer, void *Data, std::uint64_t sizeInByte, std::uint64_t &ReadPos,
+                                   std::size_t DataBufferSize);
     };
 }

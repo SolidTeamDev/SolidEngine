@@ -63,7 +63,7 @@ namespace Solid {
         EResourceType GetType() { return type; }
 	    virtual void ToDataBuffer(std::vector<char> &buffer);
 
-	    virtual int FromDataBuffer(char *buffer, int bSize);
+	    virtual int FromDataBuffer(char *buffer, size_t bSize);
 
     };
 
@@ -83,7 +83,7 @@ namespace Solid {
 
 	    virtual void ToDataBuffer(std::vector<char> &buffer) override;
 
-	    virtual int FromDataBuffer(char *buffer, int bSize) override;
+	    virtual int FromDataBuffer(char *buffer, size_t bSize) override;
 
     };
 
@@ -108,7 +108,7 @@ namespace Solid {
 
         virtual void ToDataBuffer(std::vector<char> &buffer) override;
 
-        virtual int FromDataBuffer(char *buffer, int bSize) override;
+        virtual int FromDataBuffer(char *buffer, size_t bSize) override;
 
     };
 
@@ -160,7 +160,7 @@ namespace Solid {
 
         virtual void ToDataBuffer(std::vector<char> &buffer) override;
 
-        virtual int FromDataBuffer(char *buffer, int bSize) override;
+        virtual int FromDataBuffer(char *buffer, size_t bSize) override;
     };
 
 	class SOLID_API SkeletonResource : public Resource
@@ -274,7 +274,7 @@ namespace Solid {
 		void operator delete(void* _ptr);
 	    virtual void ToDataBuffer(std::vector<char> &buffer) override;
 
-	    virtual int FromDataBuffer(char *buffer, int bSize) override;
+	    virtual int FromDataBuffer(char *buffer, size_t bSize) override;
     };
 
     class SOLID_API ComputeShaderResource : public Resource
@@ -303,7 +303,7 @@ namespace Solid {
 
 	    virtual void ToDataBuffer(std::vector<char> &buffer) override;
 
-	    virtual int FromDataBuffer(char *buffer, int bSize) override;
+	    virtual int FromDataBuffer(char *buffer, size_t bSize) override;
     };
 
     class SOLID_API MaterialResource : public Resource
@@ -359,7 +359,7 @@ namespace Solid {
         ~MaterialResource();
 
 	    virtual void ToDataBuffer(std::vector<char> &buffer) override;
-	    virtual int FromDataBuffer(char *buffer, int bSize) override;
+	    virtual int FromDataBuffer(char *buffer, size_t bSize) override;
 
         const std::shared_ptr<IShader> GetShader() const;
         const std::shared_ptr<const IShader> GetDefaultshader() const;
@@ -384,7 +384,7 @@ namespace Solid {
 		}
 		virtual void ToDataBuffer(std::vector<char> &buffer) override;
 
-		virtual int FromDataBuffer(char *buffer, int bSize) override;
+		virtual int FromDataBuffer(char *buffer, size_t bSize) override;
 	};
 	class SOLID_API AudioResource : public Resource
 	{
@@ -402,7 +402,7 @@ namespace Solid {
 		~AudioResource();
 		virtual void ToDataBuffer(std::vector<char> &buffer) override;
 
-		virtual int FromDataBuffer(char *buffer, int bSize) override;
+		virtual int FromDataBuffer(char *buffer, size_t bSize) override;
 
 	};
 	class SOLID_API PrefabResource : public Resource
@@ -427,7 +427,7 @@ namespace Solid {
 
 		virtual void ToDataBuffer(std::vector<char> &buffer) override;
 
-		virtual int FromDataBuffer(char *buffer, int bSize) override;
+		virtual int FromDataBuffer(char *buffer, size_t bSize) override;
 
 	};
 }

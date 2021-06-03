@@ -192,13 +192,14 @@ namespace Solid
         }
         Task* UnDispatch()
         {
+
             bDispatched = false;
             return this;
         }
         [[nodiscard]] bool Error() const { return bExceptionCatch.load();}
         void ResetRunning() { bHasRun = false; bExceptionCatch = false;}
         static ID_Internal MakeID(const std::string& _sw) { return ID_Internal{_sw};}
-        std::string_view getID(){return std::forward<std::string_view>(std::string_view(ID));}
+        std::string getID(){return ID;}
         virtual ~Task(){
             if(pairData != nullptr)
             {

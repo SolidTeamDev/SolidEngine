@@ -39,33 +39,25 @@ void Resource::ToDataBuffer(std::vector<char> &buffer)
 
 }
 
-int Resource::FromDataBuffer(char *buffer, int bSize)
+int Resource::FromDataBuffer(char *buffer, size_t bSize)
 {
 	//WARNING : No test for read overflow
 	std::uint64_t ReadPos = 0;
 
 	//asset type
-	ResourcesLoader::ReadFromBuffer(buffer, &(this->type), sizeof(this->type), ReadPos);
+	ResourcesLoader::ReadFromBuffer(buffer, &(this->type), sizeof(this->type), ReadPos, bSize);
 
 	//recup path string
 	std::uint32_t size = 0;
 	std::string pString;
-	/*ResourcesLoader::ReadFromBuffer(buffer, &size, sizeof(size), ReadPos);
-	this->path.resize(size);
-	for(std::string& elt : this->path)
-	{
-		ResourcesLoader::ReadFromBuffer(buffer, &size, sizeof(size), ReadPos);
-		elt.resize(size);
-		ResourcesLoader::ReadFromBuffer(buffer, (void *) (elt.data()),  size * sizeof( std::string::value_type), ReadPos);
 
-	}
-*/
 
 	//recup name
 	size = 0;
-	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
+	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos, bSize);
 	this->name.resize(size);
-	ResourcesLoader::ReadFromBuffer(buffer, (void *) (this->name.data()), size * sizeof(std::string::value_type), ReadPos);
+	ResourcesLoader::ReadFromBuffer(buffer, (void *) (this->name.data()), size * sizeof(std::string::value_type),
+	                                ReadPos, bSize);
 	return ReadPos;
 }
 
@@ -133,7 +125,7 @@ void ImageResource::ToDataBuffer(std::vector<char> &buffer)
 
 }
 
-int ImageResource::FromDataBuffer(char* buffer , int bSize)
+int ImageResource::FromDataBuffer(char* buffer , size_t bSize)
 {
     //WARNING : No test for read overflow
     std::uint64_t ReadPos = 0;
@@ -142,17 +134,17 @@ int ImageResource::FromDataBuffer(char* buffer , int bSize)
 	ReadPos +=Resource::FromDataBuffer(buffer, bSize);
 
     //recup image metadata
-    ResourcesLoader::ReadFromBuffer(buffer, &(this->x), sizeof(this->x), ReadPos);
-    ResourcesLoader::ReadFromBuffer(buffer, &(this->y), sizeof(this->y), ReadPos);
-    ResourcesLoader::ReadFromBuffer(buffer, &(this->ChannelsNum), sizeof(this->ChannelsNum), ReadPos);
+	ResourcesLoader::ReadFromBuffer(buffer, &(this->x), sizeof(this->x), ReadPos, bSize);
+	ResourcesLoader::ReadFromBuffer(buffer, &(this->y), sizeof(this->y), ReadPos, bSize);
+	ResourcesLoader::ReadFromBuffer(buffer, &(this->ChannelsNum), sizeof(this->ChannelsNum), ReadPos, bSize);
 
     //recup image
     size = 0;
-    ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
+	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos, bSize);
 
 
     this->image.resize(size);
-    ResourcesLoader::ReadFromBuffer(buffer, (this->image.data()), size * sizeof(unsigned char), ReadPos);
+	ResourcesLoader::ReadFromBuffer(buffer, (this->image.data()), size * sizeof(unsigned char), ReadPos, bSize);
 	return ReadPos;
 }
 
@@ -180,7 +172,7 @@ void MeshResource::ToDataBuffer(std::vector<char> &buffer)
 
 }
 
-int MeshResource::FromDataBuffer(char *buffer, int bSize)
+int MeshResource::FromDataBuffer(char *buffer, size_t bSize)
 {
 	//WARNING : No test for read overflow
 	std::uint64_t ReadPos = 0;
@@ -189,19 +181,19 @@ int MeshResource::FromDataBuffer(char *buffer, int bSize)
 	ReadPos +=Resource::FromDataBuffer(buffer, bSize);
     //get SubMeshes Number
     size = 0;
-    ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
+	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos, bSize);
     this->Meshes.resize(size);
     for(MeshResource::SubMesh& Sub : this->Meshes)
     {
         size = 0;
-        ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
+	    ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos, bSize);
         Sub.indices.resize(size);
-        ResourcesLoader::ReadFromBuffer(buffer, (Sub.indices.data()), size * sizeof(unsigned int), ReadPos);
+	    ResourcesLoader::ReadFromBuffer(buffer, (Sub.indices.data()), size * sizeof(unsigned int), ReadPos, bSize);
 
         size = 0;
-        ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
+	    ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos, bSize);
         Sub.vertices.resize(size);
-        ResourcesLoader::ReadFromBuffer(buffer, (Sub.vertices.data()), size * sizeof(Vertex), ReadPos);
+	    ResourcesLoader::ReadFromBuffer(buffer, (Sub.vertices.data()), size * sizeof(Vertex), ReadPos, bSize);
     }
 
 
@@ -234,7 +226,7 @@ void ComputeShaderResource::ToDataBuffer(std::vector<char> &buffer)
 
     delete[] binaries.b;
 }
-int ComputeShaderResource::FromDataBuffer(char *buffer, int bSize)
+int ComputeShaderResource::FromDataBuffer(char *buffer, size_t bSize)
 {
 	//WARNING : No test for read overflow
 	std::uint64_t ReadPos = 0;
@@ -243,17 +235,18 @@ int ComputeShaderResource::FromDataBuffer(char *buffer, int bSize)
 	ReadPos +=Resource::FromDataBuffer(buffer, bSize);
 
     size = 0;
-    ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
+	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos, bSize);
     this->ComputeSource.resize(size);
-    ResourcesLoader::ReadFromBuffer(buffer, (void *) (this->ComputeSource.data()), size * sizeof(std::string::value_type), ReadPos);
+	ResourcesLoader::ReadFromBuffer(buffer, (void *) (this->ComputeSource.data()),
+	                                size * sizeof(std::string::value_type), ReadPos, bSize);
 
     //Shader Binary
     size = 0;
     GLenum bFormat;
-    ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
-    ResourcesLoader::ReadFromBuffer(buffer, &(bFormat), sizeof(bFormat), ReadPos);
+	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos, bSize);
+	ResourcesLoader::ReadFromBuffer(buffer, &(bFormat), sizeof(bFormat), ReadPos, bSize);
     char* binary = new char[size];
-    ResourcesLoader::ReadFromBuffer(buffer, binary, sizeof(char) * size, ReadPos);
+	ResourcesLoader::ReadFromBuffer(buffer, binary, sizeof(char) * size, ReadPos, bSize);
     binaries = {.size =size ,.format=bFormat,.b=binary};
 
     delete[] binary;
@@ -285,7 +278,7 @@ void ShaderResource::ToDataBuffer(std::vector<char> &buffer)
     ResourcesLoader::Append(buffer, binaries.b, sizeof  (char) * binaries.size);
     delete[] binaries.b;
 }
-int ShaderResource::FromDataBuffer(char *buffer, int bSize)
+int ShaderResource::FromDataBuffer(char *buffer, size_t bSize)
 {
 	//WARNING : No test for read overflow
 	std::uint64_t ReadPos = 0;
@@ -295,22 +288,24 @@ int ShaderResource::FromDataBuffer(char *buffer, int bSize)
 
     //shaders sources
     size = 0;
-    ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
+	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos, bSize);
     this->VertexSource.resize(size);
-    ResourcesLoader::ReadFromBuffer(buffer, (void *) (this->VertexSource.data()), size * sizeof(std::string::value_type), ReadPos);
+	ResourcesLoader::ReadFromBuffer(buffer, (void *) (this->VertexSource.data()),
+	                                size * sizeof(std::string::value_type), ReadPos, bSize);
 
     size = 0;
-    ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
+	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos, bSize);
     this->FragSource.resize(size);
-    ResourcesLoader::ReadFromBuffer(buffer, (void *) (this->FragSource.data()), size * sizeof(std::string::value_type), ReadPos);
+	ResourcesLoader::ReadFromBuffer(buffer, (void *) (this->FragSource.data()), size * sizeof(std::string::value_type),
+	                                ReadPos, bSize);
 
     //Shader Binary
     size = 0;
     GLenum bFormat;
-    ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
-    ResourcesLoader::ReadFromBuffer(buffer, &(bFormat), sizeof(bFormat), ReadPos);
+	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos, bSize);
+	ResourcesLoader::ReadFromBuffer(buffer, &(bFormat), sizeof(bFormat), ReadPos, bSize);
     char* binary = new char[size];
-    ResourcesLoader::ReadFromBuffer(buffer, binary, sizeof(char) * size, ReadPos);
+	ResourcesLoader::ReadFromBuffer(buffer, binary, sizeof(char) * size, ReadPos, bSize);
     binaries ={.size =size ,.format=bFormat,.b=binary};
     delete[] binary;
 	return ReadPos;
@@ -413,7 +408,7 @@ void MaterialResource::ToDataBuffer(std::vector<char> &buffer)
 
 }
 
-int MaterialResource::FromDataBuffer(char *buffer, int bSize)
+int MaterialResource::FromDataBuffer(char *buffer, size_t bSize)
 {
 	//WARNING : No test for read overflow
 	std::uint64_t ReadPos = 0;
@@ -424,7 +419,7 @@ int MaterialResource::FromDataBuffer(char *buffer, int bSize)
 	///shader loading
 	int j = 0;
 	Engine* engine = Engine::GetInstance();
-	ResourcesLoader::ReadFromBuffer(buffer, &(j), sizeof(j), ReadPos);
+	ResourcesLoader::ReadFromBuffer(buffer, &(j), sizeof(j), ReadPos, bSize);
 	if(j == 128)
 	{
 		this->shader = nullptr;
@@ -434,76 +429,79 @@ int MaterialResource::FromDataBuffer(char *buffer, int bSize)
 	{
 		std::string pName;
 		size = 0;
-		ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
+		ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos, bSize);
 		pName.resize(size);
-		ResourcesLoader::ReadFromBuffer(buffer, (void *) (pName.data()), size * sizeof(std::string::value_type), ReadPos);
+		ResourcesLoader::ReadFromBuffer(buffer, (void *) (pName.data()), size * sizeof(std::string::value_type),
+		                                ReadPos, bSize);
 		this->shader = engine->graphicsResourceMgr.GetShader(pName.c_str());
 
 	}
 
 	size = 0;
-	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
+	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos, bSize);
 	this->fields.resize(size);
 
 	for(auto& field : this->fields)
 	{
 	    //load field name
 	    size = 0;
-		ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
+		ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos, bSize);
 		field.name.resize(size);
-		ResourcesLoader::ReadFromBuffer(buffer, (void *) (field.name.data()), size * sizeof(std::string::value_type), ReadPos);
+		ResourcesLoader::ReadFromBuffer(buffer, (void *) (field.name.data()), size * sizeof(std::string::value_type),
+		                                ReadPos, bSize);
 		//load field type
-		ResourcesLoader::ReadFromBuffer(buffer, &(field.type), sizeof(EShaderFieldType), ReadPos);
+		ResourcesLoader::ReadFromBuffer(buffer, &(field.type), sizeof(EShaderFieldType), ReadPos, bSize);
 		switch (field.type)
 		{
 			case EShaderFieldType::BOOL:
 			{
-				ResourcesLoader::ReadFromBuffer(buffer, &(field.b), sizeof(bool), ReadPos);
+				ResourcesLoader::ReadFromBuffer(buffer, &(field.b), sizeof(bool), ReadPos, bSize);
 				break;
 			}
 			case EShaderFieldType::INT:
 			{
-				ResourcesLoader::ReadFromBuffer(buffer, &(field.i), sizeof(int), ReadPos);
+				ResourcesLoader::ReadFromBuffer(buffer, &(field.i), sizeof(int), ReadPos, bSize);
 
 				break;
 			}
 			case EShaderFieldType::FLOAT:
 			{
-				ResourcesLoader::ReadFromBuffer(buffer, &(field.f), sizeof(float), ReadPos);
+				ResourcesLoader::ReadFromBuffer(buffer, &(field.f), sizeof(float), ReadPos, bSize);
 
 				break;
 			}
 			case EShaderFieldType::VEC2:
 			{
-				ResourcesLoader::ReadFromBuffer(buffer, &(field.v2), sizeof(Vec2), ReadPos);
+				ResourcesLoader::ReadFromBuffer(buffer, &(field.v2), sizeof(Vec2), ReadPos, bSize);
 
 				break;
 			}
 			case EShaderFieldType::VEC3:
 			{
-				ResourcesLoader::ReadFromBuffer(buffer, &(field.v3), sizeof(Vec3), ReadPos);
+				ResourcesLoader::ReadFromBuffer(buffer, &(field.v3), sizeof(Vec3), ReadPos, bSize);
 
 				break;
 			}
 			case EShaderFieldType::VEC4:
 			{
-				ResourcesLoader::ReadFromBuffer(buffer, &(field.v4), sizeof(Vec4), ReadPos);
+				ResourcesLoader::ReadFromBuffer(buffer, &(field.v4), sizeof(Vec4), ReadPos, bSize);
 
 				break;
 			}
 			case EShaderFieldType::TEXT:
 			{
 				size =  256;//field.text == nullptr ? 256 : 128;
-				ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
+				ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos, bSize);
 				if(size == 128)
 				{
 					size = 0;
 					std::string tStr ;
 
-					ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
+					ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos, bSize);
 					tStr.resize(size);
 
-					ResourcesLoader::ReadFromBuffer(buffer, (void *) (tStr.data()), size * sizeof(std::string::value_type),ReadPos);
+					ResourcesLoader::ReadFromBuffer(buffer, (void *) (tStr.data()),
+					                                size * sizeof(std::string::value_type), ReadPos, bSize);
 					field.text = Engine::GetInstance()->graphicsResourceMgr.GetTexture(tStr.c_str());
 				}
 
@@ -542,7 +540,7 @@ void AudioResource::ToDataBuffer(std::vector<char> &buffer)
 
 }
 
-int AudioResource::FromDataBuffer(char *buffer, int bSize)
+int AudioResource::FromDataBuffer(char *buffer, size_t bSize)
 {
 	//WARNING : No test for read overflow
 	std::uint64_t ReadPos = 0;
@@ -552,13 +550,13 @@ int AudioResource::FromDataBuffer(char *buffer, int bSize)
 
 	//recup RawAudio
 	size = 0;
-	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
+	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos, bSize);
 	this->audioRawBinary.resize(size);
-	ResourcesLoader::ReadFromBuffer(buffer, (void *) (this->audioRawBinary.data()), size * sizeof(short), ReadPos);
+	ResourcesLoader::ReadFromBuffer(buffer, (void *) (this->audioRawBinary.data()), size * sizeof(short), ReadPos, bSize);
 
-	ResourcesLoader::ReadFromBuffer(buffer, (void *) &(this->info), sizeof(SF_INFO), ReadPos);
-	ResourcesLoader::ReadFromBuffer(buffer, (void *) &(this->format), sizeof(ALenum), ReadPos);
-	ResourcesLoader::ReadFromBuffer(buffer, (void *) &(this->numFrames), sizeof(sf_count_t), ReadPos);
+	ResourcesLoader::ReadFromBuffer(buffer, (void *) &(this->info), sizeof(SF_INFO), ReadPos, bSize);
+	ResourcesLoader::ReadFromBuffer(buffer, (void *) &(this->format), sizeof(ALenum), ReadPos, bSize);
+	ResourcesLoader::ReadFromBuffer(buffer, (void *) &(this->numFrames), sizeof(sf_count_t), ReadPos, bSize);
 	return ReadPos;
 }
 
@@ -1190,14 +1188,14 @@ void PrefabResource::ToDataBuffer(std::vector<char> &buffer)
 
 }
 
-int PrefabResource::FromDataBuffer(char *buffer, int bSize)
+int PrefabResource::FromDataBuffer(char *buffer, size_t bSize)
 {
 	std::uint64_t ReadPos =  Resource::FromDataBuffer(buffer, bSize);
 	std::uint32_t size =0;
 	//asset type
-	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
+	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos, bSize);
 	PrefabBinary.resize(size);
-	ResourcesLoader::ReadFromBuffer(buffer, PrefabBinary.data(), size*sizeof(char), ReadPos);
+	ResourcesLoader::ReadFromBuffer(buffer, PrefabBinary.data(), size * sizeof(char), ReadPos, bSize);
 	return ReadPos;
 }
 
@@ -1210,14 +1208,14 @@ void SceneResource::ToDataBuffer(std::vector<char> &buffer)
 	ResourcesLoader::Append(buffer, this->rawScene.data(), size *sizeof(char));
 }
 
-int SceneResource::FromDataBuffer(char *buffer, int bSize)
+int SceneResource::FromDataBuffer(char *buffer, size_t bSize)
 {
 	std::uint64_t ReadPos =  Resource::FromDataBuffer(buffer, bSize);
 	std::uint32_t size =0;
 	//asset type
-	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos);
+	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos, bSize);
 	rawScene.resize(size);
-	ResourcesLoader::ReadFromBuffer(buffer, rawScene.data(), size*sizeof(char), ReadPos);
+	ResourcesLoader::ReadFromBuffer(buffer, rawScene.data(), size * sizeof(char), ReadPos, bSize);
 	return ReadPos;
 }
 
@@ -1226,7 +1224,7 @@ void CubemapResource::ToDataBuffer(std::vector<char> &buffer)
 
 }
 
-int CubemapResource::FromDataBuffer(char *buffer, int bSize)
+int CubemapResource::FromDataBuffer(char *buffer, size_t bSize)
 {
     return 0;
 }

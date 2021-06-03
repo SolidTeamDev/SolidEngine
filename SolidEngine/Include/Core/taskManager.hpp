@@ -13,16 +13,16 @@ namespace Solid
     class SOLID_API TaskManager
     {
         std::mutex taskSystemGuard;
-        std::vector<Task> taskPool;
+        std::vector<Task*> taskPool;
     public:
 
         
         TaskManager();
-
+		~TaskManager();
         TaskManager(TaskManager&) = delete;
         Task* getTaskByType(const ETaskType& _s);
         Task* GetFirstAvailableTask();
-        Task* getTaskByID(const std::string_view& _s);
+        Task* getTaskByID(const std::string &_s);
         Task* getTaskByIndex(int _index);
         Task& AddTask(Task&& _t);
         TaskManager& RemoveTaskById(const std::string_view& _s);

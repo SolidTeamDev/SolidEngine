@@ -39,8 +39,9 @@ struct ShaderLoaderWrapper
 
 struct IDWrapper
 {
-    std::string Name;
-    int i;
+	std::string Name;
+	int i;
+	bool destroy = false;
 };
 const char* rootFolder = "Assets\\";
 ///
@@ -469,8 +470,9 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
         const std::size_t numOfShader = std::count_if(ToLoad.begin(), ToLoad.end(), (fp)shaderFind);
 	    const std::size_t numOfMat = std::count_if(ToLoad.begin(), ToLoad.end(), (fp)matFind);
 	    const std::size_t numOfSound = std::count_if(ToLoad.begin(), ToLoad.end(), (fp)soundFind);
-        ResourcePtrWrapper* RessourceArray = new ResourcePtrWrapper[numOffiles + numOfShader /*- numOfMat - numOfSound*/]();
-
+       // ResourcePtrWrapper* RessourceArray = new ResourcePtrWrapper[numOffiles + numOfShader /*- numOfMat - numOfSound*/]();
+		std::vector<ResourcePtrWrapper> RessourceArray;
+		RessourceArray.resize(numOffiles + numOfShader);
 
         auto Lambda = [this](const fs::path *Rpath, ResourcePtrWrapper *wrapper){LoadRessourceNoAdd(*Rpath,*wrapper); delete Rpath;};
         int i =0;
@@ -487,7 +489,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
             if(fs::is_directory(item))
             {
 
-                for(auto& item2 : fs::directory_iterator(item))
+                /*for(auto& item2 : fs::directory_iterator(item))
                 {
                     if(!item2.is_directory())
                     {
@@ -509,7 +511,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
                         }
                     }
                 }
-
+*/
                 continue; //recursive func
             }
             else
@@ -535,8 +537,9 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 
 	                continue;
                 }
-                TaskMan.AddTask(Task(Task::MakeID("Load " + name), ETaskType::RESOURCES_LOADER, Lambda, newP, &RessourceArray[i]));
-                IDS.push_back( {"Load " + name, i});
+                TaskMan.AddTask(Task(Task::MakeID("Load {"+std::to_string(i)+"} " + name), ETaskType::RESOURCES_LOADER, Lambda, newP, &RessourceArray[i]));
+
+                IDS.push_back( {"Load {"+std::to_string(i)+"} " + name, i});
 
                 ++i;
             }
@@ -550,19 +553,26 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
         {
             b = false;
             for (int j = 0; j <IDS.size(); ++j) {
+            	if(IDS[j].destroy)
+		            continue;
                 Task* t= TaskMan.getTaskByID(IDS.at(j).Name);
                 if(t == nullptr)
                     continue;
+
                 if(!t->IsFinished())
                 {
+
+	                if (t->IsDispatched() && !t->IsInProgress() && !t->Error())
+		                Log::Send(std::string(t->getID().data()) +" HAS CORRUPTED");
+
                     b = true;
                 }
                 else
                 {
-                    IDS[j].Name = "";
+                    /*IDS[j].destroy = true;
                     int k = IDS[j].i;
                     if(RessourceArray[k].r!= nullptr) {
-                        Manager->AddResource(RessourceArray[k].r);
+                       // Manager->AddResource(RessourceArray[k].r);
                     }
 	                else if(RessourceArray[k].isFBX) {
 
@@ -588,7 +598,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 		                    Manager->AddResource(elt);
 	                    }
 
-	                }
+	                }*/
                 }
             }
         }
@@ -621,7 +631,6 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 	        Manager->AddResource(mat);
 	    }
 
-		delete[] RessourceArray;
     }
         /// MonoThread Loading
     else
@@ -655,7 +664,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 			            }
 			            else
 			            {
-
+				            LoadResourcesFromFolder(item);
 				            continue; //recursive func
 			            }
 		            }
@@ -1115,7 +1124,7 @@ Resource *ResourcesLoader::LoadCubemap(const fs::path &Rpath)
 
 Resource * ResourcesLoader::LoadMesh(const fs::path &Rpath)
 {
-    MeshResource* Mesh = new MeshResource;
+    MeshResource* Mesh = new MeshResource();
     Assimp::Importer importer;
     std::string str = Rpath.string();
 
@@ -1442,9 +1451,12 @@ void ResourcesLoader::Append(std::vector<char> &DataBuffer, void *Data, std::uin
 }
 
 
-void ResourcesLoader::ReadFromBuffer(char* DataBuffer, void *Data, std::uint64_t sizeInByte, std::uint64_t& ReadPos)
+void ResourcesLoader::ReadFromBuffer(char *DataBuffer, void *Data, std::uint64_t sizeInByte, std::uint64_t &ReadPos,
+                                     std::size_t DataBufferSize)
 {
-    if (Data && (sizeInByte > 0) )
+	if(ReadPos + sizeInByte > DataBufferSize)
+		Log::Send("Try to read out of buffer", Log::ELogSeverity::WARNING);
+    else if (Data && (sizeInByte > 0))
     {
         std::memcpy(Data, &DataBuffer[ReadPos], sizeInByte);
         ReadPos+= sizeInByte;

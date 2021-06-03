@@ -216,39 +216,39 @@ namespace Solid
 
 			//Get Comp FieldName
 			ResourcesLoader::ReadFromBuffer(buffer.data(), &cmpNameSize, sizeof(std::size_t),
-			                                readPos);
+			                                readPos, buffer.size());
 			std::string Name;
 			Name.resize(cmpNameSize / sizeof(std::string::value_type));
-			ResourcesLoader::ReadFromBuffer(buffer.data(), Name.data(), cmpNameSize, readPos);
+			ResourcesLoader::ReadFromBuffer(buffer.data(), Name.data(), cmpNameSize, readPos, buffer.size());
 
 			//Get is Null
-			ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(short), readPos);
+			ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(short), readPos, buffer.size());
 			std::size_t memSize = 0;
 			//Get Field Data
 			const rfk::Field *f = t->getArchetype().getField(Name);
 			if (f->type.archetype->name == "String")
 			{
 				ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t),
-				                                readPos);
+				                                readPos, buffer.size());
 				String *str = (String *) f->getDataAddress(t);
 				str->resize(memSize / sizeof(std::string::value_type));
 
-				ResourcesLoader::ReadFromBuffer(buffer.data(), str->data(), memSize, readPos);
+				ResourcesLoader::ReadFromBuffer(buffer.data(), str->data(), memSize, readPos, buffer.size());
 			}
 			else if (f->type.archetype->name == "vectorStr")
 			{
 				std::size_t vecSize = 0;
 				ResourcesLoader::ReadFromBuffer(buffer.data(), &vecSize, sizeof(std::size_t),
-				                                readPos);
+				                                readPos, buffer.size());
 				vectorStr *vstr = (vectorStr *) f->getDataAddress(t);
 
 				for (int k = 0; k < vecSize; ++k)
 				{
 					String str;
 					ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t),
-					                                readPos);
+					                                readPos, buffer.size());
 					str.resize(memSize);
-					ResourcesLoader::ReadFromBuffer(buffer.data(), str.data(), memSize, readPos);
+					ResourcesLoader::ReadFromBuffer(buffer.data(), str.data(), memSize, readPos, buffer.size());
 
 					vstr->push_back(std::move(str));
 				}
@@ -257,9 +257,9 @@ namespace Solid
 			{
 
 				ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t),
-				                                readPos);
+				                                readPos, buffer.size());
 				char *buf = new char[memSize]();
-				ResourcesLoader::ReadFromBuffer(buffer.data(), buf, memSize, readPos);
+				ResourcesLoader::ReadFromBuffer(buffer.data(), buf, memSize, readPos, buffer.size());
 
 				if (isNull == 256)
 				{
@@ -294,7 +294,7 @@ namespace Solid
 		{
 			//get num of Childs
 			std::size_t childNum = 0;
-			ResourcesLoader::ReadFromBuffer(buffer.data(), &childNum, sizeof(std::size_t), readPos);
+			ResourcesLoader::ReadFromBuffer(buffer.data(), &childNum, sizeof(std::size_t), readPos, buffer.size());
 
 			for (int games = 0; games < childNum; ++games)
 			{
@@ -302,20 +302,20 @@ namespace Solid
 
 				//get num of comps
 				std::size_t cmpNum = 0;
-				ResourcesLoader::ReadFromBuffer(buffer.data(), &cmpNum, sizeof(std::size_t), readPos);
+				ResourcesLoader::ReadFromBuffer(buffer.data(), &cmpNum, sizeof(std::size_t), readPos, buffer.size());
 
 
 				for (int j = 0; j < cmpNum; ++j)
 				{
 					//get Comp Class / str
-					ResourcesLoader::ReadFromBuffer(buffer.data(), &cmpNameSize, sizeof(std::size_t), readPos);
+					ResourcesLoader::ReadFromBuffer(buffer.data(), &cmpNameSize, sizeof(std::size_t), readPos, buffer.size());
 					std::string className;
 					className.resize(cmpNameSize / sizeof(std::string::value_type));
-					ResourcesLoader::ReadFromBuffer(buffer.data(), className.data(), cmpNameSize, readPos);
+					ResourcesLoader::ReadFromBuffer(buffer.data(), className.data(), cmpNameSize, readPos, buffer.size());
 
 					//get Field Num
 					std::size_t FieldNum = 0;
-					ResourcesLoader::ReadFromBuffer(buffer.data(), &FieldNum, sizeof(std::size_t), readPos);
+					ResourcesLoader::ReadFromBuffer(buffer.data(), &FieldNum, sizeof(std::size_t), readPos, buffer.size());
 
 
 					rfk::Class const *myClass = n->getClass(className);
@@ -395,13 +395,13 @@ namespace Solid
 
 								//Get Comp FieldName
 								ResourcesLoader::ReadFromBuffer(buffer.data(), &cmpNameSize, sizeof(std::size_t),
-								                                readPos);
+								                                readPos, buffer.size());
 								std::string Name;
 								Name.resize(cmpNameSize / sizeof(std::string::value_type));
-								ResourcesLoader::ReadFromBuffer(buffer.data(), Name.data(), cmpNameSize, readPos);
+								ResourcesLoader::ReadFromBuffer(buffer.data(), Name.data(), cmpNameSize, readPos, buffer.size());
 
 								//Get is Null
-								ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(short), readPos);
+								ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(short), readPos, buffer.size());
 								std::size_t memSize = 0;
 								//Get Field Data
 
@@ -411,39 +411,40 @@ namespace Solid
 								if (f->type.archetype->name == "String")
 								{
 									ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t),
-									                                readPos);
+									                                readPos, buffer.size());
 									String *str = (String *) f->getDataAddress(s);
 									str->resize(memSize / sizeof(std::string::value_type));
 
-									ResourcesLoader::ReadFromBuffer(buffer.data(), str->data(), memSize, readPos);
+									ResourcesLoader::ReadFromBuffer(buffer.data(), str->data(), memSize, readPos, buffer.size());
 								}
 								else if (f->type.archetype->name == "vectorStr")
 								{
 									std::size_t vecSize = 0;
 									ResourcesLoader::ReadFromBuffer(buffer.data(), &vecSize, sizeof(std::size_t),
-									                                readPos);
+									                                readPos, buffer.size());
 									vectorStr *vstr = (vectorStr *) f->getDataAddress(s);
 
 									for (int k = 0; k < vecSize; ++k)
 									{
 										String str;
 										ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t),
-										                                readPos);
+										                                readPos, buffer.size());
 										str.resize(memSize);
-										ResourcesLoader::ReadFromBuffer(buffer.data(), str.data(), memSize, readPos);
+										ResourcesLoader::ReadFromBuffer(buffer.data(), str.data(), memSize, readPos, buffer.size());
 
 										vstr->push_back(std::move(str));
 									}
 								}
 								else
 								{
-									ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t), readPos);
+									ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t),
+									                                readPos, buffer.size());
 									if (isNull == 256)
 									{}
 									else
 									{}
 									char *buf = new char[memSize]();
-									ResourcesLoader::ReadFromBuffer(buffer.data(), buf, memSize, readPos);
+									ResourcesLoader::ReadFromBuffer(buffer.data(), buf, memSize, readPos, buffer.size());
 
 									f->setData(s, ((void *) buf), memSize);
 									delete[] buf;
@@ -482,10 +483,10 @@ namespace Solid
 
 
 		std::size_t jsonSize = 0;
-		ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), &jsonSize, sizeof(std::size_t),readPos);
+		ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), &jsonSize, sizeof(std::size_t), readPos, scene->rawScene.size());
 		std::string jsonStr;
 		jsonStr.resize(jsonSize / sizeof(std::string::value_type));
-		ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), jsonStr.data(), jsonSize,readPos);
+		ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), jsonStr.data(), jsonSize, readPos, scene->rawScene.size());
 		j = j.parse(jsonStr) ;
 
 		Engine* engine = instance;
@@ -769,10 +770,10 @@ namespace Solid
 
 
 		std::size_t jsonSize = 0;
-		ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), &jsonSize, sizeof(std::size_t),readPos);
+		ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), &jsonSize, sizeof(std::size_t), readPos, scene->rawScene.size());
 		std::string jsonStr;
 		jsonStr.resize(jsonSize / sizeof(std::string::value_type));
-		ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), jsonStr.data(), jsonSize,readPos);
+		ResourcesLoader::ReadFromBuffer(scene->rawScene.data(), jsonStr.data(), jsonSize, readPos, scene->rawScene.size());
 		j = j.parse(jsonStr) ;
 
 		Engine* engine = instance;
