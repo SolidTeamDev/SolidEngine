@@ -33,18 +33,25 @@ void GatheringSolidParticle::Init()
 	effect->killerZoneUpdater->offset = {0.02f, 0.02f, 0.02f};
 	effect->velGen->maxStartVel = {0.f,0.f,0.f,0.f};
 	effect->velGen->minStartVel = {0.f,0.f,0.f,0.f};
+    effect->colGen->minStartCol = {0.f,0.7f,0.7f,1.f};
+    effect->colGen->maxStartCol = {0.f,1.0f,1.0f,1.f};
+    effect->colGen->minEndCol = {1.f,1.0f,1.0f,0.f};
+    effect->colGen->maxEndCol = {1.f,1.0f,1.0f,0.f};
 	effect->UpdateEmitter();
 	effect->UpdateSystem();
 }
 
 void GatheringSolidParticle::Update()
 {
-	if (!gathering)
-		return;
+    if (!gathering)
+	{
+	    autoDestroy += Time::DeltaTime();
+        return;
+    }
 
 	if (gathering && currGather <= 0.f)
 	{
-		effect->SetEmitRate(165.f);
+		effect->SetEmitRate(170.f);
 		effect->UpdateEmitter();
 		currGather = 0.f;
 	}
