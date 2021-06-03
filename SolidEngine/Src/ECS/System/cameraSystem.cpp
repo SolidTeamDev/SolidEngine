@@ -11,17 +11,18 @@ void Solid::CameraSystem::Update()
 	{
 		auto& cam  = ecsManager.GetComponent<Camera>(entity);
 		auto& transform = ecsManager.GetComponent<Transform>(entity);
-		Vec3 pos =transform.GetGlobalPosition();
-		cam.position = pos;
+
+		cam.position = transform.GetGlobalPosition();
 		cam.Euler = transform.GetGlobalEuler();
+
 		Vec3 _front;
 		_front.z = Maths::Cos(Maths::DegToRad(cam.Euler.x)) *
-		           Maths::Cos(Maths::DegToRad(cam.Euler.y));
+		           Maths::Cos(Maths::DegToRad(-cam.Euler.y));
 
-		_front.x = Maths::Sin(Maths::DegToRad(cam.Euler.y));
+		_front.y = Maths::Sin(Maths::DegToRad(cam.Euler.x));
 
-		_front.y = Maths::Sin(Maths::DegToRad(cam.Euler.x)) *
-		           Maths::Cos(Maths::DegToRad(cam.Euler.y));
+		_front.x = Maths::Sin(Maths::DegToRad(-cam.Euler.y)) *
+		           Maths::Cos(Maths::DegToRad(cam.Euler.x));
 
 		cam.Front = _front.GetNormalized();
 		cam.Right = Vec3::Cross(cam.Front, Vec3::Up).GetNormalized();

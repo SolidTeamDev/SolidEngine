@@ -40,6 +40,7 @@ namespace Solid
         euler=_euler;
         Vec3 temp {Maths::DegToRad(_euler.x),Maths::DegToRad(_euler.y),Maths::DegToRad(_euler.z)};
         rotation = Quat(temp);
+        hasToUpdateMat = true;
     }
 
     void Transform::SetScale(const Vec3 &_vec)
@@ -132,9 +133,9 @@ namespace Solid
 
 	Vec3 Transform::GetGlobalPosition()
 	{
-    	Vec4 pos =GetGlobalMatrix()* Vec4(position);
-    	Vec3 pos2 = pos;
-		return  pos2;
+		if (parentTransform == nullptr)
+			return position;
+		return  parentTransform->GetGlobalMatrix()* Vec4(position);
 	}
 
 	Mat4<float> Transform::GetGlobalMatrix()
