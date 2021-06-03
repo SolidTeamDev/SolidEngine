@@ -19,6 +19,9 @@ namespace Solid SLDNamespace()
 		SLDField()
 		bool gathering = false;
 	public:
+
+        float autoDestroy = 0.f;
+
 		GatheringSolidParticle();
 		~GatheringSolidParticle();
 
