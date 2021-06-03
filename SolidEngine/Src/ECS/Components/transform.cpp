@@ -132,9 +132,9 @@ namespace Solid
 
 	Vec3 Transform::GetGlobalPosition()
 	{
-    	Vec4 pos =GetGlobalMatrix()* Vec4(position);
-    	Vec3 pos2 = pos;
-		return  pos2;
+		if (parentTransform == nullptr)
+			return position;
+		return  parentTransform->GetGlobalMatrix()* Vec4(position);
 	}
 
 	Mat4<float> Transform::GetGlobalMatrix()

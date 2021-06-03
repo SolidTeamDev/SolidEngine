@@ -182,6 +182,9 @@ namespace Solid {
             AddInfoOverlay();
         if (demoOpen)
             UI::ShowDemoWindow();
+        if (computeDemo)
+        	AddComputeOverlay();
+
 
 
         UIContext::RenderFrame();
@@ -290,6 +293,8 @@ namespace Solid {
                 Log::Send("Opened Colors Settings", Log::ELogSeverity::WARNING);
             if (UI::MenuItem("Performance Overlay", nullptr, &perfOpen))
                 Log::Send("Perf Overlay opened or closed", Log::ELogSeverity::CRITICAL);
+	        if (UI::MenuItem("Compute Shader Demo", nullptr, &computeDemo))
+		        Log::Send("Perf Overlay opened or closed", Log::ELogSeverity::CRITICAL);
             if (UI::MenuItem("Show UI Demo", nullptr, &demoOpen))
                 Log::Send("Opened Show Demo UI", Log::ELogSeverity::DEBUG);
 
@@ -524,6 +529,154 @@ namespace Solid {
 		{
 			currentScenePath.append(currentScenePtr->path[i]);
 		}
+	}
+
+	void EditorInterface::AddComputeOverlay()
+	{
+		//UI::SetNextWindowBgAlpha(0.4);
+		UI::SetNextWindowSize(ImVec2(600, 600));
+		//UI::SetNextWindowViewport(UI::GetID(UI::GetMainViewport()));
+
+		ImGuiWindowFlags flags = 0;
+		flags |= ImGuiWindowFlags_NoResize;// | ImGuiWindowFlags_NoCollapse;
+		//flags |= ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDocking;
+		//flags |= ImGuiWindowFlags_NoTitleBar;
+
+		UI::Begin("Compute Shader Demo", &computeDemo, flags);
+
+		UI::Text("Compute Shader Demo");
+		UI::Text("if you don't see anything the compute shader is nullptr");
+		UI::Separator();
+
+		const char* meshName = currentComputeShader == nullptr ? "" : currentComputeShader->name.c_str();
+		bool combo =UI::BeginCombo("##Mesh", meshName);
+		Engine* engine = Engine::GetInstance();
+		if(UI::BeginDragDropTarget())
+		{
+
+			const ImGuiPayload* drop=UI::AcceptDragDropPayload("Compute");
+			if(drop != nullptr)
+			{
+				Resource* r = *((Resource**)drop->Data);
+				currentComputeShader = engine->graphicsResourceMgr.GetCompute(r->name.c_str());
+
+			}
+			UI::EndDragDropTarget();
+		}
+		if(combo)
+		{
+			auto* meshList = engine->resourceManager.GetResourcesVecByType<ComputeShaderResource>();
+
+			for(auto mesh : *meshList)
+			{
+				bool selected = (meshName == mesh.second->name);
+				if(UI::Selectable(mesh.second->name.c_str(), selected))
+				{
+					currentComputeShader =  engine->graphicsResourceMgr.GetCompute(mesh.second->name.c_str());
+
+				}
+				if(selected)
+					UI::SetItemDefaultFocus();
+			}
+
+			UI::EndCombo();
+		}
+		if(currentComputeShader)
+		{
+			if(UI::Button("Edit vertex shader"))
+			{
+				codeEditor.isCodeEditorOpen = true;
+				codeEditor.imCodeEditor.SetText(currentComputeShader->GetComputeSource());
+				codeEditor.codeType = CodeEditor::ECodeType::COMPUTE;
+			}
+			if(codeEditor.isCodeEditorOpen)
+			{
+				auto cpos = codeEditor.imCodeEditor.GetCursorPosition();
+				UI::SetNextWindowSize(ImVec2(800,600),ImGuiCond_Once);
+				UI::Begin("Edit shader##Window", &codeEditor.isCodeEditorOpen,ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking);
+				ImGuiIO& io = ImGui::GetIO();
+				auto shift = io.KeyShift;
+				auto ctrl = io.ConfigMacOSXBehaviors ? io.KeySuper : io.KeyCtrl;
+				auto alt = io.ConfigMacOSXBehaviors ? io.KeyCtrl : io.KeyAlt;
+
+
+
+
+				if (ImGui::BeginMenuBar())
+				{
+					if (ImGui::BeginMenu("File"))
+					{
+						if (ImGui::MenuItem("Save","Ctrl-S"))
+						{
+							currentComputeShader->SetComputeSource(codeEditor.imCodeEditor.GetText());
+							currentComputeShader->ReloadShader();
+						}
+						if (ImGui::MenuItem("Quit", "Alt-F4"))
+							codeEditor.isCodeEditorOpen = false;
+						ImGui::EndMenu();
+					}
+					if (ImGui::BeginMenu("Edit"))
+					{
+						if (ImGui::MenuItem("Undo", "ALT-Backspace", nullptr, codeEditor.imCodeEditor.CanUndo()))
+							codeEditor.imCodeEditor.Undo();
+						if (ImGui::MenuItem("Redo", "Ctrl-Y", nullptr, codeEditor.imCodeEditor.CanRedo()))
+							codeEditor.imCodeEditor.Redo();
+
+						ImGui::Separator();
+
+						if (ImGui::MenuItem("Copy", "Ctrl-C", nullptr, codeEditor.imCodeEditor.HasSelection()))
+							codeEditor.imCodeEditor.Copy();
+						if (ImGui::MenuItem("Cut", "Ctrl-X", nullptr, codeEditor.imCodeEditor.HasSelection()))
+							codeEditor.imCodeEditor.Cut();
+						if (ImGui::MenuItem("Delete", "Del", nullptr, codeEditor.imCodeEditor.HasSelection()))
+							codeEditor.imCodeEditor.Delete();
+						if (ImGui::MenuItem("Paste", "Ctrl-V", nullptr, ImGui::GetClipboardText() != nullptr))
+							codeEditor.imCodeEditor.Paste();
+
+						ImGui::Separator();
+
+						if (ImGui::MenuItem("Select all", nullptr, nullptr))
+							codeEditor.imCodeEditor.SelectAll();
+
+						ImGui::EndMenu();
+					}
+
+					if (ImGui::BeginMenu("View"))
+					{
+						if (ImGui::MenuItem("Dark palette"))
+							codeEditor.imCodeEditor.SetPalette(TextEditor::GetDarkPalette());
+						if (ImGui::MenuItem("Light palette"))
+							codeEditor.imCodeEditor.SetPalette(TextEditor::GetLightPalette());
+						ImGui::EndMenu();
+					}
+					ImGui::EndMenuBar();
+				}
+
+				ImGui::Text("%6d/%-6d %6d lines  | %s | %s | %s | %s", cpos.mLine + 1, cpos.mColumn + 1, codeEditor.imCodeEditor.GetTotalLines(),
+				            codeEditor.imCodeEditor.IsOverwrite() ? "Ovr" : "Ins",
+				            codeEditor.imCodeEditor.CanUndo() ? "*" : " ",
+				            codeEditor.imCodeEditor.GetLanguageDefinition().mName.c_str(), currentComputeShader->name.c_str());
+
+				codeEditor.imCodeEditor.Render("Edit shader",UI::GetContentRegionAvail(), false);
+				if (codeEditor.imCodeEditor.WantSave())
+				{
+					currentComputeShader->SetComputeSource(codeEditor.imCodeEditor.GetText());
+					currentComputeShader->ReloadShader();
+				}
+				UI::End();
+			}
+			UI::Separator();
+
+
+			currentComputeShader->InitTex({128, 128});
+			currentComputeShader->BindShader();
+			uint Result = currentComputeShader->Dispatch();
+			UI::Image((ImTextureID) (size_t) Result, {512, 512});
+			currentComputeShader->UnbindShader();
+		}
+
+
+		UI::End();
 	}
 }
 

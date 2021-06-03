@@ -21,9 +21,11 @@ namespace Solid
         bool        p_open    = true;
         bool        perfOpen  = false;
         bool        demoOpen  = false;
+        bool        computeDemo = false;
 	    bool        colorOpen = false;
 	    bool        openScenePopup = false;
 	    bool        saveScenePopup = false;
+	    std::shared_ptr<ICompute> currentComputeShader = nullptr;
 	    SceneResource* currentScenePtr = nullptr;
 	    SceneResource* choice = nullptr;
 	    std::string str ;
@@ -41,7 +43,16 @@ namespace Solid
         InspectorInterface      inspectorInterface;
         HierarchyTreeInterface  hierarchyTreeInterface;
         ButtonInterface         buttonInterface;
-
+	    struct CodeEditor
+	    {
+		    enum class ECodeType
+		    {
+			    COMPUTE
+		    };
+		    TextEditor imCodeEditor;
+		    ECodeType codeType;
+		    bool isCodeEditorOpen = false;
+	    }codeEditor;
     public:
         EditorInterface();
         explicit EditorInterface(Window* window, Renderer* renderer);
@@ -107,6 +118,11 @@ namespace Solid
          * @brief Draws the additional informations overlay
          */
         void AddInfoOverlay();
+
+	    /**
+		 * @brief Draws the compute Demo overlay
+		 */
+	    void AddComputeOverlay();
 
 
         void LoadSceneCall(Resource* scene);

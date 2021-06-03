@@ -267,34 +267,257 @@ GL::Shader::Shader(ShaderResource *_s) :IShader(EResourceType::Shader)
 	LoadShaderFields();
 }
 
-GL::ComputeShader::ComputeShader(ComputeShaderResource *_cs) :Shader(EResourceType::Compute)
+GL::ComputeShader::ComputeShader(ComputeShaderResource *_cs) : ICompute(EResourceType::Compute)
 {
-    name = _cs->name;
-
+	shader.name = _cs->name;
+	ICompute::name = _cs->name;
     //use binaries if available
 	std::vector<char*> tab;
+	source = _cs;
 	tab.push_back(_cs->ComputeSource.data());
-	ShaderWrapper compute = CreateShader(GL_COMPUTE_SHADER, 1, tab);
-	if(compute.error)
+	Shader::ShaderWrapper computeW = shader.CreateShader(GL_COMPUTE_SHADER, 1, tab);
+	if(computeW.error)
 		return;
-	ProgID = glCreateProgram();
-	glAttachShader(ProgID, compute.id);
-	glLinkProgram(ProgID);
+	shader.ProgID = glCreateProgram();
+	glAttachShader(shader.ProgID, computeW.id);
+	glLinkProgram(shader.ProgID);
+	compute = computeW.id;
 	GLint linkStatus;
-	glGetProgramiv(ProgID, GL_LINK_STATUS, &linkStatus);
+	glGetProgramiv(shader.ProgID, GL_LINK_STATUS, &linkStatus);
 	if (linkStatus == GL_FALSE)
 	{
 
 		GLchar infoLog[1024];
-		glGetProgramInfoLog(ProgID, ARRAYSIZE(infoLog), nullptr, infoLog);
+		glGetProgramInfoLog(shader.ProgID, ARRAYSIZE(infoLog), nullptr, infoLog);
 		Log::Send(infoLog, Log::ELogSeverity::ERROR);
 		//TODO : Cleanup at return
-		compute.error = true;
+		computeW.error = true;
 	}
 
 
 }
 
+void GL::ComputeShader::InitTex(Vec2i size)
+{
+	if(isInit)
+	{
+		shader.BindShader();
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, OutTexId);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, TexSize.x, TexSize.y, 0, GL_RGBA, GL_FLOAT,
+		             NULL);
+		glBindImageTexture(0, OutTexId, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
+		shader.UnbindShader();
+		return;
+	}
+	TexSize = size;
+	shader.BindShader();
+	glGenTextures(1, &OutTexId);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, OutTexId);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, TexSize.x, TexSize.y, 0, GL_RGBA, GL_FLOAT,
+	             NULL);
+	glBindImageTexture(0, OutTexId, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
+	glBindTexture(GL_TEXTURE_2D,0);
+	shader.UnbindShader();
+}
+
+uint GL::ComputeShader::Dispatch()
+{
+	glDispatchCompute((GLuint)512, (GLuint)512, 1);
+	glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+	return OutTexId;
+}
+
+void GL::ComputeShader::ReloadShader()
+{
+	std::vector<char*> fragS;
+	fragS.push_back(source->ComputeSource.data());
+	glShaderSource(compute,1,fragS.data(), nullptr);
+	glCompileShader(compute);
+	GLint success = 0;
+	glGetShaderiv(compute, GL_COMPILE_STATUS, &success);
+	if (success == GL_FALSE)
+	{
+		GLchar infoLog[1024];
+		glGetShaderInfoLog(compute, 1024, nullptr, infoLog);
+		Log::Send(infoLog, Log::ELogSeverity::ERROR);
+	}
+	if (success > 0)
+	{
+		glLinkProgram(shader.ProgID);
+		LoadShaderFields();
+		fs::path p=ResourcesLoader::SolidPath.parent_path();
+		for(auto& elt : source->path)
+		{
+			p.append(elt);
+		}
+		fs::path vert = p;
+
+		vert.append(source->name).append("main.Compute");
+		p.append(source->name + ".SCompute");
+		std::vector<char> buffer;
+
+		source->ToDataBuffer(buffer);
+		std::ofstream file(p, std::fstream::binary | std::fstream::trunc);
+		std::ofstream vertfile(vert, std::fstream::binary | std::fstream::trunc);
+
+		if(file.is_open())
+		{
+			file.write(buffer.data(),buffer.size());
+			file.close();
+		}
+		if(vertfile.is_open())
+		{
+			vertfile.write(source->ComputeSource.data(),source->ComputeSource.size());
+			vertfile.close();
+		}
+
+	}
+}
+
+void GL::ComputeShader::BindShader()
+{
+	shader.BindShader();
+}
+
+void GL::ComputeShader::UnbindShader()
+{
+	shader.UnbindShader();
+}
+
+void GL::ComputeShader::SetFloat(const char *_name, float _value)
+{
+	shader.SetFloat(_name,_value);
+}
+
+void GL::ComputeShader::SetInt(const char *_name, int _value)
+{
+	shader.SetInt(_name,_value);
+}
+
+void GL::ComputeShader::SetBool(const char *_name, bool _value)
+{
+	shader.SetBool(_name,_value);
+}
+
+void GL::ComputeShader::SetVec2(const char *_name, Vec2 _value)
+{
+	shader.SetVec2(_name,_value);
+}
+
+void GL::ComputeShader::SetVec3(const char *_name, Vec3 _value)
+{
+	shader.SetVec3(_name,_value);
+}
+
+void GL::ComputeShader::SetVec4(const char *_name, Vec4 _value)
+{
+	shader.SetVec4(_name,_value);
+}
+
+void GL::ComputeShader::SetMatrix(const char *_name, Mat4<float> _value)
+{
+	shader.SetMatrix(_name,_value);
+}
+
+void GL::ComputeShader::SetFloatArray(const char *_name, int size, float *_value)
+{
+	shader.SetFloatArray(_name,size,_value);
+}
+
+void GL::ComputeShader::SetIntArray(const char *_name, int size, int *_value)
+{
+	shader.SetIntArray(_name,size,_value);
+}
+
+void GL::ComputeShader::SetVec3Array(const char *_name, int size, Vec3 *_value)
+{
+	shader.SetVec3Array(_name,size,_value);
+}
+
+void GL::ComputeShader::SetMatrixArray(const char *_name, int size, Mat4<float> *_value)
+{
+	shader.SetMatrixArray(_name,size,_value);
+}
+
+void GL::ComputeShader::GetIntArray(const char *_name, int size, int *_value)
+{
+	shader.GetIntArray(_name,size,_value);
+}
+
+void GL::ComputeShader::GetInt(const char *_name, int *_value)
+{
+	shader.GetInt(_name,_value);
+}
+
+void GL::ComputeShader::LoadShaderFields()
+{
+	shader.LoadShaderFields();
+}
+
+std::vector<ShaderUniform> &GL::ComputeShader::GetUniformList()
+{
+	return shader.GetUniformList();
+}
+
+void GL::ComputeShader::SetMVP(Transform &_model, Camera &_camera) const
+{
+	shader.SetMVP(_model,_camera);
+}
+
+void GL::ComputeShader::SetLights(Camera &_camera) const
+{
+	shader.SetLights(_camera);
+}
+
+void GL::ComputeShader::SetAnim(Animation *_anim) const
+{
+	shader.SetAnim(_anim);
+}
+
+void GL::ComputeShader::SetMaterial(const char *_name)
+{
+	shader.SetMaterial(_name);
+}
+
+std::string &GL::ComputeShader::GetFragSource()
+{
+	return shader.GetFragSource();
+}
+
+std::string &GL::ComputeShader::GetVertSource()
+{
+	return shader.GetVertSource();
+}
+
+void GL::ComputeShader::SetFragSource(const std::string &_src)
+{
+	shader.SetFragSource(_src);
+}
+
+void GL::ComputeShader::SetVertSource(const std::string &_src)
+{
+	shader.SetVertSource(_src);
+}
+
+void GL::ComputeShader::SetComputeSource(const std::string &_src)
+{
+	source->ComputeSource = _src;
+}
+
+std::string &GL::ComputeShader::GetComputeSource()
+{
+	return source->ComputeSource;
+}
 
 
 //+Type = GL_VERTEX_SHADER / GL_FRAGMENT_SHADER / GL_COMPUTE_SHADER
