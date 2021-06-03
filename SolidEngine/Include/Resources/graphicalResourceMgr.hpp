@@ -17,6 +17,7 @@ namespace Solid
 		//protected members
 		std::unordered_map<std::string, std::shared_ptr<IMesh>> Meshes;
 		std::unordered_map<std::string, std::shared_ptr<IShader>> Shaders;
+		std::unordered_map<std::string, std::shared_ptr<ICompute>> Computes;
         std::unordered_map<std::string, std::shared_ptr<ITexture>> textures;
         std::unordered_map<std::string, std::shared_ptr<ICubemap>> cubemaps;
 		ResourceManager* resourceMgr = nullptr;
@@ -59,13 +60,13 @@ namespace Solid
 					break;
 			}
 		}
-		std::shared_ptr<IShader> StoreShader(ComputeShaderResource* _shader)
+		std::shared_ptr<ICompute> StoreShader(ComputeShaderResource* _shader)
 		{
 			switch (renderer->GetRenderType())
 			{
 				case ERendererType::OpenGl45:
 				{
-					auto it =Shaders.emplace(_shader->name,std::make_shared<GL::ComputeShader>());
+					auto it =Computes.emplace(_shader->name,std::make_shared<GL::ComputeShader>());
 					return it.first->second;
 					break;
 				}
@@ -150,15 +151,25 @@ namespace Solid
 			if(it == Shaders.end())
 			{
 				ShaderResource* s = resourceMgr->GetRawShaderByName(_name);
-				ComputeShaderResource* cs = nullptr;
 				if(s == nullptr)
 				{
-					cs = resourceMgr->GetRawComputeByName(_name);
-					if(cs== nullptr)
-						return nullptr;
-					return Shaders.emplace(cs->name, std::make_shared<GL::ComputeShader>(cs)).first->second;
+					return nullptr;
 				}
 				return Shaders.emplace(s->name, std::make_shared<GL::Shader>(s)).first->second;
+			}
+			return it->second;
+		}
+		std::shared_ptr<ICompute> GetCompute(const char* _name)
+		{
+			auto it = Computes.find(_name);
+			if(it == Computes.end())
+			{
+				ComputeShaderResource* cs = resourceMgr->GetRawComputeByName(_name);
+				if(cs == nullptr)
+				{
+					return nullptr;
+				}
+				return Computes.emplace(cs->name, std::make_shared<GL::ComputeShader>(cs)).first->second;
 			}
 			return it->second;
 		}
