@@ -19,6 +19,9 @@ namespace Solid SLDNamespace()
         int health = 0;
 
         SLDField()
+        float bulletSpeed = 0;
+
+        SLDField()
         float mouseSensitivity = 0;
 	private:
 		Engine* engine = nullptr;
@@ -51,6 +54,7 @@ namespace Solid SLDNamespace()
 	    void MoveLeft();
 	    void MoveRight();
 	    void Jump();
+	    void Dash();
 
 	    void Fire();
 

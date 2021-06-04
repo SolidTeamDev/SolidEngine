@@ -21,8 +21,9 @@ namespace Solid SLDNamespace()
     	virtual void Init() {};
     	virtual void Release() { };
     	GameObject* gameObject = nullptr;
-    	Components& operator=(const Components&)
+    	Components& operator=(const Components& _c)
 	    {
+            gameObject =_c.gameObject;
     		return *this;
 	    }
 		Components_GENERATED
