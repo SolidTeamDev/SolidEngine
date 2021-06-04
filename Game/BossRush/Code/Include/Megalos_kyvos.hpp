@@ -10,11 +10,19 @@ namespace Solid SLDNamespace()
 	public:
 		
 	private:
+	    enum class EStepAttack
+	    {
+	        One,
+	        Two,
+	        Three,
+	        None
+	    };
 	    struct Data
 	    {
             int Index;
 	        float Ratio;
 	        Vec3  pos = Vec3::Zero;
+	        EStepAttack Step = EStepAttack::None;
 	    };
 		std::vector<GameObject*> CubeBullets;
 	    std::vector<Data>       DataBullets;
