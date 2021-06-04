@@ -60,6 +60,7 @@ namespace Solid
 	                 GameObject *go, Components *cmp, std::size_t FieldNum, std::size_t cmpNameSize);
 
 	    void AddAllComps(GameObject *elt, std::vector<char> &buffer, uint64_t &ReadPos);
+	    void setJsonSave(json &j, GameObject *elt, std::string &path);
     public:
     	//Engine** test = &instance;
         Window* window;

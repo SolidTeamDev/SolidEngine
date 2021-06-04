@@ -549,23 +549,14 @@ namespace Solid
 		j = j.flatten();
 		std::string elt = "/Scene";
 		GameObject* world = ecsManager.GetWorld();
-		std::function<void(json&, GameObject*, std::string&)> Lambda = [&](json& j, GameObject* elt, std::string& path){
 
-			for(GameObject* sub : elt->childs)
-			{
-				std::string subP = path + "/{GameObject_"+ std::to_string(sub->GetEntity()) + "}" ;
-				j[subP + "/Name"] = sub->name;
-				Lambda(std::ref(j), sub, std::ref(subP));
-			}
-
-		};
 		std::string subP = elt + "/{SkyBoxName}" ;
 		if(renderer->_map != nullptr)
 			j[subP] = renderer->_map->name;
 		else
 			j[subP] = "NO_SKYBOX";
 
-		Lambda(std::ref(j), world, std::ref(elt));
+		setJsonSave(std::ref(j), world, std::ref(elt));
 		j = j.unflatten();
 
 		std::ofstream file(p, std::ifstream::binary | std::ifstream::trunc);
@@ -1048,6 +1039,19 @@ namespace Solid
 		renderer->DrawSkybox(*activeCamera);
 		renderer->EndFramebuffer();
 		audioSystem->Update(*activeCamera);
+	}
+
+	void Engine::setJsonSave(json &j, GameObject *elt, std::string &path)
+	{
+
+    	for(GameObject* sub : elt->childs)
+    	{
+    		std::string subP = path + "/{GameObject_"+ std::to_string(sub->GetEntity()) + "}" ;
+    		j[subP + "/Name"] = sub->name;
+		    setJsonSave(std::ref(j), sub, std::ref(subP));
+    	}
+
+
 	}
 
 } //!namespace

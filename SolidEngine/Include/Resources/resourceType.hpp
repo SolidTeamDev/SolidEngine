@@ -14,7 +14,7 @@
 
 namespace fs = std::filesystem;
 namespace Solid {
-	typedef nlohmann::json json;
+	typedef nlohmann::ordered_json json ;
 	class ITexture;
 	class IShader;
 
