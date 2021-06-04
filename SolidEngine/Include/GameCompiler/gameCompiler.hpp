@@ -38,6 +38,7 @@ namespace Solid
 	    fs::path IncludePath = "";
 	    fs::path DllPath = "";
 	    fs::path vcVarsP = "";
+	    std::string MainScene = "";
 	    HMODULE hGetProcIDDLL = nullptr;
 
     private:
@@ -52,7 +53,7 @@ namespace Solid
 	    void CreateToml(fs::path& p);
 	    void ReloadCmake();
 	    void HotReload();
-	    void Build();
+	    bool Build();
 	    void CreateScript(const std::string& _name);
 	    void updateVCPath();
 	    const rfk::Namespace * GetNamespace(std::string _str);

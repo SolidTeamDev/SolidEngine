@@ -186,6 +186,8 @@ namespace Solid {
             UI::ShowDemoWindow();
         if (computeDemo)
         	AddComputeOverlay();
+        if(openBuildMenu)
+        	DrawBuildMenu();
 
 
 
@@ -249,8 +251,7 @@ namespace Solid {
 
 	            if (UI::MenuItem("Windows"))
 	            {
-		            GameCompiler::GetInstance()->Build();
-		            Log::Send("Building for Windows", Log::ELogSeverity::ERROR);
+		           openBuildMenu =true;
 	            }
 	            if (UI::MenuItem("Update VC compiler"))
 	            {
@@ -685,6 +686,55 @@ namespace Solid {
 	{
 		if(_ptr == EditorInterface::selectedGO)
 			EditorInterface::selectedGO = nullptr;
+	}
+
+	void EditorInterface::DrawBuildMenu()
+	{
+		UI::SetNextWindowSize(ImVec2(600, 600));
+		//UI::SetNextWindowViewport(UI::GetID(UI::GetMainViewport()));
+
+		ImGuiWindowFlags flags = 0;
+		flags |= ImGuiWindowFlags_NoResize;// | ImGuiWindowFlags_NoCollapse;
+		//flags |= ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDocking;
+		//flags |= ImGuiWindowFlags_NoTitleBar;
+
+		UI::Begin("Packaging Project", &openBuildMenu, flags);
+		Engine* engine = Engine::GetInstance();
+		std::string sceneName = GameCompiler::GetInstance()->MainScene;
+		bool combo =UI::BeginCombo("##SCENE", sceneName.c_str());
+		if(combo)
+		{
+			auto* sceneList = engine->resourceManager.GetResourcesVecByType<SceneResource>();
+
+			for(auto& scene : *sceneList)
+			{
+				bool selected = (sceneName == scene.second->name);
+				if(UI::Selectable(scene.second->name.c_str(), selected))
+				{
+					GameCompiler::GetInstance()->MainScene = scene.second->name;
+				}
+				if(selected)
+					UI::SetItemDefaultFocus();
+			}
+
+			UI::EndCombo();
+		}
+
+		if(UI::Button("Begin Build For Windows"))
+		{
+			SceneResource* scene =Engine::GetInstance()->resourceManager.GetSceneByName(GameCompiler::GetInstance()->MainScene.c_str());
+			if(scene != nullptr)
+			{
+				GameCompiler::GetInstance()->Build();
+				Log::Send("Building for Windows", Log::ELogSeverity::ERROR);
+			}
+			else
+			{
+				Log::Send("BUILD FAILED : NO MAIN SCENE CHOSEN OR SCENE NAME IS INVALID", Log::ELogSeverity::ERROR);
+			}
+		}
+
+		UI::End();
 	}
 }
 
