@@ -7,6 +7,7 @@ namespace Solid
     /// DeltaTime
     double Time::lastTime = 0;
     double Time::deltaTime = 0;
+    double Time::globalTime = 0;
 
     /// Fps
     int Time::fps = 0;
@@ -16,6 +17,7 @@ namespace Solid
 
     void Time::Update()
     {
+        globalTime += glfwGetTime();
         UpdateDeltaTime();
         UpdateFps();
     }
@@ -46,6 +48,11 @@ namespace Solid
     double Time::DeltaTime()
     {
         return deltaTime;
+    }
+
+    double Time::GlobalTime()
+    {
+        return globalTime;
     }
 
     int Time::Fps()

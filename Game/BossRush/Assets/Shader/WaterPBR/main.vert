@@ -22,7 +22,3 @@ void main()
     time = _GlobalTime;
     gl_Position = proj * view * vec4(vWorldPos, 1.0f);
 }
-
-
-
-

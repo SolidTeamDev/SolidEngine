@@ -129,7 +129,7 @@ Solid::GameObject *Solid::SceneGraphManager::GetNodeFromEntity(Solid::Entity _en
 }
 
 template<class T>
-void Solid::SceneGraphManager::AddComp(const std::string &className, std::vector<char> &buffer, std::uint64_t &readPos,
+T * Solid::SceneGraphManager::AddComp(const std::string &className, std::vector<char> &buffer, std::uint64_t &readPos,
                                        GameObject *go, Components *cmp, std::size_t FieldNum, std::size_t cmpNameSize)
 {
 	T *t = Engine::GetInstance()->ecsManager.AddComponent(go, *(T *) cmp);
@@ -149,22 +149,27 @@ void Solid::SceneGraphManager::AddComp(const std::string &className, std::vector
 		std::size_t memSize = 0;
 		//Get Field Data
 		const rfk::Field *f = t->getArchetype().getField(Name);
+		std::size_t fieldSize = 0;
+		ResourcesLoader::ReadFromBuffer(buffer.data(), &fieldSize, sizeof(std::size_t),
+		                                readPos, buffer.size());
+		if(f == nullptr)
+		{
+			readPos+=fieldSize;
+			continue;
+		}
 		if (f->type.archetype->name == "String")
 		{
-			ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t),
-			                                readPos, buffer.size());
 			String *str = (String *) f->getDataAddress(t);
-			str->resize(memSize / sizeof(std::string::value_type));
+			str->resize(fieldSize / sizeof(std::string::value_type));
 
-			ResourcesLoader::ReadFromBuffer(buffer.data(), str->data(), memSize, readPos, buffer.size());
+			ResourcesLoader::ReadFromBuffer(buffer.data(), str->data(), fieldSize, readPos, buffer.size());
 		}
 		else if (f->type.archetype->name == "vectorStr")
 		{
 			std::size_t vecSize = 0;
+			vectorStr *vstr = (vectorStr *) f->getDataAddress(t);
 			ResourcesLoader::ReadFromBuffer(buffer.data(), &vecSize, sizeof(std::size_t),
 			                                readPos, buffer.size());
-			vectorStr *vstr = (vectorStr *) f->getDataAddress(t);
-
 			for (int k = 0; k < vecSize; ++k)
 			{
 				String str;
@@ -178,26 +183,18 @@ void Solid::SceneGraphManager::AddComp(const std::string &className, std::vector
 		}
 		else
 		{
-
-			ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t),
-			                                readPos, buffer.size());
-			char *buf = new char[memSize]();
-			ResourcesLoader::ReadFromBuffer(buffer.data(), buf, memSize, readPos, buffer.size());
-
 			if (isNull == 256)
-			{
-				std::string s = std::string(buf, memSize);
-				f->setData(t, s);
-			}
+			{}
 			else
-			{
+			{}
+			char *buf = new char[fieldSize]();
+			ResourcesLoader::ReadFromBuffer(buffer.data(), buf, fieldSize, readPos, buffer.size());
 
-				f->setData(t, ((void *) buf), memSize);
-			}
-
-
+			f->setData(t, ((void *) buf), fieldSize);
 			delete[] buf;
+
 		}
+
 
 		if (className == "Transform" && Name == "rotation")
 		{
@@ -208,6 +205,7 @@ void Solid::SceneGraphManager::AddComp(const std::string &className, std::vector
 	if(className.find("Collider") != std::string::npos)
 		t->Release();
 	t->Init();
+	return t;
 
 }
 
@@ -239,6 +237,10 @@ void Solid::SceneGraphManager::AddAllComps(GameObject *elt, std::vector<char> &b
 			std::size_t FieldNum = 0;
 			ResourcesLoader::ReadFromBuffer(buffer.data(), &FieldNum, sizeof(std::size_t), readPos, buffer.size());
 
+
+			//get SkipSize
+			std::size_t SkipSize = 0;
+			ResourcesLoader::ReadFromBuffer(buffer.data(), &SkipSize, sizeof(std::size_t), readPos, buffer.size());
 
 			rfk::Class const *myClass = n->getClass(className);
 			rfk::Namespace const* ns = Compiler->GetNamespace("Solid");
@@ -292,7 +294,9 @@ void Solid::SceneGraphManager::AddAllComps(GameObject *elt, std::vector<char> &b
 				}
 				else if (className == "Camera")
 				{
-					AddComp<Camera>(className, buffer, readPos, go, cmp,FieldNum, cmpNameSize);
+					Camera* cam = AddComp<Camera>(className, buffer, readPos, go, cmp,FieldNum, cmpNameSize);
+					if(cam->IsActive())
+						cam->SetActiveCamera();
 					delete cmp;
 				}
 				else if (className == "Light")
@@ -616,6 +620,7 @@ void Solid::SceneGraphManager::AddAllComps(GameObject *elt, std::vector<char> &b
 				}
 				else if (ns != nullptr && myClass->isSubclassOf(*ns->getClass("Script")))
 				{
+
 					if(!ecsManager.GotComponent<ScriptList>(go->GetEntity()))
 					{
 						ecsManager.AddComponent(go, ScriptList());
@@ -636,22 +641,69 @@ void Solid::SceneGraphManager::AddAllComps(GameObject *elt, std::vector<char> &b
 						ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(short), readPos, buffer.size());
 						std::size_t memSize = 0;
 						//Get Field Data
-						ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t), readPos, buffer.size());
-						if (isNull == 256)
-						{}
-						else
-						{}
-						char *buf = new char[memSize]();
-						ResourcesLoader::ReadFromBuffer(buffer.data(), buf, memSize, readPos, buffer.size());
+
 						const rfk::Field *f = s->getArchetype().getField(Name, rfk::EFieldFlags::Default,
-																		 true);
-						f->setData(s, ((void *) buf), memSize);
-						delete[] buf;
+						                                                 true);
+
+						std::size_t fieldSize = 0;
+						ResourcesLoader::ReadFromBuffer(buffer.data(), &fieldSize, sizeof(std::size_t),
+						                                readPos, buffer.size());
+
+						if(f == nullptr)
+						{
+							readPos += fieldSize;
+							continue;
+						}
+
+						if (f->type.archetype->name == "String")
+						{
+							String *str = (String *) f->getDataAddress(s);
+							str->resize(fieldSize / sizeof(std::string::value_type));
+
+							ResourcesLoader::ReadFromBuffer(buffer.data(), str->data(), fieldSize, readPos, buffer.size());
+						}
+						else if (f->type.archetype->name == "vectorStr")
+						{
+							std::size_t vecSize = 0;
+							vectorStr *vstr = (vectorStr *) f->getDataAddress(s);
+							ResourcesLoader::ReadFromBuffer(buffer.data(), &vecSize, sizeof(std::size_t),
+							                                readPos, buffer.size());
+							for (int k = 0; k < vecSize; ++k)
+							{
+								String str;
+								ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t),
+								                                readPos, buffer.size());
+								str.resize(memSize);
+								ResourcesLoader::ReadFromBuffer(buffer.data(), str.data(), memSize, readPos, buffer.size());
+
+								vstr->push_back(std::move(str));
+							}
+						}
+						else
+						{
+							if (isNull == 256)
+							{}
+							else
+							{}
+							char *buf = new char[fieldSize]();
+							ResourcesLoader::ReadFromBuffer(buffer.data(), buf, fieldSize, readPos, buffer.size());
+
+							f->setData(s, ((void *) buf), fieldSize);
+							delete[] buf;
+
+						}
+
+
+
+
 
 					}
 				}
 			}
-
+			else
+			{
+				readPos+= SkipSize;
+			}
 		}
 	}
 	//get num of Childs

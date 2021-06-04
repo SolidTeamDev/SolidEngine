@@ -53,6 +53,7 @@ namespace Solid
 		    ECodeType codeType;
 		    bool isCodeEditorOpen = false;
 	    }codeEditor;
+	    bool openBuildMenu = false;
     public:
         EditorInterface();
         explicit EditorInterface(Window* window, Renderer* renderer);
@@ -124,6 +125,7 @@ namespace Solid
 		 */
 	    void AddComputeOverlay();
 
+	    void DrawBuildMenu();
 
         void LoadSceneCall(Resource* scene);
 

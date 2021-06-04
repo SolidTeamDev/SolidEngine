@@ -226,22 +226,27 @@ namespace Solid
 			std::size_t memSize = 0;
 			//Get Field Data
 			const rfk::Field *f = t->getArchetype().getField(Name);
+			std::size_t fieldSize = 0;
+			ResourcesLoader::ReadFromBuffer(buffer.data(), &fieldSize, sizeof(std::size_t),
+			                                readPos, buffer.size());
+			if(f == nullptr)
+			{
+				readPos+=fieldSize;
+				continue;
+			}
 			if (f->type.archetype->name == "String")
 			{
-				ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t),
-				                                readPos, buffer.size());
 				String *str = (String *) f->getDataAddress(t);
-				str->resize(memSize / sizeof(std::string::value_type));
+				str->resize(fieldSize / sizeof(std::string::value_type));
 
-				ResourcesLoader::ReadFromBuffer(buffer.data(), str->data(), memSize, readPos, buffer.size());
+				ResourcesLoader::ReadFromBuffer(buffer.data(), str->data(), fieldSize, readPos, buffer.size());
 			}
 			else if (f->type.archetype->name == "vectorStr")
 			{
 				std::size_t vecSize = 0;
+				vectorStr *vstr = (vectorStr *) f->getDataAddress(t);
 				ResourcesLoader::ReadFromBuffer(buffer.data(), &vecSize, sizeof(std::size_t),
 				                                readPos, buffer.size());
-				vectorStr *vstr = (vectorStr *) f->getDataAddress(t);
-
 				for (int k = 0; k < vecSize; ++k)
 				{
 					String str;
@@ -255,26 +260,18 @@ namespace Solid
 			}
 			else
 			{
-
-				ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t),
-				                                readPos, buffer.size());
-				char *buf = new char[memSize]();
-				ResourcesLoader::ReadFromBuffer(buffer.data(), buf, memSize, readPos, buffer.size());
-
 				if (isNull == 256)
-				{
-					std::string s = std::string(buf, memSize);
-					f->setData(t, s);
-				}
+				{}
 				else
-				{
+				{}
+				char *buf = new char[fieldSize]();
+				ResourcesLoader::ReadFromBuffer(buffer.data(), buf, fieldSize, readPos, buffer.size());
 
-					f->setData(t, ((void *) buf), memSize);
-				}
-
-
+				f->setData(t, ((void *) buf), fieldSize);
 				delete[] buf;
+
 			}
+
 
 			if (className == "Transform" && Name == "rotation")
 			{
@@ -316,6 +313,10 @@ namespace Solid
 					//get Field Num
 					std::size_t FieldNum = 0;
 					ResourcesLoader::ReadFromBuffer(buffer.data(), &FieldNum, sizeof(std::size_t), readPos, buffer.size());
+
+					//get SkipSize
+					std::size_t SkipSize = 0;
+					ResourcesLoader::ReadFromBuffer(buffer.data(), &SkipSize, sizeof(std::size_t), readPos, buffer.size());
 
 
 					rfk::Class const *myClass = n->getClass(className);
@@ -722,22 +723,29 @@ namespace Solid
 								const rfk::Field *f = s->getArchetype().getField(Name, rfk::EFieldFlags::Default,
 								                                                 true);
 
+								std::size_t fieldSize = 0;
+								ResourcesLoader::ReadFromBuffer(buffer.data(), &fieldSize, sizeof(std::size_t),
+								                                                        readPos, buffer.size());
+
+								if(f == nullptr)
+								{
+									readPos += fieldSize;
+									continue;
+								}
+
 								if (f->type.archetype->name == "String")
 								{
-									ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t),
-									                                readPos, buffer.size());
 									String *str = (String *) f->getDataAddress(s);
-									str->resize(memSize / sizeof(std::string::value_type));
+									str->resize(fieldSize / sizeof(std::string::value_type));
 
-									ResourcesLoader::ReadFromBuffer(buffer.data(), str->data(), memSize, readPos, buffer.size());
+									ResourcesLoader::ReadFromBuffer(buffer.data(), str->data(), fieldSize, readPos, buffer.size());
 								}
 								else if (f->type.archetype->name == "vectorStr")
 								{
 									std::size_t vecSize = 0;
+									vectorStr *vstr = (vectorStr *) f->getDataAddress(s);
 									ResourcesLoader::ReadFromBuffer(buffer.data(), &vecSize, sizeof(std::size_t),
 									                                readPos, buffer.size());
-									vectorStr *vstr = (vectorStr *) f->getDataAddress(s);
-
 									for (int k = 0; k < vecSize; ++k)
 									{
 										String str;
@@ -751,16 +759,14 @@ namespace Solid
 								}
 								else
 								{
-									ResourcesLoader::ReadFromBuffer(buffer.data(), &memSize, sizeof(std::size_t),
-									                                readPos, buffer.size());
 									if (isNull == 256)
 									{}
 									else
 									{}
-									char *buf = new char[memSize]();
-									ResourcesLoader::ReadFromBuffer(buffer.data(), buf, memSize, readPos, buffer.size());
+									char *buf = new char[fieldSize]();
+									ResourcesLoader::ReadFromBuffer(buffer.data(), buf, fieldSize, readPos, buffer.size());
 
-									f->setData(s, ((void *) buf), memSize);
+									f->setData(s, ((void *) buf), fieldSize);
 									delete[] buf;
 
 								}
@@ -772,7 +778,10 @@ namespace Solid
 							}
 						}
 					}
-
+					else
+					{
+						readPos+= SkipSize;
+					}
 				}
 				AddAllComps(go, buffer, readPos);
 			}
@@ -1077,6 +1086,74 @@ namespace Solid
 						//store num of fields
 						std::size_t numFields = script->getArchetype().fields.size();
 						ResourcesLoader::Append(buffer, &numFields, sizeof(std::size_t));
+						//calc skip size
+						std::size_t skipSize = 0;
+						for(auto& cField : script->getArchetype().fields)//2 cField var WARN
+						{
+							std::size_t size = 0;
+							size = cField.name.size()*sizeof(std::string::value_type);
+							//store field name / string
+							skipSize += sizeof(std::size_t);
+							skipSize +=  size;
+							short isNull = 128;
+							if(cField.type.archetype == nullptr)
+							{
+								isNull = 256;
+								std::string str = cField.getData<std::string>(script);
+								std::size_t strS =  str.size()*sizeof(std::string::value_type);
+								//store isNull
+								skipSize += sizeof(short);
+								//store field data
+								skipSize +=  sizeof(std::size_t);
+								skipSize +=  strS;
+							}
+							else
+							{
+								skipSize +=  sizeof(short);
+								if(cField.type.archetype->name == "String")
+								{
+									String* str = (String*)cField.getDataAddress(script);
+									size = str->size()*sizeof(std::string::value_type);
+									skipSize +=  sizeof(std::size_t);
+									skipSize +=  size;
+								}
+								else if(cField.type.archetype->name == "vectorStr")
+								{
+									vectorStr* vstr = (vectorStr*)cField.getDataAddress(cmp);
+									size = vstr->size();
+									std::size_t fieldsize = sizeof(std::size_t);
+									for(auto& str : *vstr)
+									{
+										fieldsize += str.size()*sizeof(std::string::value_type);
+										fieldsize += sizeof(std::size_t);
+									}
+
+									skipSize +=  sizeof(std::size_t);
+
+									skipSize +=  sizeof(std::size_t);
+									for(auto& str : *vstr)
+									{
+										std::size_t strSize = str.size()*sizeof(std::string::value_type);
+										skipSize += sizeof(std::size_t);
+										skipSize +=  strSize;
+									}
+								}
+								else
+								{
+									size = cField.type.archetype->memorySize;
+									//store isNull
+									//store field data
+									skipSize += sizeof(std::size_t);
+									skipSize += size;
+
+								}
+							}
+
+						}
+
+						ResourcesLoader::Append(buffer, &skipSize, sizeof(std::size_t));
+
+
 						for(auto& cField : script->getArchetype().fields)//2 cField var WARN
 						{
 							std::size_t size = 0;
@@ -1108,8 +1185,17 @@ namespace Solid
 								}
 								else if(cField.type.archetype->name == "vectorStr")
 								{
-									vectorStr* vstr = (vectorStr*)cField.getDataAddress(script);
+									vectorStr* vstr = (vectorStr*)cField.getDataAddress(cmp);
 									size = vstr->size();
+									std::size_t fieldsize = sizeof(std::size_t);
+									for(auto& str : *vstr)
+									{
+										fieldsize += str.size()*sizeof(std::string::value_type);
+										fieldsize += sizeof(std::size_t);
+									}
+
+									ResourcesLoader::Append(buffer, &fieldsize, sizeof(std::size_t));
+
 									ResourcesLoader::Append(buffer, &size, sizeof(std::size_t));
 									for(auto& str : *vstr)
 									{
@@ -1146,14 +1232,189 @@ namespace Solid
 					//store num of fields
 					std::size_t numFields = 0;
 					ResourcesLoader::Append(buffer, &numFields, sizeof(std::size_t));
-
 					ParticleEffect* effect = (ParticleEffect*)cmp;
+					std::size_t skipSize = 0;
+
+
+					std::size_t isNull = (effect->GetSystem() != nullptr) ? 128 : 256;
+					skipSize += sizeof(std::size_t);
+					if(isNull == 128)
+					{
+						auto ptr = effect->GetSystem();
+						skipSize +=  sizeof(std::size_t);
+
+					}
+					isNull = (effect->GetEmitter() != nullptr) ? 128 : 256;
+					skipSize +=  sizeof(std::size_t);
+					if(isNull == 128)
+					{
+						auto ptr = effect->GetEmitter();
+						skipSize +=  sizeof(float);
+
+					}
+					isNull = (effect->GetParticleTex() != nullptr) ? 128 : 256;
+					skipSize += sizeof(std::size_t);
+					if(isNull == 128)
+					{
+						auto ptr = effect->GetParticleTex();
+						cmpNameSize = ptr->name.size()*sizeof(std::string::value_type);
+						skipSize += sizeof(std::size_t);
+						skipSize += ( cmpNameSize);
+
+					}
+					isNull = (effect->GetRenderer() != nullptr) ? 128 : 256;
+					skipSize += sizeof(std::size_t);
+					if(isNull == 128)
+					{
+						auto ptr = effect->GetRenderer();
+					}
+					isNull = (effect->velFromPosGen != nullptr) ? 128 : 256;
+					skipSize +=  sizeof(std::size_t);
+					if(isNull == 128)
+					{
+						auto ptr = effect->velFromPosGen;
+						skipSize +=  sizeof(Vec4);
+						skipSize +=  sizeof(float);
+						skipSize += sizeof(float);
+					}
+					isNull = (effect->colGen != nullptr) ? 128 : 256;
+					skipSize += sizeof(std::size_t);
+					if(isNull == 128)
+					{
+						auto ptr = effect->colGen;
+						skipSize +=  sizeof(Vec4);
+						skipSize +=  sizeof(Vec4);
+						skipSize +=  sizeof(Vec4);
+						skipSize +=  sizeof(Vec4);
+					}
+					isNull = (effect->sphereVelGen != nullptr) ? 128 : 256;
+					skipSize +=  sizeof(std::size_t);
+					if(isNull == 128)
+					{
+						auto ptr = effect->sphereVelGen;
+						skipSize += sizeof(float);
+						skipSize +=  sizeof(float);
+
+					}
+					isNull = (effect->spherePosGen != nullptr) ? 128 : 256;
+					skipSize +=  sizeof(std::size_t);
+					if(isNull == 128)
+					{
+						auto ptr = effect->spherePosGen;
+						skipSize +=  sizeof(Vec4);
+						skipSize +=  sizeof(float);
+						skipSize +=  sizeof(float);
+						skipSize += sizeof(float);
+
+					}
+					isNull = (effect->timeGen != nullptr) ? 128 : 256;
+					skipSize +=  sizeof(std::size_t);
+					if(isNull == 128)
+					{
+						auto ptr = effect->timeGen;
+						skipSize +=  sizeof(float);
+						skipSize +=  sizeof(float);
+
+
+					}
+					isNull = (effect->velGen != nullptr) ? 128 : 256;
+					skipSize += sizeof(std::size_t);
+					if(isNull == 128)
+					{
+						auto ptr = effect->velGen;
+						skipSize +=  sizeof(Vec4);
+						skipSize +=  sizeof(Vec4);
+
+					}
+					isNull = (effect->boxPosGen != nullptr) ? 128 : 256;
+					skipSize +=  sizeof(std::size_t);
+					if(isNull == 128)
+					{
+						auto ptr = effect->boxPosGen;
+						skipSize +=  sizeof(Vec4);
+						skipSize +=  sizeof(Vec4);
+
+					}
+					isNull = (effect->killerZoneUpdater != nullptr) ? 128 : 256;
+					skipSize +=  sizeof(std::size_t);
+					if(isNull == 128)
+					{
+						auto ptr = effect->killerZoneUpdater;
+						skipSize += sizeof(Vec3);
+						skipSize +=  sizeof(Vec3);
+
+					}
+					isNull = (effect->attractorUpdater != nullptr) ? 128 : 256;
+					skipSize +=  sizeof(std::size_t);
+					if(isNull == 128)
+					{
+						auto ptr = effect->attractorUpdater;
+						cmpNameSize = ptr->attractors.size();
+						skipSize +=  sizeof(std::size_t);
+						skipSize += ( sizeof(Vec4) * cmpNameSize);
+
+					}
+					isNull = (effect->velColUpdater != nullptr) ? 128 : 256;
+					skipSize +=  sizeof(std::size_t);
+					if(isNull == 128)
+					{
+						auto ptr = effect->velColUpdater;
+						skipSize +=  sizeof(Vec4);
+						skipSize +=  sizeof(Vec4);
+
+					}
+					isNull = (effect->posColUpdater != nullptr) ? 128 : 256;
+					skipSize +=  sizeof(std::size_t);
+					if(isNull == 128)
+					{
+						auto ptr = effect->posColUpdater;
+						skipSize +=  sizeof(Vec4);
+						skipSize += sizeof(Vec4);
+
+					}
+					isNull = (effect->colorUpdater != nullptr) ? 128 : 256;
+					skipSize +=  sizeof(std::size_t);
+					if(isNull == 128)
+					{
+						auto ptr = effect->colorUpdater;
+
+					}
+					isNull = (effect->eulerUpdater != nullptr) ? 128 : 256;
+					skipSize +=  sizeof(std::size_t);
+					if(isNull == 128)
+					{
+						auto ptr = effect->eulerUpdater;
+						skipSize +=  sizeof(Vec4);
+
+					}
+					isNull = (effect->floorUpdater != nullptr) ? 128 : 256;
+					skipSize +=  sizeof(std::size_t);
+					if(isNull == 128)
+					{
+						auto ptr = effect->floorUpdater;
+						skipSize +=  sizeof(float);
+						skipSize +=  sizeof(float);
+
+
+					}
+					isNull = (effect->timeUpdater != nullptr) ? 128 : 256;
+					skipSize +=  sizeof(std::size_t);
+					if(isNull == 128)
+					{
+						auto ptr = effect->timeUpdater;
+
+					}
+
+
+					ResourcesLoader::Append(buffer, &skipSize, sizeof(std::size_t));
+
+
 
 
 					std::size_t numP = effect->particlesSize;
 					ResourcesLoader::Append(buffer, &numP, sizeof(std::size_t));
 
-					std::size_t isNull = (effect->GetSystem() != nullptr) ? 128 : 256;
+					isNull = (effect->GetSystem() != nullptr) ? 128 : 256;
 					ResourcesLoader::Append(buffer, &isNull, sizeof(std::size_t));
 					if(isNull == 128)
 					{
@@ -1338,6 +1599,73 @@ namespace Solid
 					//store num of fields
 					std::size_t numFields = cmp->getArchetype().fields.size();
 					ResourcesLoader::Append(buffer, &numFields, sizeof(std::size_t));
+					std::size_t skipSize = 0;
+					for(auto& cField : cmp->getArchetype().fields)//2 cField var WARN
+					{
+						std::size_t size = 0;
+						size = cField.name.size()*sizeof(std::string::value_type);
+						//store field name / string
+						skipSize += sizeof(std::size_t);
+						skipSize +=  size;
+						short isNull = 128;
+						if(cField.type.archetype == nullptr)
+						{
+							isNull = 256;
+							std::string str = cField.getData<std::string>(cmp);
+							std::size_t strS =  str.size()*sizeof(std::string::value_type);
+							//store isNull
+							skipSize += sizeof(short);
+							//store field data
+							skipSize +=  sizeof(std::size_t);
+							skipSize +=  strS;
+						}
+						else
+						{
+							skipSize +=  sizeof(short);
+							if(cField.type.archetype->name == "String")
+							{
+								String* str = (String*)cField.getDataAddress(cmp);
+								size = str->size()*sizeof(std::string::value_type);
+								skipSize +=  sizeof(std::size_t);
+								skipSize +=  size;
+							}
+							else if(cField.type.archetype->name == "vectorStr")
+							{
+								vectorStr* vstr = (vectorStr*)cField.getDataAddress(cmp);
+								size = vstr->size();
+								std::size_t fieldsize = sizeof(std::size_t);
+								for(auto& str : *vstr)
+								{
+									fieldsize += str.size()*sizeof(std::string::value_type);
+									fieldsize += sizeof(std::size_t);
+								}
+
+								skipSize +=  sizeof(std::size_t);
+
+								skipSize +=  sizeof(std::size_t);
+								for(auto& str : *vstr)
+								{
+									std::size_t strSize = str.size()*sizeof(std::string::value_type);
+									skipSize += sizeof(std::size_t);
+									skipSize +=  strSize;
+								}
+							}
+							else
+							{
+								size = cField.type.archetype->memorySize;
+								//store isNull
+								//store field data
+								skipSize += sizeof(std::size_t);
+								skipSize += size;
+
+							}
+						}
+
+					}
+
+					ResourcesLoader::Append(buffer, &skipSize, sizeof(std::size_t));
+
+
 					for(auto& cField : cmp->getArchetype().fields)//2 cField var WARN
 					{
 						std::size_t size = 0;
@@ -1371,6 +1699,15 @@ namespace Solid
 							{
 								vectorStr* vstr = (vectorStr*)cField.getDataAddress(cmp);
 								size = vstr->size();
+								std::size_t fieldsize = sizeof(std::size_t);
+								for(auto& str : *vstr)
+								{
+								    fieldsize += str.size()*sizeof(std::string::value_type);
+								    fieldsize += sizeof(std::size_t);
+								}
+
+								ResourcesLoader::Append(buffer, &fieldsize, sizeof(std::size_t));
+
 								ResourcesLoader::Append(buffer, &size, sizeof(std::size_t));
 								for(auto& str : *vstr)
 								{
