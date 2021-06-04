@@ -184,6 +184,7 @@ void GL::Mesh::DrawMesh(const std::vector<MaterialResource *>& _list, Transform&
 				if(_anim)
 				{ shader->SetAnim(_anim); }
 
+				shader->SetFloat("_GlobalTime", Time::GlobalTime());
 				shader->SetMVP(_tr, _cam);
 				shader->SetLights(_cam);
 			}
