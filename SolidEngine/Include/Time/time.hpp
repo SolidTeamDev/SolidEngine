@@ -11,6 +11,8 @@ namespace Solid
         static double lastTime;
         static double deltaTime;
 
+        static double globalTime;
+
         /// FPS
         static int fps;
         static int fpsCount;
@@ -22,6 +24,8 @@ namespace Solid
     public:
         static void Update();
         static double DeltaTime();
+        static double GlobalTime();
+
 
         static int Fps();
     };
