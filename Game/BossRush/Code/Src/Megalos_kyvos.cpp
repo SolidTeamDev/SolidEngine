@@ -55,7 +55,7 @@ void Megalos_kyvos::PrimaryAttack()
         return;
 
     DataBullets[0].Ratio += Time::DeltaTime() * SpeedPrimaryAttack;
-    float t =  DataBullets[0].Step == EStepAttack::Two ? DataBullets[0].Ratio * 3 : DataBullets[0].Ratio;
+    float t =  DataBullets[0].Step == EStepAttack::Two ? DataBullets[0].Ratio * 5 : DataBullets[0].Ratio;
     if(DataBullets[0].Step == EStepAttack::One)
     {
         if (t > 1)
@@ -89,7 +89,7 @@ void Megalos_kyvos::PrimaryAttack()
             DataBullets[0].Step = EStepAttack::None;
             return;
         }
-        CubeBullets[i]->transform->Rotate( Vec3(0,t/5,0));
+        CubeBullets[i]->transform->Rotate( Vec3(0,t/7,0));
     }
 }
 
