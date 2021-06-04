@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <functional>
 #include "Build/solidAPI.hpp"
 #include "componentManager.hpp"
 #include "entityManager.hpp"
@@ -10,7 +11,7 @@
 
 namespace Solid
 {
-	struct FromSceneGraphMgr{};
+	struct FromSceneGraphMgr{ void* destrotroyedEnt = nullptr;};
     class SOLID_API ECSManager
     {
     private:
@@ -18,6 +19,7 @@ namespace Solid
         std::unique_ptr<EntityManager> entityManager;
         std::unique_ptr<SystemManager> systemManager;
         std::unique_ptr<SceneGraphManager> sceneGraphManager;
+	    std::vector<std::function<void(Entity, void*)>> DestroyedEntityCallbacks;
     public:
 
         void Init()
@@ -28,7 +30,10 @@ namespace Solid
             sceneGraphManager = std::make_unique<SceneGraphManager>();
         }
 
-
+		void AddDestroyedEntityCallback(const std::function<void(Entity, void*)>& _func)
+		{
+			DestroyedEntityCallbacks.push_back(_func);
+		}
 
         GameObject* CreateEntity()
         {
@@ -74,8 +79,12 @@ namespace Solid
             componentManager->EntityDestroyed(_entity);
 
             systemManager->EntityDestroyed(_entity);
-
-            sceneGraphManager->GetNodeFromEntity(_entity)->RemoveCurrent();
+			GameObject* go = sceneGraphManager->GetNodeFromEntity(_entity);
+            go->RemoveCurrent();
+	        for(auto& elt : DestroyedEntityCallbacks)
+	        {
+		        elt(_entity, go);
+	        }
         }
 
 	    void DestroyEntity(Entity _entity, FromSceneGraphMgr _noDel)
@@ -85,6 +94,10 @@ namespace Solid
 		    componentManager->EntityDestroyed(_entity);
 
 		    systemManager->EntityDestroyed(_entity);
+		    for(auto& elt : DestroyedEntityCallbacks)
+		    {
+			    elt(_entity, _noDel.destrotroyedEnt);
+		    }
 
 	    }
         GameObject* GetGameObjectFromEntity(Entity _e)

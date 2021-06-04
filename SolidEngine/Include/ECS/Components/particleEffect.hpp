@@ -31,6 +31,27 @@ namespace Solid SLDNamespace()
 
 		public:
 
+			size_t GetNumParticle()
+			{
+				return numParticles;
+			}
+			std::shared_ptr<ParticleSystem> GetSystem()
+			{
+				return system;
+			}
+			std::shared_ptr<ParticleEmitter> GetEmitter()
+			{
+				return emitter;
+			}
+			std::shared_ptr<ITexture> GetParticleTex()
+			{
+				return ParticleTex;
+			}
+			std::shared_ptr<GLParticleRenderer> GetRenderer()
+			{
+				return renderer;
+			}
+
 			SLDField()
 			float particlesSize;
 
@@ -69,6 +90,8 @@ namespace Solid SLDNamespace()
 			void CpuUpdate();
 			void GpuUpdate();
 			void Render();
+
+
 			void SetTex(const std::shared_ptr<ITexture> _tex);
 			void SetCount(size_t _count)
 			{

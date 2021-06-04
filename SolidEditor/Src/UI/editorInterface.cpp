@@ -39,6 +39,8 @@ namespace Solid {
         DarkTheme();
         std::function<void(Resource*)> callback = std::bind(&EditorInterface::LoadSceneCall, this, std::placeholders::_1);
         Engine::GetInstance()->AddLoadedSceneCallback(callback);
+	    std::function<void(Entity, void*)> callback2 = std::bind(&EditorInterface::DestroyedSelectedGO, this, std::placeholders::_1, std::placeholders::_2);
+        Engine::GetInstance()->ecsManager.AddDestroyedEntityCallback(callback2);
     }
 
     EditorInterface::EditorInterface(Window *_window, Renderer* _renderer) :
@@ -677,6 +679,12 @@ namespace Solid {
 
 
 		UI::End();
+	}
+
+	void EditorInterface::DestroyedSelectedGO(Entity _id, void* _ptr)
+	{
+		if(_ptr == EditorInterface::selectedGO)
+			EditorInterface::selectedGO = nullptr;
 	}
 }
 

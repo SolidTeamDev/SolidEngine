@@ -34,7 +34,8 @@ Solid::GameObject::~GameObject()
 		        child->physicsActor->release();
             child->physicsActor = nullptr;
         }
-		Engine::GetInstance()->ecsManager.DestroyEntity(child->entity,FromSceneGraphMgr{});
+
+		Engine::GetInstance()->ecsManager.DestroyEntity(child->entity,FromSceneGraphMgr{child});
 		delete child;
 	}
 }
@@ -297,6 +298,320 @@ void Solid::SceneGraphManager::AddAllComps(GameObject *elt, std::vector<char> &b
 				else if (className == "Light")
 				{
 					AddComp<Light>(className, buffer, readPos, go, cmp,FieldNum, cmpNameSize);
+					delete cmp;
+				}
+				else if (className == "ParticleEffect")
+				{
+
+
+
+					ParticleEffect *t = Engine::GetInstance()->ecsManager.AddComponent(go, *(ParticleEffect *) cmp);
+					std::size_t sizep = 0;
+					ResourcesLoader::ReadFromBuffer(buffer.data(), &sizep, sizeof(std::size_t),readPos, buffer.size());
+					t->particlesSize = sizep;
+
+					std::size_t isNull = 0;
+					ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(std::size_t), readPos, buffer.size());
+					if(isNull == 128)
+					{
+						std::size_t numP = 0;
+						ResourcesLoader::ReadFromBuffer(buffer.data(), &numP, sizeof(std::size_t), readPos, buffer.size());
+						t->SetCount(numP);
+					}
+					isNull = 0;
+					ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(std::size_t), readPos, buffer.size());
+					if(isNull == 128)
+					{
+						float em = 0;
+						ResourcesLoader::ReadFromBuffer(buffer.data(), &em, sizeof(float), readPos, buffer.size());
+						t->SetEmitRate(em);
+					}
+					isNull = 0;
+					ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(std::size_t), readPos, buffer.size());
+					if(isNull == 128)
+					{
+
+						std::size_t nsize = 0;
+						ResourcesLoader::ReadFromBuffer(buffer.data(), &nsize, sizeof(std::size_t), readPos, buffer.size());
+						std::string TexName;
+						TexName.resize(nsize / sizeof(std::string::value_type));
+						ResourcesLoader::ReadFromBuffer(buffer.data(), TexName.data(), nsize, readPos, buffer.size());
+						t->SetTex(Engine::GetInstance()->graphicsResourceMgr.GetTexture(TexName.c_str()));
+					}
+					isNull = 0;
+					ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(std::size_t), readPos, buffer.size());
+					if(isNull == 128)
+					{
+
+					}
+					isNull = 0;
+					ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(std::size_t), readPos, buffer.size());
+					if(isNull == 128)
+					{
+						if(t->velFromPosGen == nullptr)
+							t->velFromPosGen = std::make_shared<VelFromPosGen>();
+						ResourcesLoader::ReadFromBuffer(buffer.data(), &t->velFromPosGen->offset, sizeof(Vec4), readPos, buffer.size());
+						ResourcesLoader::ReadFromBuffer(buffer.data(), &t->velFromPosGen->minScale, sizeof(float), readPos, buffer.size());
+						ResourcesLoader::ReadFromBuffer(buffer.data(), &t->velFromPosGen->maxScale, sizeof(float), readPos, buffer.size());
+
+					}
+					else
+					{
+						t->velFromPosGen = nullptr;
+					}
+					isNull = 0;
+					ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(std::size_t), readPos, buffer.size());
+					if(isNull == 128)
+					{
+						if(t->colGen == nullptr)
+							t->colGen = std::make_shared<BasicColorGen>();
+
+						{
+							auto ptr = t->colGen;
+							ResourcesLoader::ReadFromBuffer(buffer.data(), &ptr->minStartCol, sizeof(Vec4), readPos, buffer.size());
+							ResourcesLoader::ReadFromBuffer(buffer.data(), &ptr->maxStartCol, sizeof(Vec4), readPos, buffer.size());
+							ResourcesLoader::ReadFromBuffer(buffer.data(), &ptr->minEndCol, sizeof(Vec4), readPos, buffer.size());
+							ResourcesLoader::ReadFromBuffer(buffer.data(), &ptr->maxEndCol, sizeof(Vec4), readPos, buffer.size());
+						}
+					}
+					else
+					{
+						t->colGen = nullptr;
+					}
+					isNull = 0;
+					ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(std::size_t), readPos, buffer.size());
+					if(isNull == 128)
+					{
+						if(t->sphereVelGen == nullptr)
+							t->sphereVelGen = std::make_shared<SphereVelGen>();
+
+						{
+							auto ptr = t->sphereVelGen;
+							ResourcesLoader::ReadFromBuffer(buffer.data(), &ptr->minVel, sizeof(float), readPos, buffer.size());
+							ResourcesLoader::ReadFromBuffer(buffer.data(), &ptr->maxVel, sizeof(float), readPos, buffer.size());
+
+						}
+					}
+					else
+					{
+						t->sphereVelGen = nullptr;
+					}
+					isNull = 0;
+					ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(std::size_t), readPos, buffer.size());
+					if(isNull == 128)
+					{
+						if(t->spherePosGen == nullptr)
+							t->spherePosGen = std::make_shared<SpherePosGen>();
+
+						{
+							auto ptr = t->spherePosGen;
+							ResourcesLoader::ReadFromBuffer(buffer.data(), &ptr->center, sizeof(Vec4), readPos, buffer.size());
+							ResourcesLoader::ReadFromBuffer(buffer.data(), &ptr->radX, sizeof(float), readPos, buffer.size());
+							ResourcesLoader::ReadFromBuffer(buffer.data(), &ptr->radY, sizeof(float), readPos, buffer.size());
+							ResourcesLoader::ReadFromBuffer(buffer.data(), &ptr->radZ, sizeof(float), readPos, buffer.size());
+
+						}
+					}
+					else
+					{
+						t->spherePosGen = nullptr;
+					}
+					isNull = 0;
+					ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(std::size_t), readPos, buffer.size());
+					if(isNull == 128)
+					{
+						if(t->timeGen == nullptr)
+							t->timeGen = std::make_shared<BasicTimeGen>();
+
+						{
+							auto ptr = t->timeGen;
+							ResourcesLoader::ReadFromBuffer(buffer.data(), &ptr->minTime, sizeof(float), readPos, buffer.size());
+							ResourcesLoader::ReadFromBuffer(buffer.data(), &ptr->maxTime, sizeof(float), readPos, buffer.size());
+
+
+						}
+					}
+					else
+					{
+						t->timeGen = nullptr;
+					}
+					isNull = 0;
+					ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(std::size_t), readPos, buffer.size());
+					if(isNull == 128)
+					{
+						if(t->velGen == nullptr)
+							t->velGen = std::make_shared<BasicVelGen>();
+
+						{
+							auto ptr = t->velGen;
+							ResourcesLoader::ReadFromBuffer(buffer.data(), &ptr->minStartVel, sizeof(Vec4), readPos, buffer.size());
+							ResourcesLoader::ReadFromBuffer(buffer.data(), &ptr->maxStartVel, sizeof(Vec4), readPos, buffer.size());
+
+						}
+					}
+					else
+					{
+						t->velGen = nullptr;
+					}
+					isNull = 0;
+					ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(std::size_t), readPos, buffer.size());
+					if(isNull == 128)
+					{
+						if(t->boxPosGen == nullptr)
+							t->boxPosGen = std::make_shared<BoxPosGen>();
+
+						{
+							auto ptr = t->boxPosGen;
+							ResourcesLoader::ReadFromBuffer(buffer.data(), &ptr->pos, sizeof(Vec4), readPos, buffer.size());
+							ResourcesLoader::ReadFromBuffer(buffer.data(), &ptr->maxStartPosOffset, sizeof(Vec4), readPos, buffer.size());
+
+						}
+					}
+					else
+					{
+						t->boxPosGen = nullptr;
+					}
+					isNull = 0;
+					ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(std::size_t), readPos, buffer.size());
+					if(isNull == 128)
+					{
+						if(t->killerZoneUpdater == nullptr)
+							t->killerZoneUpdater = std::make_shared<KillerZoneUpdater>();
+
+						{
+							auto ptr = t->killerZoneUpdater;
+							ResourcesLoader::ReadFromBuffer(buffer.data(), &ptr->pos, sizeof(Vec3), readPos, buffer.size());
+							ResourcesLoader::ReadFromBuffer(buffer.data(), &ptr->offset, sizeof(Vec3), readPos, buffer.size());
+
+						}
+					}
+					else
+					{
+						t->killerZoneUpdater = nullptr;
+					}
+					isNull = 0;
+					ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(std::size_t), readPos, buffer.size());
+					if(isNull == 128)
+					{
+						if(t->attractorUpdater == nullptr)
+							t->attractorUpdater = std::make_shared<AttractorUpdater>();
+
+						{
+							auto ptr = t->attractorUpdater;
+							std::size_t attsize = 0;
+							ResourcesLoader::ReadFromBuffer(buffer.data(), &attsize, sizeof(std::size_t), readPos, buffer.size());
+							t->attractorUpdater->attractors.resize(attsize);
+							ResourcesLoader::ReadFromBuffer(buffer.data(), ptr->attractors.data(), sizeof(Vec4) * attsize, readPos, buffer.size());
+
+						}
+					}
+					else
+					{
+						t->attractorUpdater = nullptr;
+					}
+					isNull = 0;
+					ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(std::size_t), readPos, buffer.size());
+					if(isNull == 128)
+					{
+						if(t->velColUpdater == nullptr)
+							t->velColUpdater = std::make_shared<VelColorUpdater>();
+
+						{
+							auto ptr = t->velColUpdater;
+							ResourcesLoader::ReadFromBuffer(buffer.data(), &ptr->minVel, sizeof(Vec4), readPos, buffer.size());
+							ResourcesLoader::ReadFromBuffer(buffer.data(), &ptr->maxVel, sizeof(Vec4), readPos, buffer.size());
+
+						}
+					}
+					else
+					{
+						t->velColUpdater = nullptr;
+					}
+					isNull = 0;
+					ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(std::size_t), readPos, buffer.size());
+					if(isNull == 128)
+					{
+						if(t->posColUpdater == nullptr)
+							t->posColUpdater = std::make_shared<PosColorUpdater>();
+
+
+						{
+							auto ptr = t->posColUpdater;
+							ResourcesLoader::ReadFromBuffer(buffer.data(), &ptr->minPos, sizeof(Vec4), readPos, buffer.size());
+							ResourcesLoader::ReadFromBuffer(buffer.data(), &ptr->maxPos, sizeof(Vec4), readPos, buffer.size());
+
+						}
+					}
+					else
+					{
+						t->posColUpdater = nullptr;
+					}
+					isNull = 0;
+					ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(std::size_t), readPos, buffer.size());
+					if(isNull == 128)
+					{
+						if(t->colorUpdater == nullptr)
+							t->colorUpdater = std::make_shared<BasicColorUpdater>();
+
+						{
+							auto ptr = t->colorUpdater;
+
+						}
+					}
+					else
+					{
+						t->colorUpdater = nullptr;
+					}
+					isNull = 0;
+					ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(std::size_t), readPos, buffer.size());
+					if(isNull == 128)
+					{
+						if(t->eulerUpdater == nullptr)
+							t->eulerUpdater = std::make_shared<EulerUpdater>();
+
+						{
+							auto ptr = t->eulerUpdater;
+							ResourcesLoader::ReadFromBuffer(buffer.data(), &ptr->globalAcceleration, sizeof(Vec4), readPos, buffer.size());
+
+						}
+					}
+					else
+					{
+						t->eulerUpdater = nullptr;
+					}
+					isNull = 0;
+					ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(std::size_t), readPos, buffer.size());
+					if(isNull == 128)
+					{
+						if(t->floorUpdater == nullptr)
+							t->floorUpdater = std::make_shared<FloorUpdater>();
+
+						{
+							auto ptr = t->floorUpdater;
+							ResourcesLoader::ReadFromBuffer(buffer.data(), &ptr->bounceFactor, sizeof(float), readPos, buffer.size());
+							ResourcesLoader::ReadFromBuffer(buffer.data(), &ptr->floorY, sizeof(float), readPos, buffer.size());
+
+
+						}
+					}
+					else
+					{
+						t->floorUpdater = nullptr;
+					}
+					isNull = 0;
+					ResourcesLoader::ReadFromBuffer(buffer.data(), &isNull, sizeof(std::size_t), readPos, buffer.size());
+					if(isNull == 128)
+					{
+						if(t->timeUpdater == nullptr)
+							t->timeUpdater = std::make_shared<BasicTimeUpdater>();
+
+					}
+					else
+					{
+						t->timeUpdater = nullptr;
+					}
+					t->UpdateSystem();
+					t->UpdateEmitter();
 					delete cmp;
 				}
 				else if (ns != nullptr && myClass->isSubclassOf(*ns->getClass("Script")))

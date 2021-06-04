@@ -126,5 +126,7 @@ namespace Solid
 
 
         void LoadSceneCall(Resource* scene);
+
+        void DestroyedSelectedGO(Entity _id, void* _ptr);
     };
 }

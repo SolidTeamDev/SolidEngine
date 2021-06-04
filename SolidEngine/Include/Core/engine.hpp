@@ -61,6 +61,7 @@ namespace Solid
 
 	    void AddAllComps(GameObject *elt, std::vector<char> &buffer, uint64_t &ReadPos);
 	    void setJsonSave(json &j, GameObject *elt, std::string &path);
+	    void SaveAllComp(GameObject *elt, std::vector<char> &buffer);
     public:
     	//Engine** test = &instance;
         Window* window;
@@ -130,6 +131,8 @@ namespace Solid
 	    void RenderToBuffer(const Vec2i& _size);
 
 	    void AddLoadedSceneCallback(const std::function<void(Resource*)>& _func);
+
+
 
     };
 

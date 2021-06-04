@@ -1085,6 +1085,190 @@ void PrefabResource::UpdatePrefab(GameObject *_gameObject)
 
 				}
 			}
+			else if(cmp->getArchetype().name == "ParticleEffect")
+			{
+				std::size_t offset =0;
+
+				std::size_t cmpNameSize = 0;
+
+				//store comp name / string
+				cmpNameSize = cmp->getArchetype().name.size()*sizeof(std::string::value_type);
+				ResourcesLoader::Append(buffer, &cmpNameSize, sizeof(std::size_t));
+				ResourcesLoader::Append(buffer, (void*)cmp->getArchetype().name.data(),  cmpNameSize);
+				ParticleEffect* effect = (ParticleEffect*)cmp;
+				std::size_t numP = effect->particlesSize;
+				ResourcesLoader::Append(buffer, &numP, sizeof(std::size_t));
+
+				std::size_t isNull = (effect->GetSystem() != nullptr) ? 128 : 256;
+				ResourcesLoader::Append(buffer, &isNull, sizeof(std::size_t));
+				if(isNull == 128)
+				{
+					auto ptr = effect->GetSystem();
+					ResourcesLoader::Append(buffer, &ptr->count, sizeof(std::size_t));
+
+				}
+				isNull = (effect->GetEmitter() != nullptr) ? 128 : 256;
+				ResourcesLoader::Append(buffer, &isNull, sizeof(std::size_t));
+				if(isNull == 128)
+				{
+					auto ptr = effect->GetEmitter();
+					ResourcesLoader::Append(buffer, &ptr->emitRate, sizeof(float));
+
+				}
+				isNull = (effect->GetParticleTex() != nullptr) ? 128 : 256;
+				ResourcesLoader::Append(buffer, &isNull, sizeof(std::size_t));
+				if(isNull == 128)
+				{
+					auto ptr = effect->GetParticleTex();
+					cmpNameSize = ptr->name.size()*sizeof(std::string::value_type);
+					ResourcesLoader::Append(buffer, &cmpNameSize, sizeof(std::size_t));
+					ResourcesLoader::Append(buffer, (void*)ptr->name.data(),  cmpNameSize);
+
+				}
+				isNull = (effect->GetRenderer() != nullptr) ? 128 : 256;
+				ResourcesLoader::Append(buffer, &isNull, sizeof(std::size_t));
+				if(isNull == 128)
+				{
+					auto ptr = effect->GetRenderer();
+				}
+				isNull = (effect->velFromPosGen != nullptr) ? 128 : 256;
+				ResourcesLoader::Append(buffer, &isNull, sizeof(std::size_t));
+				if(isNull == 128)
+				{
+					auto ptr = effect->velFromPosGen;
+					ResourcesLoader::Append(buffer, &ptr->offset, sizeof(Vec4));
+					ResourcesLoader::Append(buffer, &ptr->minScale, sizeof(float));
+					ResourcesLoader::Append(buffer, &ptr->maxScale, sizeof(float));
+				}
+				isNull = (effect->colGen != nullptr) ? 128 : 256;
+				ResourcesLoader::Append(buffer, &isNull, sizeof(std::size_t));
+				if(isNull == 128)
+				{
+					auto ptr = effect->colGen;
+					ResourcesLoader::Append(buffer, &ptr->minStartCol, sizeof(Vec4));
+					ResourcesLoader::Append(buffer, &ptr->maxStartCol, sizeof(Vec4));
+					ResourcesLoader::Append(buffer, &ptr->minEndCol, sizeof(Vec4));
+					ResourcesLoader::Append(buffer, &ptr->maxEndCol, sizeof(Vec4));
+				}
+				isNull = (effect->sphereVelGen != nullptr) ? 128 : 256;
+				ResourcesLoader::Append(buffer, &isNull, sizeof(std::size_t));
+				if(isNull == 128)
+				{
+					auto ptr = effect->sphereVelGen;
+					ResourcesLoader::Append(buffer, &ptr->minVel, sizeof(float));
+					ResourcesLoader::Append(buffer, &ptr->maxVel, sizeof(float));
+
+				}
+				isNull = (effect->spherePosGen != nullptr) ? 128 : 256;
+				ResourcesLoader::Append(buffer, &isNull, sizeof(std::size_t));
+				if(isNull == 128)
+				{
+					auto ptr = effect->spherePosGen;
+					ResourcesLoader::Append(buffer, &ptr->center, sizeof(Vec4));
+					ResourcesLoader::Append(buffer, &ptr->radX, sizeof(float));
+					ResourcesLoader::Append(buffer, &ptr->radY, sizeof(float));
+					ResourcesLoader::Append(buffer, &ptr->radZ, sizeof(float));
+
+				}
+				isNull = (effect->timeGen != nullptr) ? 128 : 256;
+				ResourcesLoader::Append(buffer, &isNull, sizeof(std::size_t));
+				if(isNull == 128)
+				{
+					auto ptr = effect->timeGen;
+					ResourcesLoader::Append(buffer, &ptr->minTime, sizeof(float));
+					ResourcesLoader::Append(buffer, &ptr->maxTime, sizeof(float));
+
+
+				}
+				isNull = (effect->velGen != nullptr) ? 128 : 256;
+				ResourcesLoader::Append(buffer, &isNull, sizeof(std::size_t));
+				if(isNull == 128)
+				{
+					auto ptr = effect->velGen;
+					ResourcesLoader::Append(buffer, &ptr->minStartVel, sizeof(Vec4));
+					ResourcesLoader::Append(buffer, &ptr->maxStartVel, sizeof(Vec4));
+
+				}
+				isNull = (effect->boxPosGen != nullptr) ? 128 : 256;
+				ResourcesLoader::Append(buffer, &isNull, sizeof(std::size_t));
+				if(isNull == 128)
+				{
+					auto ptr = effect->boxPosGen;
+					ResourcesLoader::Append(buffer, &ptr->pos, sizeof(Vec4));
+					ResourcesLoader::Append(buffer, &ptr->maxStartPosOffset, sizeof(Vec4));
+
+				}
+				isNull = (effect->killerZoneUpdater != nullptr) ? 128 : 256;
+				ResourcesLoader::Append(buffer, &isNull, sizeof(std::size_t));
+				if(isNull == 128)
+				{
+					auto ptr = effect->killerZoneUpdater;
+					ResourcesLoader::Append(buffer, &ptr->pos, sizeof(Vec3));
+					ResourcesLoader::Append(buffer, &ptr->offset, sizeof(Vec3));
+
+				}
+				isNull = (effect->attractorUpdater != nullptr) ? 128 : 256;
+				ResourcesLoader::Append(buffer, &isNull, sizeof(std::size_t));
+				if(isNull == 128)
+				{
+					auto ptr = effect->attractorUpdater;
+					cmpNameSize = ptr->attractors.size();
+					ResourcesLoader::Append(buffer, &cmpNameSize, sizeof(std::size_t));
+					ResourcesLoader::Append(buffer, ptr->attractors.data(), sizeof(Vec4) * cmpNameSize);
+
+				}
+				isNull = (effect->velColUpdater != nullptr) ? 128 : 256;
+				ResourcesLoader::Append(buffer, &isNull, sizeof(std::size_t));
+				if(isNull == 128)
+				{
+					auto ptr = effect->velColUpdater;
+					ResourcesLoader::Append(buffer, &ptr->minVel, sizeof(Vec4));
+					ResourcesLoader::Append(buffer, &ptr->maxVel, sizeof(Vec4));
+
+				}
+				isNull = (effect->posColUpdater != nullptr) ? 128 : 256;
+				ResourcesLoader::Append(buffer, &isNull, sizeof(std::size_t));
+				if(isNull == 128)
+				{
+					auto ptr = effect->posColUpdater;
+					ResourcesLoader::Append(buffer, &ptr->minPos, sizeof(Vec4));
+					ResourcesLoader::Append(buffer, &ptr->maxPos, sizeof(Vec4));
+
+				}
+				isNull = (effect->colorUpdater != nullptr) ? 128 : 256;
+				ResourcesLoader::Append(buffer, &isNull, sizeof(std::size_t));
+				if(isNull == 128)
+				{
+					auto ptr = effect->colorUpdater;
+
+				}
+				isNull = (effect->eulerUpdater != nullptr) ? 128 : 256;
+				ResourcesLoader::Append(buffer, &isNull, sizeof(std::size_t));
+				if(isNull == 128)
+				{
+					auto ptr = effect->eulerUpdater;
+					ResourcesLoader::Append(buffer, &ptr->globalAcceleration, sizeof(Vec4));
+
+				}
+				isNull = (effect->floorUpdater != nullptr) ? 128 : 256;
+				ResourcesLoader::Append(buffer, &isNull, sizeof(std::size_t));
+				if(isNull == 128)
+				{
+					auto ptr = effect->floorUpdater;
+					ResourcesLoader::Append(buffer, &ptr->bounceFactor, sizeof(float));
+					ResourcesLoader::Append(buffer, &ptr->floorY, sizeof(float));
+
+
+				}
+				isNull = (effect->timeUpdater != nullptr) ? 128 : 256;
+				ResourcesLoader::Append(buffer, &isNull, sizeof(std::size_t));
+				if(isNull == 128)
+				{
+					auto ptr = effect->timeUpdater;
+
+				}
+
+			}
 			else
 			{
 				Log::Send(cmp->getArchetype().name);
