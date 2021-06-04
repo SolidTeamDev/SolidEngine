@@ -1016,7 +1016,7 @@ void PrefabResource::UpdatePrefab(GameObject *_gameObject)
 			{
 				for(Script* script : ((ScriptList*)cmp)->GetAllScripts())
 				{
-					Log::Send(script->getArchetype().name);
+
 					std::size_t offset =0;
 
 					std::size_t scriptNameSize = 0;
@@ -1029,6 +1029,74 @@ void PrefabResource::UpdatePrefab(GameObject *_gameObject)
 					//store num of fields
 					std::size_t numFields = script->getArchetype().fields.size();
 					ResourcesLoader::Append(buffer, &numFields, sizeof(std::size_t));
+					//calc skip size
+					std::size_t skipSize = 0;
+					for(auto& cField : script->getArchetype().fields)//2 cField var WARN
+					{
+						std::size_t size = 0;
+						size = cField.name.size()*sizeof(std::string::value_type);
+						//store field name / string
+						skipSize += sizeof(std::size_t);
+						skipSize +=  size;
+						short isNull = 128;
+						if(cField.type.archetype == nullptr)
+						{
+							isNull = 256;
+							std::string str = cField.getData<std::string>(script);
+							std::size_t strS =  str.size()*sizeof(std::string::value_type);
+							//store isNull
+							skipSize += sizeof(short);
+							//store field data
+							skipSize +=  sizeof(std::size_t);
+							skipSize +=  strS;
+						}
+						else
+						{
+							skipSize +=  sizeof(short);
+							if(cField.type.archetype->name == "String")
+							{
+								String* str = (String*)cField.getDataAddress(script);
+								size = str->size()*sizeof(std::string::value_type);
+								skipSize +=  sizeof(std::size_t);
+								skipSize +=  size;
+							}
+							else if(cField.type.archetype->name == "vectorStr")
+							{
+								vectorStr* vstr = (vectorStr*)cField.getDataAddress(cmp);
+								size = vstr->size();
+								std::size_t fieldsize = sizeof(std::size_t);
+								for(auto& str : *vstr)
+								{
+									fieldsize += str.size()*sizeof(std::string::value_type);
+									fieldsize += sizeof(std::size_t);
+								}
+
+								skipSize +=  sizeof(std::size_t);
+
+								skipSize +=  sizeof(std::size_t);
+								for(auto& str : *vstr)
+								{
+									std::size_t strSize = str.size()*sizeof(std::string::value_type);
+									skipSize += sizeof(std::size_t);
+									skipSize +=  strSize;
+								}
+							}
+							else
+							{
+								size = cField.type.archetype->memorySize;
+								//store isNull
+								//store field data
+								skipSize += sizeof(std::size_t);
+								skipSize += size;
+
+							}
+						}
+
+					}
+
+					ResourcesLoader::Append(buffer, &skipSize, sizeof(std::size_t));
+
+
 					for(auto& cField : script->getArchetype().fields)//2 cField var WARN
 					{
 						std::size_t size = 0;
@@ -1060,8 +1128,17 @@ void PrefabResource::UpdatePrefab(GameObject *_gameObject)
 							}
 							else if(cField.type.archetype->name == "vectorStr")
 							{
-								vectorStr* vstr = (vectorStr*)cField.getDataAddress(script);
+								vectorStr* vstr = (vectorStr*)cField.getDataAddress(cmp);
 								size = vstr->size();
+								std::size_t fieldsize = sizeof(std::size_t);
+								for(auto& str : *vstr)
+								{
+									fieldsize += str.size()*sizeof(std::string::value_type);
+									fieldsize += sizeof(std::size_t);
+								}
+
+								ResourcesLoader::Append(buffer, &fieldsize, sizeof(std::size_t));
+
 								ResourcesLoader::Append(buffer, &size, sizeof(std::size_t));
 								for(auto& str : *vstr)
 								{
@@ -1095,11 +1172,192 @@ void PrefabResource::UpdatePrefab(GameObject *_gameObject)
 				cmpNameSize = cmp->getArchetype().name.size()*sizeof(std::string::value_type);
 				ResourcesLoader::Append(buffer, &cmpNameSize, sizeof(std::size_t));
 				ResourcesLoader::Append(buffer, (void*)cmp->getArchetype().name.data(),  cmpNameSize);
+				//store num of fields
+				std::size_t numFields = 0;
+				ResourcesLoader::Append(buffer, &numFields, sizeof(std::size_t));
 				ParticleEffect* effect = (ParticleEffect*)cmp;
+				std::size_t skipSize = 0;
+
+
+				std::size_t isNull = (effect->GetSystem() != nullptr) ? 128 : 256;
+				skipSize += sizeof(std::size_t);
+				if(isNull == 128)
+				{
+					auto ptr = effect->GetSystem();
+					skipSize +=  sizeof(std::size_t);
+
+				}
+				isNull = (effect->GetEmitter() != nullptr) ? 128 : 256;
+				skipSize +=  sizeof(std::size_t);
+				if(isNull == 128)
+				{
+					auto ptr = effect->GetEmitter();
+					skipSize +=  sizeof(float);
+
+				}
+				isNull = (effect->GetParticleTex() != nullptr) ? 128 : 256;
+				skipSize += sizeof(std::size_t);
+				if(isNull == 128)
+				{
+					auto ptr = effect->GetParticleTex();
+					cmpNameSize = ptr->name.size()*sizeof(std::string::value_type);
+					skipSize += sizeof(std::size_t);
+					skipSize += ( cmpNameSize);
+
+				}
+				isNull = (effect->GetRenderer() != nullptr) ? 128 : 256;
+				skipSize += sizeof(std::size_t);
+				if(isNull == 128)
+				{
+					auto ptr = effect->GetRenderer();
+				}
+				isNull = (effect->velFromPosGen != nullptr) ? 128 : 256;
+				skipSize +=  sizeof(std::size_t);
+				if(isNull == 128)
+				{
+					auto ptr = effect->velFromPosGen;
+					skipSize +=  sizeof(Vec4);
+					skipSize +=  sizeof(float);
+					skipSize += sizeof(float);
+				}
+				isNull = (effect->colGen != nullptr) ? 128 : 256;
+				skipSize += sizeof(std::size_t);
+				if(isNull == 128)
+				{
+					auto ptr = effect->colGen;
+					skipSize +=  sizeof(Vec4);
+					skipSize +=  sizeof(Vec4);
+					skipSize +=  sizeof(Vec4);
+					skipSize +=  sizeof(Vec4);
+				}
+				isNull = (effect->sphereVelGen != nullptr) ? 128 : 256;
+				skipSize +=  sizeof(std::size_t);
+				if(isNull == 128)
+				{
+					auto ptr = effect->sphereVelGen;
+					skipSize += sizeof(float);
+					skipSize +=  sizeof(float);
+
+				}
+				isNull = (effect->spherePosGen != nullptr) ? 128 : 256;
+				skipSize +=  sizeof(std::size_t);
+				if(isNull == 128)
+				{
+					auto ptr = effect->spherePosGen;
+					skipSize +=  sizeof(Vec4);
+					skipSize +=  sizeof(float);
+					skipSize +=  sizeof(float);
+					skipSize += sizeof(float);
+
+				}
+				isNull = (effect->timeGen != nullptr) ? 128 : 256;
+				skipSize +=  sizeof(std::size_t);
+				if(isNull == 128)
+				{
+					auto ptr = effect->timeGen;
+					skipSize +=  sizeof(float);
+					skipSize +=  sizeof(float);
+
+
+				}
+				isNull = (effect->velGen != nullptr) ? 128 : 256;
+				skipSize += sizeof(std::size_t);
+				if(isNull == 128)
+				{
+					auto ptr = effect->velGen;
+					skipSize +=  sizeof(Vec4);
+					skipSize +=  sizeof(Vec4);
+
+				}
+				isNull = (effect->boxPosGen != nullptr) ? 128 : 256;
+				skipSize +=  sizeof(std::size_t);
+				if(isNull == 128)
+				{
+					auto ptr = effect->boxPosGen;
+					skipSize +=  sizeof(Vec4);
+					skipSize +=  sizeof(Vec4);
+
+				}
+				isNull = (effect->killerZoneUpdater != nullptr) ? 128 : 256;
+				skipSize +=  sizeof(std::size_t);
+				if(isNull == 128)
+				{
+					auto ptr = effect->killerZoneUpdater;
+					skipSize += sizeof(Vec3);
+					skipSize +=  sizeof(Vec3);
+
+				}
+				isNull = (effect->attractorUpdater != nullptr) ? 128 : 256;
+				skipSize +=  sizeof(std::size_t);
+				if(isNull == 128)
+				{
+					auto ptr = effect->attractorUpdater;
+					cmpNameSize = ptr->attractors.size();
+					skipSize +=  sizeof(std::size_t);
+					skipSize += ( sizeof(Vec4) * cmpNameSize);
+
+				}
+				isNull = (effect->velColUpdater != nullptr) ? 128 : 256;
+				skipSize +=  sizeof(std::size_t);
+				if(isNull == 128)
+				{
+					auto ptr = effect->velColUpdater;
+					skipSize +=  sizeof(Vec4);
+					skipSize +=  sizeof(Vec4);
+
+				}
+				isNull = (effect->posColUpdater != nullptr) ? 128 : 256;
+				skipSize +=  sizeof(std::size_t);
+				if(isNull == 128)
+				{
+					auto ptr = effect->posColUpdater;
+					skipSize +=  sizeof(Vec4);
+					skipSize += sizeof(Vec4);
+
+				}
+				isNull = (effect->colorUpdater != nullptr) ? 128 : 256;
+				skipSize +=  sizeof(std::size_t);
+				if(isNull == 128)
+				{
+					auto ptr = effect->colorUpdater;
+
+				}
+				isNull = (effect->eulerUpdater != nullptr) ? 128 : 256;
+				skipSize +=  sizeof(std::size_t);
+				if(isNull == 128)
+				{
+					auto ptr = effect->eulerUpdater;
+					skipSize +=  sizeof(Vec4);
+
+				}
+				isNull = (effect->floorUpdater != nullptr) ? 128 : 256;
+				skipSize +=  sizeof(std::size_t);
+				if(isNull == 128)
+				{
+					auto ptr = effect->floorUpdater;
+					skipSize +=  sizeof(float);
+					skipSize +=  sizeof(float);
+
+
+				}
+				isNull = (effect->timeUpdater != nullptr) ? 128 : 256;
+				skipSize +=  sizeof(std::size_t);
+				if(isNull == 128)
+				{
+					auto ptr = effect->timeUpdater;
+
+				}
+
+
+				ResourcesLoader::Append(buffer, &skipSize, sizeof(std::size_t));
+
+
+
+
 				std::size_t numP = effect->particlesSize;
 				ResourcesLoader::Append(buffer, &numP, sizeof(std::size_t));
 
-				std::size_t isNull = (effect->GetSystem() != nullptr) ? 128 : 256;
+				isNull = (effect->GetSystem() != nullptr) ? 128 : 256;
 				ResourcesLoader::Append(buffer, &isNull, sizeof(std::size_t));
 				if(isNull == 128)
 				{
@@ -1271,7 +1529,7 @@ void PrefabResource::UpdatePrefab(GameObject *_gameObject)
 			}
 			else
 			{
-				Log::Send(cmp->getArchetype().name);
+
 				std::size_t offset =0;
 
 				std::size_t cmpNameSize = 0;
@@ -1284,6 +1542,73 @@ void PrefabResource::UpdatePrefab(GameObject *_gameObject)
 				//store num of fields
 				std::size_t numFields = cmp->getArchetype().fields.size();
 				ResourcesLoader::Append(buffer, &numFields, sizeof(std::size_t));
+				std::size_t skipSize = 0;
+				for(auto& cField : cmp->getArchetype().fields)//2 cField var WARN
+				{
+					std::size_t size = 0;
+					size = cField.name.size()*sizeof(std::string::value_type);
+					//store field name / string
+					skipSize += sizeof(std::size_t);
+					skipSize +=  size;
+					short isNull = 128;
+					if(cField.type.archetype == nullptr)
+					{
+						isNull = 256;
+						std::string str = cField.getData<std::string>(cmp);
+						std::size_t strS =  str.size()*sizeof(std::string::value_type);
+						//store isNull
+						skipSize += sizeof(short);
+						//store field data
+						skipSize +=  sizeof(std::size_t);
+						skipSize +=  strS;
+					}
+					else
+					{
+						skipSize +=  sizeof(short);
+						if(cField.type.archetype->name == "String")
+						{
+							String* str = (String*)cField.getDataAddress(cmp);
+							size = str->size()*sizeof(std::string::value_type);
+							skipSize +=  sizeof(std::size_t);
+							skipSize +=  size;
+						}
+						else if(cField.type.archetype->name == "vectorStr")
+						{
+							vectorStr* vstr = (vectorStr*)cField.getDataAddress(cmp);
+							size = vstr->size();
+							std::size_t fieldsize = sizeof(std::size_t);
+							for(auto& str : *vstr)
+							{
+								fieldsize += str.size()*sizeof(std::string::value_type);
+								fieldsize += sizeof(std::size_t);
+							}
+
+							skipSize +=  sizeof(std::size_t);
+
+							skipSize +=  sizeof(std::size_t);
+							for(auto& str : *vstr)
+							{
+								std::size_t strSize = str.size()*sizeof(std::string::value_type);
+								skipSize += sizeof(std::size_t);
+								skipSize +=  strSize;
+							}
+						}
+						else
+						{
+							size = cField.type.archetype->memorySize;
+							//store isNull
+							//store field data
+							skipSize += sizeof(std::size_t);
+							skipSize += size;
+
+						}
+					}
+
+				}
+
+				ResourcesLoader::Append(buffer, &skipSize, sizeof(std::size_t));
+
+
 				for(auto& cField : cmp->getArchetype().fields)//2 cField var WARN
 				{
 					std::size_t size = 0;
@@ -1317,6 +1642,15 @@ void PrefabResource::UpdatePrefab(GameObject *_gameObject)
 						{
 							vectorStr* vstr = (vectorStr*)cField.getDataAddress(cmp);
 							size = vstr->size();
+							std::size_t fieldsize = sizeof(std::size_t);
+							for(auto& str : *vstr)
+							{
+								fieldsize += str.size()*sizeof(std::string::value_type);
+								fieldsize += sizeof(std::size_t);
+							}
+
+							ResourcesLoader::Append(buffer, &fieldsize, sizeof(std::size_t));
+
 							ResourcesLoader::Append(buffer, &size, sizeof(std::size_t));
 							for(auto& str : *vstr)
 							{
@@ -1339,7 +1673,6 @@ void PrefabResource::UpdatePrefab(GameObject *_gameObject)
 				}
 
 			}
-
 
 		}
 
