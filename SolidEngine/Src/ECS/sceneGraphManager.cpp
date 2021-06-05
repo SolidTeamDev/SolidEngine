@@ -28,14 +28,15 @@ Solid::GameObject::~GameObject()
 
 	for (GameObject* child : childs)
 	{
-	    if(child->physicsActor != nullptr)
+        Engine::GetInstance()->ecsManager.DestroyEntity(child->entity,FromSceneGraphMgr{child});
+
+        if(child->physicsActor != nullptr)
         {
             if(child->physicsActor->isReleasable())
 		        child->physicsActor->release();
             child->physicsActor = nullptr;
         }
 
-		Engine::GetInstance()->ecsManager.DestroyEntity(child->entity,FromSceneGraphMgr{child});
 		delete child;
 	}
 }
@@ -43,6 +44,11 @@ Solid::GameObject::~GameObject()
 Solid::GameObject *Solid::GameObject::AddToCurrent(Solid::Entity _entity)
 {
 	GameObject* obj = new GameObject(this,_entity);
+    if(obj->physicsActor == nullptr)
+    {
+        Physics& physics = Engine::GetInstance()->physics;
+        physics.ConvertActor(obj,PhysicsActorType::STATIC);
+    }
 	childs.push_back(obj);
 	return obj;
 }
