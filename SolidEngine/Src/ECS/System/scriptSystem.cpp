@@ -31,13 +31,27 @@ void ScriptSystem::Destroy()
 
 void ScriptSystem::Update()
 {
-	for (auto entity : entities)
+    size_t i = 0;
+	for (auto it = entities.begin() ; it != entities.end();)
 	{
-		ScriptList& scriptL = ecsManager.GetComponent<ScriptList>(entity);
+		ScriptList& scriptL = ecsManager.GetComponent<ScriptList>(*it);
 
 
 		scriptL.Update();
 
+        if(ecsManager.GetCompArray<ScriptList>()->IsEntityDestroyed() != -1)
+        {
+            it = entities.begin();
+            for(int j = 0 ; j < i ; ++j)
+                it++;
+
+            if(it == entities.end())
+                break;
+        }
+        else
+            it++;
+
+        ++i;
 	}
 
 }

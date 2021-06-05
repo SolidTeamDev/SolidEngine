@@ -68,6 +68,7 @@ namespace Solid
         Renderer* renderer = nullptr;
 	    GameCompiler* Compiler;
         Audio audio;
+        Physics physics;
         ECSManager ecsManager;
         std::shared_ptr<RendererSystem> rendererSystem;
         std::shared_ptr<AudioSystem> audioSystem;
@@ -81,7 +82,6 @@ namespace Solid
         TaskManager taskManager;
         ThreadManager threadPool;
         GraphicalResourceMgr graphicsResourceMgr;
-        Physics physics;
 
         Camera* activeCamera = nullptr;
         Framebuffer PlayBuffer;

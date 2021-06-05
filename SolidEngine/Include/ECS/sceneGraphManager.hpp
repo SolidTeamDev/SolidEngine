@@ -16,6 +16,7 @@ namespace Solid
     public:
 
         std::string name = "New GameObject";
+        std::string tag = "";
         physx::PxActor* physicsActor = nullptr;
 
         Transform* transform = nullptr;
