@@ -30,6 +30,7 @@ namespace Solid
         std::unordered_map<size_t, Entity> indexToEntityMap {};
 
         size_t size {};
+        int destroyEntityNumber = -1;
 
     public:
 
@@ -119,8 +120,17 @@ namespace Solid
             if(entityToIndexMap.find(_entity) != entityToIndexMap.end())
             {
                 Components* c =RemoveData(_entity);
-
+                destroyEntityNumber = _entity;
             }
+        }
+
+        int IsEntityDestroyed()
+        {
+	        int tmp = destroyEntityNumber;
+
+	        destroyEntityNumber = -1;
+
+            return tmp;
         }
 
 

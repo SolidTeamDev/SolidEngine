@@ -46,7 +46,12 @@ namespace Solid
         GameObject* gameObject = EditorInterface::selectedGO;
 
         UI::Text("Name: ");
+        UI::SameLine();
         EditText(gameObject->name, "##name");
+
+        UI::Text("Tag:  ");
+        UI::SameLine();
+        EditText(gameObject->tag,"##tag");
 
 	    if(engine->ecsManager.GotComponent<Transform>(gameObject->GetEntity()))
 	    {
