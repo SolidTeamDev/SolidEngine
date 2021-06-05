@@ -90,6 +90,9 @@ public:	\
 		__RFK_DISABLE_WARNING_PUSH	\
 		__RFK_DISABLE_WARNING_OFFSETOF	\
 		field = childArchetype->addField("SpeedPrimaryAttack", 8180773268483240923u, rfk::Type::getType<float>(), static_cast<rfk::EFieldFlags>(1), &thisArchetype, offsetof(ChildType, SpeedPrimaryAttack));	\
+		field = childArchetype->addField("SpeedSecondaryAttack", 192223428306142735u, rfk::Type::getType<float>(), static_cast<rfk::EFieldFlags>(1), &thisArchetype, offsetof(ChildType, SpeedSecondaryAttack));	\
+		field = childArchetype->addField("SizeSecondaryAttack", 13301946747969879333u, rfk::Type::getType<float>(), static_cast<rfk::EFieldFlags>(1), &thisArchetype, offsetof(ChildType, SizeSecondaryAttack));	\
+		field = childArchetype->addField("RotationAttackSpeed", 5740517204461577709u, rfk::Type::getType<float>(), static_cast<rfk::EFieldFlags>(1), &thisArchetype, offsetof(ChildType, RotationAttackSpeed));	\
 		__RFK_DISABLE_WARNING_POP	\
 	}
 

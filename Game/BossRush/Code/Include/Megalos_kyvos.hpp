@@ -21,7 +21,7 @@ namespace Solid SLDNamespace()
 	    {
             int Index;
 	        float Ratio;
-	        Vec3  pos = Vec3::Zero;
+	        Vec3  SaveVec3 = Vec3::Zero;
 	        EStepAttack Step = EStepAttack::None;
 	    };
 		std::vector<GameObject*> CubeBullets;
@@ -29,6 +29,12 @@ namespace Solid SLDNamespace()
 	public:
 	    SLDField()
 	    float SpeedPrimaryAttack = 0.5;
+        SLDField()
+        float SpeedSecondaryAttack = 1;
+        SLDField()
+        float SizeSecondaryAttack = 10;
+        SLDField()
+        float RotationAttackSpeed = 1;
 
 		Megalos_kyvos();
 		~Megalos_kyvos();
@@ -48,6 +54,8 @@ namespace Solid SLDNamespace()
 
         void ChooseAttack() override;
         void UpdateAttack() override;
+
+        void CreateBulletsCube(std::string namePrefab, Vec3 pos, Vec3 scale);
 		Megalos_kyvos_GENERATED
 	};
 	
