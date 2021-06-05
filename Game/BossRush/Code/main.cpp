@@ -22,7 +22,7 @@ int main()
 		throw ThrowError("Engine not correctly initialized !",ESolidErrorCode::S_INIT_ERROR);
 	Window* window = engine->window;
 	Renderer* renderer = engine->renderer;
-	
+	engine->Compiler->GameLoadDLL("BossRush");
 	glfwSwapInterval(0);
 	ResourcesLoader loader;
 	loader.SetManager(&(engine->resourceManager));
@@ -30,7 +30,7 @@ int main()
 	fs::path p = fs::current_path();
 	p.append("Assets");
 	loader.LoadResourcesFromFolder(p);
-	engine->LoadScene("");
+	engine->LoadScene("GuiScene.SolidScene");
 	engine->EnableMultiThread(false);
 	Camera sceneCam;
 	Time::Update();

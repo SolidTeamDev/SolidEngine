@@ -578,7 +578,7 @@ namespace Solid
 		                     "\t\t""throw ThrowError(\"Engine not correctly initialized !\",ESolidErrorCode::S_INIT_ERROR);\n"
 		                     "\t""Window* window = engine->window;\n"
 		                     "\t""Renderer* renderer = engine->renderer;\n"
-		                     "\t""engine->Compiler->GameLoadDLL(\""+ProjectName+"\")\n"
+		                     "\t""engine->Compiler->GameLoadDLL(\""+ProjectName+"\");\n"
 		                     "\t""glfwSwapInterval(0);\n"
 		                     "\t""ResourcesLoader loader;\n"
 		                     "\t""loader.SetManager(&(engine->resourceManager));\n"
