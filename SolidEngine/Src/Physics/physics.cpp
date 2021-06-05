@@ -87,8 +87,8 @@ namespace Solid
 
     void Physics::SetTransform(physx::PxActor* _actor, const Transform& _transform) const
     {
-        Vec3 pos = _transform.GetLocalPosition();
-        Quat rot = _transform.GetLocalRotation().GetInversed();
+        Vec3 pos = _transform.GetGlobalPosition();
+        Quat rot = _transform.GetGlobalRotation().GetInversed();
         PxTransform pxT = PxTransform(PxVec3(pos.x,pos.y,pos.z),PxQuat(rot.x,rot.y,rot.z,rot.w));
 
         switch(_actor->getType())

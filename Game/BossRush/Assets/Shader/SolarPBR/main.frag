@@ -26,6 +26,7 @@ uniform bool isUsingRoughnessMap;
 uniform bool isUsingAoMap; 
 uniform float ttt;
 
+uniform vec3 SColor;
 uniform vec2 resolution;
 
 
@@ -71,10 +72,10 @@ vec3 SolarColor(void)
             s*=e=1.8/min(dot(p,p),1.2),
             p=abs(p)*e-3.;
         g+=e=length(p.yz)/s;
-        (e<.005)?O.xyz+=mix(r/r,HSolar(g*.5),.6)*.05*exp(-g*10.):p;
+        (e<.005)?O.xyz+=mix(r/r,HSolar(g*0.5),0.6)*0.5*exp(-g*10.):p;
     }
 
-	return O;
+	return O*SColor;
 }
 
 
@@ -295,5 +296,8 @@ void main()
 {
     fragColor = PBRShading();
 }
+
+
+
 
 

@@ -16,7 +16,7 @@ namespace Solid
                 continue;
             }
 
-            auto transform = ecsManager.GetComponent<Transform>(entity);
+            auto& transform = ecsManager.GetComponent<Transform>(entity);
             if(ecsManager.GotComponent<Animation>(entity))
             {
                 auto& anim = ecsManager.GetComponent<Animation>(entity);
