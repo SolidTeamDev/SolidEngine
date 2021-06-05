@@ -31,8 +31,22 @@ namespace Solid
             Transform& transform = ecsManager.GetComponent<Transform>(entity);
 
             Vec3 scale = transform.GetLocalScale();
-            transform = _physics.GetTransform(go->physicsActor);
-            transform.SetScale(scale);
+            Transform t = _physics.GetTransform(go->physicsActor);
+            if(transform.GetParentTransform())
+            {
+                Vec3 ParentPos = transform.GetParentTransform()->GetGlobalPosition();
+                Quat ParentRot = transform.GetParentTransform()->GetGlobalRotation();
+                transform.SetPosition(t.GetLocalPosition()- ParentPos);
+                transform.SetRotation(t.GetLocalRotation() * ParentRot.GetInversed());
+                transform.SetScale(scale);
+            }
+            else
+                {
+                    transform.SetPosition(t.GetLocalPosition());
+                    transform.SetRotation(t.GetLocalRotation());
+                    transform.SetScale(scale);
+                }
+
         }
     }
 } //!namespace

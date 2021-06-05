@@ -50,7 +50,7 @@ namespace Solid SLDNamespace()
 	    Vec3 GetLocalForward() const;
 	    Vec3 GetLocalRight() const;
 	    Vec3 GetLocalUp() const;
-	    Vec3 GetGlobalPosition();
+	    Vec3 GetGlobalPosition() const ;
 	    Vec3 GetGlobalEuler()const;
 	    Quat GetGlobalRotation() const;
 	    Vec3 GetGlobalScale() const;

@@ -16,7 +16,9 @@ namespace Solid
     rotation(_rotation),
     euler(Maths::RadToDeg(rotation.ToEuler())),
     scale(_scale)
-    {}
+    {
+
+    }
 
     void Transform::SetPosition(const Vec3 &_vec)
     {
@@ -131,7 +133,7 @@ namespace Solid
 		parentTransform = _parent;
 	}
 
-	Vec3 Transform::GetGlobalPosition()
+	Vec3 Transform::GetGlobalPosition() const
 	{
 		if (parentTransform == nullptr)
 			return position;

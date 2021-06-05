@@ -23,14 +23,7 @@ void Megalos_kyvos::Init()
 
 void Megalos_kyvos::Destroy()
 {
-    for(auto go : CubeBullets)
-    {
-        if(engine->ecsManager.GotComponent<BoxCollider>(go->GetEntity()))
-            engine->ecsManager.RemoveComponent<BoxCollider>(go);
 
-        engine->ecsManager.DestroyEntity(go->GetEntity());
-    }
-    CubeBullets.clear();
 
 }
 
@@ -121,7 +114,7 @@ void Megalos_kyvos::SecondaryAttack()
         if (t > 1)
         {
             DataBullets[0].Ratio = 0;
-            //DataBullets[0].Step = EStepAttack::Two;
+            DataBullets[0].Step = EStepAttack::Two;
             CubeBullets[i]->transform->SetScale(Vec3::Lerp(Vec3(2,1,1), Vec3(SizeSecondaryAttack,1,1), t));
             CubeBullets[i+1]->transform->SetScale(Vec3::Lerp(Vec3(1,1,2), Vec3(1,1,SizeSecondaryAttack), t));
             if(box1 != nullptr)
@@ -202,8 +195,8 @@ void Megalos_kyvos::UpdateAttack()
     {
         if(DataBullets.size() <= 0 && CubeBullets.size() <= 0)
         {
-            Vec3 pos = Vec3(gameObject->transform->GetGlobalPosition().x,1,
-                            gameObject->transform->GetGlobalPosition().z);
+            Vec3 pos = Vec3(gameObject->transform->GetLocalPosition().x,1,
+                            gameObject->transform->GetLocalPosition().z);
             CreateBulletsCube("CubeBullet", pos, Vec3(2,1,1));
             CreateBulletsCube("CubeBullet", pos, Vec3(1,1,2));
 
