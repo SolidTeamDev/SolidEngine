@@ -578,7 +578,7 @@ namespace Solid
 		                     "\t\t""throw ThrowError(\"Engine not correctly initialized !\",ESolidErrorCode::S_INIT_ERROR);\n"
 		                     "\t""Window* window = engine->window;\n"
 		                     "\t""Renderer* renderer = engine->renderer;\n"
-		                     "\t""\n"
+		                     "\t""engine->Compiler->GameLoadDLL(\""+ProjectName+"\")\n"
 		                     "\t""glfwSwapInterval(0);\n"
 		                     "\t""ResourcesLoader loader;\n"
 		                     "\t""loader.SetManager(&(engine->resourceManager));\n"
@@ -726,6 +726,32 @@ namespace Solid
 		if(getNamespace == nullptr)
 			return -1;
 		return entryPoint();
+	}
+
+	void GameCompiler::GameLoadDLL(std::string name)
+	{
+    	if(hGetProcIDDLL == nullptr)
+	    {
+			fs::path dll = fs::current_path();
+			dll.append(name);
+		    hGetProcIDDLL = LoadLibrary(dll.string().c_str());
+		    if(hGetProcIDDLL != nullptr)
+		    {
+			    entryPoint = (f_Entry)GetProcAddress(hGetProcIDDLL, "Entry");
+			    getClass = (f_GetClass)GetProcAddress(hGetProcIDDLL, "GetClass");
+			    getNamespace = (f_GetNamespace)GetProcAddress(hGetProcIDDLL, "GetNamespace");
+			    if(entryPoint == nullptr || getClass == nullptr || getNamespace == nullptr)
+			    {
+				    Log::Send("DLL Does NOT contain function needed for loading custom scripts" + name, Log::ELogSeverity::ERROR);
+
+			    }
+		    }
+		    else
+		    {
+		    	Log::Send("Cannot find Scripts DLL named" + name, Log::ELogSeverity::ERROR);
+		    }
+
+	    }
 	}
 
 

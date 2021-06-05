@@ -58,6 +58,8 @@ namespace Solid
 	    void updateVCPath();
 	    const rfk::Namespace * GetNamespace(std::string _str);
 	    const rfk::Class * GetClass(std::string _str);
+
+	    void GameLoadDLL(std::string name);
 	    int EntryPoint();
 
         void AddLib();
