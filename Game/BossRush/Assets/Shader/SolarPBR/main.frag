@@ -56,7 +56,7 @@ const float PI =  3.14159265359;
 
 vec3 SolarColor(void)
 {
-    
+    vec2 C = gl_FragCoord.xy;
 	vec3 O=vec3(0);
     vec3 r=iResolution,p;
     float g=0.,e=0.,s=0.;
