@@ -44,11 +44,6 @@ Solid::GameObject::~GameObject()
 Solid::GameObject *Solid::GameObject::AddToCurrent(Solid::Entity _entity)
 {
 	GameObject* obj = new GameObject(this,_entity);
-    if(obj->physicsActor == nullptr)
-    {
-        Physics& physics = Engine::GetInstance()->physics;
-        physics.ConvertActor(obj,PhysicsActorType::STATIC);
-    }
 	childs.push_back(obj);
 	return obj;
 }
