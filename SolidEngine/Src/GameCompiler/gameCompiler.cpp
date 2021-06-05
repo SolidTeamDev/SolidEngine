@@ -605,6 +605,7 @@ namespace Solid
 		                     "\t\t""renderer->ClearColor({0,0,0,1});\n"
 		                     "\t\t""renderer->Clear(window->GetWindowSize());\n"
 		                     "\t\t""engine->activeCamera->UpdateCamera(window->GetWindowSize());\n"
+		                     "\t\t""engine->renderer->DrawSkybox(*engine->activeCamera);\n"
 		                     "\t\t""engine->rendererSystem->Update(engine->renderer,*engine->activeCamera);\n"
 		                     "\t\t""engine->audioSystem->Update(*engine->activeCamera);\n"
 		                     "\t\t""Time::Update();\n"
