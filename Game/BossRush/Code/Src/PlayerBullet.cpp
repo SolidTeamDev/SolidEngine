@@ -12,8 +12,3 @@ PlayerBullet::~PlayerBullet()
 {
 	
 }
-
-void Solid::PlayerBullet::Destroy()
-{
-    Engine::GetInstance()->ecsManager.DestroyEntity(gameObject->GetEntity());
-}

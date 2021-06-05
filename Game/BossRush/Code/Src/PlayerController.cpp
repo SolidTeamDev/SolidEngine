@@ -11,6 +11,7 @@ PlayerController::PlayerController()
     engine->inputManager->AddKeyInput("Back",GLFW_KEY_S,ImEnumDetectionType::PRESSED);
     engine->inputManager->AddKeyInput("Left",GLFW_KEY_A,ImEnumDetectionType::PRESSED);
     engine->inputManager->AddKeyInput("Right",GLFW_KEY_D,ImEnumDetectionType::PRESSED);
+    engine->inputManager->AddKeyInput("Dash",GLFW_KEY_LEFT_SHIFT, ImEnumDetectionType::NO_REPEAT);
     engine->inputManager->AddKeyInput("Jump",GLFW_KEY_SPACE, ImEnumDetectionType::NO_REPEAT);
     engine->inputManager->AddMouseInput("Fire1",GLFW_MOUSE_BUTTON_1, ImEnumDetectionType::NO_REPEAT);
 
@@ -46,6 +47,8 @@ void PlayerController::Update()
         MoveRight();
     if(engine->inputManager->IsPressed("Jump") && isGrounded)
         Jump();
+    if(engine->inputManager->IsPressed("Dash"))
+        Dash();
 
     if(engine->inputManager->IsPressed("Fire1"))
         Fire();
@@ -91,14 +94,12 @@ void PlayerController::MoveForward()
     if(!rigidBody)
         return;
 
-    Vec3 camRot = camera->parent->transform->GetLocalEuler();
-    Vec3 playerRot = gameObject->transform->GetLocalEuler();
+    Vec3 dir = camera->parent->transform->GetLocalUp() * moveSpeed;
 
-    camera->parent->transform->SetEuler(Vec3(0));
+    dir.y = 0;
+    dir.z = -dir.z;
 
-    gameObject->transform->SetEuler(Vec3(playerRot.x,playerRot.y,camRot.y));
-
-    rigidBody->AddForce(Vec3(0,0,moveSpeed));
+    rigidBody->AddForce(dir);
 }
 
 void PlayerController::MoveBack()
@@ -106,7 +107,12 @@ void PlayerController::MoveBack()
     if(!rigidBody)
         return;
 
-    rigidBody->AddForce(Vec3(0,0,-moveSpeed));
+    Vec3 dir = camera->parent->transform->GetLocalUp() * moveSpeed;
+
+    dir.x = -dir.x;
+    dir.y = 0;
+
+    rigidBody->AddForce(dir);
 }
 
 void PlayerController::MoveLeft()
@@ -114,7 +120,12 @@ void PlayerController::MoveLeft()
     if(!rigidBody)
         return;
 
-    rigidBody->AddForce(Vec3(moveSpeed,0,0));
+    Vec3 dir = camera->parent->transform->GetLocalRight() * moveSpeed;
+
+    dir.x = -dir.x;
+    dir.y = 0;
+
+    rigidBody->AddForce(dir);
 }
 
 void PlayerController::MoveRight()
@@ -122,7 +133,12 @@ void PlayerController::MoveRight()
     if(!rigidBody)
         return;
 
-    rigidBody->AddForce(Vec3(-moveSpeed,0,0));
+    Vec3 dir = camera->parent->transform->GetLocalRight() * moveSpeed;
+
+    dir.y = 0;
+    dir.z = -dir.z;
+
+    rigidBody->AddForce(dir);
 }
 
 void PlayerController::Jump()
@@ -133,12 +149,19 @@ void PlayerController::Jump()
     rigidBody->AddImpulse(Vec3(0,jumpForce,0));
 }
 
+void PlayerController::Dash()
+{
+    
+}
+
 void PlayerController::Fire()
 {
-    /*GameObject* go = engine->ecsManager.Instantiate("Bullet", nullptr, "PlayerBullet");
+    Vec3 dir = camera->parent->transform->GetLocalUp() * bulletSpeed;
+    dir.z = -dir.z;
 
-    go->transform->SetPosition(gameObject->transform->GetPosition());
-    engine->ecsManager.GetComponent<RigidBody>(go->GetEntity()).SetLinearVelocity(Vec3(0,0,10));*/
+    GameObject* go = engine->ecsManager.Instantiate("Bullet", nullptr, "PlayerBullet");
+    go->transform->SetPosition(gameObject->transform->GetLocalPosition());
+    engine->ecsManager.GetComponent<RigidBody>(go->GetEntity()).SetLinearVelocity(dir);
 }
 
 void PlayerController::OnContactEnter(GameObject *_other)

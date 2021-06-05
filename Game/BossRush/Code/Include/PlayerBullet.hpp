@@ -15,8 +15,6 @@ namespace Solid SLDNamespace()
 		PlayerBullet();
 		~PlayerBullet();
 
-        void Destroy() override;
-
         PlayerBullet_GENERATED
 	};
 	
