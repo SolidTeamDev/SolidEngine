@@ -36,6 +36,9 @@ int main()
 	Time::Update();
 	if(engine->activeCamera == nullptr)
 		engine->SetActiveCamera(&sceneCam);
+	engine->InitScript();
+	Time::Update();
+	Time::Update();
 	while (!glfwWindowShouldClose(window->GetHandle()))
 	{
 		glfwPollEvents();
