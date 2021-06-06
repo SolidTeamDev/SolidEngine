@@ -68,35 +68,41 @@ namespace Solid
 
     void Animation::CalculateBoneTransform (SkeletonResource::Bone* bone, const Mat4f& _parentTRS)
     {
-        //const char* nodeName = bone->name.c_str();
         Mat4f nodeTransform = Mat4f::Identity;
-
-        //SkeletonResource::Bone* newBone = anim->Root->FindBoneByName(nodeName);
 
         if (bone)
         {
-            UpdateBone(CurrentTime, bone);
+            UpdateBone(CurrentTime*1000, bone);
             nodeTransform = bone->LocalTrans;
         }
 
         Mat4f GlobalTrans =  _parentTRS * nodeTransform;
         {
             FinalsTrans[bone->id] =  ( GlobalTrans * bone->offset);
-            //FinalsTransBone[bone->id] =  ( GlobalTrans * newBone->offset.GetTransposed().GetInversed() );
+            if(ShowSkeleton)
+                FinalsTransBone[bone->id] =  ( GlobalTrans * bone->offset.GetTransposed().GetInversed());
+
         }
 
         for (auto child : bone->Childrens)
             CalculateBoneTransform(child, GlobalTrans);
     }
 
-    void Animation::SetAnim(AnimResource* _anim)
+    void Animation::SetAnim(String _animName,bool _loop)
+    {
+        AnimResource* anim = Engine::GetInstance()->resourceManager.GetRawAnimByName(AnimName.c_str());
+        if(anim)
+            SetAnim(anim);
+    }
+    void Animation::SetAnim(AnimResource* _anim,bool _loop)
     {
         anim = _anim;
         AnimName = anim->name;
-        AnimTime = anim->numTicks/anim->ticksPerSeconds;
+        AnimTime = anim->numTicks/1000;
+        Loop = _loop;
+        IsFinish = false;
         CurrentTime = 0;
-        std::cout << AnimTime << std::endl;
-        InverseRootMat = (anim->Root->LocalTrans ) ;
+        CurrentIndex = 0;
         FinalsTrans.clear();
         FinalsTransBone.clear();
         FinalsTrans.reserve(anim->numOfBones);
@@ -114,10 +120,17 @@ namespace Solid
     {
         if (anim)
         {
-            CurrentTime += anim->ticksPerSeconds * dt;
+            CurrentTime += dt;
             CurrentTime = fmod(CurrentTime, anim->numTicks);
-            if(CurrentTime >= AnimTime)
+            if(CurrentTime >= AnimTime && Loop)
+            {
                 CurrentTime = 0;
+                CurrentIndex = 0;
+                if(IsFinish)
+                    IsFinish = false;
+            }
+            else if(CurrentTime >= AnimTime && !IsFinish && !Loop)
+                IsFinish = true;
             CalculateBoneTransform(anim->Root, Mat4f::Identity);
         }
     }
@@ -129,12 +142,25 @@ namespace Solid
             {
                 int index = 0;
                 if(currTime <= bone->channel.Frames.size())
-                    index = (int)currTime;
+                    index = currTime;
                 else
-                    index = (int)bone->channel.Frames.size()-1;
+                    index = bone->channel.Frames.size()-1;
 
-                SkeletonResource::Bone::KeyFrame& keyFrame = bone->channel.Frames[index];
+                for(int i = CurrentIndex; i < bone->channel.Frames.size(); )
+                {
+                    SkeletonResource::Bone::KeyFrame& keyFrame = bone->channel.Frames[i];
+                    if(keyFrame.time <= currTime)
+                    {
+                        ++i;
 
+                    }
+                    else
+                    {
+                        CurrentIndex = i;
+                        break;
+                    }
+                }
+                SkeletonResource::Bone::KeyFrame& keyFrame = bone->channel.Frames[CurrentIndex];
                 Vec3 translation = keyFrame.usePos   ? keyFrame.pos   : Vec3::Zero;
                 Quat rotation    = keyFrame.useRot   ? keyFrame.Rot   : Quat::Identity;
                 Vec3 scale       = keyFrame.useScale ? keyFrame.Scale : Vec3(1,1,1);

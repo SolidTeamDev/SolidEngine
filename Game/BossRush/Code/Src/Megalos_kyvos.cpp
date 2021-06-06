@@ -213,8 +213,8 @@ void Megalos_kyvos::Special1Attack()
         {
             DataBullets[0].Ratio = 0;
             DataBullets[0].Step = EStepAttack::None;
-            /*
-             *
+
+
             for(auto go : CubeBullets[i]->childs)
             {
                 go->transform->SetScale(Vec3::Lerp(Vec3(1,1,1), Vec3(10,1,1), t));
@@ -223,20 +223,20 @@ void Megalos_kyvos::Special1Attack()
                 BoxCollider* box1 = &engine->ecsManager.GetComponent<BoxCollider>(go->GetEntity());
                 if(box1 != nullptr)
                     box1->SetSize(CubeBullets[i]->transform->GetLocalScale());
-            }*/
+            }
 
             return;
         }
-        //CubeBullets[i]->transform->SetRotation( Vec3::Lerp(Vec3::Zero, Vec3(0,180,0), t));
+        CubeBullets[i]->transform->Rotate( Vec3(0,10*Time::DeltaTime(),0));
 
-        /*for(auto go : CubeBullets[i]->childs)
+        for(auto go : CubeBullets[i]->childs)
         {
             go->transform->SetScale(Vec3::Lerp(Vec3(1,1,1), Vec3(10,1,1), t));
 
             BoxCollider* box1 = &engine->ecsManager.GetComponent<BoxCollider>(go->GetEntity());
             if(box1 != nullptr)
                 box1->SetSize(CubeBullets[i]->transform->GetLocalScale());
-        }*/
+        }
 
     }
 }
