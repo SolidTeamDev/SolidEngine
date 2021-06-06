@@ -26,6 +26,8 @@ namespace Solid SLDNamespace()
 
         SLDField()
         String animIdle = "";
+        SLDField()
+        String animFwd = "";
 	private:
 		Engine* engine = nullptr;
 	    RigidBody* rigidBody = nullptr;
