@@ -583,7 +583,7 @@ void ResourcesLoader::LoadResourcesFromFolder(const fs::path &Rpath)
 	                    {
 	                	    if(!hasLoadedPrisme)
 		                    {
-
+			                    RessourceArray[k].fbx.mesh->name = "Prisme.Fbx";
 				                Manager->AddResource(RessourceArray[k].fbx.mesh);
 				                hasLoadedPrisme = true;
 			                }
