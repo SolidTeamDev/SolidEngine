@@ -1,7 +1,7 @@
 #pragma once
 
 /**
-*	Source file: D:\Project\SolidEngine\Game\BossRush\Code\Include\Megalos_kyvos.hpp
+*	Source file: C:\Users\Trist\Desktop\Isart\SolidEngine\Game\BossRush\Code\Include\Megalos_kyvos.hpp
 */
 
 #include "EntityMacros.h"
@@ -19,13 +19,13 @@
 #ifdef __RFK3698706698196451833u_DeclareGetNamespaceFragment
 	#undef __RFK3698706698196451833u_DeclareGetNamespaceFragment
 #endif
-#define __RFK3698706698196451833u_DeclareGetNamespaceFragment inline rfk::NamespaceFragment const& getNamespaceFragment3698706698196451833u_12469948519134979926() noexcept;
+#define __RFK3698706698196451833u_DeclareGetNamespaceFragment inline rfk::NamespaceFragment const& getNamespaceFragment3698706698196451833u_9361833319552507617() noexcept;
 
 #ifdef __RFK3698706698196451833u_DefineGetNamespaceFragment
 	#undef __RFK3698706698196451833u_DefineGetNamespaceFragment
 #endif
 #define __RFK3698706698196451833u_DefineGetNamespaceFragment	\
-	inline rfk::NamespaceFragment const& getNamespaceFragment3698706698196451833u_12469948519134979926() noexcept	\
+	inline rfk::NamespaceFragment const& getNamespaceFragment3698706698196451833u_9361833319552507617() noexcept	\
 	{	\
 		static rfk::NamespaceFragment	fragment("Solid", 3698706698196451833u);	\
 		static bool						initialized = false;	\
@@ -41,7 +41,7 @@
 	#undef __RFK3698706698196451833u_RegisterNamespace
 #endif
 #define __RFK3698706698196451833u_RegisterNamespace	\
-	inline rfk::NamespaceFragmentRegisterer namespaceFragmentRegisterer3698706698196451833u_12469948519134979926 = rfk::NamespaceFragmentRegisterer("Solid", 3698706698196451833u, &getNamespaceFragment3698706698196451833u_12469948519134979926(), true);
+	inline rfk::NamespaceFragmentRegisterer namespaceFragmentRegisterer3698706698196451833u_9361833319552507617 = rfk::NamespaceFragmentRegisterer("Solid", 3698706698196451833u, &getNamespaceFragment3698706698196451833u_9361833319552507617(), true);
 
 #ifdef __RFK3698706698196451833u_GENERATED
 	#undef __RFK3698706698196451833u_GENERATED
@@ -93,6 +93,8 @@ public:	\
 		field = childArchetype->addField("SpeedSecondaryAttack", 192223428306142735u, rfk::Type::getType<float>(), static_cast<rfk::EFieldFlags>(1), &thisArchetype, offsetof(ChildType, SpeedSecondaryAttack));	\
 		field = childArchetype->addField("SizeSecondaryAttack", 13301946747969879333u, rfk::Type::getType<float>(), static_cast<rfk::EFieldFlags>(1), &thisArchetype, offsetof(ChildType, SizeSecondaryAttack));	\
 		field = childArchetype->addField("RotationAttackSpeed", 5740517204461577709u, rfk::Type::getType<float>(), static_cast<rfk::EFieldFlags>(1), &thisArchetype, offsetof(ChildType, RotationAttackSpeed));	\
+		field = childArchetype->addField("TimeSpecialAttack", 6809822427485314880u, rfk::Type::getType<float>(), static_cast<rfk::EFieldFlags>(1), &thisArchetype, offsetof(ChildType, TimeSpecialAttack));	\
+		field = childArchetype->addField("NumberSpawnCubeS2", 5636068330731880708u, rfk::Type::getType<int>(), static_cast<rfk::EFieldFlags>(1), &thisArchetype, offsetof(ChildType, NumberSpawnCubeS2));	\
 		__RFK_DISABLE_WARNING_POP	\
 	}
 

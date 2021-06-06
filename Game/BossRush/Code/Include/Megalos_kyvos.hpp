@@ -35,6 +35,12 @@ namespace Solid SLDNamespace()
         float SizeSecondaryAttack = 10;
         SLDField()
         float RotationAttackSpeed = 1;
+        SLDField()
+        float TimeSpecialAttack = 0.5;
+        float CurrTimeSpe = 0;
+        SLDField()
+        int NumberSpawnCubeS2 = 5;
+        int CurrNumber = 0;
 
 		Megalos_kyvos();
 		~Megalos_kyvos();

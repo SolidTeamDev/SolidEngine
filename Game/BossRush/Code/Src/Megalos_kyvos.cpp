@@ -18,7 +18,7 @@ Megalos_kyvos::~Megalos_kyvos()
 void Megalos_kyvos::Init()
 {
     Boss::Init();
-    StateAttack = EAttack::SECONDARY;
+    StateAttack = EAttack::SPECIAL2;
 }
 
 void Megalos_kyvos::Destroy()
@@ -106,8 +106,8 @@ void Megalos_kyvos::SecondaryAttack()
     DataBullets[0].Ratio += Time::DeltaTime() * SpeedSecondaryAttack;
     float t =  DataBullets[0].Ratio;
 
-    BoxCollider* box1 = &engine->ecsManager.GetComponent<BoxCollider>(CubeBullets[i]->GetEntity());;
-    BoxCollider* box2 = &engine->ecsManager.GetComponent<BoxCollider>(CubeBullets[i+1]->GetEntity());;
+    BoxCollider* box1 = &engine->ecsManager.GetComponent<BoxCollider>(CubeBullets[i]->GetEntity());
+    BoxCollider* box2 = &engine->ecsManager.GetComponent<BoxCollider>(CubeBullets[i+1]->GetEntity());
 
     if(DataBullets[0].Step == EStepAttack::One)
     {
@@ -115,8 +115,8 @@ void Megalos_kyvos::SecondaryAttack()
         {
             DataBullets[0].Ratio = 0;
             DataBullets[0].Step = EStepAttack::Two;
-            CubeBullets[i]->transform->SetScale(Vec3::Lerp(Vec3(2,1,1), Vec3(SizeSecondaryAttack,1,1), t));
-            CubeBullets[i+1]->transform->SetScale(Vec3::Lerp(Vec3(1,1,2), Vec3(1,1,SizeSecondaryAttack), t));
+            CubeBullets[i]->transform->SetScale(Vec3::Lerp(Vec3(2,1,1), Vec3(SizeSecondaryAttack,1,1), 1));
+            CubeBullets[i+1]->transform->SetScale(Vec3::Lerp(Vec3(1,1,2), Vec3(1,1,SizeSecondaryAttack), 1));
             if(box1 != nullptr)
                 box1->SetSize(CubeBullets[i]->transform->GetLocalScale());
             if(box2 != nullptr)
@@ -152,17 +152,123 @@ void Megalos_kyvos::SecondaryAttack()
 
 void Megalos_kyvos::TertiaryAttack()
 {
+    int i = DataBullets[0].Index;
+    if(DataBullets[0].Step == EStepAttack::None)
+        return;
 
+    DataBullets[0].Ratio += Time::DeltaTime() * SpeedSecondaryAttack;
+    float t =  DataBullets[0].Ratio;
+
+    if(DataBullets[0].Step == EStepAttack::One)
+    {
+        Vec3 pos = Vec3(Target.x, Target.y + 5, Target.z);
+        if (t > 1)
+        {
+            DataBullets[0].Ratio = 0;
+            DataBullets[0].Step = EStepAttack::Two;
+            CubeBullets[i]->transform->SetPosition(Vec3::Lerp(gameObject->transform->GetLocalPosition(), pos, 1));
+            return;
+        }
+        CubeBullets[i]->transform->SetPosition(Vec3::Lerp(gameObject->transform->GetLocalPosition(), pos, t));
+    }
+
+    else if(DataBullets[0].Step == EStepAttack::Two)
+    {
+        if (t > 1)
+        {
+            DataBullets[0].Ratio = 0;
+            DataBullets[0].Step = EStepAttack::None;
+            for(auto go : CubeBullets[i]->childs)
+            {
+                go->transform->SetScale(Vec3::Lerp(Vec3(1,1,1), Vec3(1,10,1), 1));
+                BoxCollider* box1 = &engine->ecsManager.GetComponent<BoxCollider>(go->GetEntity());
+                if(box1 != nullptr)
+                    box1->SetSize(CubeBullets[i]->transform->GetLocalScale());
+
+            }
+            return;
+        }
+        for(auto go : CubeBullets[i]->childs)
+        {
+            go->transform->SetScale(Vec3::Lerp(Vec3(1,1,1), Vec3(1,10,1), t));
+            BoxCollider* box1 = &engine->ecsManager.GetComponent<BoxCollider>(go->GetEntity());
+            if(box1 != nullptr)
+                box1->SetSize(CubeBullets[i]->transform->GetLocalScale());
+
+        }
+    }
 }
 
 void Megalos_kyvos::Special1Attack()
 {
+    int i = DataBullets[0].Index;
+    if(DataBullets[0].Step == EStepAttack::None)
+        return;
 
+    DataBullets[0].Ratio += Time::DeltaTime() * SpeedSecondaryAttack;
+    float t =  DataBullets[0].Ratio;
+    if(DataBullets[0].Step == EStepAttack::One)
+    {
+        if (t > 1)
+        {
+            DataBullets[0].Ratio = 0;
+            DataBullets[0].Step = EStepAttack::None;
+            /*
+             *
+            for(auto go : CubeBullets[i]->childs)
+            {
+                go->transform->SetScale(Vec3::Lerp(Vec3(1,1,1), Vec3(10,1,1), t));
+                go->transform->Rotate( Vec3(0,10*Time::DeltaTime(),0));
+
+                BoxCollider* box1 = &engine->ecsManager.GetComponent<BoxCollider>(go->GetEntity());
+                if(box1 != nullptr)
+                    box1->SetSize(CubeBullets[i]->transform->GetLocalScale());
+            }*/
+
+            return;
+        }
+        //CubeBullets[i]->transform->SetRotation( Vec3::Lerp(Vec3::Zero, Vec3(0,180,0), t));
+
+        /*for(auto go : CubeBullets[i]->childs)
+        {
+            go->transform->SetScale(Vec3::Lerp(Vec3(1,1,1), Vec3(10,1,1), t));
+
+            BoxCollider* box1 = &engine->ecsManager.GetComponent<BoxCollider>(go->GetEntity());
+            if(box1 != nullptr)
+                box1->SetSize(CubeBullets[i]->transform->GetLocalScale());
+        }*/
+
+    }
 }
 
 void Megalos_kyvos::Special2Attack()
 {
 
+
+    for(auto Data : DataBullets)
+    {
+        int i = Data.Index;
+        if(Data.Step == EStepAttack::None)
+            continue;
+
+        Data.Ratio += Time::DeltaTime() * SpeedSecondaryAttack;
+        if(Data.Step == EStepAttack::One)
+        {
+            Log::Send("Size " + std::to_string(DataBullets.size()) + ":" + std::to_string(CubeBullets.size()));
+            if(Data.Ratio >= 1)
+            {
+                Data.Step = EStepAttack::None;
+                CubeBullets[i]->transform->SetScale(Vec3::Lerp(Vec3(1,1,1), Vec3(1,10,1),1));
+                BoxCollider* box1 = &engine->ecsManager.GetComponent<BoxCollider>(CubeBullets[i]->GetEntity());
+                if(box1 != nullptr)
+                    box1->SetSize(CubeBullets[i]->transform->GetLocalScale());
+            }
+            CubeBullets[i]->transform->SetScale(Vec3::Lerp(Vec3(1,1,1), Vec3(1,10,1), Data.Ratio));
+            BoxCollider* box1 = &engine->ecsManager.GetComponent<BoxCollider>(CubeBullets[i]->GetEntity());
+            if(box1 != nullptr)
+                box1->SetSize(CubeBullets[i]->transform->GetLocalScale());
+        }
+    }
 }
 
 void Megalos_kyvos::ChooseAttack()
@@ -207,15 +313,41 @@ void Megalos_kyvos::UpdateAttack()
     }
     else if(StateAttack == EAttack::TERTIARY)
     {
+        if(DataBullets.size() <= 0 && CubeBullets.size() <= 0)
+        {
 
+            CreateBulletsCube("MultiPillar", gameObject->transform->GetLocalPosition(), Vec3(0.5));
+            int i = CubeBullets.size() - 1;
+            DataBullets.push_back({i, 0,Vec3::Zero, EStepAttack::One});
+        }
+        TertiaryAttack();
     }
     else if(StateAttack == EAttack::SPECIAL1)
     {
+        if(DataBullets.size() <= 0 && CubeBullets.size() <= 0)
+        {
 
+            CreateBulletsCube("BulletSA1", Target, Vec3(1));
+            int i = CubeBullets.size() - 1;
+            DataBullets.push_back({i, 0,Vec3::Zero, EStepAttack::One});
+        }
+        Special1Attack();
     }
     else if(StateAttack == EAttack::SPECIAL2)
     {
-
+        if(CurrTimeSpe >= TimeSpecialAttack && CurrNumber < NumberSpawnCubeS2)
+        {
+            Vec3 pos = Vec3(Player->transform->GetLocalPosition().x,
+                            Player->transform->GetLocalPosition().y+5,
+                            Player->transform->GetLocalPosition().z);
+            CreateBulletsCube("CubeBullet",pos , Vec3(1));
+            int i = CubeBullets.size() - 1;
+            DataBullets.push_back({i, 0,Vec3::Zero, EStepAttack::One});
+            CurrTimeSpe = 0;
+            CurrNumber++;
+        }
+        Special2Attack();
+        CurrTimeSpe+=Time::DeltaTime();
     }
 }
 
