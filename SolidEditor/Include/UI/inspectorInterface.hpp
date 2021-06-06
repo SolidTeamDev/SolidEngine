@@ -27,7 +27,8 @@ namespace Solid
             enum class ECodeType
             {
                 VERTEX,
-                FRAGMENT
+                FRAGMENT,
+                COMPUTE
             };
             TextEditor imCodeEditor;
             ECodeType codeType;

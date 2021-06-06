@@ -1,11 +1,14 @@
 #version 450
-layout(local_size_x = 1, local_size_y = 1) in;
+layout(local_size_x = 8, local_size_y = 8) in;
 uniform float _mult = 1;
 uniform float _GlobalTime =0;
-uniform vec2 resolution = vec2(512,512);
+uniform float mask = 0.3f;
+
 uniform vec3 SColor = vec3(0.2);
-vec3 _color;
-layout(rgba32f, binding = 0) uniform image2D img_output;
+
+
+layout(rgba32f, binding = 0) uniform writeonly image2D _img_output;
+layout(rgba32f) uniform readonly image2D albedo;
 
 #define iTime _GlobalTime
 #define iResolution vec3(resolution,1.)
@@ -18,11 +21,22 @@ layout(rgba32f, binding = 0) uniform image2D img_output;
 
 vec3 WaterColor(vec2 texSize)
 {
+    ivec2 pixel_coords = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 alSize = imageSize(albedo);
+    vec2 alfSize = vec2(float(alSize.x), float(alSize.y));
+    vec2 ratio = vec2(alfSize.x / texSize.x, alfSize.y / texSize.y);
     
-    	float t = iTime * 0.0001;
+    
+    ivec2 alCoord = ivec2(pixel_coords.x * ratio.x , pixel_coords.y * ratio.y);
+    vec4 alPixel = imageLoad(albedo,alCoord );
+    
+    	float t = iTime * 0.00005;
     // uv should be the 0-1 uv of texture...
-	vec2 uv =  vec2(float(gl_GlobalInvocationID.x)/ texSize.x , float(gl_GlobalInvocationID.y)/texSize.y);
+	vec2 uv =  vec2(float(gl_GlobalInvocationID.x)/ texSize.x , float(gl_GlobalInvocationID.y)/ texSize.y);
 
+	
+    // output to a specific pixel in the image
+    
 
 #ifdef SHOW_TILING
 	vec2 p = mod(uv*TAU*2.0, TAU)-250.0;
@@ -42,7 +56,8 @@ vec3 WaterColor(vec2 texSize)
 	c /= float(MAX_ITER);
 	c = 1.17-pow(c, 1.4);
 	vec3 colour = vec3(pow(abs(c), 8.0));
-    	colour = clamp(colour + SColor, 0.0, 1.0);
+		colour += mask;
+    	colour = clamp(colour * alPixel.xyz, 0.0, 1.0);
 
 #ifdef SHOW_TILING
 	// Flash tile borders...
@@ -62,13 +77,28 @@ vec3 WaterColor(vec2 texSize)
 void main()
 {
     ivec2 pixel_coords = ivec2(gl_GlobalInvocationID.xy);
-    ivec2 size = imageSize(img_output);
+    ivec2 size = imageSize(_img_output);
+    
     vec2 fPixel_coords = vec2(float(pixel_coords.x), float(pixel_coords.y));
     vec2 fSize = vec2(float(size.x), float(size.y));
     vec4 pixel = vec4(WaterColor(fSize), 1.0);
     // output to a specific pixel in the image
-    imageStore(img_output, pixel_coords, pixel);
+    imageStore(_img_output, pixel_coords, pixel);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

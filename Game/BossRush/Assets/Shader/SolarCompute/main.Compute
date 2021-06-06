@@ -1,52 +1,39 @@
 #version 450
-layout(local_size_x = 1, local_size_y = 1) in;
+layout(local_size_x = 8, local_size_y = 8) in;
 uniform float _mult = 1;
 uniform float _GlobalTime =0;
 uniform vec2 resolution = vec2(512,512);
 
 vec3 _color;
-layout(rgba32f, binding = 0) uniform image2D img_output;
+layout(rgba32f, binding = 0) uniform image2D _img_output;
+layout(rgba32f) uniform image2D albedo;
 
 #define iTime _GlobalTime
-#define iResolution vec3(resolution,1.)
-#define RSolar(p,a,r)mix(a*dot(p,a),p,cos(r))+sin(r)*cross(p,a)
-#define HSolar(h)cos(h*6.3+vec3(0,23,21))*.5+.5
 
 
 
-vec3 SolarColor(vec2 texSize)
+
+vec3 SolarColor(ivec2 texSize)
 {
-    vec2 C = vec2(float(gl_GlobalInvocationID.x)*5.0f , float(gl_GlobalInvocationID.y)*5.0f);
-	vec3 O=vec3(0);
-    vec3 r=iResolution,p;
-    float g=0.,e=0.,s=0.;
-    for(float i=0.;i<99.;++i)
-    {
-        p=g*vec3((C-.5*r.xy)/r.y,1);
-        p-=vec3(.02,.01,.08);
-        p=RSolar(p,normalize(vec3(1,3,3)),iTime*.000001);
-        p+=p;
-        s=2.;
-        for(int j=0;j<7;++j)
-            s*=e=1.8/min(dot(p,p),1.2),
-            p=abs(p)*e-3.;
-        g+=e=length(p.yz)/s;
-        (e<.005)?O.xyz+=mix(r/r,HSolar(g*.5),.6)*.05*exp(-g*10.):p;
-    }
-
-	return O;
+   
+   //return vec3(0);
+   return imageLoad(albedo, ivec2(gl_GlobalInvocationID.xy));
+   
+   
 }
 
 void main()
 {
     ivec2 pixel_coords = ivec2(gl_GlobalInvocationID.xy);
-    ivec2 size = imageSize(img_output);
+    ivec2 size = imageSize(_img_output);
     vec2 fPixel_coords = vec2(float(pixel_coords.x), float(pixel_coords.y));
     vec2 fSize = vec2(float(size.x), float(size.y));
-    vec4 pixel = vec4(SolarColor(fSize), 1.0);
+    vec4 pixel = vec4(SolarColor(size), 1.0f);
     // output to a specific pixel in the image
-    imageStore(img_output, pixel_coords, pixel);
+    imageStore(_img_output, pixel_coords, pixel);
 }
+
+
 
 
 

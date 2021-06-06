@@ -375,7 +375,7 @@ uint GL::ComputeShader::Dispatch()
 uint GL::ComputeShader::ForceDispatch()
 {
 	Dispatched = true;
-	uint textID = 0;
+	uint textID = 1;
 	for(auto& value : ComputeFields)
 	{
 		switch (value.type)
@@ -420,7 +420,7 @@ uint GL::ComputeShader::ForceDispatch()
 						continue;
 
 					SetInt(value.name.c_str(), textID);
-					value.text.text->BindTexture(textID);
+					value.text.text->BindImageTexture(textID);
 					++textID;
 				}
 				break;
@@ -449,7 +449,7 @@ uint GL::ComputeShader::ForceDispatch()
 
 				int TexUnit = 0;
 				GetInt(value.name.c_str(), &TexUnit);
-				value.text.text->UnBindTexture(TexUnit);
+				value.text.text->UnBindImageTexture(TexUnit);
 			}
 
 		}
@@ -928,7 +928,10 @@ void GL::Shader::LoadShaderFields()
             case GL_SAMPLER_2D:
                 shaderUniform.type = MaterialResource::EShaderFieldType::TEXT;
                 break;
-            default:
+	        case GL_IMAGE_2D:
+		        shaderUniform.type = MaterialResource::EShaderFieldType::TEXT;
+		        break;
+		    default:
                 shaderUniform.type = MaterialResource::EShaderFieldType::NONE;
                 break;
         }
@@ -955,7 +958,7 @@ GL::Texture::Texture(ImageResource *_image)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	//if(_image->ChannelsNum == 4)
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _image->x, _image->y, 0, GL_RGBA, GL_UNSIGNED_BYTE, _image->image.data());
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, _image->x, _image->y, 0, GL_RGBA, GL_UNSIGNED_BYTE, _image->image.data());
 	//else if(_image->ChannelsNum == 3)
 	//	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, _image->x, _image->y, 0, GL_RGB, GL_UNSIGNED_BYTE, _image->image.data());
 	glGenerateMipmap(GL_TEXTURE_2D);
@@ -1004,6 +1007,21 @@ void GL::Texture::UnBindTexture(uint _texUnit)
 {
 	glActiveTexture(GL_TEXTURE0+ _texUnit);
 	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void GL::Texture::BindImageTexture(uint _texUnit)
+{
+	if(_texUnit == 0)
+		return;
+	glBindImageTexture(_texUnit, texId, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA32F);
+
+}
+
+void GL::Texture::UnBindImageTexture(uint _texUnit)
+{
+	if(_texUnit == 0)
+		return;
+	glBindImageTexture(_texUnit, 0, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA32F);
 }
 
 GL::Cubemap::Cubemap(CubemapResource *_cubemap)

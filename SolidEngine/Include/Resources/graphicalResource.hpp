@@ -213,6 +213,10 @@ namespace Solid
 
 			virtual void BindTexture(uint _texUnit) override;
 
+			virtual void BindImageTexture(uint _texUnit) override;
+
+			virtual void UnBindImageTexture(uint _texUnit) override;
+
 			virtual void UnBindTexture(uint _texUnit) override;
 		};
 

@@ -220,7 +220,8 @@ namespace Solid
 	    ~ITexture() = default;
 	    virtual void BindTexture(uint _texUnit) = 0;
 	    virtual void UnBindTexture(uint _texUnit) = 0;
-
+		virtual void BindImageTexture(uint _texUnit) = 0;
+		virtual void UnBindImageTexture(uint _texUnit) = 0;
 	};
 
 	class SOLID_API ICubemap

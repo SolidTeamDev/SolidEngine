@@ -568,94 +568,170 @@ namespace Solid
                         }
 
                         //Open window to edit shader
-                        if(codeEditor.isCodeEditorOpen)
-                        {
-                            auto cpos = codeEditor.imCodeEditor.GetCursorPosition();
-                            UI::SetNextWindowSize(ImVec2(800,600),ImGuiCond_Once);
-                            UI::Begin("Edit shader##Window", &codeEditor.isCodeEditorOpen,ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking);
-	                        ImGuiIO& io = ImGui::GetIO();
-	                        auto shift = io.KeyShift;
-	                        auto ctrl = io.ConfigMacOSXBehaviors ? io.KeySuper : io.KeyCtrl;
-	                        auto alt = io.ConfigMacOSXBehaviors ? io.KeyCtrl : io.KeyAlt;
+	                    if(codeEditor.isCodeEditorOpen && codeEditor.codeType == CodeEditor::ECodeType::VERTEX)
+	                    {
+		                    auto cpos = codeEditor.imCodeEditor.GetCursorPosition();
+		                    UI::SetNextWindowSize(ImVec2(800,600),ImGuiCond_Once);
+		                    UI::Begin("Edit shader##Window", &codeEditor.isCodeEditorOpen,ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking);
+		                    ImGuiIO& io = ImGui::GetIO();
+		                    auto shift = io.KeyShift;
+		                    auto ctrl = io.ConfigMacOSXBehaviors ? io.KeySuper : io.KeyCtrl;
+		                    auto alt = io.ConfigMacOSXBehaviors ? io.KeyCtrl : io.KeyAlt;
 
 
 
 
-                            if (ImGui::BeginMenuBar())
-                            {
-                                if (ImGui::BeginMenu("File"))
-                                {
-                                    if (ImGui::MenuItem("Save","Ctrl-S"))
-                                    {
-                                        if(codeEditor.codeType == CodeEditor::ECodeType::FRAGMENT)
-                                            mat->GetShader()->SetFragSource(codeEditor.imCodeEditor.GetText());
-                                        else if(codeEditor.codeType == CodeEditor::ECodeType::VERTEX)
-                                            mat->GetShader()->SetVertSource(codeEditor.imCodeEditor.GetText());
+		                    if (ImGui::BeginMenuBar())
+		                    {
+			                    if (ImGui::BeginMenu("File"))
+			                    {
+				                    if (ImGui::MenuItem("Save","Ctrl-S"))
+				                    {
+					                    mat->GetShader()->SetVertSource(codeEditor.imCodeEditor.GetText());
 
-                                        mat->GetShader()->ReloadShader();
-                                        mat->LoadShaderFields();
-                                    }
-                                    if (ImGui::MenuItem("Quit", "Alt-F4"))
-                                        codeEditor.isCodeEditorOpen = false;
-                                    ImGui::EndMenu();
-                                }
-                                if (ImGui::BeginMenu("Edit"))
-                                {
-                                    if (ImGui::MenuItem("Undo", "ALT-Backspace", nullptr, codeEditor.imCodeEditor.CanUndo()))
-                                        codeEditor.imCodeEditor.Undo();
-                                    if (ImGui::MenuItem("Redo", "Ctrl-Y", nullptr, codeEditor.imCodeEditor.CanRedo()))
-                                        codeEditor.imCodeEditor.Redo();
+					                    mat->GetShader()->ReloadShader();
+					                    mat->LoadShaderFields();
+				                    }
+				                    if (ImGui::MenuItem("Quit", "Alt-F4"))
+					                    codeEditor.isCodeEditorOpen = false;
+				                    ImGui::EndMenu();
+			                    }
+			                    if (ImGui::BeginMenu("Edit"))
+			                    {
+				                    if (ImGui::MenuItem("Undo", "ALT-Backspace", nullptr, codeEditor.imCodeEditor.CanUndo()))
+					                    codeEditor.imCodeEditor.Undo();
+				                    if (ImGui::MenuItem("Redo", "Ctrl-Y", nullptr, codeEditor.imCodeEditor.CanRedo()))
+					                    codeEditor.imCodeEditor.Redo();
 
-                                    ImGui::Separator();
+				                    ImGui::Separator();
 
-                                    if (ImGui::MenuItem("Copy", "Ctrl-C", nullptr, codeEditor.imCodeEditor.HasSelection()))
-                                        codeEditor.imCodeEditor.Copy();
-                                    if (ImGui::MenuItem("Cut", "Ctrl-X", nullptr, codeEditor.imCodeEditor.HasSelection()))
-                                        codeEditor.imCodeEditor.Cut();
-                                    if (ImGui::MenuItem("Delete", "Del", nullptr, codeEditor.imCodeEditor.HasSelection()))
-                                        codeEditor.imCodeEditor.Delete();
-                                    if (ImGui::MenuItem("Paste", "Ctrl-V", nullptr, ImGui::GetClipboardText() != nullptr))
-                                        codeEditor.imCodeEditor.Paste();
+				                    if (ImGui::MenuItem("Copy", "Ctrl-C", nullptr, codeEditor.imCodeEditor.HasSelection()))
+					                    codeEditor.imCodeEditor.Copy();
+				                    if (ImGui::MenuItem("Cut", "Ctrl-X", nullptr, codeEditor.imCodeEditor.HasSelection()))
+					                    codeEditor.imCodeEditor.Cut();
+				                    if (ImGui::MenuItem("Delete", "Del", nullptr, codeEditor.imCodeEditor.HasSelection()))
+					                    codeEditor.imCodeEditor.Delete();
+				                    if (ImGui::MenuItem("Paste", "Ctrl-V", nullptr, ImGui::GetClipboardText() != nullptr))
+					                    codeEditor.imCodeEditor.Paste();
 
-                                    ImGui::Separator();
+				                    ImGui::Separator();
 
-                                    if (ImGui::MenuItem("Select all", nullptr, nullptr))
-                                        codeEditor.imCodeEditor.SelectAll();
+				                    if (ImGui::MenuItem("Select all", nullptr, nullptr))
+					                    codeEditor.imCodeEditor.SelectAll();
 
-                                    ImGui::EndMenu();
-                                }
+				                    ImGui::EndMenu();
+			                    }
 
-                                if (ImGui::BeginMenu("View"))
-                                {
-                                    if (ImGui::MenuItem("Dark palette"))
-                                        codeEditor.imCodeEditor.SetPalette(TextEditor::GetDarkPalette());
-                                    if (ImGui::MenuItem("Light palette"))
-                                        codeEditor.imCodeEditor.SetPalette(TextEditor::GetLightPalette());
-                                    ImGui::EndMenu();
-                                }
-                                ImGui::EndMenuBar();
-                            }
+			                    if (ImGui::BeginMenu("View"))
+			                    {
+				                    if (ImGui::MenuItem("Dark palette"))
+					                    codeEditor.imCodeEditor.SetPalette(TextEditor::GetDarkPalette());
+				                    if (ImGui::MenuItem("Light palette"))
+					                    codeEditor.imCodeEditor.SetPalette(TextEditor::GetLightPalette());
+				                    ImGui::EndMenu();
+			                    }
+			                    ImGui::EndMenuBar();
+		                    }
 
-                            ImGui::Text("%6d/%-6d %6d lines  | %s | %s | %s | %s", cpos.mLine + 1, cpos.mColumn + 1, codeEditor.imCodeEditor.GetTotalLines(),
-                                        codeEditor.imCodeEditor.IsOverwrite() ? "Ovr" : "Ins",
-                                        codeEditor.imCodeEditor.CanUndo() ? "*" : " ",
-                                        codeEditor.imCodeEditor.GetLanguageDefinition().mName.c_str(), mat->GetShader()->name.c_str());
+		                    ImGui::Text("%6d/%-6d %6d lines  | %s | %s | %s | %s", cpos.mLine + 1, cpos.mColumn + 1, codeEditor.imCodeEditor.GetTotalLines(),
+		                                codeEditor.imCodeEditor.IsOverwrite() ? "Ovr" : "Ins",
+		                                codeEditor.imCodeEditor.CanUndo() ? "*" : " ",
+		                                codeEditor.imCodeEditor.GetLanguageDefinition().mName.c_str(), mat->GetShader()->name.c_str());
 
-                            codeEditor.imCodeEditor.Render("Edit shader",UI::GetContentRegionAvail(), false);
-	                        if (codeEditor.imCodeEditor.WantSave())
-	                        {
+		                    codeEditor.imCodeEditor.Render("Edit shader",UI::GetContentRegionAvail(), false);
+		                    if (codeEditor.imCodeEditor.WantSave())
+		                    {
 
-		                        if(codeEditor.codeType == CodeEditor::ECodeType::FRAGMENT)
-			                        mat->GetShader()->SetFragSource(codeEditor.imCodeEditor.GetText());
-		                        else if(codeEditor.codeType == CodeEditor::ECodeType::VERTEX)
-			                        mat->GetShader()->SetVertSource(codeEditor.imCodeEditor.GetText());
+			                    mat->GetShader()->SetVertSource(codeEditor.imCodeEditor.GetText());
 
-		                        mat->GetShader()->ReloadShader();
-		                        mat->LoadShaderFields();
+			                    mat->GetShader()->ReloadShader();
+			                    mat->LoadShaderFields();
 
-	                        }
-                            UI::End();
-                        }
+		                    }
+		                    UI::End();
+	                    }
+	                    if(codeEditor.isCodeEditorOpen && codeEditor.codeType == CodeEditor::ECodeType::FRAGMENT)
+	                    {
+		                    auto cpos = codeEditor.imCodeEditor.GetCursorPosition();
+		                    UI::SetNextWindowSize(ImVec2(800,600),ImGuiCond_Once);
+		                    UI::Begin("Edit shader##Window", &codeEditor.isCodeEditorOpen,ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking);
+		                    ImGuiIO& io = ImGui::GetIO();
+		                    auto shift = io.KeyShift;
+		                    auto ctrl = io.ConfigMacOSXBehaviors ? io.KeySuper : io.KeyCtrl;
+		                    auto alt = io.ConfigMacOSXBehaviors ? io.KeyCtrl : io.KeyAlt;
+
+
+
+
+		                    if (ImGui::BeginMenuBar())
+		                    {
+			                    if (ImGui::BeginMenu("File"))
+			                    {
+				                    if (ImGui::MenuItem("Save","Ctrl-S"))
+				                    {
+					                    mat->GetShader()->SetFragSource(codeEditor.imCodeEditor.GetText());
+
+					                    mat->GetShader()->ReloadShader();
+					                    mat->LoadShaderFields();
+				                    }
+				                    if (ImGui::MenuItem("Quit", "Alt-F4"))
+					                    codeEditor.isCodeEditorOpen = false;
+				                    ImGui::EndMenu();
+			                    }
+			                    if (ImGui::BeginMenu("Edit"))
+			                    {
+				                    if (ImGui::MenuItem("Undo", "ALT-Backspace", nullptr, codeEditor.imCodeEditor.CanUndo()))
+					                    codeEditor.imCodeEditor.Undo();
+				                    if (ImGui::MenuItem("Redo", "Ctrl-Y", nullptr, codeEditor.imCodeEditor.CanRedo()))
+					                    codeEditor.imCodeEditor.Redo();
+
+				                    ImGui::Separator();
+
+				                    if (ImGui::MenuItem("Copy", "Ctrl-C", nullptr, codeEditor.imCodeEditor.HasSelection()))
+					                    codeEditor.imCodeEditor.Copy();
+				                    if (ImGui::MenuItem("Cut", "Ctrl-X", nullptr, codeEditor.imCodeEditor.HasSelection()))
+					                    codeEditor.imCodeEditor.Cut();
+				                    if (ImGui::MenuItem("Delete", "Del", nullptr, codeEditor.imCodeEditor.HasSelection()))
+					                    codeEditor.imCodeEditor.Delete();
+				                    if (ImGui::MenuItem("Paste", "Ctrl-V", nullptr, ImGui::GetClipboardText() != nullptr))
+					                    codeEditor.imCodeEditor.Paste();
+
+				                    ImGui::Separator();
+
+				                    if (ImGui::MenuItem("Select all", nullptr, nullptr))
+					                    codeEditor.imCodeEditor.SelectAll();
+
+				                    ImGui::EndMenu();
+			                    }
+
+			                    if (ImGui::BeginMenu("View"))
+			                    {
+				                    if (ImGui::MenuItem("Dark palette"))
+					                    codeEditor.imCodeEditor.SetPalette(TextEditor::GetDarkPalette());
+				                    if (ImGui::MenuItem("Light palette"))
+					                    codeEditor.imCodeEditor.SetPalette(TextEditor::GetLightPalette());
+				                    ImGui::EndMenu();
+			                    }
+			                    ImGui::EndMenuBar();
+		                    }
+
+		                    ImGui::Text("%6d/%-6d %6d lines  | %s | %s | %s | %s", cpos.mLine + 1, cpos.mColumn + 1, codeEditor.imCodeEditor.GetTotalLines(),
+		                                codeEditor.imCodeEditor.IsOverwrite() ? "Ovr" : "Ins",
+		                                codeEditor.imCodeEditor.CanUndo() ? "*" : " ",
+		                                codeEditor.imCodeEditor.GetLanguageDefinition().mName.c_str(), mat->GetShader()->name.c_str());
+
+		                    codeEditor.imCodeEditor.Render("Edit shader",UI::GetContentRegionAvail(), false);
+		                    if (codeEditor.imCodeEditor.WantSave())
+		                    {
+
+			                    mat->GetShader()->SetFragSource(codeEditor.imCodeEditor.GetText());
+
+			                    mat->GetShader()->ReloadShader();
+			                    mat->LoadShaderFields();
+
+		                    }
+		                    UI::End();
+	                    }
 
                         // Choose Shader
                         const char* shaderName = mat->GetShader() == nullptr ? "DEFAULT SHADER" : mat->GetShader()->name.c_str();
@@ -1308,7 +1384,8 @@ namespace Solid
 
     void InspectorInterface::EditTexture(MatText &_texture, const std::string &_label)
     {
-	    UI::Checkbox("##ISCOMPUTEGEN", &_texture.isUsingComputeGeneratedTex);
+	    UI::Checkbox("##"
+				  "ISCOMPUTEGEN", &_texture.isUsingComputeGeneratedTex);
 	    UI::SameLine();
 	    if (_texture.isUsingComputeGeneratedTex)
 	    {
@@ -1336,8 +1413,9 @@ namespace Solid
 		    {
 			    codeEditor.isCodeEditorOpen = true;
 			    codeEditor.imCodeEditor.SetText(_texture.Compute->GetComputeSource());
+			    codeEditor.codeType = CodeEditor::ECodeType::COMPUTE;
 		    }
-		    if(codeEditor.isCodeEditorOpen)
+		    if(codeEditor.isCodeEditorOpen && codeEditor.codeType == CodeEditor::ECodeType::COMPUTE)
 		    {
 			    auto cpos = codeEditor.imCodeEditor.GetCursorPosition();
 			    UI::SetNextWindowSize(ImVec2(800,600),ImGuiCond_Once);
@@ -1404,7 +1482,7 @@ namespace Solid
 			    ImGui::Text("%6d/%-6d %6d lines  | %s | %s | %s | %s", cpos.mLine + 1, cpos.mColumn + 1, codeEditor.imCodeEditor.GetTotalLines(),
 			                codeEditor.imCodeEditor.IsOverwrite() ? "Ovr" : "Ins",
 			                codeEditor.imCodeEditor.CanUndo() ? "*" : " ",
-			                codeEditor.imCodeEditor.GetLanguageDefinition().mName.c_str(), _texture.Compute->name.c_str());
+			                codeEditor.imCodeEditor.GetLanguageDefinition().mName.c_str(), textName.c_str());
 
 			    codeEditor.imCodeEditor.Render("Edit shader",UI::GetContentRegionAvail(), false);
 			    if (codeEditor.imCodeEditor.WantSave())
@@ -1473,7 +1551,7 @@ namespace Solid
 			    }
 
 		    }
-
+			UI::Unindent();
 	    }
 	    else
 	    {
