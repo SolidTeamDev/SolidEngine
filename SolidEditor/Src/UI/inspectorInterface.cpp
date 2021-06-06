@@ -878,8 +878,8 @@ namespace Solid
                     bool selected = (SKName == anim.second->name);
                     if(UI::Selectable(anim.second->name.c_str(), selected))
                     {
-                        _anim.SetAnim((AnimResource *) anim.second);
 
+                        _anim.SetAnim((AnimResource *) anim.second);
                     }
                     if(selected)
                         UI::SetItemDefaultFocus();
@@ -887,8 +887,10 @@ namespace Solid
 
                 UI::EndCombo();
             }
-        }
+            EditBool(_anim.Loop,"Loop##ANIMATION");
+            EditBool(_anim.IsFinish,"Finish##ANIMATION");
 
+        }
     }
 
     void InspectorInterface::EditCamera(Camera& _camera)

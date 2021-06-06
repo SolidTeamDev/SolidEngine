@@ -101,8 +101,7 @@ namespace Solid
         engine->renderer->DrawSkybox(sceneCam);
         if(ShowSkeleton)
         {
-        	///TOMOVE
-            engine->animSystem->Update(sceneCam);
+            engine->animSystem->DebugUpdate(sceneCam);
         }
 
         if(ShowGrid)
@@ -136,6 +135,14 @@ namespace Solid
         {
             UI::Checkbox("Grid", &ShowGrid);
             UI::Checkbox("Skeleton", &ShowSkeleton);
+            if(ShowSkeleton)
+            {
+                for (auto entity :  engine->animSystem->entities)
+                {
+                    auto &anim = engine->animSystem->ecsManager.GetComponent<Animation>(entity);
+                    anim.ShowSkeleton = ShowSkeleton;
+                }
+            }
 
             UI::EndMenu();
         }

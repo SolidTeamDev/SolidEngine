@@ -183,6 +183,7 @@ namespace Solid
     void Engine::Update()
     {
         inputManager->Update();
+        animSystem->Update();
 
         scriptSystem->Update();
     }

@@ -19,21 +19,25 @@ namespace Solid SLDNamespace()
         void CalculateBoneTransform (SkeletonResource::Bone* bone, const Solid::Mat4f& _parent);
         void DrawSkeleton(std::vector<Vec3>& points, std::vector<uint>& indices,
                           SkeletonResource::Bone* bone = nullptr);
-        void SetAnim(AnimResource *_anim);
+        void SetAnim(AnimResource *_anim,bool _loop = true);
+        void SetAnim(String _animName,bool _loop = true);
+
         void UpdateAnim(float dt);
         void UpdateBone(float currTime, SkeletonResource::Bone* bone = nullptr);
         const AnimResource * GetAnim();
         const std::vector<Mat4f> GetFinalTrans();
 		void Init();
 
+        bool Loop = false;
+        bool IsFinish = false;
+        bool ShowSkeleton = false;
     private:
-        //SkeletonResource* Skeleton = nullptr;
         float AnimTime;
         AnimResource* anim = nullptr;
 	    SLDField()
         String AnimName;
-        float CurrentTime;
-        Mat4f InverseRootMat = Mat4f::Identity;
+        float CurrentTime = 0;
+        int CurrentIndex = 0;
         std::vector<Mat4f> FinalsTrans;
         std::vector<Mat4f> FinalsTransBone;
     public:

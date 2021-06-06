@@ -34,9 +34,11 @@ namespace Solid
             Transform t = _physics.GetTransform(go->physicsActor);
             if(transform.GetParentTransform())
             {
-                Vec3 ParentPos = transform.GetParentTransform()->GetGlobalPosition();
+                //Vec3 ParentPos = transform.GetParentTransform()->GetGlobalPosition();
+                Mat4f MatParent = transform.GetParentTransform()->GetGlobalMatrix().GetInversed();
                 Quat ParentRot = transform.GetParentTransform()->GetGlobalRotation();
-                transform.SetPosition(t.GetLocalPosition()- ParentPos);
+                Vec3 LocalPos = MatParent * Vec4(t.GetLocalPosition());
+                transform.SetPosition(LocalPos);
                 transform.SetRotation(t.GetLocalRotation() * ParentRot.GetInversed());
                 transform.SetScale(scale);
             }

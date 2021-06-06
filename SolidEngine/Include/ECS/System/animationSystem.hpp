@@ -15,7 +15,9 @@ namespace Solid
 	public:
 		AnimationSystem(ECSManager& _ecsManager): System(_ecsManager){};
 
-		void Update(Camera& _camera);
+		void Update();
+		void DebugUpdate(Camera& _camera);
+
 	};
 } //!namespace
 
