@@ -36,16 +36,16 @@ namespace Solid
             {
                 Vec3 ParentPos = transform.GetParentTransform()->GetGlobalPosition();
                 Quat ParentRot = transform.GetParentTransform()->GetGlobalRotation();
-                transform.SetPosition(t.GetLocalPosition()- ParentPos);
+                transform.SetPosition(t.GetLocalPosition() + ParentPos);
                 transform.SetRotation(t.GetLocalRotation() * ParentRot.GetInversed());
                 transform.SetScale(scale);
             }
             else
-                {
-                    transform.SetPosition(t.GetLocalPosition());
-                    transform.SetRotation(t.GetLocalRotation());
-                    transform.SetScale(scale);
-                }
+            {
+                transform.SetPosition(t.GetLocalPosition());
+                transform.SetRotation(t.GetLocalRotation());
+                transform.SetScale(scale);
+            }
 
         }
     }

@@ -24,6 +24,7 @@ void PlayerController::Init()
         rigidBody = &engine->ecsManager.GetComponent<RigidBody>(gameObject->GetEntity());
 
     camera = engine->activeCamera->gameObject;
+    mesh = engine->ecsManager.FindGameObjectByName("Mesh",gameObject->childs[0]);
 
     engine->inputManager->ShowCursor(false);
 }
@@ -81,10 +82,10 @@ void PlayerController::RotateCamera()
     rot.y -= (float)xpos * mouseSensitivity;
 
 
-    if (rot.x < -120.0f)
-        rot.x = -120.0f;
-    if (rot.x > -63.0f)
-        rot.x = -63.0f;
+    if (rot.x < -60)
+        rot.x = -60;
+    if (rot.x > 10)
+        rot.x = 10;
 
     transform.SetEuler(rot);
 }
@@ -94,12 +95,14 @@ void PlayerController::MoveForward()
     if(!rigidBody)
         return;
 
-    Vec3 dir = camera->parent->transform->GetLocalUp() * moveSpeed;
+    Vec3 dir = camera->parent->transform->GetLocalForward() * moveSpeed;
 
+    dir.x = -dir.x;
     dir.y = 0;
-    dir.z = -dir.z;
 
     rigidBody->AddForce(dir);
+
+    mesh->transform->SetEuler(Vec3(90,0,camera->parent->transform->GetLocalEuler().y));
 }
 
 void PlayerController::MoveBack()
@@ -107,10 +110,10 @@ void PlayerController::MoveBack()
     if(!rigidBody)
         return;
 
-    Vec3 dir = camera->parent->transform->GetLocalUp() * moveSpeed;
+    Vec3 dir = camera->parent->transform->GetLocalForward() * moveSpeed;
 
-    dir.x = -dir.x;
     dir.y = 0;
+    dir.z = -dir.z;
 
     rigidBody->AddForce(dir);
 }
@@ -156,8 +159,8 @@ void PlayerController::Dash()
 
 void PlayerController::Fire()
 {
-    Vec3 dir = camera->parent->transform->GetLocalUp() * bulletSpeed;
-    dir.z = -dir.z;
+    Vec3 dir = camera->parent->transform->GetLocalForward() * bulletSpeed;
+    dir.x = -dir.x;
 
     GameObject* go = engine->ecsManager.Instantiate("Bullet", nullptr, "PlayerBullet");
     go->transform->SetPosition(gameObject->transform->GetLocalPosition());
