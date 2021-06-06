@@ -168,12 +168,29 @@ void GL::Mesh::DrawMesh(const std::vector<MaterialResource *>& _list, Transform&
 							break;
                         case MaterialResource::EShaderFieldType::TEXT:
                             {
-                                if(value.text == nullptr)
-                                    continue;
+                            	if(value.text.isUsingComputeGeneratedTex)
+	                            {
+		                            if(value.text.Compute == nullptr)
+			                            continue;
 
-                                shader->SetInt(value.name.c_str(), textID);
-                                value.text->BindTexture(textID);
-                                ++textID;
+		                            shader->SetInt(value.name.c_str(), textID);
+		                            value.text.Compute->BindShader();
+		                            value.text.Compute->SetFloat("_GlobalTime", Time::GlobalTime());
+		                            uint Texture = value.text.Compute->Dispatch();
+		                            value.text.Compute->UnbindShader();
+		                            glActiveTexture(GL_TEXTURE0+ textID);
+		                            glBindTexture(GL_TEXTURE_2D, Texture);
+		                            ++textID;
+	                            }
+                            	else
+	                            {
+		                            if(value.text.text == nullptr)
+			                            continue;
+
+		                            shader->SetInt(value.name.c_str(), textID);
+		                            value.text.text->BindTexture(textID);
+		                            ++textID;
+	                            }
                                 break;
                             }
 						default:
@@ -202,12 +219,23 @@ void GL::Mesh::DrawMesh(const std::vector<MaterialResource *>& _list, Transform&
             {
                 if(value.type == MaterialResource::EShaderFieldType::TEXT)
                 {
-                    if(value.text == nullptr)
-                        continue;
+                	if(value.text.isUsingComputeGeneratedTex)
+	                {
+		                int TexUnit = 0;
+		                shader->GetInt(value.name.c_str(), &TexUnit);
+		                glActiveTexture(GL_TEXTURE0+ TexUnit);
+		                glBindTexture(GL_TEXTURE_2D, 0);
+	                }
+                	else
+	                {
+		                if(value.text.text == nullptr)
+			                continue;
 
-                    int TexUnit = 0;
-                    shader->GetInt(value.name.c_str(), &TexUnit);
-                    value.text->UnBindTexture(TexUnit);
+		                int TexUnit = 0;
+		                shader->GetInt(value.name.c_str(), &TexUnit);
+		                value.text.text->UnBindTexture(TexUnit);
+	                }
+
                 }
             }
 		}
@@ -302,6 +330,7 @@ void GL::ComputeShader::InitTex(Vec2i size)
 {
 	if(isInit)
 	{
+		TexSize = size;
 		shader.BindShader();
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, OutTexId);
@@ -518,6 +547,11 @@ void GL::ComputeShader::SetComputeSource(const std::string &_src)
 std::string &GL::ComputeShader::GetComputeSource()
 {
 	return source->ComputeSource;
+}
+
+Vec2i GL::ComputeShader::GetTexSize()
+{
+	return TexSize;
 }
 
 
