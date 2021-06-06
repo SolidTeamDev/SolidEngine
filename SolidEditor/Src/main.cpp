@@ -57,7 +57,7 @@ int main(int argc, char** argv)
 	    editor.CurrentProjectJson["Project"]["LastOpenedScene"] = editor.lastScene;
 	    std::ofstream file(ProjectPath, std::fstream::trunc);
 
-	    file << std::setw(4)<< editor.CurrentProjectJson.unflatten();
+	    file << std::setw(4)<< editor.CurrentProjectJson;
 	    file.close();
 
 
