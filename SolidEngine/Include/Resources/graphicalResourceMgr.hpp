@@ -190,6 +190,13 @@ namespace Solid
 		{
 			return Shaders;
 		}
+		void ResetAllComputeDispatch()
+		{
+			for(auto& elt : Computes)
+			{
+				elt.second->ResetDispatchState();
+			}
+		}
 		void Init(ResourceManager* _mgr, Renderer* _renderer) {resourceMgr= _mgr; renderer = _renderer;}
 
 	};

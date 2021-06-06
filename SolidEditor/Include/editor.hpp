@@ -84,7 +84,7 @@ namespace Solid
 
         json CurrentProjectJson;
         bool ForceInit = false;
-
+		std::string lastScene = "Untitled";
         Editor();
         ~Editor();
         void InitFromProject(fs::path _projectPath);

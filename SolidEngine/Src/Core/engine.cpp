@@ -832,6 +832,8 @@ namespace Solid
 				if(key.find("GameObject") != std::string::npos)
 				{
 					GameObject* ent = engine->ecsManager.CreateEntity( it.value()["Name"], e);
+					if(it.value()["TAG"].is_string())
+						ent->tag = it.value()["TAG"];
 					Lambda(std::ref(it.value()), ent->GetEntity());
 				}
 			}
@@ -843,6 +845,8 @@ namespace Solid
 			{
 				std::string name = it.value()["Name"];
 				GameObject* ent = engine->ecsManager.CreateEntity(name);
+				if(it.value()["TAG"].is_string())
+					ent->tag = it.value()["TAG"];
 				Lambda(std::ref(it.value()), ent->GetEntity());
 			}
 		}
@@ -950,6 +954,8 @@ namespace Solid
 				if(key.find("GameObject") != std::string::npos)
 				{
 					GameObject* ent = engine->ecsManager.CreateEntity( it.value()["Name"], e);
+					if(it.value()["TAG"].is_string())
+						ent->tag = it.value()["TAG"];
 					Lambda(std::ref(it.value()), ent->GetEntity());
 				}
 			}
@@ -961,6 +967,8 @@ namespace Solid
 			{
 				std::string name = it.value()["Name"];
 				GameObject* ent = engine->ecsManager.CreateEntity(name);
+				if(it.value()["TAG"].is_string())
+					ent->tag = it.value()["TAG"];
 				Lambda(std::ref(it.value()), ent->GetEntity());
 			}
 		}
@@ -986,6 +994,7 @@ namespace Solid
 			{
 				std::string subP = path + "/{GameObject_"+ std::to_string(sub->GetEntity()) + "}" ;
 				j[subP + "/Name"] = sub->name;
+				j[subP + "/TAG"] = sub->tag;
 				Lambda(std::ref(j), sub, std::ref(subP));
 			}
 
@@ -1050,7 +1059,8 @@ namespace Solid
     	for(GameObject* sub : elt->childs)
     	{
     		std::string subP = path + "/{GameObject_"+ std::to_string(sub->GetEntity()) + "}" ;
-    		j[subP + "/Name"] = sub->name;
+		    j[subP + "/Name"] = sub->name;
+		    j[subP + "/TAG"] = sub->tag;
 		    setJsonSave(std::ref(j), sub, std::ref(subP));
     	}
 

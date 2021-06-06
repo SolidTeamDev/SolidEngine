@@ -322,7 +322,8 @@ GL::ComputeShader::ComputeShader(ComputeShaderResource *_cs) : ICompute(EResourc
 		//TODO : Cleanup at return
 		computeW.error = true;
 	}
-
+	LoadShaderFields();
+	ReloadFields();
 
 }
 
@@ -365,8 +366,94 @@ void GL::ComputeShader::InitTex(Vec2i size)
 
 uint GL::ComputeShader::Dispatch()
 {
+	if(Dispatched)
+		return OutTexId;
+
+	return ForceDispatch();
+}
+
+uint GL::ComputeShader::ForceDispatch()
+{
+	Dispatched = true;
+	uint textID = 0;
+	for(auto& value : ComputeFields)
+	{
+		switch (value.type)
+		{
+			case EShaderFieldType::BOOL:
+				SetBool(value.name.c_str(), value.b);
+				break;
+			case  EShaderFieldType::INT:
+				SetInt(value.name.c_str(), value.i);
+				break;
+			case  EShaderFieldType::FLOAT:
+				SetFloat(value.name.c_str(), value.f);
+				break;
+			case  EShaderFieldType::VEC2:
+				SetVec2(value.name.c_str(), value.v2);
+				break;
+			case  EShaderFieldType::VEC3:
+				SetVec3(value.name.c_str(), value.v3);
+				break;
+			case  EShaderFieldType::VEC4:
+				SetVec4(value.name.c_str(), value.v4);
+				break;
+			case EShaderFieldType::TEXT:
+			{
+				if(value.text.isUsingComputeGeneratedTex)
+				{
+					if(value.text.Compute == nullptr)
+						continue;
+
+					SetInt(value.name.c_str(), textID);
+					value.text.Compute->BindShader();
+					value.text.Compute->SetFloat("_GlobalTime", Time::GlobalTime());
+					uint Texture = value.text.Compute->Dispatch();
+					value.text.Compute->UnbindShader();
+					glActiveTexture(GL_TEXTURE0+ textID);
+					glBindTexture(GL_TEXTURE_2D, Texture);
+					++textID;
+				}
+				else
+				{
+					if(value.text.text == nullptr)
+						continue;
+
+					SetInt(value.name.c_str(), textID);
+					value.text.text->BindTexture(textID);
+					++textID;
+				}
+				break;
+			}
+			default:
+				break;
+		}
+	}
 	glDispatchCompute((GLuint)512, (GLuint)512, 1);
 	glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+	for(auto& value : ComputeFields)
+	{
+		if(value.type == EShaderFieldType::TEXT)
+		{
+			if(value.text.isUsingComputeGeneratedTex)
+			{
+				int TexUnit = 0;
+				GetInt(value.name.c_str(), &TexUnit);
+				glActiveTexture(GL_TEXTURE0+ TexUnit);
+				glBindTexture(GL_TEXTURE_2D, 0);
+			}
+			else
+			{
+				if(value.text.text == nullptr)
+					continue;
+
+				int TexUnit = 0;
+				GetInt(value.name.c_str(), &TexUnit);
+				value.text.text->UnBindTexture(TexUnit);
+			}
+
+		}
+	}
 	return OutTexId;
 }
 
@@ -388,6 +475,7 @@ void GL::ComputeShader::ReloadShader()
 	{
 		glLinkProgram(shader.ProgID);
 		LoadShaderFields();
+		ReloadFields();
 		fs::path p=ResourcesLoader::SolidPath.parent_path();
 		for(auto& elt : source->path)
 		{

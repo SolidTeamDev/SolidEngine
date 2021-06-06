@@ -1313,23 +1313,7 @@ namespace Solid
 	    if (_texture.isUsingComputeGeneratedTex)
 	    {
 		    std::string textName = _texture.Compute == nullptr ? "None" : _texture.Compute->name;
-		    Vec2i size = _texture.Compute == nullptr ? Vec2i() : _texture.Compute->GetTexSize();
-		    UI::DragInt2("ComputeBufferSize", &size.x);
-		    if (_texture.Compute != nullptr)
-			    _texture.Compute->InitTex(size);
 		    bool combo = UI::BeginCombo(_label.c_str(), textName.c_str());
-		    if (UI::BeginDragDropTarget())
-		    {
-
-			    const ImGuiPayload *drop = UI::AcceptDragDropPayload("Compute");
-			    if (drop != nullptr)
-			    {
-				    Resource *r = *((Resource **) drop->Data);
-				    _texture.Compute = engine->graphicsResourceMgr.GetCompute(r->name.c_str());
-				    _texture.text = nullptr;
-			    }
-			    UI::EndDragDropTarget();
-		    }
 		    if (combo)
 		    {
 			    auto *textures = engine->resourceManager.GetResourcesVecByType<ComputeShaderResource>();
@@ -1347,6 +1331,149 @@ namespace Solid
 
 			    UI::EndCombo();
 		    }
+
+		    if(UI::Button("Edit Compute shader"))
+		    {
+			    codeEditor.isCodeEditorOpen = true;
+			    codeEditor.imCodeEditor.SetText(_texture.Compute->GetComputeSource());
+		    }
+		    if(codeEditor.isCodeEditorOpen)
+		    {
+			    auto cpos = codeEditor.imCodeEditor.GetCursorPosition();
+			    UI::SetNextWindowSize(ImVec2(800,600),ImGuiCond_Once);
+			    UI::Begin("Edit shader##Window", &codeEditor.isCodeEditorOpen,ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking);
+			    ImGuiIO& io = ImGui::GetIO();
+			    auto shift = io.KeyShift;
+			    auto ctrl = io.ConfigMacOSXBehaviors ? io.KeySuper : io.KeyCtrl;
+			    auto alt = io.ConfigMacOSXBehaviors ? io.KeyCtrl : io.KeyAlt;
+
+
+
+
+			    if (ImGui::BeginMenuBar())
+			    {
+				    if (ImGui::BeginMenu("File"))
+				    {
+					    if (ImGui::MenuItem("Save","Ctrl-S"))
+					    {
+						    _texture.Compute->SetComputeSource(codeEditor.imCodeEditor.GetText());
+
+						    _texture.Compute->ReloadShader();
+					    }
+					    if (ImGui::MenuItem("Quit", "Alt-F4"))
+						    codeEditor.isCodeEditorOpen = false;
+					    ImGui::EndMenu();
+				    }
+				    if (ImGui::BeginMenu("Edit"))
+				    {
+					    if (ImGui::MenuItem("Undo", "ALT-Backspace", nullptr, codeEditor.imCodeEditor.CanUndo()))
+						    codeEditor.imCodeEditor.Undo();
+					    if (ImGui::MenuItem("Redo", "Ctrl-Y", nullptr, codeEditor.imCodeEditor.CanRedo()))
+						    codeEditor.imCodeEditor.Redo();
+
+					    ImGui::Separator();
+
+					    if (ImGui::MenuItem("Copy", "Ctrl-C", nullptr, codeEditor.imCodeEditor.HasSelection()))
+						    codeEditor.imCodeEditor.Copy();
+					    if (ImGui::MenuItem("Cut", "Ctrl-X", nullptr, codeEditor.imCodeEditor.HasSelection()))
+						    codeEditor.imCodeEditor.Cut();
+					    if (ImGui::MenuItem("Delete", "Del", nullptr, codeEditor.imCodeEditor.HasSelection()))
+						    codeEditor.imCodeEditor.Delete();
+					    if (ImGui::MenuItem("Paste", "Ctrl-V", nullptr, ImGui::GetClipboardText() != nullptr))
+						    codeEditor.imCodeEditor.Paste();
+
+					    ImGui::Separator();
+
+					    if (ImGui::MenuItem("Select all", nullptr, nullptr))
+						    codeEditor.imCodeEditor.SelectAll();
+
+					    ImGui::EndMenu();
+				    }
+
+				    if (ImGui::BeginMenu("View"))
+				    {
+					    if (ImGui::MenuItem("Dark palette"))
+						    codeEditor.imCodeEditor.SetPalette(TextEditor::GetDarkPalette());
+					    if (ImGui::MenuItem("Light palette"))
+						    codeEditor.imCodeEditor.SetPalette(TextEditor::GetLightPalette());
+					    ImGui::EndMenu();
+				    }
+				    ImGui::EndMenuBar();
+			    }
+
+			    ImGui::Text("%6d/%-6d %6d lines  | %s | %s | %s | %s", cpos.mLine + 1, cpos.mColumn + 1, codeEditor.imCodeEditor.GetTotalLines(),
+			                codeEditor.imCodeEditor.IsOverwrite() ? "Ovr" : "Ins",
+			                codeEditor.imCodeEditor.CanUndo() ? "*" : " ",
+			                codeEditor.imCodeEditor.GetLanguageDefinition().mName.c_str(), _texture.Compute->name.c_str());
+
+			    codeEditor.imCodeEditor.Render("Edit shader",UI::GetContentRegionAvail(), false);
+			    if (codeEditor.imCodeEditor.WantSave())
+			    {
+
+				    _texture.Compute->SetComputeSource(codeEditor.imCodeEditor.GetText());
+
+				    _texture.Compute->ReloadShader();
+
+			    }
+			    UI::End();
+		    }
+		    Vec2i size = _texture.Compute == nullptr ? Vec2i() : _texture.Compute->GetTexSize();
+		    UI::DragInt2("ComputeBufferSize", &size.x);
+		    if (_texture.Compute != nullptr)
+			    _texture.Compute->InitTex(size);
+		    if (UI::BeginDragDropTarget())
+		    {
+
+			    const ImGuiPayload *drop = UI::AcceptDragDropPayload("Compute");
+			    if (drop != nullptr)
+			    {
+				    Resource *r = *((Resource **) drop->Data);
+				    _texture.Compute = engine->graphicsResourceMgr.GetCompute(r->name.c_str());
+				    _texture.text = nullptr;
+			    }
+			    UI::EndDragDropTarget();
+		    }
+		    UI::Indent();
+		    if(_texture.Compute != nullptr)
+		    {
+			    if(UI::TreeNode(std::string("Edit "+textName + " Uniforms ##COMPUTE").c_str()))
+			    {
+
+
+				    for(auto& field : _texture.Compute->ComputeFields)
+				    {
+					    switch(field.type)
+					    {
+						    case ICompute::EShaderFieldType::BOOL:
+							    EditBool(field.b,field.name);
+							    break;
+						    case ICompute::EShaderFieldType::INT:
+							    EditInt(field.i,field.name,1);
+							    break;
+						    case ICompute::EShaderFieldType::FLOAT:
+							    EditFloat(field.f,field.name,0.01f);
+							    break;
+						    case ICompute::EShaderFieldType::VEC2:
+							    EditVec2(field.v2,field.name,0.01f);
+							    break;
+						    case ICompute::EShaderFieldType::VEC3:
+							    EditVec3(field.v3,field.name,0.01f);
+							    break;
+						    case ICompute::EShaderFieldType::VEC4:
+							    EditVec4(field.v4,field.name,0.01f);
+							    break;
+						    case ICompute::EShaderFieldType::TEXT:
+							    EditTexture(field.text,field.name);
+							    break;
+						    default:
+							    break;
+					    }
+				    }
+				    UI::TreePop();
+			    }
+
+		    }
+
 	    }
 	    else
 	    {

@@ -89,12 +89,47 @@ namespace Solid
 	class SOLID_API ICompute : public IShader
 	{
 	public:
+		enum class EShaderFieldType : int
+		{
+			BOOL,
+			INT,
+			FLOAT,
+			VEC2,
+			VEC3,
+			VEC4,
+			TEXT,
+			NONE
+		};
+		class SOLID_API ShaderField
+		{
+		public:
+			std::string name;
+			EShaderFieldType type;
+			union
+			{
+				bool   b;
+				int    i;
+				float  f;
+				Vec2   v2;
+				Vec3   v3;
+				Vec4   v4;
 
+			};
+			MatText text;
+			ShaderField();
 
+			ShaderField(EShaderFieldType _type);
+			ShaderField(const struct ShaderUniform& _uniform);
+			ShaderField(const ShaderField& _copy);
+			~ShaderField(){};
+			ShaderField& operator=(const ShaderField& _copy);
+		};
 
+		std::vector<ShaderField> ComputeFields;
 	protected:
 		ComputeShaderResource* source = nullptr;
 		bool isInit = false;
+		bool Dispatched = false;
 
 	public:
 		//public func
@@ -107,7 +142,69 @@ namespace Solid
 		virtual void SetComputeSource(const std::string& _src) = 0;
 		virtual std::string& GetComputeSource() = 0;
 		virtual uint Dispatch() = 0;
+		void SaveFields(std::vector<char> &buffer);
+		size_t GetSkipSize();
+		void LoadFields(char *buffer, size_t bSize, uint64_t &readPos);
+		void ReloadFields()
+		{
+			std::vector<ShaderField> temp = ComputeFields;
+			ComputeFields.clear();
+
+			auto uniforms = GetUniformList();
+
+			for(const auto& uniform: uniforms)
+				ComputeFields.emplace_back(uniform);
+			for (int i = 0; i < ComputeFields.size(); ++i)
+			{
+				for (int j = 0; j < temp.size(); ++j)
+				{
+					if(ComputeFields[i].name == temp[j].name && ComputeFields[i].type == temp[j].type)
+					{
+						switch (ComputeFields[i].type)
+						{
+							case EShaderFieldType::BOOL:
+								ComputeFields[i].b = temp[j].b;
+								break;
+							case EShaderFieldType::INT:
+								ComputeFields[i].i = temp[j].i;
+								break;
+							case EShaderFieldType::FLOAT:
+								ComputeFields[i].f = temp[j].f;
+								break;
+							case EShaderFieldType::VEC2:
+								ComputeFields[i].v2 = temp[j].v2;
+								break;
+							case EShaderFieldType::VEC3:
+								ComputeFields[i].v3 = temp[j].v3;
+								break;
+							case EShaderFieldType::VEC4:
+								ComputeFields[i].v4 = temp[j].v4;
+								break;
+							case EShaderFieldType::TEXT:
+								ComputeFields[i].text = temp[j].text;
+								break;
+							default:
+								break;
+
+						}
+					}
+				}
+			}
+		}
+
+		bool WasDispatched()
+		{
+			return Dispatched;
+		}
+		void ResetDispatchState()
+		{
+			Dispatched = false;
+		}
+		virtual uint ForceDispatch() = 0;
 	};
+
+
+
 	class SOLID_API ITexture
 	{
 	public:

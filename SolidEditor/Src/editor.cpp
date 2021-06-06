@@ -63,12 +63,15 @@ namespace Solid
         EditorInterface editorInterface(window, renderer);
 
         glfwSwapInterval(0);
-
+		if(lastScene != "Untitled")
+		{
+			Engine::GetInstance()->LoadScene(lastScene.c_str());
+		}
 	    while (!glfwWindowShouldClose(window->GetHandle()))
         {
             glfwPollEvents();
             editorInputManager->Update();
-
+			engine->graphicsResourceMgr.ResetAllComputeDispatch();
             //TODO: Update engine task in engine
 			engine->ForceUpdate();
             if(play && !paused)
@@ -87,7 +90,7 @@ namespace Solid
 
             window->SwapBuffers();
         }
-
+		lastScene = editorInterface.currentOpenedScene;
     }
 
     void Editor::LoadResources( fs::path& p)
@@ -111,6 +114,9 @@ namespace Solid
 	void Editor::InitFromProject(fs::path _projectPath)
 	{
 		std::string ProjectName =CurrentProjectJson["Project"]["Name"] ;
+		if(CurrentProjectJson["Project"]["LastOpenedScene"].is_string())
+			lastScene =CurrentProjectJson["Project"]["LastOpenedScene"];
+
 		fs::path ProjectPath =_projectPath.parent_path().string() ;
 		fs::path AssetPath =ProjectPath.string() + "/" +(std::string(CurrentProjectJson["Project"]["AssetFolder"])) ;
 		fs::path CodePath =ProjectPath.string() +"/" +(std::string(CurrentProjectJson["Project"]["SourcesFolder"])) ;

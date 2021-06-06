@@ -192,6 +192,8 @@ namespace Solid
 
 			~ComputeShader() = default;
 
+			virtual uint ForceDispatch() override;
+
 		};
 
 		class SOLID_API Texture : public ITexture

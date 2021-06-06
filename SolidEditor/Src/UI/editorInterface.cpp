@@ -216,9 +216,23 @@ namespace Solid {
     {
         if (UI::BeginMenu("Files"))
         {
-	        if (UI::MenuItem("Save Project"))
+	        if (UI::MenuItem("New Scene"))
 	        {
-
+	        	currentOpenedScene = "Untitled";
+	        	currentScenePtr = nullptr;
+	        	currentScenePath = "";
+		        Engine* engine = Engine::GetInstance();
+		        GameObject* world = engine->ecsManager.GetWorld();
+		        for (auto it = world->childs.begin() ; it != world->childs.end();)
+		        {
+			        engine->ecsManager.DestroyEntity((*it)->GetEntity());
+			        //(*it)->RemoveCurrent();
+			        it = world->childs.begin();
+			        if(it == world->childs.end())
+			        {
+				        break;
+			        }
+		        }
 	        }
             if (UI::MenuItem("Save Scene"))
             {

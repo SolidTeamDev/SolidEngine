@@ -402,6 +402,7 @@ void MaterialResource::ToDataBuffer(std::vector<char> &buffer)
 						ResourcesLoader::Append(buffer, &(size), sizeof(size));
 						ResourcesLoader::Append(buffer, (void *) (field.text.Compute->name.c_str()), size * sizeof(std::string::value_type));
 						ResourcesLoader::Append(buffer, &TS, sizeof(Vec2i));
+						field.text.Compute->SaveFields(buffer);
 
 					}
 				}
@@ -534,8 +535,16 @@ int MaterialResource::FromDataBuffer(char *buffer, size_t bSize)
 					{
 						ResourcesLoader::ReadFromBuffer(buffer, &(TS), sizeof(Vec2i), ReadPos, bSize);
 						field.text.Compute = Engine::GetInstance()->graphicsResourceMgr.GetCompute(tStr.c_str());
+						std::size_t skipSize = 0;
+						ResourcesLoader::ReadFromBuffer(buffer, &(skipSize), sizeof(size_t), ReadPos, bSize);
+
 						if(field.text.Compute)
+						{
 							field.text.Compute->InitTex(TS);
+							field.text.Compute->LoadFields(buffer, bSize, ReadPos);
+						}
+						else
+							ReadPos += skipSize;
 					}
 					else
 						field.text.text = Engine::GetInstance()->graphicsResourceMgr.GetTexture(tStr.c_str());
@@ -1023,6 +1032,8 @@ void PrefabResource::UpdatePrefab(GameObject *_gameObject)
 
 		std::string subP = path + "/{GameObject_"+ std::to_string(elt->GetEntity()) + "}" ;
 		j[subP + "/Name"] = elt->name;
+		j[subP + "/TAG"] = elt->tag;
+
 		for(GameObject* sub : elt->childs)
 		{
 			Lambda(std::ref(j), sub, std::ref(subP));
