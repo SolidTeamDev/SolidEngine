@@ -1,0 +1,78 @@
+#version 450
+layout(local_size_x = 1, local_size_y = 1) in;
+uniform float _mult = 1;
+uniform float _GlobalTime =0;
+uniform vec2 resolution = vec2(512,512);
+uniform vec3 SColor = vec3(0.2);
+vec3 _color;
+layout(rgba32f, binding = 0) uniform image2D img_output;
+
+#define iTime _GlobalTime
+#define iResolution vec3(resolution,1.)
+#define RWater(p,a,r)mix(a*dot(p,a),p,cos(r))+sin(r)*cross(p,a)
+#define HWater(h)cos(h*6.3+vec3(0,23,21))*.5+.5
+#define TAU 6.28318530718
+#define MAX_ITER 4
+
+
+
+vec3 WaterColor(vec2 texSize)
+{
+    
+    	float t = iTime * 0.0001;
+    // uv should be the 0-1 uv of texture...
+	vec2 uv =  vec2(float(gl_GlobalInvocationID.x)/ texSize.x , float(gl_GlobalInvocationID.y)/texSize.y);
+
+
+#ifdef SHOW_TILING
+	vec2 p = mod(uv*TAU*2.0, TAU)-250.0;
+#else
+    vec2 p = mod(uv*TAU, TAU)-250.0;
+#endif
+	vec2 i = vec2(p);
+	float c = 1.0;
+	float inten = .005;
+
+	for (int n = 1; n < MAX_ITER; n++)
+	{
+		float t = t * (1.0 - (3.5 / float(n+1)));
+		i = p + vec2(cos(t - i.x) + sin(t + i.y), sin(t - i.y) + cos(t + i.x));
+		c += 1.0/length(vec2(p.x / (sin(i.x+t)/inten),p.y / (cos(i.y+t)/inten)));
+	}
+	c /= float(MAX_ITER);
+	c = 1.17-pow(c, 1.4);
+	vec3 colour = vec3(pow(abs(c), 8.0));
+    	colour = clamp(colour + SColor, 0.0, 1.0);
+
+#ifdef SHOW_TILING
+	// Flash tile borders...
+	vec2 pixel = 2.0 / resolution.xy;
+	uv *= 2.0;
+
+	float f = floor(mod(time*.5, 2.0)); 	// Flash value.
+	vec2 first = step(pixel, uv) * f;		   	// Rule out first screen pixels and flash.
+	uv  = step(fract(uv), pixel);				// Add one line of pixels per tile.
+	colour = mix(colour, vec3(1.0, 1.0, 0.0), (uv.x + uv.y) * first.x * first.y); // Yellow line
+
+#endif
+
+	return colour;
+}
+
+void main()
+{
+    ivec2 pixel_coords = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(img_output);
+    vec2 fPixel_coords = vec2(float(pixel_coords.x), float(pixel_coords.y));
+    vec2 fSize = vec2(float(size.x), float(size.y));
+    vec4 pixel = vec4(WaterColor(fSize), 1.0);
+    // output to a specific pixel in the image
+    imageStore(img_output, pixel_coords, pixel);
+}
+
+
+
+
+
+
+

@@ -17,6 +17,7 @@ namespace Solid {
 	typedef nlohmann::ordered_json json ;
 	class ITexture;
 	class IShader;
+	class ICompute;
 
 	struct ShaderBinary
 	{
@@ -306,6 +307,14 @@ namespace Solid {
 	    virtual int FromDataBuffer(char *buffer, size_t bSize) override;
     };
 
+    struct MatText
+    {
+    	bool isUsingComputeGeneratedTex = false;
+	    std::shared_ptr<ITexture> text;
+	    std::shared_ptr<ICompute> Compute;
+    };
+
+
     class SOLID_API MaterialResource : public Resource
     {
     private:
@@ -338,7 +347,7 @@ namespace Solid {
                 Vec4   v4;
 
             };
-            std::shared_ptr<ITexture> text;
+	        MatText text;
 	        ShaderField();
 
             ShaderField(EShaderFieldType _type);

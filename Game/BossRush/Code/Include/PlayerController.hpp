@@ -23,10 +23,16 @@ namespace Solid SLDNamespace()
 
         SLDField()
         float mouseSensitivity = 0;
+
+        SLDField()
+        String animIdle = "";
+        SLDField()
+        String animFwd = "";
 	private:
 		Engine* engine = nullptr;
 	    RigidBody* rigidBody = nullptr;
 	    GameObject* camera = nullptr;
+	    GameObject* mesh = nullptr;
 
 	    bool isGrounded = false;
 

@@ -752,6 +752,8 @@ Solid::SceneGraphManager::Instantiate(std::string _prefabName, Solid::GameObject
 			if(key.find("GameObject") != std::string::npos)
 			{
 				GameObject* enti = engine->ecsManager.CreateEntity( it.value()["Name"], e);
+				if(it.value()["TAG"].is_string())
+					enti->tag = it.value()["TAG"];
 				Lambda(std::ref(it.value()), enti->GetEntity());
 			}
 		}
@@ -772,6 +774,8 @@ Solid::SceneGraphManager::Instantiate(std::string _prefabName, Solid::GameObject
 			{
 				ent = engine->ecsManager.CreateEntity(name, parent->GetEntity());
 			}
+			if(it.value()["TAG"].is_string())
+				ent->tag = it.value()["TAG"];
 			Lambda(std::ref(it.value()), ent->GetEntity());
 		}
 	}

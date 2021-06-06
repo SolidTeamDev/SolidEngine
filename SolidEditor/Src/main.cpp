@@ -21,9 +21,9 @@ int main(int argc, char** argv)
     {
 	    Solid::Editor editor;
 	    bool b = false;
-    	if(argc > 1)
+	    std::string ProjectPath;
+	    if(argc > 1)
 	    {
-		    std::string ProjectPath;
 		    for (int i = 1; i < argc; ++i)
 		    {
 			    std::string arg = argv[i];
@@ -53,6 +53,13 @@ int main(int argc, char** argv)
 
 
         editor.Run();
+	    fs::path ProjectFolderPath =ProjectPath ;
+	    editor.CurrentProjectJson["Project"]["LastOpenedScene"] = editor.lastScene;
+	    std::ofstream file(ProjectPath, std::fstream::trunc);
+
+	    file << std::setw(4)<< editor.CurrentProjectJson;
+	    file.close();
+
 
     }
     catch(const Solid::ThrowError& e)

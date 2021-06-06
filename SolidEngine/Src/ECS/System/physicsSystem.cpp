@@ -43,11 +43,11 @@ namespace Solid
                 transform.SetScale(scale);
             }
             else
-                {
-                    transform.SetPosition(t.GetLocalPosition());
-                    transform.SetRotation(t.GetLocalRotation());
-                    transform.SetScale(scale);
-                }
+            {
+                transform.SetPosition(t.GetLocalPosition());
+                transform.SetRotation(t.GetLocalRotation());
+                transform.SetScale(scale);
+            }
 
         }
     }

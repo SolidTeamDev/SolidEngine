@@ -29,20 +29,19 @@ namespace Solid
 	    SceneResource* currentScenePtr = nullptr;
 	    SceneResource* choice = nullptr;
 	    std::string str ;
-		std::string currentOpenedScene = "Untitled";
 		fs::path    currentScenePath;
-        Window*     window;
-        Renderer*   renderer;
-        ImGuiStyle& editorStyle;
-
+	    Window*     window;
+	    Renderer*   renderer;
+	    ImGuiStyle& editorStyle;
         //All interfaces
         LogsInterface           logsInterface;
-        PlayInterface           playInterface;
-        FilesInterface          filesInterface;
-        SceneInterface          sceneInterface;
-        InspectorInterface      inspectorInterface;
-        HierarchyTreeInterface  hierarchyTreeInterface;
-        ButtonInterface         buttonInterface;
+
+	    PlayInterface           playInterface;
+	    FilesInterface          filesInterface;
+	    SceneInterface          sceneInterface;
+	    InspectorInterface      inspectorInterface;
+	    HierarchyTreeInterface  hierarchyTreeInterface;
+	    ButtonInterface         buttonInterface;
 	    struct CodeEditor
 	    {
 		    enum class ECodeType
@@ -55,13 +54,14 @@ namespace Solid
 	    }codeEditor;
 	    bool openBuildMenu = false;
     public:
-        EditorInterface();
-        explicit EditorInterface(Window* window, Renderer* renderer);
-
+	    EditorInterface();
+	    explicit EditorInterface(Window* window, Renderer* renderer);
         ~EditorInterface() = default;
 
         static Solid::GameObject* selectedGO;
-        static bool        draggingEnt;
+
+	    std::string currentOpenedScene = "Untitled";
+	    static bool        draggingEnt;
 
 
         /**
