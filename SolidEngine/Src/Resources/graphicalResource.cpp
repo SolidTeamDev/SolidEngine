@@ -330,6 +330,8 @@ void GL::ComputeShader::InitTex(Vec2i size)
 {
 	if(isInit)
 	{
+		if(TexSize.x == size.x && TexSize.y == size.y)
+			return;
 		TexSize = size;
 		shader.BindShader();
 		glActiveTexture(GL_TEXTURE0);
@@ -357,6 +359,7 @@ void GL::ComputeShader::InitTex(Vec2i size)
 	             NULL);
 	glBindImageTexture(0, OutTexId, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
 	glBindTexture(GL_TEXTURE_2D,0);
+	isInit =true;
 	shader.UnbindShader();
 }
 
