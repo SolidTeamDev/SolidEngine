@@ -120,7 +120,7 @@ namespace Solid
 		Shader shader;
 		protected:
 			//protected members
-			Vec2i TexSize;
+			Vec2i TexSize = {128,128};
 			uint OutTexId;
 			uint compute;
 
@@ -181,6 +181,7 @@ namespace Solid
 
 			ComputeShader(ComputeShaderResource* _cs);
 			void InitTex(Vec2i size) override;
+			Vec2i GetTexSize() override;
 			uint Dispatch()override;
 
 			virtual void SetComputeSource(const std::string &_src) override;

@@ -1306,40 +1306,85 @@ namespace Solid
 	    }
     }
 
-    void InspectorInterface::EditTexture(std::shared_ptr<ITexture>& _texture, const std::string &_label)
+    void InspectorInterface::EditTexture(MatText &_texture, const std::string &_label)
     {
-        std::string textName = _texture == nullptr ? "None" : _texture->name;
-
-	    bool combo = UI::BeginCombo(_label.c_str(),textName.c_str());
-	    if(UI::BeginDragDropTarget())
+	    UI::Checkbox("##ISCOMPUTEGEN", &_texture.isUsingComputeGeneratedTex);
+	    UI::SameLine();
+	    if (_texture.isUsingComputeGeneratedTex)
 	    {
-
-		    const ImGuiPayload* drop=UI::AcceptDragDropPayload("Image");
-		    if(drop != nullptr)
+		    std::string textName = _texture.Compute == nullptr ? "None" : _texture.Compute->name;
+		    Vec2i size = _texture.Compute == nullptr ? Vec2i() : _texture.Compute->GetTexSize();
+		    UI::DragInt2("ComputeBufferSize", &size.x);
+		    if (_texture.Compute != nullptr)
+			    _texture.Compute->InitTex(size);
+		    bool combo = UI::BeginCombo(_label.c_str(), textName.c_str());
+		    if (UI::BeginDragDropTarget())
 		    {
-			    Resource* r = *((Resource**)drop->Data);
-			    _texture = engine->graphicsResourceMgr.GetTexture(r->name.c_str());
 
+			    const ImGuiPayload *drop = UI::AcceptDragDropPayload("Compute");
+			    if (drop != nullptr)
+			    {
+				    Resource *r = *((Resource **) drop->Data);
+				    _texture.Compute = engine->graphicsResourceMgr.GetCompute(r->name.c_str());
+				    _texture.text = nullptr;
+			    }
+			    UI::EndDragDropTarget();
 		    }
-		    UI::EndDragDropTarget();
+		    if (combo)
+		    {
+			    auto *textures = engine->resourceManager.GetResourcesVecByType<ComputeShaderResource>();
+			    for (auto text : *textures)
+			    {
+				    bool selected = (textName == text.second->name);
+				    if (UI::Selectable(text.second->name.c_str(), selected))
+				    {
+					    _texture.Compute = engine->graphicsResourceMgr.GetCompute(text.second->name.c_str());
+					    _texture.text = nullptr;
+				    }
+				    if (selected)
+					    UI::SetItemDefaultFocus();
+			    }
+
+			    UI::EndCombo();
+		    }
 	    }
-        if (combo)
-        {
-            auto *textures = engine->resourceManager.GetResourcesVecByType<ImageResource>();
-            for (auto text : *textures)
-            {
-                bool selected = (textName == text.second->name);
-                if(UI::Selectable(text.second->name.c_str(), selected))
-                {
-                    _texture = engine->graphicsResourceMgr.GetTexture(text.second->name.c_str());
-                }
-                if(selected)
-                    UI::SetItemDefaultFocus();
-            }
+	    else
+	    {
+		    std::string textName = _texture.text == nullptr ? "None" : _texture.text->name;
 
-            UI::EndCombo();
-        }
-        //UI::Image(engine->graphicsResourceMgr.GetTexture(_texture->name))
+		    bool combo = UI::BeginCombo(_label.c_str(), textName.c_str());
+		    if (UI::BeginDragDropTarget())
+		    {
+
+			    const ImGuiPayload *drop = UI::AcceptDragDropPayload("Image");
+			    if (drop != nullptr)
+			    {
+				    Resource *r = *((Resource **) drop->Data);
+				    _texture.text = engine->graphicsResourceMgr.GetTexture(r->name.c_str());
+				    _texture.Compute = nullptr;
+			    }
+			    UI::EndDragDropTarget();
+		    }
+		    if (combo)
+		    {
+			    auto *textures = engine->resourceManager.GetResourcesVecByType<ImageResource>();
+			    for (auto text : *textures)
+			    {
+				    bool selected = (textName == text.second->name);
+				    if (UI::Selectable(text.second->name.c_str(), selected))
+				    {
+					    _texture.text = engine->graphicsResourceMgr.GetTexture(text.second->name.c_str());
+					    _texture.Compute = nullptr;
+				    }
+				    if (selected)
+					    UI::SetItemDefaultFocus();
+			    }
+
+			    UI::EndCombo();
+		    }
+		    //UI::Image(engine->graphicsResourceMgr.GetTexture(_texture->name))
+
+	    }
+
     }
-
 } //namespace

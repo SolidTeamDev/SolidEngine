@@ -103,6 +103,7 @@ namespace Solid
 		~ICompute() = default;
 
 		virtual void InitTex(Vec2i size) = 0;
+		virtual Vec2i GetTexSize() = 0;
 		virtual void SetComputeSource(const std::string& _src) = 0;
 		virtual std::string& GetComputeSource() = 0;
 		virtual uint Dispatch() = 0;

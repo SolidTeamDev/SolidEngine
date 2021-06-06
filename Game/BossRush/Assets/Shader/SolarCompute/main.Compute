@@ -1,13 +1,13 @@
 #version 450
 layout(local_size_x = 1, local_size_y = 1) in;
 uniform float _mult = 1;
-uniform float time =70000000;
+uniform float _GlobalTime =0;
 uniform vec2 resolution = vec2(512,512);
 
 vec3 _color;
 layout(rgba32f, binding = 0) uniform image2D img_output;
 
-#define iTime time
+#define iTime _GlobalTime
 #define iResolution vec3(resolution,1.)
 #define RSolar(p,a,r)mix(a*dot(p,a),p,cos(r))+sin(r)*cross(p,a)
 #define HSolar(h)cos(h*6.3+vec3(0,23,21))*.5+.5

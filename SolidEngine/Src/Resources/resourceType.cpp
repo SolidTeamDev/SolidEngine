@@ -389,15 +389,35 @@ void MaterialResource::ToDataBuffer(std::vector<char> &buffer)
 			}
 			case EShaderFieldType::TEXT:
 			{
-				size =  field.text == nullptr ? 256 : 128;
+				size =  field.text.isUsingComputeGeneratedTex ? 256 : 128;
 				ResourcesLoader::Append(buffer, &(size), sizeof(size));
-				if(field.text != nullptr)
+				if(field.text.isUsingComputeGeneratedTex)
 				{
-					size = field.text->name.size();
+					size =  field.text.Compute == nullptr ? 256 : 128;
 					ResourcesLoader::Append(buffer, &(size), sizeof(size));
-					ResourcesLoader::Append(buffer, (void *) (field.text->name.c_str()), size * sizeof(std::string::value_type));
+					if(field.text.Compute != nullptr)
+					{
+						Vec2i TS = field.text.Compute->GetTexSize();
+						size = field.text.Compute->name.size();
+						ResourcesLoader::Append(buffer, &(size), sizeof(size));
+						ResourcesLoader::Append(buffer, (void *) (field.text.Compute->name.c_str()), size * sizeof(std::string::value_type));
+						ResourcesLoader::Append(buffer, &TS, sizeof(Vec2i));
 
+					}
 				}
+				else
+				{
+					size =  field.text.text == nullptr ? 256 : 128;
+					ResourcesLoader::Append(buffer, &(size), sizeof(size));
+					if(field.text.text != nullptr)
+					{
+						size = field.text.text->name.size();
+						ResourcesLoader::Append(buffer, &(size), sizeof(size));
+						ResourcesLoader::Append(buffer, (void *) (field.text.text->name.c_str()), size * sizeof(std::string::value_type));
+
+					}
+				}
+
 
 				break;
 			}
@@ -490,19 +510,35 @@ int MaterialResource::FromDataBuffer(char *buffer, size_t bSize)
 			}
 			case EShaderFieldType::TEXT:
 			{
-				size =  256;//field.text == nullptr ? 256 : 128;
+				size =  0;//field.text.isUsing == nullptr ? 256 : 128;
+				ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos, bSize);
+				if(size == 256)
+				{
+					field.text.isUsingComputeGeneratedTex = true;
+				}
 				ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos, bSize);
 				if(size == 128)
 				{
 					size = 0;
 					std::string tStr ;
+					Vec2i TS = {128,128};
 
 					ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos, bSize);
+
 					tStr.resize(size);
 
 					ResourcesLoader::ReadFromBuffer(buffer, (void *) (tStr.data()),
 					                                size * sizeof(std::string::value_type), ReadPos, bSize);
-					field.text = Engine::GetInstance()->graphicsResourceMgr.GetTexture(tStr.c_str());
+
+					if(field.text.isUsingComputeGeneratedTex)
+					{
+						ResourcesLoader::ReadFromBuffer(buffer, &(TS), sizeof(Vec2i), ReadPos, bSize);
+						field.text.Compute = Engine::GetInstance()->graphicsResourceMgr.GetCompute(tStr.c_str());
+						if(field.text.Compute)
+							field.text.Compute->InitTex(TS);
+					}
+					else
+						field.text.text = Engine::GetInstance()->graphicsResourceMgr.GetTexture(tStr.c_str());
 				}
 
 				break;
@@ -659,7 +695,8 @@ MaterialResource::ShaderField::ShaderField(MaterialResource::EShaderFieldType _t
 			v4 = (0,0,0);
 			break;
 	    case EShaderFieldType::TEXT:
-	        text = nullptr;
+	        text.text = nullptr;
+	        text.Compute = nullptr;
             break;
 		default:
 			type = EShaderFieldType::NONE;
@@ -729,7 +766,8 @@ MaterialResource::ShaderField::ShaderField(const ShaderUniform &_uniform)
             v4 = (0,0,0);
             break;
         case EShaderFieldType::TEXT:
-            text = nullptr;
+            text.text = nullptr;
+            text.Compute = nullptr;
             break;
         default:
             type = EShaderFieldType::NONE;

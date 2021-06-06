@@ -70,7 +70,7 @@ namespace Solid
         bool EditVec4(Vec4 &_vec, const std::string &_label, float _step);
         bool EditVec2(Vec2 &_vec, const std::string &_label, float _step);
         void EditText(std::string& _str, const std::string& _label);
-        void EditTexture(std::shared_ptr<ITexture>& _texture, const std::string& _label);
+        void EditTexture(MatText &_texture, const std::string& _label);
 
         bool p_open = true;
         bool openCreateScript = false;
