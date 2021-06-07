@@ -23,11 +23,8 @@ namespace Solid SLDNamespace()
 
         SLDField()
         float mouseSensitivity = 0;
-
         SLDField()
-        String animIdle = "";
-        SLDField()
-        String animFwd = "";
+        float cameraDistance = 0;
 	private:
 		Engine* engine = nullptr;
 	    RigidBody* rigidBody = nullptr;
