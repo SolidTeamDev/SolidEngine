@@ -1,5 +1,7 @@
 #include "PlayerController.hpp"
-
+#include "followingObj.hpp"
+#include "ECS/Components/scriptList.hpp"
+#include <iostream>
 #include <Core/engine.hpp>
 
 using namespace Solid;
@@ -329,6 +331,8 @@ void PlayerController::Fire()
     GameObject* go = engine->ecsManager.Instantiate("Bullet", nullptr, "PlayerBullet");
     go->transform->SetPosition(gameObject->transform->GetLocalPosition());
     engine->ecsManager.GetComponent<RigidBody>(go->GetEntity()).SetLinearVelocity(dir);
+
+
 }
 void PlayerController::Dead()
 {
