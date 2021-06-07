@@ -886,6 +886,13 @@ namespace Solid
 		    isNew = true;
     		scene = new SceneResource();
 	    }
+    	auto* MatList = resourceManager.GetResourcesVecByType<MaterialResource>();
+    	for(auto& elt : *MatList)
+    	{
+    		ResourcesLoader loader;
+    		loader.SaveMaterialToFile((MaterialResource*)elt.second);
+    	}
+
 		scene->rawScene.clear();
 		json j;
 		j["Scene"].array();

@@ -155,7 +155,17 @@ void PlayerController::Update()
         engine->inputManager->ShowCursor(isPaused);
     }
 }
-
+void PlayerController::LateUpdate()
+{
+	ImGuiWindowFlags flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar |ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDocking;
+	UI::SetNextWindowPos(ImVec2(10,10));
+	UI::SetNextWindowSize(ImVec2(500,100));
+	float f = (float)health/ 100.0f;
+	UI::Begin("BAR", nullptr,flags);
+	std::string s = std::to_string(health) + "/ 100 ";
+	UI::ProgressBar(f, ImVec2(300,15), s.data());
+	UI::End();
+}
 void PlayerController::RotateCamera()
 {
     if(!camera || isPaused)

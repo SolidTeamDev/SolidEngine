@@ -190,7 +190,6 @@ namespace Solid {
         	DrawBuildMenu();
 
 
-
         UIContext::RenderFrame();
         renderer->UpdateFramebuffer(sceneInterface.getSceneFrameBuffer());
     }
