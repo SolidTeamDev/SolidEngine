@@ -79,6 +79,8 @@ namespace Solid SLDNamespace()
 
         void Update() override;
 
+        void LateUpdate() override;
+
         void OnContactEnter(GameObject *_other) override;
 
         void OnContactExit(GameObject *_other) override;
