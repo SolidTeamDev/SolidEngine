@@ -604,7 +604,7 @@ namespace Solid
 		                     "\t\t""engine->FixedUpdate();\n"
 		                     "\t\t""engine->LateUpdate();\n"
 		                     "\t\t""int x,y;\n"
-		                     "\t\t""glfwGetWindowPos(engine->window->GetHandle(), &x,&y); \n"
+		                     "\t\t""glfwGetWindowSize(engine->window->GetHandle(), &x,&y); \n"
 		                     "\t\t""engine->RenderToBuffer({(int)x,(int)y}, false);\n"
 		                     "\t\t""Time::Update();\n"
 		                     "\t\t""\n"

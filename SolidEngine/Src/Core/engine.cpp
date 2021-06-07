@@ -1069,14 +1069,21 @@ namespace Solid
     	if(activeCamera == nullptr)
     		return;
 
-		activeCamera->UpdateCamera(PlayBuffer.size);
 		if(renderToFB)
 		{
+			activeCamera->UpdateCamera(PlayBuffer.size);
 			renderer->BeginFramebuffer(PlayBuffer);
 
 		}
+		else
+			activeCamera->UpdateCamera(_size);
+
 		renderer->ClearColor({0.f,0.f,0.f,1});
-		renderer->Clear(PlayBuffer.size);
+		if(renderToFB)
+			renderer->Clear(PlayBuffer.size);
+		else
+			renderer->Clear(_size);
+
 		rendererSystem->Update(renderer, *activeCamera);
 		renderer->DrawSkybox(*activeCamera);
 		particleEffectSystem->Update(*activeCamera);
