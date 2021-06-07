@@ -59,11 +59,14 @@ namespace Solid
 	    void ReLoadRessource(Resource* _resource);
         void LoadRessourceNoAdd(const fs::path &Rpath, ResourcePtrWrapper &wrapper);
         void LoadResourcesFromFolder(const fs::path& Rpath);
-        static void Append(std::vector<char>& DataBuffer, void* Data, std::uint64_t sizeInByte);
+	    static void Append(std::vector<char>& DataBuffer, void* Data, std::uint64_t sizeInByte);
+	    static void Append(std::vector<unsigned char>& DataBuffer, void* Data, std::uint64_t sizeInByte);
         void SaveMaterialToFile(MaterialResource* _mat);
 	    void SavePrefabToFile(PrefabResource* _prefab);
         //inline static void ReadFromBuffer(std::vector<char>& DataBuffer, void* Data, std::uint64_t sizeInByte, std::uint64_t& ReadPos);
-        static void ReadFromBuffer(char *DataBuffer, void *Data, std::uint64_t sizeInByte, std::uint64_t &ReadPos,
+        static void ReadFromBuffer(unsigned char *DataBuffer, void *Data, std::uint64_t sizeInByte, std::uint64_t &ReadPos,
                                    std::size_t DataBufferSize);
+	    static void ReadFromBuffer(char *DataBuffer, void *Data, std::uint64_t sizeInByte, std::uint64_t &ReadPos,
+	                               std::size_t DataBufferSize);
     };
 }

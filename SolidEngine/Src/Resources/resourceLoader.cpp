@@ -1820,4 +1820,26 @@ Resource *ResourcesLoader::LoadSolidScene(const fs::path &Rpath)
 	return scene;
 }
 
+void ResourcesLoader::Append(std::vector<unsigned char> &DataBuffer, void *Data, std::uint64_t sizeInByte)
+{
+	if (Data && (sizeInByte > 0))
+	{
+		std::size_t start = DataBuffer.size();
+		DataBuffer.resize(start + sizeInByte);
+		std::memcpy(&DataBuffer[start], Data, sizeInByte);
+	}
+}
+
+void ResourcesLoader::ReadFromBuffer(unsigned char *DataBuffer, void *Data, std::uint64_t sizeInByte, uint64_t &ReadPos,
+                                     std::size_t DataBufferSize)
+{
+	if(ReadPos + sizeInByte > DataBufferSize)
+		Log::Send("Try to read out of buffer", Log::ELogSeverity::WARNING);
+	else if (Data && (sizeInByte > 0))
+	{
+		std::memcpy(Data, &DataBuffer[ReadPos], sizeInByte);
+		ReadPos+= sizeInByte;
+	}
+}
+
 

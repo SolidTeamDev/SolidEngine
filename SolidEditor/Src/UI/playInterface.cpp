@@ -19,10 +19,15 @@ namespace Solid
         UI::Begin("Play", &p_open,
                   ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
 
-        ImVec2 windowSize = UI::GetContentRegionAvail();
+	    std::function<Vec2i(ImVec2)> converti = [](ImVec2 v) -> Vec2i{ return {(int)v.x,(int)v.y};};
 
-        engine->RenderToBuffer({(int)windowSize.x,(int)windowSize.y});
-        UI::Image((ImTextureID)(size_t)engine->PlayBuffer.texture,windowSize,ImVec2{0,1},ImVec2{1,0});
+        ImVec2 windowSize = UI::GetContentRegionAvail();
+		ImVec2 winPos = ImVec2(UI::GetWindowPos().x,UI::GetWindowPos().y +UI::GetCursorPos().y);
+	    engine->PlayBuffer.size = (converti(windowSize).x <= 0 && converti(windowSize).y <= 0) ? engine->window->GetWindowSize() : converti(windowSize);
+	    engine->PlayBuffer.pos = (converti(winPos).x <= 0 && converti(winPos).y <= 0) ? Vec2i{0,0} : converti(winPos);
+
+	    engine->RenderToBuffer({(int)windowSize.x,(int)windowSize.y});
+	    UI::Image((ImTextureID)(size_t)engine->PlayBuffer.texture,windowSize,ImVec2{0,1},ImVec2{1,0});
 
         UI::End();
     }

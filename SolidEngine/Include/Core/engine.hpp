@@ -25,6 +25,8 @@
 #include "std_wrapper.hpp"
 #include "GameCompiler/gameCompiler.hpp"
 #include "systemCmd.hpp"
+#include "imgui.h"
+#include "imgui_internal.h"
 #undef ERROR
 
 namespace Solid
@@ -62,6 +64,11 @@ namespace Solid
 	    void AddAllComps(GameObject *elt, std::vector<char> &buffer, uint64_t &ReadPos);
 	    void setJsonSave(json &j, GameObject *elt, std::string &path);
 	    void SaveAllComp(GameObject *elt, std::vector<char> &buffer);
+	    ImGuiContext* UICompCtx = nullptr;
+	    ImGuiContext* EditorContext = nullptr;
+	    bool hasBegunUIRendering = false;
+	    bool hasEndedUIRendering = false;
+
     public:
     	//Engine** test = &instance;
         Window* window;
@@ -87,6 +94,7 @@ namespace Solid
         Framebuffer PlayBuffer;
 
         InputManager* inputManager = nullptr;
+
 
         static Engine* GetInstance();
         bool MultiThreadEnabled()const {return mtEnabled;}
@@ -132,7 +140,8 @@ namespace Solid
 
 	    void AddLoadedSceneCallback(const std::function<void(Resource*)>& _func);
 
-
+		void BeginUIComponents();
+		void EndUIComponents();
 
     };
 

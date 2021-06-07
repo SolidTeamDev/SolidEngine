@@ -4,6 +4,8 @@
 #include <sstream>
 #include "Rendering/OpenGL45/openGl45Renderer.hpp"
 #include "UI/solidUI.hpp"
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 #include "Resources/ressources.hpp"
 
 #include "ECS/Components/transform.hpp"
@@ -141,6 +143,18 @@ namespace Solid
         UIContext::InitializeSolidUI(window->GetHandle());
         ///
 
+	    EditorContext = UI::GetCurrentContext();
+	    ImGuiIO& editorIO = UI::GetIO();
+	    UICompCtx =ImGui::CreateContext(editorIO.Fonts);
+
+	    UI::SetCurrentContext(UICompCtx);
+	    ImGui::StyleColorsDark();
+
+	    ImGui_ImplGlfw_InitForOpenGL(window->GetHandle(), false);
+	    ImGui_ImplOpenGL3_Init("#version 450");
+
+	    UI::SetCurrentContext(EditorContext);
+
         if(window != nullptr && renderer != nullptr)
             engineContextInit = true;
 	    graphicsResourceMgr.Init(&resourceManager, renderer);
@@ -184,7 +198,6 @@ namespace Solid
     {
         inputManager->Update();
         animSystem->Update();
-
         scriptSystem->Update();
     }
 
@@ -196,7 +209,9 @@ namespace Solid
 
     void Engine::LateUpdate()
     {
-        scriptSystem->LateUpdate();
+	    BeginUIComponents();
+	    scriptSystem->LateUpdate();
+	    EndUIComponents();
     }
 
 	void Engine::ForceUpdate()
@@ -871,6 +886,13 @@ namespace Solid
 		    isNew = true;
     		scene = new SceneResource();
 	    }
+    	auto* MatList = resourceManager.GetResourcesVecByType<MaterialResource>();
+    	for(auto& elt : *MatList)
+    	{
+    		ResourcesLoader loader;
+    		loader.SaveMaterialToFile((MaterialResource*)elt.second);
+    	}
+
 		scene->rawScene.clear();
 		json j;
 		j["Scene"].array();
@@ -1049,8 +1071,25 @@ namespace Solid
 		renderer->ClearColor({0.f,0.f,0.f,1});
 		renderer->Clear(PlayBuffer.size);
 		rendererSystem->Update(renderer, *activeCamera);
-        renderer->DrawSkybox(*activeCamera);
-        particleEffectSystem->Update(*activeCamera);
+		renderer->DrawSkybox(*activeCamera);
+		particleEffectSystem->Update(*activeCamera);
+
+		UI::SetCurrentContext(UICompCtx);
+		if(hasEndedUIRendering)
+		{
+			ImGui_ImplOpenGL3_RenderDrawData(UI::GetDrawData());
+
+			if (UI::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+			{
+				GLFWwindow* backupWindow = glfwGetCurrentContext();
+				UI::UpdatePlatformWindows();
+				UI::RenderPlatformWindowsDefault();
+				glfwMakeContextCurrent(backupWindow);
+			}
+		}
+
+		UI::SetCurrentContext(EditorContext);
+
 		renderer->EndFramebuffer();
 		audioSystem->Update(*activeCamera);
 
@@ -1751,6 +1790,58 @@ namespace Solid
 
 
 
+	}
+
+	void Engine::BeginUIComponents()
+	{
+		if(hasBegunUIRendering)
+			return;
+		hasBegunUIRendering = true;
+		hasEndedUIRendering = false;
+		ImVec2 vPos = UI::GetMainViewport()->Pos;
+		UI::SetCurrentContext(UICompCtx);
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		UI::NewFrame();
+
+		UI::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(5.f, 3.f));
+		UI::PushStyleVar(ImGuiStyleVar_WindowTitleAlign, ImVec2(0.5f, 0.5f));
+
+		UI::PushStyleVar(ImGuiStyleVar_TabRounding, 2.f);
+		UI::PushStyleVar(ImGuiStyleVar_FrameRounding, 3);
+		UI::PushStyleVar(ImGuiStyleVar_WindowRounding, 3);
+
+
+		std::function<Vec2(ImVec2)> convert = [](ImVec2 v) -> Vec2{ return Vec2(v.x,v.y);};
+
+		Vec2 vS = convert(UI::GetMainViewport()->Size);
+		Vec2 ratio = Vec2(  vS.x/(float )PlayBuffer.size.x,  vS.y/(float )PlayBuffer.size.y);
+		Vec2 ratio2 = Vec2((float )PlayBuffer.size.x / vS.x,(float )PlayBuffer.size.y / vS.y);
+		Vec2 Mouse = convert(UI::GetIO().MousePos);
+		Vec2 fbPos = Vec2(PlayBuffer.pos.x,PlayBuffer.pos.y);
+		Vec2 loacal = fbPos -convert(vPos);
+		Vec2 loPos = Vec2(loacal.x,loacal.y);
+		UI::GetIO().DisplayFramebufferScale = ImVec2(ratio2.x, ratio2.y);
+		Mouse.x -= loacal.x;
+		Mouse.y -= loacal.y;
+		UI::GetIO().MousePos.y = Mouse.y;
+		UI::GetIO().MousePos.x = Mouse.x;
+		UI::GetIO().MousePos.y *= ratio.y;
+		UI::GetIO().MousePos.x *= ratio.x;
+
+	}
+
+	void Engine::EndUIComponents()
+	{
+    	if(!hasBegunUIRendering)
+    		return;
+		UI::PopStyleVar(5);
+
+		UI::Render();
+
+		UI::SetCurrentContext(EditorContext);
+		hasBegunUIRendering = false;
+		hasEndedUIRendering = true;
 	}
 
 } //!namespace

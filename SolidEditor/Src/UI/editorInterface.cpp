@@ -190,7 +190,6 @@ namespace Solid {
         	DrawBuildMenu();
 
 
-
         UIContext::RenderFrame();
         renderer->UpdateFramebuffer(sceneInterface.getSceneFrameBuffer());
     }
@@ -233,6 +232,7 @@ namespace Solid {
 				        break;
 			        }
 		        }
+		        EditorInterface::selectedGO = nullptr;
 	        }
             if (UI::MenuItem("Save Scene"))
             {

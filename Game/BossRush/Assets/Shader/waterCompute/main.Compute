@@ -3,6 +3,8 @@ layout(local_size_x = 8, local_size_y = 8) in;
 uniform float _mult = 1;
 uniform float _GlobalTime =0;
 uniform float mask = 0.3f;
+uniform bool isUsingAlbedo;
+uniform vec3 albedoValue;
 
 uniform vec3 SColor = vec3(0.2);
 
@@ -30,7 +32,7 @@ vec3 WaterColor(vec2 texSize)
     ivec2 alCoord = ivec2(pixel_coords.x * ratio.x , pixel_coords.y * ratio.y);
     vec4 alPixel = imageLoad(albedo,alCoord );
     
-    	float t = iTime * 0.00005;
+    	float t = iTime * 0.00001;
     // uv should be the 0-1 uv of texture...
 	vec2 uv =  vec2(float(gl_GlobalInvocationID.x)/ texSize.x , float(gl_GlobalInvocationID.y)/ texSize.y);
 
@@ -57,7 +59,10 @@ vec3 WaterColor(vec2 texSize)
 	c = 1.17-pow(c, 1.4);
 	vec3 colour = vec3(pow(abs(c), 8.0));
 		colour += mask;
+	if(isUsingAlbedo)
     	colour = clamp(colour * alPixel.xyz, 0.0, 1.0);
+    else
+    	colour = clamp(colour * albedoValue, 0.0, 1.0);
 
 #ifdef SHOW_TILING
 	// Flash tile borders...
@@ -85,6 +90,8 @@ void main()
     // output to a specific pixel in the image
     imageStore(_img_output, pixel_coords, pixel);
 }
+
+
 
 
 

@@ -16,4 +16,9 @@ namespace Solid
         return pInstance;
     }
 
+	Framebuffer *Renderer::GetCurrentBuffer()
+	{
+		return currentFB;
+	}
+
 } //!namespace
