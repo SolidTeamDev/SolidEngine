@@ -68,7 +68,7 @@ namespace Solid
 	    ImGuiContext* EditorContext = nullptr;
 	    bool hasBegunUIRendering = false;
 	    bool hasEndedUIRendering = false;
-
+		bool play = false;
     public:
     	//Engine** test = &instance;
         Window* window;
@@ -142,6 +142,10 @@ namespace Solid
 
 		void BeginUIComponents();
 		void EndUIComponents();
+
+		void Play();
+		void Stop();
+		bool IsPlaying();
 
     };
 

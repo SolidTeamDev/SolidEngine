@@ -586,6 +586,7 @@ namespace Solid
 		                     "\t""fs::path p = fs::current_path();\n"
 		                     "\t""p.append(\"Assets\");\n"
 		                     "\t""loader.LoadResourcesFromFolder(p);\n"
+		                     "\t""engine->Play();\n"
 		                     "\t""engine->LoadScene(\""+MainScene+"\");\n"
 		                     "\t""engine->EnableMultiThread(false);\n"
 		                     "\t""Camera sceneCam;\n"
@@ -612,6 +613,7 @@ namespace Solid
 		                     "\t\t""\n"
 		                     "\t\t""window->SwapBuffers();\n"
 		                     "\t""}\n"
+		                     "\t""engine->Stop();\n"
 		                     "\t""return 0;\n"
 		                     "}\n";
 

@@ -869,7 +869,10 @@ namespace Solid
 		std::string str = j ["Scene"]["{SkyBoxName}"];
 		Engine::GetInstance()->renderer->_map = Engine::GetInstance()->graphicsResourceMgr.GetCubemap(str.c_str());
 		AddAllComps(world, scene->rawScene, readPos);
-
+		if(play)
+		{
+			InitScript();
+		}
 		for(auto& elt : LoadedSceneCallbacks)
 		{
 		    elt(scene);
@@ -886,6 +889,13 @@ namespace Solid
 		    isNew = true;
     		scene = new SceneResource();
 	    }
+    	auto* MatList = resourceManager.GetResourcesVecByType<MaterialResource>();
+    	for(auto& elt : *MatList)
+    	{
+    		ResourcesLoader loader;
+    		loader.SaveMaterialToFile((MaterialResource*)elt.second);
+    	}
+
 		scene->rawScene.clear();
 		json j;
 		j["Scene"].array();
@@ -1837,6 +1847,19 @@ namespace Solid
 		hasEndedUIRendering = true;
 	}
 
+	void Engine::Play()
+	{
+		play = true;
+	}
+	void Engine::Stop()
+	{
+		play = false;
+	}
+
+	bool Engine::IsPlaying()
+	{
+		return play;
+	}
 } //!namespace
 
 

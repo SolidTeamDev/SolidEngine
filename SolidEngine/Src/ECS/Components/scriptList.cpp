@@ -1,7 +1,7 @@
 //
 // Created by ryan1 on 10/05/2021.
 //
-
+#include "Core/engine.hpp"
 #include "ECS/Components/scriptList.hpp"
 
 
@@ -95,6 +95,20 @@ Script *ScriptList::GetScript(const char *_scriptName)
 		if(elt->getArchetype().name == _scriptName)
 		{
 			return elt;
+		}
+		const rfk::Namespace* n =Engine::GetInstance()->Compiler->GetNamespace("Solid");
+		if(n != nullptr)
+		{
+			const rfk::Class* c = n->getClass(_scriptName);
+			if(c != nullptr)
+			{
+				if(elt->getArchetype().isSubclassOf(*c))
+				{
+					return elt;
+				}
+
+			}
+
 		}
 	}
 	return nullptr;

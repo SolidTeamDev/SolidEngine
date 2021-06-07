@@ -176,8 +176,11 @@ namespace Solid
 		        }
 		        for(auto& elt : node->childPaths)
 		        {
-		        	return f(&elt.second);
-
+		        	bool b =  f(&elt.second);
+					if(b)
+						return true;
+					else
+						continue;
 		        }
 		        return false;
 	        };

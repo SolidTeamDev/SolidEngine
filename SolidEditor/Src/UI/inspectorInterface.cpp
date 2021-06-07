@@ -1413,9 +1413,13 @@ namespace Solid
 
 		    if(UI::Button("Edit Compute shader"))
 		    {
-			    codeEditor.isCodeEditorOpen = true;
-			    codeEditor.imCodeEditor.SetText(_texture.Compute->GetComputeSource());
-			    codeEditor.codeType = CodeEditor::ECodeType::COMPUTE;
+		    	if(_texture.Compute != nullptr)
+			    {
+				    codeEditor.isCodeEditorOpen = true;
+				    codeEditor.imCodeEditor.SetText(_texture.Compute->GetComputeSource());
+				    codeEditor.codeType = CodeEditor::ECodeType::COMPUTE;
+
+			    }
 		    }
 		    if(codeEditor.isCodeEditorOpen && codeEditor.codeType == CodeEditor::ECodeType::COMPUTE)
 		    {
