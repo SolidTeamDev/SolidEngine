@@ -47,8 +47,6 @@ namespace Solid SLDNamespace()
 
         void Init() override;
 		void Update() override;
-		void FixedUpdate() override;
-		void LateUpdate() override;
         void Destroy() override;
 
     private:

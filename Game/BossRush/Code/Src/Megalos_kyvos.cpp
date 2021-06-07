@@ -31,6 +31,12 @@ void Megalos_kyvos::Destroy()
 
 void Megalos_kyvos::Update()
 {
+    if(BossHealth <= 0)
+    {
+        engine->ecsManager.DestroyEntity(gameObject->GetEntity());
+        return;
+    }
+
     Boss::Update();
     if(DataBullets.size() > 0)
     {
@@ -42,18 +48,7 @@ void Megalos_kyvos::Update()
 
     UpdateAttack();
 
-};
-void Megalos_kyvos::FixedUpdate()
-{
-
-
-
-};
-void Megalos_kyvos::LateUpdate()
-{
-
-
-};
+}
 
 void Megalos_kyvos::PrimaryAttack()
 {
@@ -170,7 +165,7 @@ void Megalos_kyvos::TertiaryAttack()
 
     if(DataBullets[0].Step == EStepAttack::One)
     {
-        Vec3 pos = Vec3(Target.x, Target.y + 5, Target.z);
+        Vec3 pos = Vec3(Target.x, Target.y + 2, Target.z);
         if (t > 1)
         {
             DataBullets[0].Ratio = 0;
@@ -225,7 +220,7 @@ void Megalos_kyvos::Special1Attack()
 
             for(auto go : CubeBullets[i]->childs)
             {
-                go->transform->SetScale(Vec3::Lerp(Vec3(1,1,1), Vec3(10,1,1), t));
+                go->transform->SetScale(Vec3::Lerp(Vec3(1,1,1), Vec3(15,1,1), t));
                 go->transform->Rotate( Vec3(0,10*Time::DeltaTime(),0));
 
                 BoxCollider* box1 = &engine->ecsManager.GetComponent<BoxCollider>(go->GetEntity());
@@ -239,7 +234,7 @@ void Megalos_kyvos::Special1Attack()
 
         for(auto go : CubeBullets[i]->childs)
         {
-            go->transform->SetScale(Vec3::Lerp(Vec3(1,1,1), Vec3(10,1,1), t));
+            go->transform->SetScale(Vec3::Lerp(Vec3(1,1,1), Vec3(15,1,1), t));
 
             BoxCollider* box1 = &engine->ecsManager.GetComponent<BoxCollider>(go->GetEntity());
             if(box1 != nullptr)
@@ -342,6 +337,7 @@ void Megalos_kyvos::ChooseAttack()
 void Megalos_kyvos::CreateBulletsCube(std::string namePrefab, Vec3 pos, Vec3 scale)
 {
     GameObject* go = engine->ecsManager.Instantiate(namePrefab,nullptr, namePrefab + std::to_string(CubeBullets.size()));
+    go->tag = "CubeBullet";
     go->transform->SetPosition(pos);
     go->transform->SetScale(scale);
     CubeBullets.push_back(go);

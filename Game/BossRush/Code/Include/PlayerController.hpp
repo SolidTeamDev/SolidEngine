@@ -85,6 +85,8 @@ namespace Solid SLDNamespace()
 
         void OnContactExit(GameObject *_other) override;
 
+        void OnTriggerEnter(GameObject *_other) override;
+
     private:
 
 	    void RotateCamera();

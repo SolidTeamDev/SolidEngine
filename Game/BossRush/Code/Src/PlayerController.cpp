@@ -18,8 +18,7 @@ PlayerController::PlayerController()
     engine->inputManager->AddMouseInput("Fire1",GLFW_MOUSE_BUTTON_1, ImEnumDetectionType::NO_REPEAT);
     engine->inputManager->AddMouseInput("Fire2",GLFW_MOUSE_BUTTON_2, ImEnumDetectionType::PRESSED);
     engine->inputManager->AddKeyInput("Taunt",GLFW_KEY_T, ImEnumDetectionType::NO_REPEAT);
-    /*TODO remove Death touch*/
-    engine->inputManager->AddKeyInput("Death",GLFW_KEY_K, ImEnumDetectionType::NO_REPEAT);
+
     engine->inputManager->AddKeyInput("Pause",GLFW_KEY_ESCAPE, ImEnumDetectionType::NO_REPEAT);
 
 }
@@ -48,7 +47,20 @@ void PlayerController::Destroy()
 
 void PlayerController::Update()
 {
+    if (engine->inputManager->IsPressed("Pause"))
+    {
+        isPaused = !isPaused;
+        engine->inputManager->ShowCursor(isPaused);
+    }
+
     RotateCamera();
+
+    if(health <= 0 && stateAnim != EStateAnim::Death)
+    {
+        Dead();
+        return;
+    }
+
     //Controller and Animation
     if(stateAnim != EStateAnim::Death)
     {
@@ -145,14 +157,6 @@ void PlayerController::Update()
                 stateAnim = EStateAnim::Idle;
             }
         }
-
-        if (engine->inputManager->IsPressed("Death"))
-            Dead();
-    }
-    if (engine->inputManager->IsPressed("Pause"))
-    {
-        isPaused = !isPaused;
-        engine->inputManager->ShowCursor(isPaused);
     }
 }
 void PlayerController::LateUpdate()
@@ -360,5 +364,13 @@ void PlayerController::OnContactExit(GameObject *_other)
 {
     if(_other->name == "Ground")
         isGrounded = false;
+}
+
+void PlayerController::OnTriggerEnter(GameObject *_other)
+{
+    if(_other->tag != "CubeBullet")
+        return;
+
+    health -= 5;
 }
 
