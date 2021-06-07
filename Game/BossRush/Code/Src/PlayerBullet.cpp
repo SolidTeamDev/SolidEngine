@@ -1,6 +1,8 @@
 #include "PlayerBullet.hpp"
-#include "Boss.hpp"
 #include "Core/engine.hpp"
+#include "ECS/Components/scriptList.hpp"
+#include "Megalos_kyvos.hpp"
+
 using namespace Solid;
 
 PlayerBullet::PlayerBullet()
@@ -27,7 +29,12 @@ void Solid::PlayerBullet::OnTriggerEnter(Solid::GameObject *_other)
 
     Engine* engine = Engine::GetInstance();
 
-    engine->ecsManager.GetComponent<Boss*>(_other->GetEntity())->BossHealth -= damage;
+    Megalos_kyvos* tmp = (Megalos_kyvos*)engine->ecsManager.GetComponent<ScriptList>(_other->parent->GetEntity()).GetScript("Megalos_kyvos");
 
-    engine->ecsManager.DestroyEntity(gameObject->GetEntity());
+    if(!tmp)
+        return;
+
+    tmp->BossHealth -= damage;
+
+    //engine->ecsManager.DestroyEntity(gameObject->GetEntity());
 }

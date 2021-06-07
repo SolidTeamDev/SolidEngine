@@ -254,7 +254,7 @@ void Megalos_kyvos::Special2Attack()
         Data.Ratio += Time::DeltaTime() * SpeedSecondaryAttack;
         if(Data.Step == EStepAttack::One)
         {
-            Log::Send("Size " + std::to_string(DataBullets.size()) + ":" + std::to_string(CubeBullets.size()));
+            //Log::Send("Size " + std::to_string(DataBullets.size()) + ":" + std::to_string(CubeBullets.size()));
             if(Data.Ratio >= 1)
             {
                 Data.Step = EStepAttack::None;
