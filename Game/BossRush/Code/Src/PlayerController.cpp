@@ -166,13 +166,7 @@ void PlayerController::Fire()
     GameObject* go = engine->ecsManager.Instantiate("Bullet", nullptr, "PlayerBullet");
     go->transform->SetPosition(gameObject->transform->GetLocalPosition());
     engine->ecsManager.GetComponent<RigidBody>(go->GetEntity()).SetLinearVelocity(dir);
-    GameObject* ptl = engine->ecsManager.Instantiate("BulletParticle", nullptr, "BulletParticle");
-    if (ptl == nullptr)
-        std::cout << "sah\n";
 
-    ScriptList& scriptList = engine->ecsManager.GetComponent<ScriptList>(ptl->GetEntity());
-    followingObj* ptlComp = (followingObj*)scriptList.AddScript("followingObj");
-    ptlComp->following = go;
 
 }
 

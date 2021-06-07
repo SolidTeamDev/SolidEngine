@@ -323,7 +323,7 @@ GL::ComputeShader::ComputeShader(ComputeShaderResource *_cs) : ICompute(EResourc
 		computeW.error = true;
 	}
 	LoadShaderFields();
-	ReloadFields();
+	//ReloadFields();
 
 }
 

@@ -1,6 +1,7 @@
 #include "followingObj.hpp"
 #include "Core/engine.hpp"
 #include "ECS/Components/scriptList.hpp"
+#include "ECS/Components/rigidBody.hpp"
 #include "PlayerBullet.hpp"
 using namespace Solid;
 
@@ -25,13 +26,16 @@ void followingObj::Update()
     {
         effect = &(engine->ecsManager.GetComponent<ParticleEffect>(gameObject->GetEntity()));
     }
-    if (cd == 5000.f)
+    if (cd == 5000.f || following == nullptr)
     {
+        following = gameObject->parent;
+        dir = engine->ecsManager.GetComponent<RigidBody>(following->GetEntity()).GetLinearVelocity();
+
         ScriptList& scriptList = engine->ecsManager.GetComponent<ScriptList>(following->GetEntity());
         cd = ((PlayerBullet*)(scriptList.GetScript("PlayerBullet")))->lifeTime;
         cd -= 3 * Time::DeltaTime();
-        effect->timeGen->maxTime = cd;
-        effect->timeGen->minTime = cd;
+        effect->timeGen->maxTime = cd/2.f;
+        effect->timeGen->minTime = cd/2.f;
 
     }
     cd -= Time::DeltaTime();
@@ -40,8 +44,6 @@ void followingObj::Update()
         engine->ecsManager.DestroyEntity(gameObject->GetEntity());
         return;
     }
-    effect->spherePosGen->center = following->transform->GetGlobalPosition();
-
 };
 void followingObj::FixedUpdate() {
 
