@@ -593,7 +593,7 @@ namespace Solid
 		                     "\t""Time::Update();\n"
 		                     "\t""if(engine->activeCamera == nullptr)\n"
 		                     "\t\t""engine->SetActiveCamera(&sceneCam);\n"
-		                     "\t""engine->InitScript();\n"
+		                     "\t""\n"
 		                     "\t""Time::Update();\n"
 		                     "\t""Time::Update();\n"
 		                     "\t""while (!glfwWindowShouldClose(window->GetHandle()))\n"
@@ -603,12 +603,9 @@ namespace Solid
 		                     "\t\t""engine->Update();\n"
 		                     "\t\t""engine->FixedUpdate();\n"
 		                     "\t\t""engine->LateUpdate();\n"
-		                     "\t\t""renderer->ClearColor({0,0,0,1});\n"
-		                     "\t\t""renderer->Clear(window->GetWindowSize());\n"
-		                     "\t\t""engine->activeCamera->UpdateCamera(window->GetWindowSize());\n"
-		                     "\t\t""engine->renderer->DrawSkybox(*engine->activeCamera);\n"
-		                     "\t\t""engine->rendererSystem->Update(engine->renderer,*engine->activeCamera);\n"
-		                     "\t\t""engine->audioSystem->Update(*engine->activeCamera);\n"
+		                     "\t\t""int x,y;\n"
+		                     "\t\t""glfwGetWindowPos(engine->window->GetHandle(), &x,&y);\n"
+		                     "\t\t""engine->RenderToBuffer({(int)x,(int)y});\n"
 		                     "\t\t""Time::Update();\n"
 		                     "\t\t""\n"
 		                     "\t\t""window->SwapBuffers();\n"
@@ -623,7 +620,7 @@ namespace Solid
 			file.close();
 		}
 
-
+		Engine* engine = Engine::GetInstance();
 
 		fs::path build= srcPath;
 		build.append("Build");
