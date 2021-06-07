@@ -1,7 +1,7 @@
 #include "followingObj.hpp"
 #include "Core/engine.hpp"
 #include "ECS/Components/scriptList.hpp"
-#include "ECS/Components/rigidBody.hpp"
+#include <iostream>
 #include "PlayerBullet.hpp"
 using namespace Solid;
 
@@ -21,29 +21,26 @@ void followingObj::Init()
 
 void followingObj::Update()
 {
-    Engine* engine = Engine::GetInstance();
+    /*Engine* engine = Engine::GetInstance();
     if (effect == nullptr)
     {
-        effect = &(engine->ecsManager.GetComponent<ParticleEffect>(gameObject->GetEntity()));
+        if (engine->ecsManager.GotComponent<ParticleEffect>(gameObject->GetEntity()))
+            effect = &(engine->ecsManager.GetComponent<ParticleEffect>(gameObject->GetEntity()));
     }
-    if (cd == 5000.f || following == nullptr)
+    else
     {
-        following = gameObject->parent;
-        dir = engine->ecsManager.GetComponent<RigidBody>(following->GetEntity()).GetLinearVelocity();
-
-        ScriptList& scriptList = engine->ecsManager.GetComponent<ScriptList>(following->GetEntity());
-        cd = ((PlayerBullet*)(scriptList.GetScript("PlayerBullet")))->lifeTime;
-        cd -= 3 * Time::DeltaTime();
-        effect->timeGen->maxTime = cd/2.f;
-        effect->timeGen->minTime = cd/2.f;
-
+        effect->timeGen->maxTime = 0.3f;
+        effect->timeGen->minTime = 0.5f;
+        effect->eulerUpdater->globalAcceleration = dir + dir;
     }
-    cd -= Time::DeltaTime();
-    if(following == nullptr || effect == nullptr || cd <= 0.f)
+    if (rb == nullptr)
     {
-        engine->ecsManager.DestroyEntity(gameObject->GetEntity());
-        return;
+        if (engine->ecsManager.GotComponent<RigidBody>(gameObject->GetEntity()))
+            rb = &(engine->ecsManager.GetComponent<RigidBody>(gameObject->GetEntity()));
     }
+    else
+        dir = rb->GetLinearVelocity();*/
+
 };
 void followingObj::FixedUpdate() {
 

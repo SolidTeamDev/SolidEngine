@@ -3,6 +3,7 @@
 #include "ECS/Components/script.hpp"
 #include "ECS/Components/particleEffect.hpp"
 #include "EngineGenerated/EntityMacros.h"
+#include "ECS/Components/rigidBody.hpp"
 #include "EngineGenerated/followingObj.sld.hpp"
 namespace Solid SLDNamespace()
 {
@@ -11,7 +12,7 @@ namespace Solid SLDNamespace()
 	public:
         GameObject* following = nullptr;
         ParticleEffect* effect= nullptr;
-        float cd = 5000.f;
+        RigidBody* rb = nullptr;
         Vec3 dir = {0.f,0.f,0.f};
 
 	private:
