@@ -329,7 +329,8 @@ void PlayerController::Dash()
 void PlayerController::Fire()
 {
     Vec3 dir = camera->transform->GetLocalForward() * bulletSpeed;
-    dir.x = -dir.x;
+
+    mesh->transform->SetEuler(Vec3(90, 0, camera->transform->GetLocalEuler().y));
 
     GameObject* go = engine->ecsManager.Instantiate("Bullet", nullptr, "PlayerBullet");
     go->transform->SetPosition(gameObject->transform->GetLocalPosition());

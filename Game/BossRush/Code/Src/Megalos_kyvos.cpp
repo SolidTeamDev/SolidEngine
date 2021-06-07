@@ -1,4 +1,5 @@
 #include "Core/engine.hpp"
+#include <stdlib.h>
 #include "Core/Maths/Utils/FunctionCurve.hpp"
 #include "Core/Maths/solidMaths.hpp"
 #include "ECS/Components/boxCollider.hpp"
@@ -7,18 +8,18 @@ using namespace Solid;
 
 Megalos_kyvos::Megalos_kyvos()
 {
-	
+
 }
 
 Megalos_kyvos::~Megalos_kyvos()
 {
-	
+
 }
 
 void Megalos_kyvos::Init()
 {
     Boss::Init();
-    StateAttack = EAttack::SPECIAL2;
+    StateAttack = EAttack::NONE;
 }
 
 void Megalos_kyvos::Destroy()
@@ -31,6 +32,14 @@ void Megalos_kyvos::Destroy()
 void Megalos_kyvos::Update()
 {
     Boss::Update();
+    if(DataBullets.size() > 0)
+    {
+        if(DataBullets[0].Step == EStepAttack::None)
+            ChooseAttack();
+    }
+    else if(DataBullets.size() == 0 && StateAttack == EAttack::NONE)
+        ChooseAttack();
+
     UpdateAttack();
 
 };
@@ -53,7 +62,7 @@ void Megalos_kyvos::PrimaryAttack()
         return;
 
     DataBullets[0].Ratio += DataBullets[0].Step == EStepAttack::Two ? Time::DeltaTime() * SpeedPrimaryAttack *5 :
-                                                                        Time::DeltaTime() * SpeedPrimaryAttack;
+                            Time::DeltaTime() * SpeedPrimaryAttack;
     float t =  DataBullets[0].Ratio;
     BoxCollider* box = &engine->ecsManager.GetComponent<BoxCollider>(CubeBullets[i]->GetEntity());;
 
@@ -212,7 +221,6 @@ void Megalos_kyvos::Special1Attack()
         if (t > 1)
         {
             DataBullets[0].Ratio = 0;
-            DataBullets[0].Step = EStepAttack::None;
 
 
             for(auto go : CubeBullets[i]->childs)
@@ -224,7 +232,7 @@ void Megalos_kyvos::Special1Attack()
                 if(box1 != nullptr)
                     box1->SetSize(CubeBullets[i]->transform->GetLocalScale());
             }
-
+            DataBullets[0].Step = EStepAttack::None;
             return;
         }
         CubeBullets[i]->transform->Rotate( Vec3(0,10*Time::DeltaTime(),0));
@@ -273,7 +281,63 @@ void Megalos_kyvos::Special2Attack()
 
 void Megalos_kyvos::ChooseAttack()
 {
+    Target = Player->transform->GetLocalPosition();
 
+    for(auto cube : CubeBullets)
+    {
+        engine->ecsManager.DestroyEntity(cube->GetEntity());
+    }
+    CubeBullets.clear();
+    DataBullets.clear();
+    int v1 = rand() % 3;
+    if (StateAttack == EAttack::NONE)
+    {
+        if(v1 == 0)
+            StateAttack = EAttack::PRIMARY;
+        else if(v1 == 1)
+            StateAttack = EAttack::SECONDARY;
+        else
+            StateAttack = EAttack::TERTIARY;
+
+    }
+    else if(StateAttack == EAttack::PRIMARY)
+    {
+        if(v1 == 0)
+            StateAttack = EAttack::SPECIAL1;
+        else if(v1 == 1)
+            StateAttack = EAttack::SECONDARY;
+        else
+            StateAttack = EAttack::TERTIARY;
+
+    }
+    else if(StateAttack == EAttack::SECONDARY)
+    {
+        if(v1 == 0)
+            StateAttack = EAttack::PRIMARY;
+        else if(v1 == 1)
+            StateAttack = EAttack::SPECIAL1;
+        else
+            StateAttack = EAttack::TERTIARY;
+
+    }
+    else if (StateAttack == EAttack::TERTIARY)
+    {
+        if(v1 == 0)
+            StateAttack = EAttack::PRIMARY;
+        else
+            StateAttack = EAttack::SECONDARY;
+
+    }
+    else if(StateAttack == EAttack::SPECIAL1)
+    {
+        if(v1 == 0)
+            StateAttack = EAttack::PRIMARY;
+        else if(v1 == 1)
+            StateAttack = EAttack::SECONDARY;
+        else
+            StateAttack = EAttack::TERTIARY;
+
+    }
 }
 void Megalos_kyvos::CreateBulletsCube(std::string namePrefab, Vec3 pos, Vec3 scale)
 {

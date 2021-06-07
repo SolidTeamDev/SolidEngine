@@ -53,7 +53,7 @@ const float PI =  3.14159265359;
 vec3 WaterColor(void)
 {
     
-	float t = time * 0.000003;
+	float t = time * 0.000001;
     // uv should be the 0-1 uv of texture...
 	vec2 uv = gl_FragCoord.xy / resolution.xy;
 
@@ -311,6 +311,7 @@ void main()
 {
     fragColor = PBRShading();
 }
+
 
 
 
