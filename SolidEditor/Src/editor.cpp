@@ -208,6 +208,7 @@ namespace Solid
 		    Engine::GetInstance()->InitScript();
 
 		    play = true;
+		    Engine::GetInstance()->Play();
 			//save component State
 	    }
 	}
@@ -245,6 +246,8 @@ namespace Solid
 				EditorInterface::selectedGO = Engine::GetInstance()->ecsManager.FindGameObjectByName(selectName);
 			play = false;
 			Engine::GetInstance()->DestroyScript();
+			Engine::GetInstance()->Stop();
+
 		}
 	}
 } //!namespace

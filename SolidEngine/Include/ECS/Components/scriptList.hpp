@@ -62,6 +62,7 @@ namespace Solid SLDNamespace()
 			for (int i = 0; i < Scripts.size(); ++i)
 			{
 				Script* elt = Scripts[i];
+				elt->Destroy();
 				delete elt;
 				Scripts[i] = nullptr;
 

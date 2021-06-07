@@ -869,7 +869,10 @@ namespace Solid
 		std::string str = j ["Scene"]["{SkyBoxName}"];
 		Engine::GetInstance()->renderer->_map = Engine::GetInstance()->graphicsResourceMgr.GetCubemap(str.c_str());
 		AddAllComps(world, scene->rawScene, readPos);
-
+		if(play)
+		{
+			InitScript();
+		}
 		for(auto& elt : LoadedSceneCallbacks)
 		{
 		    elt(scene);
@@ -1844,6 +1847,19 @@ namespace Solid
 		hasEndedUIRendering = true;
 	}
 
+	void Engine::Play()
+	{
+		play = true;
+	}
+	void Engine::Stop()
+	{
+		play = false;
+	}
+
+	bool Engine::IsPlaying()
+	{
+		return play;
+	}
 } //!namespace
 
 
