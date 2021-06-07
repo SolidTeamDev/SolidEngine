@@ -197,11 +197,40 @@ void ButtonInterface::Draw()
 				{
 					FieldData fieldD;
 					fieldD.fName= field.name;
-					void* fData =field.getDataAddress(scriptToSave);
-					uint fSize = field.type.archetype->memorySize;
-					fieldD.fData.resize(fSize);
-					std::memcpy(fieldD.fData.data(), fData, fSize);
-					compD.fields.push_back(std::move(fieldD));
+					if(field.type.archetype == nullptr)
+					{
+
+					}
+					else if(field.type.archetype->name == "String")
+					{
+						String fData =field.getData<String>(scriptToSave);
+						uint fSize = fData.size();
+						fieldD.fData.resize(fSize);
+						std::memcpy(fieldD.fData.data(), fData.data(), fSize);
+						compD.fields.push_back(std::move(fieldD));
+					}
+					else if(field.type.archetype->name == "vectorStr")
+					{
+						vectorStr fData =field.getData<vectorStr>(scriptToSave);
+						size_t size = fData.size();
+						ResourcesLoader::Append(fieldD.fData, &size, sizeof(size_t));
+						for(auto& str : fData)
+						{
+							size = str.size();
+							ResourcesLoader::Append(fieldD.fData, &size, sizeof(size_t));
+							ResourcesLoader::Append(fieldD.fData, str.data(),str.size()*sizeof(std::string::value_type));
+
+						}
+					}
+					else
+					{
+						void* fData =field.getDataAddress(scriptToSave);
+						uint fSize = field.type.archetype->memorySize;
+						fieldD.fData.resize(fSize);
+						std::memcpy(fieldD.fData.data(), fData, fSize);
+						compD.fields.push_back(std::move(fieldD));
+					}
+
 				}
 				delete allS[i];
 				allS[i] = nullptr;
@@ -304,7 +333,41 @@ void ButtonInterface::Draw()
 						{
 							const rfk::Field* f= newComp->getArchetype().getField(field.fName);
 							if(f != nullptr)
-								f->setData(newComp, field.fData.data(), field.fData.size());
+							{
+								if(f->type.archetype == nullptr)
+								{
+
+								}
+								else if(f->type.archetype->name == "String")
+								{
+									String* s =(String*)f->getDataAddress(newComp);
+									if(s != nullptr)
+									{
+										String copy;
+										copy.resize(field.fData.size());
+										std::memcpy(copy.data(), field.fData.data(), field.fData.size());
+									}
+								}
+								else if(f->type.archetype->name == "vectorStr")
+								{
+										std::uint64_t readPos = 0;
+										vectorStr* fData =(vectorStr*)f->getDataAddress(newComp);
+										size_t size = 0;
+										ResourcesLoader::ReadFromBuffer(field.fData.data(), &size, sizeof(size_t), readPos, field.fData.size());
+										fData->resize(size);
+										for(auto& str : *fData)
+										{
+											size = 0;
+											ResourcesLoader::ReadFromBuffer(field.fData.data(), &size, sizeof(size_t), readPos, field.fData.size());
+											str.resize(size);
+											ResourcesLoader::ReadFromBuffer(field.fData.data(), str.data(),str.size()*sizeof(std::string::value_type), readPos, field.fData.size());
+
+										}
+
+								}
+								else
+									f->setData(newComp, field.fData.data(), field.fData.size());
+							}
 						}
 						array[elt.entityCompIndex].GetAllScripts()[elt.CompListIndex] = newComp;
 					}

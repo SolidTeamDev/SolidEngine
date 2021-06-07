@@ -41,14 +41,16 @@ namespace Solid
 
         void UpdateFramebuffer(const Framebuffer& _framebuffer) const final;
 
-        void BeginFramebuffer(const Framebuffer& _framebuffer) const final;
-        void EndFramebuffer() const final;
+        void BeginFramebuffer(Framebuffer &_framebuffer) final;
+        void EndFramebuffer()  final;
         ShaderBinary GetShaderBinary(uint _PID) const final;
         uint CreateShaderFromBinary(ShaderBinary _binary) const final;
 
 	    void DrawSolidGrid(const Camera& _camera, float _gridSize, Vec3 _color, float _thickness) const final;
 	    void DrawSkybox(const Camera &_camera) const final;
 	    void DrawLines(const Camera& _camera, std::vector<Vec3> _points, std::vector<uint> indices) const final;
+
+	    virtual void viewport(Vec2 pos, Vec2 Ratio) override;
     };
 
 } //!namespace

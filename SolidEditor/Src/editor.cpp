@@ -1,4 +1,6 @@
 #include <string>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 
 #include "editor.hpp"
 #undef ERROR
@@ -67,6 +69,7 @@ namespace Solid
 		{
 			Engine::GetInstance()->LoadScene(lastScene.c_str());
 		}
+
 	    while (!glfwWindowShouldClose(window->GetHandle()))
         {
             glfwPollEvents();
@@ -82,7 +85,7 @@ namespace Solid
             }
 
             renderer->ClearColor({0,0,0,1});
-            renderer->Clear(window->GetWindowSize());
+	        renderer->Clear(window->GetWindowSize());
 
             editorInterface.Update();
 
