@@ -1061,7 +1061,7 @@ namespace Solid
 		activeCamera = _newCam;
 	}
 
-	void Engine::RenderToBuffer(const Vec2i& _size = {0,0})
+	void Engine::RenderToBuffer(const Vec2i &_size = {0, 0}, bool renderToFB = true)
 	{
 		PlayBuffer.size = (_size.x <= 0 && _size.y <= 0) ? window->GetWindowSize() : _size;
         renderer->UpdateFramebuffer(PlayBuffer);
@@ -1070,7 +1070,11 @@ namespace Solid
     		return;
 
 		activeCamera->UpdateCamera(PlayBuffer.size);
-		renderer->BeginFramebuffer(PlayBuffer);
+		if(renderToFB)
+		{
+			renderer->BeginFramebuffer(PlayBuffer);
+
+		}
 		renderer->ClearColor({0.f,0.f,0.f,1});
 		renderer->Clear(PlayBuffer.size);
 		rendererSystem->Update(renderer, *activeCamera);
@@ -1092,8 +1096,11 @@ namespace Solid
 		}
 
 		UI::SetCurrentContext(EditorContext);
+		if(renderToFB)
+		{
+			renderer->EndFramebuffer();
+		}
 
-		renderer->EndFramebuffer();
 		audioSystem->Update(*activeCamera);
 
     }

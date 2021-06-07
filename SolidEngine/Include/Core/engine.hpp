@@ -136,7 +136,7 @@ namespace Solid
 
 	    void SetActiveCamera(Camera* _newCam);
 
-	    void RenderToBuffer(const Vec2i& _size);
+	    void RenderToBuffer(const Vec2i &_size, bool renderToFB);
 
 	    void AddLoadedSceneCallback(const std::function<void(Resource*)>& _func);
 
