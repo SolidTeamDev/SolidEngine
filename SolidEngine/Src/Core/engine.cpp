@@ -1064,6 +1064,8 @@ namespace Solid
 		renderer->ClearColor({0.f,0.f,0.f,1});
 		renderer->Clear(PlayBuffer.size);
 		rendererSystem->Update(renderer, *activeCamera);
+		renderer->DrawSkybox(*activeCamera);
+		particleEffectSystem->Update(*activeCamera);
 
 		UI::SetCurrentContext(UICompCtx);
 		if(hasEndedUIRendering)
@@ -1081,8 +1083,6 @@ namespace Solid
 
 		UI::SetCurrentContext(EditorContext);
 
-		renderer->DrawSkybox(*activeCamera);
-        particleEffectSystem->Update(*activeCamera);
 		renderer->EndFramebuffer();
 		audioSystem->Update(*activeCamera);
 
