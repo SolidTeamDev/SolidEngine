@@ -48,8 +48,8 @@ int main()
 		engine->FixedUpdate();
 		engine->LateUpdate();
 		int x,y;
-		glfwGetWindowPos(engine->window->GetHandle(), &x,&y);
-		engine->RenderToBuffer({(int)x,(int)y});
+		glfwGetWindowSize(engine->window->GetHandle(), &x,&y); 
+		engine->RenderToBuffer({(int)x,(int)y}, false);
 		Time::Update();
 		
 		window->SwapBuffers();
