@@ -232,6 +232,7 @@ namespace Solid {
 				        break;
 			        }
 		        }
+		        EditorInterface::selectedGO = nullptr;
 	        }
             if (UI::MenuItem("Save Scene"))
             {
