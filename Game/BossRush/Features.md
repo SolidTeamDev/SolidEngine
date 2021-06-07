@@ -27,11 +27,8 @@ Nous visons un jeu comportant au moins 2 boss avec chacun des patterns différen
 - Attaque 3: Place au dessus du joueur plein de cube oriente de maniere differente et les scales 
 
 ####Pattern 2
-- Attaque 4: invoque un enorme cube au dessus du joueur et le laisse tomber
+- Attaque 4: invoque 4 cube qui se scale et forme une croix 
 
-####Pattern 3
-
-- Attaque 5: invoque plusieurs cube en ligne et les fait tomber un a un
   
 ####
   Ps: les cubes reviennent au noyau ou disparaissent avant de lancer une nouvelle attaque
