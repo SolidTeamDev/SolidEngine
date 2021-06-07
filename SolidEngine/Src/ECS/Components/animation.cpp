@@ -88,18 +88,19 @@ namespace Solid
             CalculateBoneTransform(child, GlobalTrans);
     }
 
-    void Animation::SetAnim(String _animName,bool _loop)
+    void Animation::SetAnim(String _animName,bool _loop, float speed)
     {
-        AnimResource* anim = Engine::GetInstance()->resourceManager.GetRawAnimByName(AnimName.c_str());
+        AnimResource* anim = Engine::GetInstance()->resourceManager.GetRawAnimByName(_animName.c_str());
         if(anim)
-            SetAnim(anim);
+            SetAnim(anim,_loop,speed);
     }
-    void Animation::SetAnim(AnimResource* _anim,bool _loop)
+    void Animation::SetAnim(AnimResource* _anim,bool _loop, float speed)
     {
         anim = _anim;
         AnimName = anim->name;
         AnimTime = anim->numTicks/1000;
         Loop = _loop;
+        SpeedAnim = speed;
         IsFinish = false;
         CurrentTime = 0;
         CurrentIndex = 0;
@@ -120,7 +121,7 @@ namespace Solid
     {
         if (anim)
         {
-            CurrentTime += dt;
+            CurrentTime += dt * SpeedAnim;
             CurrentTime = fmod(CurrentTime, anim->numTicks);
             if(CurrentTime >= AnimTime && Loop)
             {

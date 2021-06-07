@@ -12,6 +12,7 @@ namespace Solid SLDNamespace()
         GameObject* following = nullptr;
         ParticleEffect* effect= nullptr;
         float cd = 5000.f;
+        Vec3 dir = {0.f,0.f,0.f};
 
 	private:
 		

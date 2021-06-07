@@ -19,8 +19,8 @@ namespace Solid SLDNamespace()
         void CalculateBoneTransform (SkeletonResource::Bone* bone, const Solid::Mat4f& _parent);
         void DrawSkeleton(std::vector<Vec3>& points, std::vector<uint>& indices,
                           SkeletonResource::Bone* bone = nullptr);
-        void SetAnim(AnimResource *_anim,bool _loop = true);
-        void SetAnim(String _animName,bool _loop = true);
+        void SetAnim(AnimResource *_anim,bool _loop = true, float speed = 1.f);
+        void SetAnim(String _animName,bool _loop = true, float speed = 1.f);
 
         void UpdateAnim(float dt);
         void UpdateBone(float currTime, SkeletonResource::Bone* bone = nullptr);
@@ -31,6 +31,7 @@ namespace Solid SLDNamespace()
         bool Loop = false;
         bool IsFinish = false;
         bool ShowSkeleton = false;
+        float SpeedAnim = 1.f;
     private:
         float AnimTime;
         AnimResource* anim = nullptr;

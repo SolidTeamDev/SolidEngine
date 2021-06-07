@@ -1082,9 +1082,11 @@ namespace Solid
 		UI::SetCurrentContext(EditorContext);
 
 		renderer->DrawSkybox(*activeCamera);
+        particleEffectSystem->Update(*activeCamera);
 		renderer->EndFramebuffer();
 		audioSystem->Update(*activeCamera);
-	}
+
+    }
 
 	void Engine::setJsonSave(json &j, GameObject *elt, std::string &path)
 	{
