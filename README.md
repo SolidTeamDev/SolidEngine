@@ -38,4 +38,6 @@ PBR Ready LIGHT
 with SolidEngine You have access to a sample bossrush game
 the goal of the game is to defeat the boss
 
-you can launch the game in editor with the scene named Boss1
+to launch the game in the editor go to Files/LoadScene/Boss1.SolidScene
+to launch it stand alone C:\Users\Trist\Desktop\Isart\SolidEngine\Game\BossRush\Code\Build\Game.exe
+see if the assets folder is biend next to the .exe if not copy the assets folder from SolidEngine\Game\BossRush
