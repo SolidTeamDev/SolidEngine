@@ -783,7 +783,11 @@ Solid::SceneGraphManager::Instantiate(std::string _prefabName, Solid::GameObject
 	AddAllComps(ent, buffer, readPos);
 	if(engine->IsPlaying())
 	{
-		engine->InitScript();
+		if(engine->ecsManager.GotComponent<ScriptList>(ent->GetEntity()))
+		{
+			ScriptList& sl = engine->ecsManager.GetComponent<ScriptList>(ent->GetEntity());
+			sl.Init();
+		}
 	}
 	return ent;
 }

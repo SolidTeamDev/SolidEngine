@@ -9,7 +9,6 @@ namespace Solid
 {
 	void AnimationSystem::Update()
 	{
-		//TODO: Update with audio system -> find better solution
 		for (auto entity : entities)
 		{
 			auto& anim  = ecsManager.GetComponent<Animation>(entity);
