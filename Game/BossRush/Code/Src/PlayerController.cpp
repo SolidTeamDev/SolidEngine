@@ -190,8 +190,6 @@ void PlayerController::RotateCamera()
 
 void PlayerController::MoveForward()
 {
-    if(!rigidBody)
-        return;
     if((stateAnim == EStateAnim::Attack1 ||stateAnim == EStateAnim::Attack2) && !anim->IsFinish)
     {
     }
@@ -205,19 +203,17 @@ void PlayerController::MoveForward()
         stateAnim = EStateAnim::Run;
     }
 
-    Vec3 dir = camera->transform->GetLocalForward() * moveSpeed;
+    Vec3 dir = camera->transform->GetLocalForward() * moveSpeed * Time::DeltaTime();
 
     dir.y = 0;
 
-    rigidBody->AddForce(dir);
+    gameObject->transform->Translate(dir);
 
     mesh->transform->SetEuler(Vec3(90,0,camera->transform->GetLocalEuler().y));
 }
 
 void PlayerController::MoveBack()
 {
-    if(!rigidBody)
-        return;
     if((stateAnim == EStateAnim::Attack1 ||stateAnim == EStateAnim::Attack2) && !anim->IsFinish)
     {
     }
@@ -231,11 +227,11 @@ void PlayerController::MoveBack()
         stateAnim = EStateAnim::Back;
     }
 
-    Vec3 dir = camera->transform->GetLocalForward() * -moveSpeed;
+    Vec3 dir = camera->transform->GetLocalForward() * -(moveSpeed/2) * Time::DeltaTime();
 
     dir.y = 0;
 
-    rigidBody->AddForce(dir);
+    gameObject->transform->Translate(dir);
     mesh->transform->SetEuler(Vec3(90,0,camera->transform->GetLocalEuler().y));
 }
 
@@ -244,7 +240,7 @@ void PlayerController::MoveLeft()
     if(!rigidBody)
         return;
 
-    Vec3 dir = camera->transform->GetLocalRight() * moveSpeed;
+    Vec3 dir = camera->transform->GetLocalRight() * moveSpeed * Time::DeltaTime();
 
     dir.y = 0;
     if(stateAnim == EStateAnim::AttackCharge && !anim->IsFinish)
@@ -253,11 +249,10 @@ void PlayerController::MoveLeft()
         return;
     }
 
-    rigidBody->AddForce(dir);
+    gameObject->transform->Translate(dir);
+
     if((stateAnim == EStateAnim::Attack1 ||stateAnim == EStateAnim::Attack2) && !anim->IsFinish)
-    {
         mesh->transform->SetEuler(Vec3(90,0,camera->transform->GetLocalEuler().y));
-    }
     else if (stateAnim == EStateAnim::Back)
         mesh->transform->SetEuler(Vec3(90, 0, camera->transform->GetLocalEuler().y + 45.f));
     else if (stateAnim == EStateAnim::Run)
@@ -268,6 +263,7 @@ void PlayerController::MoveLeft()
         mesh->transform->SetEuler(Vec3(90, 0, camera->transform->GetLocalEuler().y - 90.f));
         stateAnim = EStateAnim::Left;
     }
+
 }
 
 void PlayerController::MoveRight()
@@ -275,7 +271,7 @@ void PlayerController::MoveRight()
     if(!rigidBody)
         return;
 
-    Vec3 dir = camera->transform->GetLocalRight() * -moveSpeed;
+    Vec3 dir = camera->transform->GetLocalRight() * -moveSpeed * Time::DeltaTime();
 
     dir.y = 0;
 
@@ -286,13 +282,10 @@ void PlayerController::MoveRight()
         return;
     }
 
-    rigidBody->AddForce(dir);
+    gameObject->transform->Translate(dir);
 
     if((stateAnim == EStateAnim::Attack1 ||stateAnim == EStateAnim::Attack2) && !anim->IsFinish)
-    {
         mesh->transform->SetEuler(Vec3(90, 0, camera->transform->GetLocalEuler().y));
-
-    }
     else if (stateAnim == EStateAnim::Back)
         mesh->transform->SetEuler(Vec3(90, 0, camera->transform->GetLocalEuler().y - 45.f));
     else if (stateAnim == EStateAnim::Run)
@@ -303,7 +296,6 @@ void PlayerController::MoveRight()
         mesh->transform->SetEuler(Vec3(90, 0, camera->transform->GetLocalEuler().y + 90.f));
         stateAnim = EStateAnim::Right;
     }
-
 
 }
 
