@@ -398,17 +398,20 @@ namespace Solid
         glBindRenderbuffer(GL_RENDERBUFFER,0);
     }
 
-    void OpenGL45Renderer::BeginFramebuffer(const Framebuffer &_framebuffer) const
+    void OpenGL45Renderer::BeginFramebuffer(Framebuffer &_framebuffer)
     {
         if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
             Log::Send("Framebuffer is not complete",Log::ELogSeverity::ERROR);
 
         glBindFramebuffer(GL_FRAMEBUFFER, _framebuffer.id);
+	    glViewport(_framebuffer.pos.x,0,_framebuffer.size.x,_framebuffer.size.y);
+	    currentFB = &_framebuffer;
     }
 
-    void OpenGL45Renderer::EndFramebuffer() const
+    void OpenGL45Renderer::EndFramebuffer()
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        currentFB = nullptr;
     }
 
 
@@ -661,5 +664,10 @@ namespace Solid
         glScissor(last_scissor_box[0], last_scissor_box[1], (GLsizei)last_scissor_box[2], (GLsizei)last_scissor_box[3]);
         glLineWidth(1);
     }
+
+	void OpenGL45Renderer::viewport(Vec2 pos, Vec2 Ratio)
+	{
+		glViewport(pos.x,pos.y, Ratio.x,Ratio.y);
+	}
 
 } //!namespace
