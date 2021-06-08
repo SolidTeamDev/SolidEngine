@@ -46,11 +46,9 @@ int main()
 		engine->Update();
 		engine->FixedUpdate();
 		engine->LateUpdate();
-		renderer->ClearColor({0,0,0,1});
-		renderer->Clear(window->GetWindowSize());
-		engine->activeCamera->UpdateCamera(window->GetWindowSize());
-		engine->rendererSystem->Update(engine->renderer,*engine->activeCamera);
-		engine->audioSystem->Update(*engine->activeCamera);
+		int x,y;
+		glfwGetWindowSize(engine->window->GetHandle(), &x,&y); 
+		engine->RenderToBuffer({(int)x,(int)y}, false);
 		Time::Update();
 		
 		window->SwapBuffers();

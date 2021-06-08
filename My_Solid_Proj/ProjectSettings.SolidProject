@@ -1,0 +1,10 @@
+{
+    "Project": {
+        "Name": "My_Solid_Proj",
+        "Path": "D:\\Project\\My_Solid_Proj",
+        "AssetFolder": "Assets",
+        "SourcesFolder": "Code",
+        "EngineIncludeFolder": "EngineInclude",
+        "LastOpenedScene": "Instantiate.SolidScene"
+    }
+}
