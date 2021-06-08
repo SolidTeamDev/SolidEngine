@@ -6,6 +6,7 @@ in vec3 vNormal;
 in float time;
 
 uniform vec2 resolution;
+uniform vec4 sColor;
 
 // shadertoy emulation
 #define iTime time
@@ -85,7 +86,7 @@ vec4 colorize(float c){
 void mainImage(out vec4 fragColor,in vec2 fragCoord){
 	vec2 uv=fragCoord.xy/iResolution.xy*2.0-1.0;
 
-	vec3 cameraPos=vec3(0.0,0.0,iTime *0.001);
+	vec3 cameraPos=vec3(0.0,0.0,iTime * 0.1);
 	vec3 cameraDir=vec3(0.0,0.0,1.0);
 	vec3 cameraPlaneU=vec3(1.0,0.0,0.0);
 	vec3 cameraPlaneV=vec3(0.0,1.0,0.0)*(iResolution.y/iResolution.x);
@@ -96,8 +97,8 @@ void mainImage(out vec4 fragColor,in vec2 fragCoord){
 
 	rayDir=normalize(rayDir);
 
-	rayDir.xy*=rotate(iTime * 0.001);
-	rayDir.yz*=rotate(iTime * 0.001);
+	rayDir.xy*=rotate(iTime * 0.1);
+	rayDir.yz*=rotate(iTime * 0.1);
 
 	float dist=scene(rayPos);
 
@@ -117,7 +118,7 @@ void mainImage(out vec4 fragColor,in vec2 fragCoord){
 
 
 	vec4 color=0.05*emission*vec4(0.3,0.3,0.9,1.0);
-	fragColor=color;
+	fragColor=color * sColor;
 }
 // --------[ Original ShaderToy ends here ]---------- //
 
@@ -126,6 +127,11 @@ void main(void)
     mainImage(gl_FragColor, gl_FragCoord.xy);
 
 }
+
+
+
+
+
 
 
 

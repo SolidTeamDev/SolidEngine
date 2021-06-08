@@ -15,7 +15,7 @@ uniform vec3 SColor;
 void main( void ) {
 
 
-	float t = time * 0.000001;
+	float t = time * 0.8;
     // uv should be the 0-1 uv of texture...
 	vec2 uv = gl_FragCoord.xy / resolution.xy;
 
@@ -54,6 +54,8 @@ void main( void ) {
 
 	gl_FragColor = vec4(colour, 1.0);
 }
+
+
 
 
 
