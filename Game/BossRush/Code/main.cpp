@@ -22,7 +22,7 @@ int main()
 		throw ThrowError("Engine not correctly initialized !",ESolidErrorCode::S_INIT_ERROR);
 	Window* window = engine->window;
 	Renderer* renderer = engine->renderer;
-	engine->Compiler->GameLoadDLL("BossRush");
+	
 	glfwSwapInterval(0);
 	ResourcesLoader loader;
 	loader.SetManager(&(engine->resourceManager));
@@ -30,14 +30,13 @@ int main()
 	fs::path p = fs::current_path();
 	p.append("Assets");
 	loader.LoadResourcesFromFolder(p);
-	engine->Play();
-	engine->LoadScene("Boss1.SolidScene");
+	engine->LoadScene("");
 	engine->EnableMultiThread(false);
 	Camera sceneCam;
 	Time::Update();
 	if(engine->activeCamera == nullptr)
 		engine->SetActiveCamera(&sceneCam);
-	
+	engine->InitScript();
 	Time::Update();
 	Time::Update();
 	while (!glfwWindowShouldClose(window->GetHandle()))
@@ -47,13 +46,14 @@ int main()
 		engine->Update();
 		engine->FixedUpdate();
 		engine->LateUpdate();
-		int x,y;
-		glfwGetWindowPos(engine->window->GetHandle(), &x,&y);
-		engine->RenderToBuffer({(int)x,(int)y});
+		renderer->ClearColor({0,0,0,1});
+		renderer->Clear(window->GetWindowSize());
+		engine->activeCamera->UpdateCamera(window->GetWindowSize());
+		engine->rendererSystem->Update(engine->renderer,*engine->activeCamera);
+		engine->audioSystem->Update(*engine->activeCamera);
 		Time::Update();
 		
 		window->SwapBuffers();
 	}
-	engine->Stop();
 	return 0;
 }

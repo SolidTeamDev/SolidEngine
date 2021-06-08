@@ -85,7 +85,7 @@ vec4 colorize(float c){
 void mainImage(out vec4 fragColor,in vec2 fragCoord){
 	vec2 uv=fragCoord.xy/iResolution.xy*2.0-1.0;
 
-	vec3 cameraPos=vec3(0.0,0.0,iTime*0.000001);
+	vec3 cameraPos=vec3(0.0,0.0,iTime *0.001);
 	vec3 cameraDir=vec3(0.0,0.0,1.0);
 	vec3 cameraPlaneU=vec3(1.0,0.0,0.0);
 	vec3 cameraPlaneV=vec3(0.0,1.0,0.0)*(iResolution.y/iResolution.x);
@@ -96,8 +96,8 @@ void mainImage(out vec4 fragColor,in vec2 fragCoord){
 
 	rayDir=normalize(rayDir);
 
-	rayDir.xy*=rotate(iTime*0.000001);
-	rayDir.yz*=rotate(iTime*0.000001);
+	rayDir.xy*=rotate(iTime * 0.001);
+	rayDir.yz*=rotate(iTime * 0.001);
 
 	float dist=scene(rayPos);
 
@@ -126,6 +126,11 @@ void main(void)
     mainImage(gl_FragColor, gl_FragCoord.xy);
 
 }
+
+
+
+
+
 
 
 

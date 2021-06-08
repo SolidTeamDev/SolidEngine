@@ -9,6 +9,7 @@
 #include <editor.hpp>
 
 using namespace Solid;
+static float TimeT = 0;
 GL::Mesh::Mesh(MeshResource *_raw):
 IMesh(_raw->Meshes.size())
 {
@@ -200,8 +201,10 @@ void GL::Mesh::DrawMesh(const std::vector<MaterialResource *>& _list, Transform&
 
 				if(_anim)
 				{ shader->SetAnim(_anim); }
-
-				shader->SetFloat("_GlobalTime", Time::GlobalTime());
+                TimeT += Time::DeltaTime();
+				if(TimeT > 36000.f)
+				    TimeT = 0;
+				shader->SetFloat("_GlobalTime",TimeT);
 				shader->SetMVP(_tr, _cam);
 				shader->SetLights(_cam);
 			}
