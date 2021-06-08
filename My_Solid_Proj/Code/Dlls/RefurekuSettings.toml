@@ -1,0 +1,57 @@
+[FileGenerationSettings]
+# Generated files will use this extension
+generatedFilesExtension = ".sld.hpp"
+
+# List of supported extensions
+supportedExtensions = [".h", ".hpp"]
+
+# Generated files will be located here
+outputDirectory = '''Include/EngineGenerated'''
+
+# Files contained in the directories of this list will be parsed
+toParseDirectories = [
+    '''Include'''
+]
+
+# Files to parse which are not included in any directory of toParseDirectories
+toParseFiles = [
+   
+   
+]
+
+# Files contained in the directories of this list will be ignored
+ignoredDirectories = [
+	'''Include/EngineGenerated''',
+#	'''Path/To/Directory/To/Ignore'''
+]
+
+# Files not to parse which are not included in any directory of ignoredDirectories
+ignoredFiles = []
+
+
+[FileParsingSettings]
+# Abort parsing on first encountered error
+shouldAbortParsingOnFirstError = true
+
+# Should all entities be parsed whether they are tagged with the macro or not
+shouldParseAllEntities = false
+
+# Include directories of the project
+projectIncludeDirectories = [
+	'''../EngineInclude/Refureku''',
+	'''../EngineInclude'''
+]
+
+# Must be one of "msvc", "clang++", "g++"
+compilerExeName = "msvc"
+
+[FileParsingSettings.Properties]
+namespaceMacroName = "SLDNamespace"
+classMacroName = "SLDClass"
+structMacroName = "SLDStruct"
+fieldMacroName = "SLDField"
+methodMacroName = "SLDMethod"
+enumMacroName = "SLDEnum"
+enumValueMacroName = "SLDEnumVal"
+variableMacroName = "SLDVariable"
+functionMacroName = "SLDFunction"

@@ -1,0 +1,5 @@
+D:/Project/My_Solid_Proj/Code/cmake-build-debug/CMakeFiles/Game.dir
+D:/Project/My_Solid_Proj/Code/cmake-build-debug/CMakeFiles/RunGenerator.dir
+D:/Project/My_Solid_Proj/Code/cmake-build-debug/CMakeFiles/My_Solid_Proj.dir
+D:/Project/My_Solid_Proj/Code/cmake-build-debug/CMakeFiles/edit_cache.dir
+D:/Project/My_Solid_Proj/Code/cmake-build-debug/CMakeFiles/rebuild_cache.dir
