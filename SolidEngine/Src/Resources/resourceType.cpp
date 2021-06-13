@@ -91,7 +91,8 @@ MaterialResource::~MaterialResource()
 
 AudioResource::~AudioResource()
 {
-	alDeleteBuffers(1, &(this->buffer));
+	if(sound)
+		sound->release();
 }
 
 
@@ -568,19 +569,10 @@ void AudioResource::ToDataBuffer(std::vector<char> &buffer)
 	std::uint32_t size = pString.size();
 
 	Resource::ToDataBuffer(buffer);
+	char name[1024];
+	sound->getName(name, 1024);
 
-	//RawAudio save
-	size = this->audioRawBinary.size();
-	ResourcesLoader::Append(buffer, &(size), sizeof(size));
-	ResourcesLoader::Append(buffer, (void *) (this->audioRawBinary.data()), size * sizeof(short));
 
-	//SFINFO Save
-	ResourcesLoader::Append(buffer, (void *) &(this->info), sizeof(SF_INFO));
-
-	//format
-	ResourcesLoader::Append(buffer, (void *) &(this->format), sizeof(ALenum));
-
-	ResourcesLoader::Append(buffer, (void *) &(this->numFrames), sizeof(sf_count_t));
 
 
 }
@@ -595,13 +587,7 @@ int AudioResource::FromDataBuffer(char *buffer, size_t bSize)
 
 	//recup RawAudio
 	size = 0;
-	ResourcesLoader::ReadFromBuffer(buffer, &(size), sizeof(size), ReadPos, bSize);
-	this->audioRawBinary.resize(size);
-	ResourcesLoader::ReadFromBuffer(buffer, (void *) (this->audioRawBinary.data()), size * sizeof(short), ReadPos, bSize);
 
-	ResourcesLoader::ReadFromBuffer(buffer, (void *) &(this->info), sizeof(SF_INFO), ReadPos, bSize);
-	ResourcesLoader::ReadFromBuffer(buffer, (void *) &(this->format), sizeof(ALenum), ReadPos, bSize);
-	ResourcesLoader::ReadFromBuffer(buffer, (void *) &(this->numFrames), sizeof(sf_count_t), ReadPos, bSize);
 	return ReadPos;
 }
 

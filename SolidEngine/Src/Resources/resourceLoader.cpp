@@ -1341,96 +1341,13 @@ Resource *ResourcesLoader::LoadAudio(const fs::path &Rpath)
 	AudioResource* audio = new AudioResource();
 	std::string p = Rpath.string();
 	const char* filename = p.c_str();
-	ALenum err, format;
-	ALuint buff;
-	SNDFILE* sndfile;
-	SF_INFO sfinfo;
-	short* membuf = nullptr;
-
-	ALsizei numBytes;
 	audio->name = Rpath.filename().string();
 	SetPath(audio->path, Rpath);
-
-	sndfile = sf_open(filename, SFM_READ, &sfinfo);
-	if (!sndfile)
-	{
-		std::cout << "Couldn't open the audio " << filename << std::endl;
-		return 0;
-	}
-
-	format = AL_NONE;
-	if (sfinfo.channels == 1)
-		format = AL_FORMAT_MONO16;
-	else if (sfinfo.channels == 2)
-		format = AL_FORMAT_STEREO16;
-	else if (sfinfo.channels == 3)
-	{
-		if (sf_command(sndfile, SFC_WAVEX_GET_AMBISONIC, NULL, 0) == SF_AMBISONIC_B_FORMAT)
-			format = AL_FORMAT_BFORMAT2D_16;
-	}
-	else if (sfinfo.channels == 4)
-	{
-		if (sf_command(sndfile, SFC_WAVEX_GET_AMBISONIC, NULL, 0) == SF_AMBISONIC_B_FORMAT)
-			format = AL_FORMAT_BFORMAT3D_16;
-	}
-
-	if(!format)
-	{
-		std::cout << "Unsupported channel count of " << filename << std::endl;
-		sf_close(sndfile);
-		return 0;
-	}
-	audio->audioRawBinary.resize((sfinfo.frames * sfinfo.channels));
-
-	audio->format = format;
-	audio->numFrames = sf_readf_short(sndfile, audio->audioRawBinary.data(), sfinfo.frames);
-	if (audio->numFrames < 1)
-	{
-		sf_close(sndfile);
-		std::cout << "Failed to read samples of " << filename << std::endl;
-		return nullptr;
-	}
-
-	numBytes = (ALsizei)(audio->numFrames * sfinfo.channels) * (ALsizei)sizeof(short);
-
-	buff = 0;
-	alGenBuffers(1, &buff);
-	alBufferData(buff, format, audio->audioRawBinary.data(), numBytes, sfinfo.samplerate);
-	audio->buffer = buff;
-	audio->info = sfinfo;
-	sf_close(sndfile);
-
-	err = alGetError();
-	if (err != AL_NO_ERROR)
-	{
-	    if(err != AL_INVALID_OPERATION)
-		    std::cout << "OpenAL Error : " << alGetString(err) << std::endl;
-		if (buff && alIsBuffer(buff))
-			alDeleteBuffers(1, &buff);
-		return nullptr;
-	}
-
-
-#if SASSET_GEN
-	printf("generate .SAudio\n");
-	std::vector<char> Data;
-	audio->ToDataBuffer(Data);
+	FMOD_MODE mode = FMOD_LOOP_NORMAL | FMOD_2D | FMOD_3D_WORLDRELATIVE| FMOD_3D_INVERSETAPEREDROLLOFF;
+	Engine::GetInstance()->audio.GetSystem()->createSound(filename, mode, nullptr,&audio->sound);
 
 
 
-
-	fs::path cachePath =Rpath.parent_path();
-	cachePath.append(Rpath.filename().string() + ".SAudio");
-	std::ofstream cacheFile(cachePath, std::fstream::binary | std::fstream::trunc);
-
-
-	if(cacheFile.is_open())
-	{
-		cacheFile.write(Data.data(), Data.size());
-	}
-#endif
-	audio->audioRawBinary.clear();
-	audio->audioRawBinary.reserve(0);
 
 	return audio;
 }
@@ -1622,34 +1539,8 @@ Resource *ResourcesLoader::LoadSolidMaterial(const fs::path &Rpath)
 
 Resource *ResourcesLoader::LoadSolidAudio(const fs::path &Rpath)
 {
-	AudioResource* audio = new AudioResource();
-	std::ifstream ifs(Rpath, std::ios::binary|std::ios::ate);
-	std::ifstream::pos_type pos = ifs.tellg();
 
-	std::vector<char>  buffer(pos);
-
-	ifs.seekg(0, std::ios::beg);
-	ifs.read(&buffer[0], pos);
-
-
-	audio->FromDataBuffer(buffer.data(),buffer.size());
-
-
-	ALsizei numBytes = (ALsizei)(audio->numFrames * audio->info.channels) * (ALsizei)sizeof(short);
-
-
-	alGenBuffers(1, &audio->buffer);
-	alBufferData(audio->buffer, audio->format, audio->audioRawBinary.data(), numBytes, audio->info.samplerate);
-	if(audio->name == "")
-	{
-		audio->name = "NoName" + std::to_string(Resource::NoNameNum);
-		Resource::NoNameNum++;
-	}
-	audio->path.clear();
-	SetPath(audio->path, Rpath);
-	audio->audioRawBinary.clear();
-	audio->audioRawBinary.reserve(0);
-	return audio;
+	return nullptr;
 }
 
 void ResourcesLoader::SetPath(std::deque<std::string> &resPath, const fs::path& Rpath)

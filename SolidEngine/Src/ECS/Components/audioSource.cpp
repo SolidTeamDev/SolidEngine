@@ -17,26 +17,21 @@ namespace Solid
 
     void AudioSource::Init()
     {
-	    alSourcei(sourceID,AL_SOURCE_SPATIALIZE_SOFT, AL_AUTO_SOFT);
-        alGenSources(1, &sourceID);
-        alSourcef(sourceID, AL_PITCH, pitch);
-        alSourcef(sourceID, AL_GAIN, volume);
-        alSource3f(sourceID, AL_POSITION, 0, 0, 0);
-        alSource3f(sourceID, AL_VELOCITY,velocity.x, velocity.y, velocity.z);
+	    FMOD::System* sys = Engine::GetInstance()->audio.GetSystem();
 
-        alSourcei(sourceID, AL_LOOPING, 0);
-        alSourcef(sourceID, AL_MAX_DISTANCE, maxDistance);
+      //  alSourcef(sourceID, AL_PITCH, pitch);
+       // alSourcef(sourceID, AL_GAIN, volume);
+       // alSource3f(sourceID, AL_POSITION, 0, 0, 0);
+       // alSource3f(sourceID, AL_VELOCITY,velocity.x, velocity.y, velocity.z);
+
+       // alSourcei(sourceID, AL_LOOPING, 0);
+       // alSourcef(sourceID, AL_MAX_DISTANCE, maxDistance);
         audioResource = Engine::GetInstance()->resourceManager.GetRawAudioByName(name.c_str());
-        if(audioResource != nullptr)
-	        alSourcei(sourceID, AL_BUFFER, audioResource->buffer);
-        ALenum error = alGetError();
-        if(error != AL_NO_ERROR)
+        if(audioResource)
         {
-            const char * str =alGetString(error);
-            if(str != nullptr)
-                Log::Send(str, Log::ELogSeverity::ERROR);
-        }
+	        Engine::GetInstance()->audio.GetSystem()->playSound(audioResource->sound, nullptr, true, &audioChannel);
 
+        }
 
         isInit = true;
     }
@@ -46,40 +41,45 @@ namespace Solid
         audioResource = _audioResource;
         name = _audioResource->name;
         Stop();
-        alSourcei(sourceID, AL_BUFFER, audioResource->buffer);
-        ALenum error = alGetError();
-        if(error != AL_NO_ERROR)
-            Log::Send(alGetString(error), Log::ELogSeverity::ERROR);
+	    Engine::GetInstance()->audio.GetSystem()->playSound(audioResource->sound, nullptr, true, &audioChannel);
+
 
     }
 
     void AudioSource::SetVolume(float _vol)
     {
         volume = Maths::Clamp<float>(_vol,0,1);
-        alSourcef(sourceID, AL_GAIN, volume);
+        audioChannel->setVolume(volume);
     }
 
     void AudioSource::SetPitch(float _pitch)
     {
-        pitch = _pitch < 0 ? 0 : _pitch;
-        alSourcef(sourceID, AL_PITCH, pitch);
+        pitch = _pitch;
+
+        audioChannel->setPitch( pitch);
     }
 
     void AudioSource::SetMaxDistance(float _maxDistance)
     {
         maxDistance = _maxDistance;
-        alSourcef(sourceID,AL_MAX_DISTANCE,_maxDistance);
+        float minDistance = 0;
+        audioChannel->get3DMinMaxDistance(&minDistance,nullptr);
+        audioChannel->set3DMinMaxDistance(minDistance, maxDistance);
     }
 
     void AudioSource::SetMusicVelocity(const Vec3& _velocity)
     {
         velocity = _velocity;
-        alSource3f(sourceID, AL_VELOCITY,velocity.x, velocity.y, velocity.z);
+        FMOD_VECTOR vec {velocity.x,velocity.y,velocity.z};
+
+	    audioChannel->set3DAttributes(nullptr, &vec);
     }
 
     void AudioSource::SetPosition(const Vec3 &_position)
     {
-        alSource3f(sourceID, AL_POSITION, _position.x, _position.y, _position.z);
+	    FMOD_VECTOR vec {_position.x,_position.y,_position.z};
+
+	    audioChannel->set3DAttributes(&vec,nullptr);
     }
 
     std::string AudioSource::GetName() const
@@ -106,67 +106,88 @@ namespace Solid
     {
         return velocity;
     }
-
+    bool AudioSource::GetIs3D() const
+	{
+		return is3D;
+	}
     void AudioSource::Play()
     {
         if(IsPlaying())
             return;
-        alSourcePlay(sourceID);
-        ALenum error = alGetError();
-        if(error != AL_NO_ERROR)
-            Log::Send(alGetString(error), Log::ELogSeverity::ERROR);
+        audioChannel->setPaused(false);
+	    isPlaying = true;
     }
 
     void AudioSource::Pause()
     {
         if(IsPaused())
             return;
-        alSourcePause(sourceID);
-        ALenum error = alGetError();
-        if(error != AL_NO_ERROR)
-            Log::Send(alGetString(error), Log::ELogSeverity::ERROR);
+	    audioChannel->setPaused(true);
     }
 
     void AudioSource::Stop()
     {
         if(!IsPlaying())
             return;
-        alSourceStop(sourceID);
-        ALenum error = alGetError();
-        if(error != AL_NO_ERROR)
-            Log::Send(alGetString(error), Log::ELogSeverity::ERROR);
+	    audioChannel->setPaused(true);
+	    audioChannel->setPosition(0, FMOD_TIMEUNIT_MS);
+	    isPlaying = false;
     }
 
     void AudioSource::SetLoop(bool _loop)
     {
-        loop = _loop;
-        alSourcei(sourceID, AL_LOOPING, loop);
+	    if(audioResource == nullptr)
+		    return;
+    	loop = _loop;
+    	FMOD_MODE mode;
+    	audioChannel->getMode(&mode);
+	    FMOD_MODE mask3d = FMOD_LOOP_NORMAL | FMOD_LOOP_OFF;
+	    FMOD_MODE isNotLoop = FMOD_LOOP_OFF & mode;
+	    if((loop && isNotLoop != 0) || (!loop && isNotLoop == 0))
+	    {
+	    	audioChannel->setMode(mode ^ mask3d);
+	    }
     }
+	void AudioSource::SetIs3D(bool _3D)
+	{
+    	if(audioResource == nullptr)
+		    return;
+		is3D = _3D;
+
+		FMOD_MODE cmode;
+		audioChannel->getMode(&cmode);
+
+		FMOD_MODE mask3d = FMOD_3D | FMOD_2D;
+
+		if(is3D && ( cmode & FMOD_3D) ==0)
+		{
+			if(audioChannel->setMode(cmode ^ mask3d) != FMOD_OK)
+			{
+				Log::Send("MODE m");
+			}
+		}
+		else if(!is3D && ( cmode & FMOD_3D) != 0)
+		{
+			if(audioChannel->setMode(cmode ^ mask3d) != FMOD_OK)
+			{
+				Log::Send("MODE");
+			}
+
+		}
+
+	}
 
     bool AudioSource::IsPlaying()
     {
-        ALint s = AL_STOPPED;
-        alGetSourcei(sourceID, AL_SOURCE_STATE, &s);
-        if(alGetError() == AL_NO_ERROR && s == AL_PLAYING)
-            return true;
-        ALenum error = alGetError();
-        if(error != AL_NO_ERROR)
-            Log::Send(alGetString(error), Log::ELogSeverity::ERROR);
-
-        return false;
+        return isPlaying;
     }
 
     bool AudioSource::IsPaused()
     {
-        ALint s = AL_STOPPED;
-        alGetSourcei(sourceID, AL_SOURCE_STATE, &s);
-        if(alGetError() == AL_NO_ERROR && s == AL_PAUSED)
-            return true;
-        ALenum error = alGetError();
-        if(error != AL_NO_ERROR)
-            Log::Send(alGetString(error), Log::ELogSeverity::ERROR);
+	    bool isPaused;
 
-        return false;
+	    audioChannel->getPaused(&isPaused);
+        return isPaused;
     }
 
     bool AudioSource::IsLooping()
@@ -181,6 +202,7 @@ namespace Solid
 		Components::Release();
 		isInit = false;
 		audioResource = nullptr;
-		alDeleteSources(1, &sourceID);
+		audioChannel->stop();
+		audioChannel = nullptr;
 	}
 } //!namespace

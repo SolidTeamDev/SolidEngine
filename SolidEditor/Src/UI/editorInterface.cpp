@@ -6,7 +6,7 @@
 #define OS_WIN 1
 #include <windows.h>
 #endif
-
+#include "fmod.hpp"
 
 #include "UI/editorInterface.hpp"
 
@@ -285,7 +285,49 @@ namespace Solid {
 
 	            UI::EndMenu();
             }
+	        if (UI::MenuItem("TEST FMOD"))
+	        {
 
+
+		        /*
+
+
+		        // Create the sound.
+		        FMOD::Sound *sound = nullptr;
+		        system->createSound("Test.ogg", FMOD_DEFAULT, nullptr, &sound);
+
+		        // Play the sound.
+		        FMOD::Channel *channel = nullptr;
+		        result = system->playSound(sound, nullptr, false, &channel);
+
+		        if (result != FMOD_OK)
+			        return ;
+
+		        // Assign the channel to the group.
+		        result = channel->setChannelGroup(channelGroup);
+		        if (result != FMOD_OK)
+			        return ;
+
+		        // Set a callback on the channel.
+		        // This works.
+		        //channel->setCallback(&channelGroupCallback);
+		        bool isPlaying = false;
+		        do {
+			        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+			        channel->isPlaying(&isPlaying);
+
+			        system->update();
+		        } while (isPlaying);
+
+*/
+		        // Clean up.
+//
+//		        channelGroup->release();
+//		        system->release();
+
+		        return ;
+	        }
             UI::EndMenu();
         }
 

@@ -145,9 +145,8 @@ void Solid::HierarchyTreeInterface::DrawCreateObject()
 
 		    }
 	    }
-	    if(UI::BeginMenu("Prefab"))
-	    {
-		    if(UI::MenuItem("Create Prefab"))
+
+		    if(UI::MenuItem("Create / Update Prefab"))
 		    {
 				if(EditorInterface::selectedGO != nullptr)
 				{
@@ -162,26 +161,7 @@ void Solid::HierarchyTreeInterface::DrawCreateObject()
 					}
 				}
 		    }
-		    if(UI::MenuItem("Update Prefab"))
-		    {
-			    if(EditorInterface::selectedGO != nullptr)
-			    {
-				    PrefabResource* prefab = engine->resourceManager.GetPrefabByName(EditorInterface::selectedGO->name.c_str());
-				    if(prefab != nullptr)
-				    {
-				    	prefab->UpdatePrefab(EditorInterface::selectedGO);
-				    }
-			    }
-		    }
-		    if(UI::MenuItem("Instantiate Prefab"))
-		    {
 
-		    	engine->ecsManager.Instantiate("Prefab1", nullptr, "InstantiatedPrefab");
-
-
-		    }
-		    UI::EndMenu();
-	    }
         UI::EndPopup();
     }
 }

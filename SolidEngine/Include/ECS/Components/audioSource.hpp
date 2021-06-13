@@ -4,9 +4,7 @@
 #include "Core/Maths/Vector/vector3.hpp"
 #include "Resources/resourceType.hpp"
 
-#include <AL/alc.h>
-#include <AL/al.h>
-#include <AL/alext.h>
+#include "fmod.hpp"
 #include <string>
 
 #include "ECS/types.hpp"
@@ -24,11 +22,17 @@ namespace Solid SLDNamespace()
         SLDField()
         String name = "None";
 
-        ALuint sourceID = 0;
+        FMOD::Channel* audioChannel = nullptr;
         AudioResource* audioResource = nullptr;
 
         SLDField()
         bool loop = false;
+	    SLDField()
+	    bool is3D = false;
+	    SLDField()
+	    bool isPlaying = false;
+	    SLDField()
+	    String ChannelGroup = "DEFAULT";
 	    SLDField()
 	    float pitch = 1.f;
 	    SLDField()
@@ -51,6 +55,8 @@ namespace Solid SLDNamespace()
 	    SLDMethod()
         void SetLoop(bool _loop);
 	    SLDMethod()
+	    void SetIs3D(bool _3D);
+	    SLDMethod()
 	    void SetVolume(float _vol);
 	    SLDMethod()
 	    void SetPitch(float _pitch);
@@ -63,6 +69,8 @@ namespace Solid SLDNamespace()
 
 	    SLDMethod()
 	    std::string GetName() const;
+	    SLDMethod()
+	    bool GetIs3D() const ;
 	    SLDMethod()
 	    float GetVolume() const;
 	    SLDMethod()
