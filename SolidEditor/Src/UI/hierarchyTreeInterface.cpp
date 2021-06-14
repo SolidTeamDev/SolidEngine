@@ -19,9 +19,11 @@ namespace Solid
         UI::BeginChild("##HierarchyChild", UI::GetContentRegionAvail(), false, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar);
 
 
+
+
         if (UI::IsWindowHovered() && UI::IsAnyMouseDown())
             EditorInterface::selectedGO = nullptr;
-
+		UI::Separator();
         DrawEntities();
 
         DrawCreateObject();
@@ -38,13 +40,11 @@ namespace Solid
 		    }
 		    else
 		    {
-			    drop=UI::AcceptDragDropPayload("Scene");
+			    const ImGuiPayload* drop=UI::AcceptDragDropPayload("ReChildGO");
 			    if(drop != nullptr)
 			    {
-				    Resource* r = *((Resource**)drop->Data);
-				    Engine::GetInstance()->LoadScene(r->name.c_str());
-				    EditorInterface::selectedGO = nullptr;
-
+				    GameObject* go = *((GameObject**)drop->Data);
+				    go->ReParentCurrent(Engine::GetInstance()->ecsManager.GetWorld());
 			    }
 			    else
 			    {
@@ -53,6 +53,16 @@ namespace Solid
 				    {
 					    Resource* r = *((Resource**)drop->Data);
 					    Engine::GetInstance()->renderer->_map = Engine::GetInstance()->graphicsResourceMgr.GetCubemap(r->name.c_str());
+				    }
+				    else
+				    {
+					    drop=UI::AcceptDragDropPayload("Scene");
+					    if(drop != nullptr)
+					    {
+						    Resource* r = *((Resource**)drop->Data);
+						    Engine::GetInstance()->LoadScene(r->name.c_str());
+						    EditorInterface::selectedGO = nullptr;
+					    }
 				    }
 			    }
 		    }
@@ -174,6 +184,7 @@ void Solid::HierarchyTreeInterface::DrawEntities()
         CheckEntities(g, 0);
     }
 
+    //modif dnd
     if (EditorInterface::draggingEnt && !UI::IsAnyMouseDown() && !UI::IsAnyItemHovered() && UI::IsWindowHovered())
     {
         EditorInterface::draggingEnt = false;
@@ -207,24 +218,28 @@ bool Solid::HierarchyTreeInterface::DrawEntity(GameObject* child)
     if (child->childs.empty())
         flags |= ImGuiTreeNodeFlags_Leaf;
     bool result = UI::TreeNodeEx((child->name + "##" +std::to_string(child->GetEntity())).c_str(), flags);
+    if(UI::BeginDragDropTarget())
+    {
+	    const ImGuiPayload* drop=UI::AcceptDragDropPayload("ReChildGO");
+	    if(drop != nullptr)
+	    {
+		    GameObject* go = *((GameObject**)drop->Data);
+		    go->ReParentCurrent(child);
+	    }
+	    UI::EndDragDropTarget();
+    }
+    if(UI::BeginDragDropSource())
+	{
+		UI::Text(child->name.c_str());
+		UI::SetDragDropPayload("ReChildGO", &(child), sizeof(GameObject**));
+
+
+		UI::EndDragDropSource();
+	}
     if (UI::IsAnyMouseDown() && UI::IsItemHovered())
         EditorInterface::selectedGO = child;
 
-    if(UI::IsMouseHoveringRect(UI::GetItemRectMin(), UI::GetItemRectMax()) &&
-            UI::IsMouseDragging(ImGuiMouseButton_Left) && child == EditorInterface::selectedGO)
-        EditorInterface::draggingEnt = true;
-
-    if(UI::IsMouseHoveringRect(UI::GetItemRectMin(), UI::GetItemRectMax()) &&
-            EditorInterface::draggingEnt && !UI::IsAnyMouseDown())
-    {
-        EditorInterface::draggingEnt = false;
-        Log::Send("Changed " + EditorInterface::selectedGO->name +
-                             "'s parent to " + child->name, Log::ELogSeverity::DEBUG);
-
-		if(child != EditorInterface::selectedGO)
-            EditorInterface::selectedGO->ReParentCurrent(child);
-
-    }
+    //modif dnd
     return result;
 }
 
