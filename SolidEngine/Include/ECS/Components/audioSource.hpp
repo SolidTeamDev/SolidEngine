@@ -4,9 +4,7 @@
 #include "Core/Maths/Vector/vector3.hpp"
 #include "Resources/resourceType.hpp"
 
-#include <AL/alc.h>
-#include <AL/al.h>
-#include <AL/alext.h>
+#include "fmod.hpp"
 #include <string>
 
 #include "ECS/types.hpp"
@@ -24,15 +22,23 @@ namespace Solid SLDNamespace()
         SLDField()
         String name = "None";
 
-        ALuint sourceID = 0;
+        FMOD::Channel* audioChannel = nullptr;
         AudioResource* audioResource = nullptr;
 
         SLDField()
         bool loop = false;
 	    SLDField()
+	    bool is3D = false;
+	    SLDField()
+	    bool isPlaying = false;
+	    SLDField()
+	    String ChannelGroup = "DEFAULT";
+	    SLDField()
 	    float pitch = 1.f;
 	    SLDField()
         float volume = 1.f;
+	    SLDField()
+	    float minDistance = 0;
 	    SLDField()
         float maxDistance = 500;
 	    SLDField()
@@ -51,11 +57,13 @@ namespace Solid SLDNamespace()
 	    SLDMethod()
         void SetLoop(bool _loop);
 	    SLDMethod()
+	    void SetIs3D(bool _3D);
+	    SLDMethod()
 	    void SetVolume(float _vol);
 	    SLDMethod()
 	    void SetPitch(float _pitch);
 	    SLDMethod()
-	    void SetMaxDistance(float _maxDistance);
+	    void SetMinMaxDistance(float _maxDistance, float _minDistance);
 	    SLDMethod()
 	    void SetMusicVelocity(const Vec3& _velocity);
 	    SLDMethod()
@@ -64,11 +72,15 @@ namespace Solid SLDNamespace()
 	    SLDMethod()
 	    std::string GetName() const;
 	    SLDMethod()
+	    bool GetIs3D() const ;
+	    SLDMethod()
 	    float GetVolume() const;
 	    SLDMethod()
 	    float GetPitch() const;
 	    SLDMethod()
 	    float GetMaxDistance() const;
+	    SLDMethod()
+	    float GetMinDistance() const;
 	    SLDMethod()
 	    Vec3  GetMusicVelocity() const;
 

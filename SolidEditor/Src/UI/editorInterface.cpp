@@ -6,7 +6,7 @@
 #define OS_WIN 1
 #include <windows.h>
 #endif
-
+#include "fmod.hpp"
 
 #include "UI/editorInterface.hpp"
 
@@ -260,30 +260,18 @@ namespace Solid {
 	            openScenePopup = true;
 
             }
-	        if (UI::BeginMenu("Build"))
+	        if (UI::BeginMenu("Package"))
             {
 
 	            if (UI::MenuItem("Windows"))
 	            {
 		           openBuildMenu =true;
 	            }
-	            if (UI::MenuItem("Update VC compiler"))
-	            {
-		            GameCompiler::GetInstance()->updateVCPath();
-	            }
-	            if (UI::MenuItem("Create Cmake"))
-	            {
-	            	GameCompiler::GetInstance()->CreateCmake();
-	            	Log::Send("Cmake Create", Log::ELogSeverity::ERROR);
-	            }
 	            if (UI::MenuItem("Reload CMAKE"))
 	            {
 		            GameCompiler::GetInstance()->ReloadCmake();
-		            Log::Send("Reloading Cmake", Log::ELogSeverity::ERROR);
 	            }
 
-
-	            UI::EndMenu();
             }
 
             UI::EndMenu();
@@ -600,7 +588,7 @@ namespace Solid {
 		}
 		if(currentComputeShader)
 		{
-			if(UI::Button("Edit vertex shader"))
+			if(UI::Button("Edit Compute shader"))
 			{
 				codeEditor.isCodeEditorOpen = true;
 				codeEditor.imCodeEditor.SetText(currentComputeShader->GetComputeSource());

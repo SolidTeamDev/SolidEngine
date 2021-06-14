@@ -866,11 +866,17 @@ namespace Solid
                 UI::Checkbox("Loop",&isLooping);
                 _audioSource.SetLoop(isLooping);
             }
-
+	        {
+		        bool is3D = _audioSource.GetIs3D();
+		        UI::Checkbox("3D Enabled",&is3D);
+		        _audioSource.SetIs3D(is3D);
+	        }
             {
                 float maxDist = _audioSource.GetMaxDistance();
                 UI::DragFloat("MaxDist",&maxDist);
-                _audioSource.SetMaxDistance(maxDist);
+	            float minDist = _audioSource.GetMinDistance();
+	            UI::DragFloat("MinDist",&maxDist);
+	            _audioSource.SetMinMaxDistance(maxDist, minDist);
             }
 
             {

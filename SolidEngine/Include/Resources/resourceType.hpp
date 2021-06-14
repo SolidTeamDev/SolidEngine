@@ -3,7 +3,7 @@
 #include <filesystem>
 #include <sndfile.h>
 #include <deque>
-
+#include "fmod.hpp"
 #include "Core/Maths/solidVector.hpp"
 #include "Core/Maths/Matrix/matrix4.hpp"
 #include "json.hpp"
@@ -398,11 +398,9 @@ namespace Solid {
 	class SOLID_API AudioResource : public Resource
 	{
 	public:
-		std::vector<short> audioRawBinary;
-		SF_INFO info;
-		ALuint buffer;
-		sf_count_t numFrames;
-		ALenum format;
+
+		FMOD::Sound *sound = nullptr;
+
 		AudioResource()
 		{
 			type = EResourceType::Audio;

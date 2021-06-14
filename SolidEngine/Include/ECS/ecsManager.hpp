@@ -71,7 +71,10 @@ namespace Solid
 	    {
         	return sceneGraphManager->Instantiate(_prefabName, parent, _name);
 	    }
-
+	    GameObject* Instantiate(GameObject* duplicatedGO, GameObject* parent, std::string _name ="" )
+	    {
+		    return sceneGraphManager->Instantiate(duplicatedGO, parent, _name);
+	    }
         void DestroyEntity(Entity _entity)
         {
             entityManager->DestroyEntity(_entity);

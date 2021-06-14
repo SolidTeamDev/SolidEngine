@@ -792,3 +792,79 @@ Solid::SceneGraphManager::Instantiate(std::string _prefabName, Solid::GameObject
 	return ent;
 }
 
+Solid::GameObject *
+Solid::SceneGraphManager::Instantiate(GameObject* duplicatedGO, Solid::GameObject *parent, std::string _name)
+{
+	if(duplicatedGO == nullptr)
+		return nullptr;
+	PrefabResource* prefab = new PrefabResource();
+	prefab->name = duplicatedGO->name;
+	prefab->path.emplace_back("Assets\\");
+	prefab->UpdatePrefab(duplicatedGO);
+
+	std::uint64_t readPos = 0;
+
+
+
+	std::vector<char>  buffer = prefab->PrefabBinary;
+	json j;
+
+	std::size_t jsonSize = 0;
+	ResourcesLoader::ReadFromBuffer(buffer.data(), &jsonSize, sizeof(std::size_t), readPos, buffer.size());
+	std::string jsonStr;
+	jsonStr.resize(jsonSize / sizeof(std::string::value_type));
+	ResourcesLoader::ReadFromBuffer(buffer.data(), jsonStr.data(), jsonSize, readPos, buffer.size());
+	j = j.parse(jsonStr) ;
+
+	Engine* engine = Engine::GetInstance();
+
+
+
+	std::function<void(json&,Entity)> Lambda = [&, engine](json& j,Entity e){
+		for(auto it = j.begin(); it != j.end(); ++it)
+		{
+			std::string key = (it).key();
+			if(key.find("GameObject") != std::string::npos)
+			{
+				GameObject* enti = engine->ecsManager.CreateEntity( it.value()["Name"], e);
+				if(it.value()["TAG"].is_string())
+					enti->tag = it.value()["TAG"];
+				Lambda(std::ref(it.value()), enti->GetEntity());
+			}
+		}
+	};
+	GameObject* ent = nullptr;
+
+	for(auto it = j["Scene"].begin(); it != j["Scene"].end(); ++it)
+	{
+		std::string key = (it).key();
+		if(key.find("GameObject") != std::string::npos)
+		{
+			std::string name = it.value()["Name"];
+			if(parent == nullptr || parent->parent == nullptr)
+			{
+				ent = engine->ecsManager.CreateEntity(name);
+			}
+			else
+			{
+				ent = engine->ecsManager.CreateEntity(name, parent->GetEntity());
+			}
+			if(it.value()["TAG"].is_string())
+				ent->tag = it.value()["TAG"];
+			Lambda(std::ref(it.value()), ent->GetEntity());
+		}
+	}
+
+	AddAllComps(ent, buffer, readPos);
+	if(engine->IsPlaying())
+	{
+		if(engine->ecsManager.GotComponent<ScriptList>(ent->GetEntity()))
+		{
+			ScriptList& sl = engine->ecsManager.GetComponent<ScriptList>(ent->GetEntity());
+			sl.Init();
+		}
+	}
+	delete prefab;
+	return ent;
+}
+

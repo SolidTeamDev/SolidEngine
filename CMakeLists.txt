@@ -12,7 +12,7 @@ set(CMAKE_CXX_STANDARD 20)
 include_directories(SolidEngine/Include)
 include_directories(SolidEngine/ThirdParty/Include)
 include_directories(SolidEngine/ThirdParty/Include/Physx)
-
+include_directories(SolidEngine/ThirdParty/Include/FMOD)
 ### Engine Sources Files
 
 # Add source files
@@ -149,8 +149,10 @@ add_dependencies(SolidEditor SolidEngine)
 ADD_CUSTOM_COMMAND (TARGET SolidEditor POST_BUILD
 
         COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Bin/glfw3.dll ${CMAKE_BINARY_DIR}/
-        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Bin/OpenAL32.dll ${CMAKE_BINARY_DIR}/
-        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Bin/sndfile.dll ${CMAKE_BINARY_DIR}/
+        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Bin/fmod.dll ${CMAKE_BINARY_DIR}/
+        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Bin/fmodL.dll ${CMAKE_BINARY_DIR}/
+        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Bin/fmodstudio.dll ${CMAKE_BINARY_DIR}/
+        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/SolidEngine/ThirdParty/Bin/fmodstudioL.dll ${CMAKE_BINARY_DIR}/
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/SolidEngine.dll ${CMAKE_BINARY_DIR}/Dlls/SolidEngine.dll
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/SolidEngine.lib ${CMAKE_BINARY_DIR}/Dlls/SolidEngine.lib
 COMMENT "Copying common binaries" VERBATIM)
