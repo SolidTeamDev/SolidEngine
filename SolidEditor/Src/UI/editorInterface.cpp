@@ -260,74 +260,20 @@ namespace Solid {
 	            openScenePopup = true;
 
             }
-	        if (UI::BeginMenu("Build"))
+	        if (UI::BeginMenu("Package"))
             {
 
 	            if (UI::MenuItem("Windows"))
 	            {
 		           openBuildMenu =true;
 	            }
-	            if (UI::MenuItem("Update VC compiler"))
-	            {
-		            GameCompiler::GetInstance()->updateVCPath();
-	            }
-	            if (UI::MenuItem("Create Cmake"))
-	            {
-	            	GameCompiler::GetInstance()->CreateCmake();
-	            	Log::Send("Cmake Create", Log::ELogSeverity::ERROR);
-	            }
 	            if (UI::MenuItem("Reload CMAKE"))
 	            {
 		            GameCompiler::GetInstance()->ReloadCmake();
-		            Log::Send("Reloading Cmake", Log::ELogSeverity::ERROR);
 	            }
 
-
-	            UI::EndMenu();
             }
-	        if (UI::MenuItem("TEST FMOD"))
-	        {
 
-
-		        /*
-
-
-		        // Create the sound.
-		        FMOD::Sound *sound = nullptr;
-		        system->createSound("Test.ogg", FMOD_DEFAULT, nullptr, &sound);
-
-		        // Play the sound.
-		        FMOD::Channel *channel = nullptr;
-		        result = system->playSound(sound, nullptr, false, &channel);
-
-		        if (result != FMOD_OK)
-			        return ;
-
-		        // Assign the channel to the group.
-		        result = channel->setChannelGroup(channelGroup);
-		        if (result != FMOD_OK)
-			        return ;
-
-		        // Set a callback on the channel.
-		        // This works.
-		        //channel->setCallback(&channelGroupCallback);
-		        bool isPlaying = false;
-		        do {
-			        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-
-			        channel->isPlaying(&isPlaying);
-
-			        system->update();
-		        } while (isPlaying);
-
-*/
-		        // Clean up.
-//
-//		        channelGroup->release();
-//		        system->release();
-
-		        return ;
-	        }
             UI::EndMenu();
         }
 
@@ -642,7 +588,7 @@ namespace Solid {
 		}
 		if(currentComputeShader)
 		{
-			if(UI::Button("Edit vertex shader"))
+			if(UI::Button("Edit Compute shader"))
 			{
 				codeEditor.isCodeEditorOpen = true;
 				codeEditor.imCodeEditor.SetText(currentComputeShader->GetComputeSource());
