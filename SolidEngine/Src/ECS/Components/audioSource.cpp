@@ -18,7 +18,21 @@ namespace Solid
     void AudioSource::Init()
     {
 	    FMOD::System* sys = Engine::GetInstance()->audio.GetSystem();
+	    sys->playSound(nullptr, nullptr, true, &audioChannel);
+	    if(audioChannel)
+	    {
+		    SetPitch(pitch);
+		    SetVolume(volume);
+		    SetMusicVelocity(velocity);
+		    SetLoop(loop);
+		    SetIs3D(is3D);
+		    SetMinMaxDistance(maxDistance, 0);
 
+	    }
+	    if(gameObject->transform)
+	    {
+	    	SetPosition(gameObject->transform->GetGlobalPosition());
+	    }
       //  alSourcef(sourceID, AL_PITCH, pitch);
        // alSourcef(sourceID, AL_GAIN, volume);
        // alSource3f(sourceID, AL_POSITION, 0, 0, 0);
@@ -29,7 +43,7 @@ namespace Solid
         audioResource = Engine::GetInstance()->resourceManager.GetRawAudioByName(name.c_str());
         if(audioResource)
         {
-	        Engine::GetInstance()->audio.GetSystem()->playSound(audioResource->sound, nullptr, true, &audioChannel);
+	        sys->playSound(audioResource->sound, nullptr, isPlaying, &audioChannel);
 
         }
 
@@ -59,11 +73,10 @@ namespace Solid
         audioChannel->setPitch( pitch);
     }
 
-    void AudioSource::SetMaxDistance(float _maxDistance)
+    void AudioSource::SetMinMaxDistance(float _maxDistance, float _minDistance)
     {
         maxDistance = _maxDistance;
-        float minDistance = 0;
-        audioChannel->get3DMinMaxDistance(&minDistance,nullptr);
+        minDistance=_minDistance;
         audioChannel->set3DMinMaxDistance(minDistance, maxDistance);
     }
 
@@ -136,8 +149,7 @@ namespace Solid
 
     void AudioSource::SetLoop(bool _loop)
     {
-	    if(audioResource == nullptr)
-		    return;
+
     	loop = _loop;
     	FMOD_MODE mode;
     	audioChannel->getMode(&mode);
@@ -150,8 +162,6 @@ namespace Solid
     }
 	void AudioSource::SetIs3D(bool _3D)
 	{
-    	if(audioResource == nullptr)
-		    return;
 		is3D = _3D;
 
 		FMOD_MODE cmode;
@@ -161,17 +171,12 @@ namespace Solid
 
 		if(is3D && ( cmode & FMOD_3D) ==0)
 		{
-			if(audioChannel->setMode(cmode ^ mask3d) != FMOD_OK)
-			{
-				Log::Send("MODE m");
-			}
+			audioChannel->setMode(cmode ^ mask3d) ;
 		}
 		else if(!is3D && ( cmode & FMOD_3D) != 0)
 		{
-			if(audioChannel->setMode(cmode ^ mask3d) != FMOD_OK)
-			{
-				Log::Send("MODE");
-			}
+			audioChannel->setMode(cmode ^ mask3d) ;
+
 
 		}
 
@@ -204,5 +209,10 @@ namespace Solid
 		audioResource = nullptr;
 		audioChannel->stop();
 		audioChannel = nullptr;
+	}
+
+	float AudioSource::GetMinDistance() const
+	{
+		return minDistance;
 	}
 } //!namespace

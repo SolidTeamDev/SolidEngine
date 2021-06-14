@@ -874,7 +874,9 @@ namespace Solid
             {
                 float maxDist = _audioSource.GetMaxDistance();
                 UI::DragFloat("MaxDist",&maxDist);
-                _audioSource.SetMaxDistance(maxDist);
+	            float minDist = _audioSource.GetMinDistance();
+	            UI::DragFloat("MinDist",&maxDist);
+	            _audioSource.SetMinMaxDistance(maxDist, minDist);
             }
 
             {

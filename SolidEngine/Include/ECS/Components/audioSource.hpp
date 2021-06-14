@@ -38,6 +38,8 @@ namespace Solid SLDNamespace()
 	    SLDField()
         float volume = 1.f;
 	    SLDField()
+	    float minDistance = 0;
+	    SLDField()
         float maxDistance = 500;
 	    SLDField()
         Vec3 velocity = {0,0,0};
@@ -61,7 +63,7 @@ namespace Solid SLDNamespace()
 	    SLDMethod()
 	    void SetPitch(float _pitch);
 	    SLDMethod()
-	    void SetMaxDistance(float _maxDistance);
+	    void SetMinMaxDistance(float _maxDistance, float _minDistance);
 	    SLDMethod()
 	    void SetMusicVelocity(const Vec3& _velocity);
 	    SLDMethod()
@@ -77,6 +79,8 @@ namespace Solid SLDNamespace()
 	    float GetPitch() const;
 	    SLDMethod()
 	    float GetMaxDistance() const;
+	    SLDMethod()
+	    float GetMinDistance() const;
 	    SLDMethod()
 	    Vec3  GetMusicVelocity() const;
 

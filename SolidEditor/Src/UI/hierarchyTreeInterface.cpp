@@ -154,23 +154,30 @@ void Solid::HierarchyTreeInterface::DrawCreateObject()
 			    }
 
 		    }
-	    }
+		    if(UI::MenuItem("Duplicate GameObject"))
+		    {
 
+
+			    EditorInterface::selectedGO =Engine::GetInstance()->ecsManager.Instantiate(EditorInterface::selectedGO,
+																				  EditorInterface::selectedGO->parent);
+
+		    }
 		    if(UI::MenuItem("Create / Update Prefab"))
 		    {
-				if(EditorInterface::selectedGO != nullptr)
-				{
-					PrefabResource* prefab = engine->resourceManager.GetPrefabByName(EditorInterface::selectedGO->name.c_str());
-					if(prefab != nullptr)
-					{
-						prefab->UpdatePrefab(EditorInterface::selectedGO);
-					}
-					else
-					{
-						engine->resourceManager.CreatePrefab(EditorInterface::selectedGO);
-					}
-				}
+			    PrefabResource* prefab = engine->resourceManager.GetPrefabByName(EditorInterface::selectedGO->name.c_str());
+			    if(prefab != nullptr)
+			    {
+				    prefab->UpdatePrefab(EditorInterface::selectedGO);
+			    }
+			    else
+			    {
+				    engine->resourceManager.CreatePrefab(EditorInterface::selectedGO);
+			    }
 		    }
+	    }
+
+
+
 
         UI::EndPopup();
     }

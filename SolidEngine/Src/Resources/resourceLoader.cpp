@@ -1343,7 +1343,7 @@ Resource *ResourcesLoader::LoadAudio(const fs::path &Rpath)
 	const char* filename = p.c_str();
 	audio->name = Rpath.filename().string();
 	SetPath(audio->path, Rpath);
-	FMOD_MODE mode = FMOD_LOOP_NORMAL | FMOD_2D | FMOD_3D_WORLDRELATIVE| FMOD_3D_INVERSETAPEREDROLLOFF;
+	FMOD_MODE mode = FMOD_LOOP_NORMAL | FMOD_2D | FMOD_3D_WORLDRELATIVE| FMOD_3D_INVERSEROLLOFF;
 	Engine::GetInstance()->audio.GetSystem()->createSound(filename, mode, nullptr,&audio->sound);
 
 
